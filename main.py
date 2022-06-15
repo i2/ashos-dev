@@ -6,13 +6,19 @@ import subprocess
 
 # TODO: the installer needs a proper rewrite
 
+#sudo apt-get update
+#sudo apt-get install -y parted btrfs-progs dosfstools tmux git
+#sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%
+#sudo mkfs.btrfs -L BTRFS /dev/sda2
+#sudo mkfs.vfat -F32 -n EFI /dev/sda1
+
 args = list(sys.argv)
 
 def clear():
-    os.system("clear")
+    os.system("#clear")
 
 def to_uuid(part):
-    uuid = str(subprocess.check_output(f"blkid -s UUID -o value {part}", shell=True))
+    uuid = str(subprocess.check_output(f"sudo blkid -s UUID -o value {part}", shell=True))
     return uuid.replace("b'","").replace('"',"").replace("\\n'","")
 
 def main(args):
