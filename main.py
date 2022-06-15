@@ -7,10 +7,11 @@ import subprocess
 # TODO: the installer needs a proper rewrite
 
 #sudo apt-get update
-#sudo apt-get install -y parted btrfs-progs dosfstools tmux git
+#sudo apt-get install -y parted btrfs-progs dosfstools debootstrap tmux git
 #sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%
 #sudo mkfs.btrfs -L BTRFS /dev/sda2
 #sudo mkfs.vfat -F32 -n EFI /dev/sda1
+#sudo debootstrap bullseye /mnt http://ftp.debian.org/debian
 
 args = list(sys.argv)
 
