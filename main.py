@@ -79,15 +79,15 @@ def main(args):
 
     os.system("sudo chroot /mnt apt-get install linux-image-5.10.0-13-amd64")
 
-	#Do these in the live system (not needed inside chroot)
+    #Do these in the live system (not needed inside chroot)
     #os.system("sudo chroot /mnt wget http://shorturl.at/hvJQW
-	#chmod +x hvJQW
-	#sudo dpkg -i hvJQW
-	#echo "deb https://www.deb-multimedia.org buster main non-free" | sudo tee -a /etc/apt/sources.list.d/multimedia.list > /dev/null
-	#sudo apt update
+    #chmod +x hvJQW
+    #sudo dpkg -i hvJQW
+    #echo "deb https://www.deb-multimedia.org buster main non-free" | sudo tee -a /etc/apt/sources.list.d/multimedia.list > /dev/null
+    #sudo apt update
 
-	os.system("sudo chroot /mnt apt-get install -y python3 python3-anytree grub-efi network-manager btrfs-progs dhcpcd5")
-	os.system("sudo chroot /mnt apt-get install -y efibootmgr nano") #redundant as I think efibootmgr is included in a one of the previous packages
+    os.system("sudo chroot /mnt apt-get install -y python3 python3-anytree grub-efi network-manager btrfs-progs dhcpcd5")
+    os.system("sudo chroot /mnt apt-get install -y efibootmgr nano") #redundant as I think efibootmgr is included in a one of the previous packages
 
 #    if efi:
 #        os.system("pacstrap /mnt efibootmgr")
