@@ -6,11 +6,11 @@ import subprocess
 
 # TODO: the installer needs a proper rewrite
 
-#sudo apt-get update
-#sudo apt-get install -y parted btrfs-progs dosfstools debootstrap tmux git
-#sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%
-#sudo mkfs.btrfs -L BTRFS /dev/sda2
-#sudo mkfs.vfat -F32 -n EFI /dev/sda1
+os.system("sudo apt-get update")
+os.system("sudo apt-get install -y parted btrfs-progs dosfstools debootstrap tmux git")
+os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
+os.system("sudo mkfs.btrfs -L BTRFS /dev/sda2")
+os.system("sudo mkfs.vfat -F32 -n EFI /dev/sda1")
 #sudo debootstrap bullseye /mnt http://ftp.debian.org/debian
 
 args = list(sys.argv)
@@ -83,7 +83,9 @@ def main(args):
         os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
 #    os.system("pacstrap /mnt base linux linux-firmware nano python3 python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub")
-
+    os.system("sudo debootstrap bullseye /mnt http://ftp.debian.org/debian")
+    
+    os.system("echo JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ")
     os.system("sudo chroot /mnt apt-get install linux-image-5.10.0-13-amd64")
 
     #Do these in the live system (not needed inside chroot)
