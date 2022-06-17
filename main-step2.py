@@ -4,20 +4,7 @@ import time
 import sys
 import subprocess
 
-#https://forum.openmediavault.org/index.php?thread/12070-guide-debootstrap-installing-debian-into-a-folder-in-a-running-system/
-
-# I am not sure if mounting dev sys proc is needed when I am doing this installer the way I am currently doing (3 steps)! Needs confirmaton. I will do it again.
-
-# maybe I can use multistrap
-
 # TODO: the installer needs a proper rewrite
-
-os.system("sudo apt-get update")
-os.system("sudo apt-get install -y parted btrfs-progs dosfstools debootstrap tmux git")
-os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
-os.system("sudo mkfs.btrfs -L BTRFS /dev/sda2")
-os.system("sudo mkfs.vfat -F32 -n EFI /dev/sda1")
-#sudo debootstrap bullseye /mnt http://ftp.debian.org/debian
 
 args = list(sys.argv)
 
@@ -71,36 +58,32 @@ def main(args):
     btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]
 
-    for btrdir in btrdirs:
-        os.system(f"sudo btrfs sub create /mnt/{btrdir}")
 
-    os.system(f"sudo umount /mnt")
-    os.system(f"sudo mount {args[1]} -o subvol=@,compress=zstd,noatime /mnt")
-
-    for mntdir in mntdirs:
-        os.system(f"sudo mkdir /mnt/{mntdir}")
-        os.system(f"sudo mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
-
-    os.system("sudo mkdir -p /mnt/{tmp,root}")
-    os.system("sudo mkdir -p /mnt/.snapshots/{rootfs,etc,var,boot,tmp,root}")
-
-    if efi:
-        os.system("sudo mkdir /mnt/boot/efi")
-        os.system(f"sudo mount {args[3]} /mnt/boot/efi")
+# Step 2 begins here:
 
 #    os.system("pacstrap /mnt base linux linux-firmware nano python3 python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub")
     os.system("sudo debootstrap bullseye /mnt http://ftp.debian.org/debian")
-
-    os.system("sudo mount -o bind /dev/pts /mnt/dev/pts")
-    os.system("sudo mount -o bind /dev /mnt/dev")
+    
+    os.system("sudo mount --bind /dev /mnt/dev")
     os.system("sudo mount -t proc none /mnt/proc")
     os.system("sudo mount -t sysfs sys /mnt/sys")
-    #MAYBE this is needed as well?!!! os.system("sudo mount --bind /dev/pts /mnt/dev/pts")
-
+    
     os.system("echo JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ")
     os.system("sudo chroot /mnt apt-get install linux-image-5.10.0-13-amd64")
 
-    # Do steps to do apt-get install inside chroot from untitled.txt
+    #Do these in the live system (not needed inside chroot)
+    #sudo systemctl start systemd-timesyncd (not presebt in my debian!!!!)
+    
+    #sync time needed to download python3-anytree
+    #sudo apt install ntp
+    #sudo systemctl enable --now ntp
+    #ntpq -p
+    #sudo hwclock --hctosys
+    
+    #os.system("sudo wget http://bit.ly/3xV2F5o -O /mnt/tmp/anytree")
+    #os.system("sudo chroot /mnt dpkg -i /tmp/anytree")
+    #os.system("echo "deb https://www.deb-multimedia.org bullseye main non-free" | sudo tee -a /mnt/etc/apt/sources.list.d/multimedia.list > /dev/null
+    #os.system("sudo chroot /mnt apt update")
 
     os.system("sudo chroot /mnt apt-get install -y python3 python3-anytree grub-efi network-manager btrfs-progs dhcpcd5")
     os.system("sudo chroot /mnt apt-get install -y efibootmgr nano") #redundant as I think efibootmgr is included in a one of the previous packages

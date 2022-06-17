@@ -1,0 +1,22 @@
+# steps to do apt-get install inside chroot
+
+    #Do these in the live system (not needed inside chroot)
+    #sudo systemctl start systemd-timesyncd (not presebt in my debian!!!!)
+    
+    # sync time in the live environment (maybe not needed after all!
+    #sudo apt install ntp
+    #sudo systemctl enable --now ntp && sleep 10s && ntpq -p #sometimes it's needed to restart ntp service to have time sync again!
+    #sudo hwclock --systohc (not needed most probably)
+    
+    #sync time in chroot (needed to download python3-anytree) #these two lines are probably not needed (test next time)    
+    # date_host=$(date '+%Y-%m-%d-%H:%M:%S') sudo -E chroot /mnt /bin/bash -c 'date -s $date_host'
+    #sudo chroot /mnt date -s "2022-06-17 14:25:00"
+    
+    #os.system("sudo wget http://bit.ly/3xV2F5o -O /mnt/tmp/anytree")
+    #os.system("sudo chroot /mnt dpkg -i /tmp/anytree")
+    #os.system("echo "deb https://www.deb-multimedia.org bullseye main non-free" | sudo tee -a /mnt/etc/apt/sources.list.d/multimedia.list > /dev/null
+    #os.system("sudo chroot /mnt apt update -oAcquire::AllowInsecureRepositories=true")
+    #os.system("sudo chroot /mnt apt-get install deb-multimedia-keyring")
+    #os.system("sudo chroot /mnt apt-get install ca-certificates") # I believe this is needed!
+    #os.system("sudo chroot /mnt apt-get install python3-anytree")
+    
