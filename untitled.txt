@@ -20,3 +20,12 @@
     #os.system("sudo chroot /mnt apt-get install ca-certificates") # I believe this is needed!
     #os.system("sudo chroot /mnt apt-get install python3-anytree")
     
+
+
+
+
+chroot /home/mayank/chroot/codebase /bin/bash <<"EOT"
+cd /tmp/so
+ls -l
+echo $$
+EOT

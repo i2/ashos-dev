@@ -82,7 +82,7 @@ def main(args):
         os.system(f"sudo mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
 
     os.system("sudo mkdir -p /mnt/{tmp,root}")
-    os.system("sudo mkdir -p /mnt/.snapshots/{rootfs,etc,var,boot,tmp,root}")
+    os.system("sudo mkdir -p /mnt/.snapshots/{ast,rootfs,etc,var,boot,tmp,root}")
 
     if efi:
         os.system("sudo mkdir /mnt/boot/efi")
@@ -133,16 +133,16 @@ def main(args):
     os.system(f"echo 'ANSI_COLOR=\"38;2;23;147;209\"' | sudo tee -a /mnt/etc/os-release")
     os.system(f"echo 'HOME_URL=\"https://github.com/CuBeRJAN/astOS\"' | sudo tee -a /mnt/etc/os-release")
     os.system(f"echo 'LOGO=astos-logo' | sudo tee -a /mnt/etc/os-release")
-    os.system(f"sudo cp -r /mnt/var/lib/pacman/* /mnt/usr/share/ast/db")
-    os.system(f"sudo sed -i s,\"#DBPath      = /var/lib/pacman/\",\"DBPath      = /usr/share/ast/db/\",g /mnt/etc/pacman.conf")
+    #os.system(f"sudo cp -r /mnt/var/lib/pacman/* /mnt/usr/share/ast/db")
+    #os.system(f"sudo sed -i s,\"#DBPath      = /var/lib/pacman/\",\"DBPath      = /usr/share/ast/db/\",g /mnt/etc/pacman.conf")
     os.system(f"echo 'DISTRIB_ID=\"astOS\"' | sudo tee /mnt/etc/lsb-release")
     os.system(f"echo 'DISTRIB_RELEASE=\"rolling\"' | sudo tee -a /mnt/etc/lsb-release")
     os.system(f"echo 'DISTRIB_DESCRIPTION=astOS' | sudo tee -a /mnt/etc/lsb-release")
 
     os.system(f"sudo chroot /mnt ln -sf {timezone} /etc/localtime")
     
-    os.system(f"sudo chroot /mnt apt-get install locales")
-    os.system("echo 'en_US UTF-8' | sudo tee -a /mnt/etc/locale.gen")
+    os.system(f"sudo chroot /mnt apt-get install -y locales")
+    os.system("echo 'en_US.UTF-8 UTF-8' | sudo tee -a /mnt/etc/locale.gen")
 #    os.system("sed -i s/'^#'// /mnt/etc/locale.gen")
 #    os.system("sed -i s/'^ '/'#'/ /mnt/etc/locale.gen")
     os.system(f"sudo chroot /mnt locale-gen")
@@ -172,7 +172,6 @@ def main(args):
             os.system("sudo chroot /mnt passwd")
 
     os.system("sudo chroot /mnt systemctl enable NetworkManager")
-    os.system("sudo mkdir -p /mnt/.snapshots/{ast,boot,etc,rootfs,var}")
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
 
     if DesktopInstall:
