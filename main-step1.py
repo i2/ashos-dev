@@ -9,8 +9,8 @@ import subprocess
 #os.system("sudo apt-get update")
 #os.system("sudo apt-get install -y parted btrfs-progs dosfstools debootstrap tmux git")
 #os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
-#os.system("sudo mkfs.btrfs -L BTRFS /dev/sda2")
-#os.system("sudo mkfs.vfat -F32 -n EFI /dev/sda1")
+#os.system("sudo /usr/sbin/mkfs.btrfs -L BTRFS /dev/sda2")
+#os.system("sudo /usr/sbin/mkfs.vfat -F32 -n EFI /dev/sda1")
 #sudo debootstrap bullseye /mnt http://ftp.debian.org/debian
 
 args = list(sys.argv)
@@ -61,7 +61,7 @@ def main(args):
     else:
         efi = False
 
-#    os.system(f"mount {args[1]} /mnt")
+    os.system(f"sudo mount {args[1]} /mnt")
     btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]
 
