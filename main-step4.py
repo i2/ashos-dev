@@ -63,6 +63,7 @@ def main(args):
     
     # step 4 begins here:
     
+    os.system("sudo mkdir -p /.snapshots/rootfs/snapshot-tmp")
     os.system("sudo sed -i '0,/@/{s,@,@.snapshots/rootfs/snapshot-tmp,}' /mnt/etc/fstab")
     os.system("sudo sed -i '0,/@etc/{s,@etc,@.snapshots/etc/etc-tmp,}' /mnt/etc/fstab")
 #    os.system("sed -i '0,/@var/{s,@var,@.snapshots/var/var-tmp,}' /mnt/etc/fstab")
