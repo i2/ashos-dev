@@ -79,8 +79,9 @@ def main(args):
     os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
     os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")
 #    os.system("cp --reflink=auto -r /mnt/var/* /mnt/.snapshots/var/var-tmp")
-    os.system("sudo mkdir -p /mnt/.snapshots/var/var-tmp/lib/{pacman,systemd}")
-    os.system("sudo cp --reflink=auto -r /mnt/var/lib/pacman/* /mnt/.snapshots/var/var-tmp/lib/pacman/")
+    #os.system("sudo mkdir -p /mnt/.snapshots/var/var-tmp/lib/pacman")       #shouldl be changed for debian
+    os.system("sudo mkdir -p /mnt/.snapshots/var/var-tmp/lib/systemd")
+#    os.system("sudo cp --reflink=auto -r /mnt/var/lib/pacman/* /mnt/.snapshots/var/var-tmp/lib/pacman/") #shouldl be changed for debian
     os.system("sudo cp --reflink=auto -r /mnt/var/lib/systemd/* /mnt/.snapshots/var/var-tmp/lib/systemd/")
     os.system("sudo cp --reflink=auto -r /mnt/boot/* /mnt/.snapshots/boot/boot-tmp")
     os.system("sudo cp --reflink=auto -r /mnt/etc/* /mnt/.snapshots/etc/etc-tmp")

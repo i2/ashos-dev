@@ -81,8 +81,10 @@ def main(args):
         os.system(f"sudo mkdir /mnt/{mntdir}")
         os.system(f"sudo mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
 
-    os.system("sudo mkdir -p /mnt/{tmp,root}")
-    os.system("sudo mkdir -p /mnt/.snapshots/{ast,rootfs,etc,var,boot,tmp,root}")
+    for i in ("tmp", "root"):
+        os.system(f"mkdir -p /mnt/{i}")
+    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp", "var"):
+        os.system(f"mkdir -p /mnt/.snapshots/{i}")
 
     if efi:
         os.system("sudo mkdir /mnt/boot/efi")
@@ -151,13 +153,12 @@ def main(args):
     os.system(f"echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
 
-    os.system("sudo mkdir -p /.snapshots/rootfs/snapshot-tmp") #Reza added this (not in upstream yet)
     os.system("sudo sed -i '0,/@/{s,@,@.snapshots/rootfs/snapshot-tmp,}' /mnt/etc/fstab")
     os.system("sudo sed -i '0,/@etc/{s,@etc,@.snapshots/etc/etc-tmp,}' /mnt/etc/fstab")
 #    os.system("sed -i '0,/@var/{s,@var,@.snapshots/var/var-tmp,}' /mnt/etc/fstab")
     os.system("sudo sed -i '0,/@boot/{s,@boot,@.snapshots/boot/boot-tmp,}' /mnt/etc/fstab")
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
-    os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp") #This gives the error
+    os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp") #This gives the error, should likely be moved to line 206
     
     #Note: After changing the default subvolume on a system with GRUB, you should run grub-install again to notify the bootloader of the changes.
     #Changing the default subvolume with btrfs subvolume set-default will make the top level of the filesystem inaccessible, except by use of the subvol=/ or subvolid=5 mount options [6].
@@ -193,8 +194,8 @@ def main(args):
     os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
     os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")
 #    os.system("cp --reflink=auto -r /mnt/var/* /mnt/.snapshots/var/var-tmp")
-    os.system("sudo mkdir -p /mnt/.snapshots/var/var-tmp/lib/{pacman,systemd}")
-    os.system("sudo cp --reflink=auto -r /mnt/var/lib/pacman/* /mnt/.snapshots/var/var-tmp/lib/pacman/")
+    os.system("sudo mkdir -p /mnt/.snapshots/var/var-tmp/lib/{pacman,systemd}") #Reza #shouldl be changed for debian
+#    os.system("sudo cp --reflink=auto -r /mnt/var/lib/pacman/* /mnt/.snapshots/var/var-tmp/lib/pacman/") #Reza #shouldl be changed for debian
     os.system("sudo cp --reflink=auto -r /mnt/var/lib/systemd/* /mnt/.snapshots/var/var-tmp/lib/systemd/")
     os.system("sudo cp --reflink=auto -r /mnt/boot/* /mnt/.snapshots/boot/boot-tmp")
     os.system("sudo cp --reflink=auto -r /mnt/etc/* /mnt/.snapshots/etc/etc-tmp")
@@ -204,6 +205,7 @@ def main(args):
     os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
 
     os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
+    #os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
 
     os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/")
     os.system("sudo cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")
@@ -220,7 +222,7 @@ def main(args):
 #    os.system(f"mount {args[1]} -o subvol=@var,compress=zstd,noatime /mnt/.snapshots/var/var-tmp")
     os.system(f"sudo mount {args[1]} -o subvol=@boot,compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp")
 #    os.system("cp --reflink=auto -r /mnt/.snapshots/var/var-tmp/* /mnt/var")
-    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-tmp/* /mnt/boot")
+    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-tmp/* /mnt/boot") #why umounted /mnt/boot and then do this?
     os.system("sudo umount /mnt/etc")
 #    os.system("mkdir /mnt/.snapshots/etc/etc-tmp")
     os.system(f"sudo mount {args[1]} -o subvol=@etc,compress=zstd,noatime /mnt/.snapshots/etc/etc-tmp")
@@ -234,9 +236,9 @@ def main(args):
     os.system(f"sudo mount {args[1]} /mnt")
     os.system("sudo btrfs sub del /mnt/@")
     
-    os.system("sudo umount /mnt/dev")
-    os.system("sudo umount /mnt/proc")
-    os.system("sudo umount /mnt/sys")
+    os.system("sudo umount /mnt/dev") #not existing (maybe not needed?)
+    os.system("sudo umount /mnt/proc") #not existing (maybe not needed?)
+    os.system("sudo umount /mnt/sys") #not existing (maybe not needed?)
     os.system("sudo umount -R /mnt")
     clear()
     print("Installation complete")

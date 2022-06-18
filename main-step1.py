@@ -75,8 +75,10 @@ def main(args):
         os.system(f"sudo mkdir /mnt/{mntdir}")
         os.system(f"sudo mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
 
-    os.system("sudo mkdir -p /mnt/{tmp,root}")
-    os.system("sudo mkdir -p /mnt/.snapshots/{rootfs,etc,var,boot,tmp,root}")
+    for i in ("tmp", "root"):
+        os.system(f"mkdir -p /mnt/{i}")
+    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp", "var"):
+        os.system(f"mkdir -p /mnt/.snapshots/{i}")
 
     if efi:
         os.system("sudo mkdir /mnt/boot/efi")
