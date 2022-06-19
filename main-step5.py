@@ -61,7 +61,7 @@ def main(args):
 
     astpart = to_uuid(args[1])
 
-    # step 5 begins here
+#REZA: STEP 5 BEGINS HERE
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
 
     if DesktopInstall:

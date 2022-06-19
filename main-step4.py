@@ -44,15 +44,11 @@ def main(args):
     print("Enter hostname:")
     hostname = input("> ")
 
-#    os.system("pacman -S --noconfirm archlinux-keyring")
-#    os.system(f"mkfs.btrfs -f {args[1]}")
-
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
         efi = False
 
-#    os.system(f"mount {args[1]} /mnt")
     btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]
 
@@ -60,18 +56,16 @@ def main(args):
     mntdirs_n.remove("")
 
     astpart = to_uuid(args[1])
-    
-    # step 4 begins here:
-    
-    os.system("sudo mkdir -p /.snapshots/rootfs/snapshot-tmp")
+
+#REZA: STEP 4 BEGINS HERE
+
     os.system("sudo sed -i '0,/@/{s,@,@.snapshots/rootfs/snapshot-tmp,}' /mnt/etc/fstab")
     os.system("sudo sed -i '0,/@etc/{s,@etc,@.snapshots/etc/etc-tmp,}' /mnt/etc/fstab")
 #    os.system("sed -i '0,/@var/{s,@var,@.snapshots/var/var-tmp,}' /mnt/etc/fstab")
     os.system("sudo sed -i '0,/@boot/{s,@boot,@.snapshots/boot/boot-tmp,}' /mnt/etc/fstab")
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
-    os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
 
-    os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")    
+    os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
 
     clear()
     os.system("sudo chroot /mnt passwd")
@@ -83,6 +77,8 @@ def main(args):
         else:
             clear()
             os.system("sudo chroot /mnt passwd")
+
+    os.system("sudo chroot /mnt systemctl enable NetworkManager")
 
 main(args)
 

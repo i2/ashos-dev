@@ -64,11 +64,11 @@ def main(args):
 #    os.system("pacman -S --noconfirm archlinux-keyring")
     os.system("export LC_ALL=C")
     #os.system("export LC_CTYPE=C")
-    
+
     # sync time in the live environment (maybe not needed after all!
     sudo apt-get install -y ntp
     sudo systemctl enable --now ntp && sleep 30s && ntpq -p #sometimes it's needed to restart ntp service to have time sync again!
-    
+
     os.system("sudo apt update")
 #    os.system(f"mkfs.btrfs -f {args[1]}")
 
@@ -121,7 +121,7 @@ def main(args):
     #os.system(sudo chmod -R 1777 /mnt/tmp)
     os.system("sudo chroot /mnt apt-get install python3-anytree")
 
-    os.system("sudo chroot /mnt apt-get install -y python3-anytree grub-efi network-manager btrfs-progs dhcpcd5")
+    os.system("sudo chroot /mnt apt-get install -y python3-anytree grub-efi network-manager btrfs-progs dhcpcd5 locales")
 ###    #os.system("sudo chroot /mnt apt-get install -y efibootmgr nano") #redundant as I think efibootmgr is included in a one of the previous packages
 
 #    if efi:
@@ -163,13 +163,11 @@ def main(args):
     os.system(f"echo 'DISTRIB_DESCRIPTION=astOS' | sudo tee -a /mnt/etc/lsb-release")
 
     os.system(f"sudo chroot /mnt ln -sf {timezone} /etc/localtime")
-    
-    os.system(f"sudo chroot /mnt apt-get install -y locales")
+
+#REZA: STEP 4 BEGINS HERE
+
     os.system("echo 'en_US.UTF-8 UTF-8' | sudo tee -a /mnt/etc/locale.gen")
-#    os.system("sed -i s/'^#'// /mnt/etc/locale.gen")
-#    os.system("sed -i s/'^ '/'#'/ /mnt/etc/locale.gen")
     os.system(f"sudo chroot /mnt locale-gen")
-    
     os.system(f"sudo chroot /mnt hwclock --systohc")
     os.system(f"echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
@@ -179,12 +177,12 @@ def main(args):
 #    os.system("sed -i '0,/@var/{s,@var,@.snapshots/var/var-tmp,}' /mnt/etc/fstab")
     os.system("sudo sed -i '0,/@boot/{s,@boot,@.snapshots/boot/boot-tmp,}' /mnt/etc/fstab")
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
-    os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp") #This gives the error, should likely be moved to line 206
-    
+### THIS LINE IS MOVED DOWN (my recent PR fix)    os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp") #This gives the error, should likely be moved to line 206
+
     #Note: After changing the default subvolume on a system with GRUB, you should run grub-install again to notify the bootloader of the changes.
     #Changing the default subvolume with btrfs subvolume set-default will make the top level of the filesystem inaccessible, except by use of the subvol=/ or subvolid=5 mount options [6].
 
-    os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")    
+    os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
 
     clear()
     os.system("sudo chroot /mnt passwd")
@@ -198,6 +196,9 @@ def main(args):
             os.system("sudo chroot /mnt passwd")
 
     os.system("sudo chroot /mnt systemctl enable NetworkManager")
+
+#REZA: STEP 5 BEGINS HERE
+
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
 
     if DesktopInstall:
@@ -256,7 +257,7 @@ def main(args):
     os.system("sudo umount -R /mnt")
     os.system(f"sudo mount {args[1]} /mnt")
     os.system("sudo btrfs sub del /mnt/@")
-    
+
     os.system("sudo umount /mnt/dev") #not existing (maybe not needed?)
     os.system("sudo umount /mnt/proc") #not existing (maybe not needed?)
     os.system("sudo umount /mnt/sys") #not existing (maybe not needed?)
