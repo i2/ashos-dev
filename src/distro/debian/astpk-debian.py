@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import sys
-import ast # Heh funny name coincidence with project name
+import ast
 import subprocess
 from anytree.importer import DictImporter
 from anytree.exporter import DictExporter
@@ -67,11 +67,11 @@ def append_base_tree(tree,val):
 
 # Add child to node
 def add_node_to_parent(tree, id, val):
-    par = (anytree.find(tree, filter_=lambda node: ("x"+str(node.name)+"x") in ("x"+str(id)+"x"))) 
+    par = (anytree.find(tree, filter_=lambda node: ("x"+str(node.name)+"x") in ("x"+str(id)+"x")))
     add = anytree.Node(val, parent=par)
 
 # Clone within node
-def add_node_to_level(tree,id, val): 
+def add_node_to_level(tree,id, val):
     npar = get_parent(tree, id)
     par = (anytree.find(tree, filter_=lambda node: ("x"+str(node.name)+"x") in ("x"+str(npar)+"x")))
     add = anytree.Node(val, parent=par)
@@ -439,7 +439,7 @@ def live_install(pkg):
     os.system(f"mount --bind /var /.snapshots/rootfs/snapshot-{tmp}/var > /dev/null 2>&1")
     os.system(f"mount --bind /etc /.snapshots/rootfs/snapshot-{tmp}/etc > /dev/null 2>&1")
     os.system(f"mount --bind /tmp /.snapshots/rootfs/snapshot-{tmp}/tmp > /dev/null 2>&1")
-    os.system(f"arch-chroot /.snapshots/rootfs/snapshot-{tmp} pacman -S  --overwrite \\* --noconfirm {pkg}")
+    os.system(f"chroot /.snapshots/rootfs/snapshot-{tmp} apt-get install -y {pkg}")
     os.system(f"umount /.snapshots/rootfs/snapshot-{tmp}/* > /dev/null 2>&1")
     os.system(f"umount /.snapshots/rootfs/snapshot-{tmp} > /dev/null 2>&1")
     #os.system(f"chattr -RV +i /.snapshots/rootfs/snapshot-{tmp}/usr > /dev/null 2>&1")
@@ -467,7 +467,8 @@ def install(snapshot,pkg):
         print("changing base snapshot is not allowed")
     else:
         prepare(snapshot)
-        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} pacman -S {pkg} --overwrite '/var/*'"))
+        #excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} apt-get -o Dpkg::Options::="--force-overwrite" install -y {pkg}"))
+        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} apt install -f -y {pkg}"))
         if int(excode) == 0:
             posttrans(snapshot)
             print(f"snapshot {snapshot} updated successfully")
@@ -569,7 +570,7 @@ def posttrans(snapshot):
     #os.system(f"mkdir -p /.snapshots/var/var-chr{snapshot}/lib/pacman >/dev/null 2>&1")
     os.system(f"cp -r --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/var/lib/systemd/* /.snapshots/var/var-chr{snapshot}/lib/systemd >/dev/null 2>&1")
     #os.system(f"cp -r --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/var/lib/pacman/* /.snapshots/var/var-chr{snapshot}/lib/pacman >/dev/null 2>&1")
-    os.system(f"cp -r -n --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/var/cache/pacman/pkg/* /var/cache/pacman/pkg/ >/dev/null 2>&1")
+    os.system(f"cp -r -n --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/var/cache/apt/* /var/cache/apt/ >/dev/null 2>&1")
     os.system(f"rm -rf /.snapshots/boot/boot-chr{snapshot}/* >/dev/null 2>&1")
     os.system(f"cp -r --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/boot/* /.snapshots/boot/boot-chr{snapshot} >/dev/null 2>&1")
     os.system(f"btrfs sub del /.snapshots/etc/etc-{etc} >/dev/null 2>&1")
@@ -902,3 +903,4 @@ def main(args):
 
 # Call main
 main(args)
+

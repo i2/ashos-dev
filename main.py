@@ -8,6 +8,9 @@ import distro
 # Instal pip: python3 -m ensurepip --upgrade
 # Insall pip requirements: python3 -m pip install -r src/requirements.txt
 
+# sudo in front of all comands is required for instance in Debian as live cd starts with non-root user, but it's not needed for Arch (starts as root)
+# I will unify them and even in arch all commands would start with sudo
+
 # For cross-linux distro, first I am going to assume a lot of lines are common between distros and then
 # whenever needed use 'if xyz in distro.id()' but if it becomes macaroni code, I'll move each distros installer to a subfolder
 # I believe astpk.py has to be separate file for each distro anyway! So chances are having separate installer.py for each distro
@@ -59,12 +62,16 @@ def main(args):
     print("Enter hostname:")
     hostname = input("> ")
 
+    if os.path.exists("/sys/firmware/efi"):
+        efi = True
+    else:
+        efi = False
+
     #REZA: STEP 1 BEGINS HERE
     if 'debian' in distro.id():
         os.system("sudo apt-get update")
         os.system("sudo apt-get install -y parted btrfs-progs dosfstools debootstrap tmux git")
         os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
-        os.system("sudo /usr/sbin/mkfs.btrfs -L BTRFS /dev/sda2")
         os.system("sudo /usr/sbin/mkfs.vfat -F32 -n EFI /dev/sda1")
         #sudo debootstrap bullseye /mnt http://ftp.debian.org/debian
     elif 'arch' in distro.id():
@@ -73,8 +80,7 @@ def main(args):
         from src.distro.arch import step1 as s1 #Then usage: s1.main()
 
     if 'debian' in distro.id():
-        os.system("export LC_ALL=C")
-        #os.system("export LC_CTYPE=C")
+        os.system("export LC_ALL=C LANGUAGE=C LANG=C") #the word 'export' can be omited I think
     elif 'arch' in distro.id():
         os.system("pacman -S --noconfirm archlinux-keyring")
 
@@ -84,14 +90,10 @@ def main(args):
         os.system("sudo systemctl enable --now ntp && sleep 30s && ntpq -p") #sometimes it's needed to restart ntp service to have time sync again!
         os.system("sudo apt update")
 
-#    os.system(f"mkfs.btrfs -f {args[1]}")
-
-    if os.path.exists("/sys/firmware/efi"):
-        efi = True
-    else:
-        efi = False
+    os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
 
     os.system(f"sudo mount {args[1]} /mnt")
+
     btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]
 

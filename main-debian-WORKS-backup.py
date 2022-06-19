@@ -21,7 +21,7 @@ import distro
 os.system("sudo apt-get update")
 os.system("sudo apt-get install -y parted btrfs-progs dosfstools debootstrap tmux git")
 os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
-#os.system("sudo /usr/sbin/mkfs.btrfs -L BTRFS /dev/sda2")
+###os.system("sudo /usr/sbin/mkfs.btrfs -L BTRFS /dev/sda2")
 os.system("sudo /usr/sbin/mkfs.vfat -F32 -n EFI /dev/sda1")
 #sudo debootstrap bullseye /mnt http://ftp.debian.org/debian
 
@@ -67,14 +67,13 @@ def main(args):
 
 #    os.system("pacman -S --noconfirm archlinux-keyring")
     os.system("export LC_ALL=C")
-    #os.system("export LC_CTYPE=C")
 
     # sync time in the live environment (maybe not needed after all!
     sudo apt-get install -y ntp
     sudo systemctl enable --now ntp && sleep 30s && ntpq -p #sometimes it's needed to restart ntp service to have time sync again!
 
     os.system("sudo apt update")
-    os.system(f"mkfs.btrfs -f {args[1]}")
+    os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
 
     if os.path.exists("/sys/firmware/efi"):
         efi = True
