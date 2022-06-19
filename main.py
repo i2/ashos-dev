@@ -97,13 +97,13 @@ def main(args):
 #    os.system("pacstrap /mnt base linux linux-firmware nano python3 python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub")
     os.system("sudo debootstrap bullseye /mnt http://ftp.debian.org/debian")
 
+    # Should I do these mounts here?
     os.system("sudo mount -o bind /dev/pts /mnt/dev/pts")
     os.system("sudo mount -o bind /dev /mnt/dev")
     os.system("sudo mount -t proc none /mnt/proc")
     os.system("sudo mount -t sysfs sys /mnt/sys")
     #MAYBE this is needed as well?!!! os.system("sudo mount --bind /dev/pts /mnt/dev/pts")
 
-    os.system("echo JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ")
     os.system("sudo chroot /mnt apt-get install linux-image-5.10.0-13-amd64")
 
     # Do steps to do apt-get install inside chroot from untitled.txt
@@ -141,6 +141,9 @@ def main(args):
     os.system(f"echo 'LOGO=astos-logo' | sudo tee -a /mnt/etc/os-release")
     #os.system(f"sudo cp -r /mnt/var/lib/pacman/* /mnt/usr/share/ast/db")
     #os.system(f"sudo sed -i s,\"#DBPath      = /var/lib/pacman/\",\"DBPath      = /usr/share/ast/db/\",g /mnt/etc/pacman.conf")
+    
+    #os.system(f"sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db")
+    #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf")
     os.system(f"echo 'DISTRIB_ID=\"astOS\"' | sudo tee /mnt/etc/lsb-release")
     os.system(f"echo 'DISTRIB_RELEASE=\"rolling\"' | sudo tee -a /mnt/etc/lsb-release")
     os.system(f"echo 'DISTRIB_DESCRIPTION=astOS' | sudo tee -a /mnt/etc/lsb-release")
