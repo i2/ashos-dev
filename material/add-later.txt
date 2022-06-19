@@ -64,3 +64,17 @@ https://stackoverflow.com/questions/43540782/python-use-different-function-depen
 
 
 Add bedrock linux to https://distro.readthedocs.io/en/latest/
+https://bedrocklinux.org/1.0beta2/strata.html
+
+Debiash:
+#https://forum.openmediavault.org/index.php?thread/12070-guide-debootstrap-installing-debian-into-a-folder-in-a-running-system/
+
+
+
+Gentash Linux
+Fedorash Linux
+Slash Linux (slackware)
+OpenBSDash
+NetBSDash
+FreeBSDash
+Centash

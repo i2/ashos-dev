@@ -8,7 +8,10 @@ import distro
 # Instal pip: python3 -m ensurepip --upgrade
 # Insall pip requirements: python3 -m pip install -r src/requirements.txt
 
-#https://forum.openmediavault.org/index.php?thread/12070-guide-debootstrap-installing-debian-into-a-folder-in-a-running-system/
+# For cross-linux distro, first I am going to assume a lot of lines are common between distros and then
+# whenever needed use 'if xyz in distro.id()' but if it becomes macaroni code, I'll move each distros installer to a subfolder
+# I believe astpk.py has to be separate file for each distro anyway! So chances are having separate installer.py for each distro
+# is a better approach in the need anyways!
 
 # I am not sure if mounting dev sys proc is needed when I am doing this installer the way I am currently doing (3 steps)! Needs confirmaton. I will do it again.
 
@@ -75,11 +78,12 @@ def main(args):
     elif 'arch' in distro.id():
         os.system("pacman -S --noconfirm archlinux-keyring")
 
-    # sync time in the live environment (maybe not needed after all!
-    sudo apt-get install -y ntp
-    sudo systemctl enable --now ntp && sleep 30s && ntpq -p #sometimes it's needed to restart ntp service to have time sync again!
+    if 'debian' in distro.id():
+        # sync time in the live environment (maybe not needed after all!
+        os.system("sudo apt-get install -y ntp")
+        os.system("sudo systemctl enable --now ntp && sleep 30s && ntpq -p") #sometimes it's needed to restart ntp service to have time sync again!
+        os.system("sudo apt update")
 
-    os.system("sudo apt update")
 #    os.system(f"mkfs.btrfs -f {args[1]}")
 
     if os.path.exists("/sys/firmware/efi"):
