@@ -106,6 +106,9 @@ def main(args):
 #   I might use multistrap later
     os.system("sudo debootstrap bullseye /mnt http://ftp.debian.org/debian")
 
+#   for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
+#       os.system("sudo mount -B $i /mnt$i")
+
     os.system("sudo mount -o bind /dev /mnt/dev")
     os.system("sudo mount -o bind /dev/pts /mnt/dev/pts")
     os.system("sudo mount -t proc none /mnt/proc")

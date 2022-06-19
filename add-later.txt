@@ -49,3 +49,6 @@ Dir {
 };
 
 --------------------------------------------------------
+
+
+# This post helped to fix the "efi variable not available in this system" error: https://bbs.archlinux.org/viewtopic.php?id=168516
