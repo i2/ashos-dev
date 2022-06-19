@@ -6,7 +6,7 @@ import subprocess
 import distro
 
 # Instal pip: python3 -m ensurepip --upgrade
-# Insall pip requirements: python3 -m pip install -r src/requirements.txt
+# Insall pip requirements: python3 -m pip install -r requirements.txt
 
 #https://forum.openmediavault.org/index.php?thread/12070-guide-debootstrap-installing-debian-into-a-folder-in-a-running-system/
 
@@ -15,6 +15,15 @@ import distro
 # maybe I can use multistrap
 
 # TODO: the installer needs a proper rewrite
+
+#REZA: STEP 1 BEGINS HERE
+
+os.system("sudo apt-get update")
+os.system("sudo apt-get install -y parted btrfs-progs dosfstools debootstrap tmux git")
+os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
+os.system("sudo /usr/sbin/mkfs.btrfs -L BTRFS /dev/sda2")
+os.system("sudo /usr/sbin/mkfs.vfat -F32 -n EFI /dev/sda1")
+#sudo debootstrap bullseye /mnt http://ftp.debian.org/debian
 
 args = list(sys.argv)
 
@@ -56,24 +65,9 @@ def main(args):
     print("Enter hostname:")
     hostname = input("> ")
 
-    #REZA: STEP 1 BEGINS HERE
-    if 'debian' in distro.id():
-        os.system("sudo apt-get update")
-        os.system("sudo apt-get install -y parted btrfs-progs dosfstools debootstrap tmux git")
-        os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
-        os.system("sudo /usr/sbin/mkfs.btrfs -L BTRFS /dev/sda2")
-        os.system("sudo /usr/sbin/mkfs.vfat -F32 -n EFI /dev/sda1")
-        #sudo debootstrap bullseye /mnt http://ftp.debian.org/debian
-    elif 'arch' in distro.id():
-        from src.distro.arch import step1 as s1 #Then usage: s1.main()
-    elif 'fedora' in distro.id():
-        from src.distro.arch import step1 as s1 #Then usage: s1.main()
-
-    if 'debian' in distro.id():
-        os.system("export LC_ALL=C")
-        #os.system("export LC_CTYPE=C")
-    elif 'arch' in distro.id():
-        os.system("pacman -S --noconfirm archlinux-keyring")
+#    os.system("pacman -S --noconfirm archlinux-keyring")
+    os.system("export LC_ALL=C")
+    #os.system("export LC_CTYPE=C")
 
     # sync time in the live environment (maybe not needed after all!
     sudo apt-get install -y ntp

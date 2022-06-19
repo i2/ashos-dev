@@ -1,0 +1,2 @@
+# Requirement to find linux distribution
+distro
