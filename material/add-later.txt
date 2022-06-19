@@ -78,3 +78,8 @@ OpenBSDash
 NetBSDash
 FreeBSDash
 Centash
+
+
+
+
+https://github.com/saltstack/salt/blob/master/salt/grains/core.py#L1624

@@ -21,7 +21,7 @@ import distro
 os.system("sudo apt-get update")
 os.system("sudo apt-get install -y parted btrfs-progs dosfstools debootstrap tmux git")
 os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
-os.system("sudo /usr/sbin/mkfs.btrfs -L BTRFS /dev/sda2")
+#os.system("sudo /usr/sbin/mkfs.btrfs -L BTRFS /dev/sda2")
 os.system("sudo /usr/sbin/mkfs.vfat -F32 -n EFI /dev/sda1")
 #sudo debootstrap bullseye /mnt http://ftp.debian.org/debian
 
@@ -74,7 +74,7 @@ def main(args):
     sudo systemctl enable --now ntp && sleep 30s && ntpq -p #sometimes it's needed to restart ntp service to have time sync again!
 
     os.system("sudo apt update")
-#    os.system(f"mkfs.btrfs -f {args[1]}")
+    os.system(f"mkfs.btrfs -f {args[1]}")
 
     if os.path.exists("/sys/firmware/efi"):
         efi = True
@@ -270,9 +270,6 @@ def main(args):
     os.system(f"sudo mount {args[1]} /mnt")
     os.system("sudo btrfs sub del /mnt/@") # it gives an error could not statfs: No such file or directory
 
-#    os.system("sudo umount /mnt/dev") #not existing (maybe not needed?)
-#    os.system("sudo umount /mnt/proc") #not existing (maybe not needed?)
-#    os.system("sudo umount /mnt/sys") #not existing (maybe not needed?)
     os.system("sudo umount -R /mnt")
     clear()
     print("Installation complete")
