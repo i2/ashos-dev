@@ -64,7 +64,7 @@ def main(args):
 #REZA: STEP 7 BEGINS HERE
     os.system("sudo umount -R /mnt")
     os.system(f"sudo mount {args[1]} /mnt")
-    os.system("sudo btrfs sub del /mnt/@")
+    os.system("sudo btrfs sub del /mnt/@") # it gives an error could not statfs: No such file or directory
     
     os.system("sudo umount /mnt/dev")
     os.system("sudo umount /mnt/proc")

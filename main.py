@@ -206,6 +206,9 @@ def main(args):
         os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
 
     os.system(f"sudo chroot /mnt sed -i s,Arch,astOS,g /etc/default/grub")
+#   os.system("sudo chroot /mnt modprobe efivarfs") THis may NOT be needed as when I ran without it, I got a warning: "EFI variables are not supported on this system"
+    os.system("sudo mount -o bind /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars") #maybe move this up top when I am doing all the other mountings
+
     os.system(f"sudo chroot /mnt grub-install {args[2]}")
     os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo sed -i '0,/subvol=@/{s,subvol=@,subvol=@.snapshots/rootfs/snapshot-tmp,g}' /mnt/boot/grub/grub.cfg")
@@ -258,11 +261,11 @@ def main(args):
 
     os.system("sudo umount -R /mnt")
     os.system(f"sudo mount {args[1]} /mnt")
-    os.system("sudo btrfs sub del /mnt/@")
+    os.system("sudo btrfs sub del /mnt/@") # it gives an error could not statfs: No such file or directory
 
-    os.system("sudo umount /mnt/dev") #not existing (maybe not needed?)
-    os.system("sudo umount /mnt/proc") #not existing (maybe not needed?)
-    os.system("sudo umount /mnt/sys") #not existing (maybe not needed?)
+#    os.system("sudo umount /mnt/dev") #not existing (maybe not needed?)
+#    os.system("sudo umount /mnt/proc") #not existing (maybe not needed?)
+#    os.system("sudo umount /mnt/sys") #not existing (maybe not needed?)
     os.system("sudo umount -R /mnt")
     clear()
     print("Installation complete")
