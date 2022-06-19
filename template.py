@@ -4,23 +4,6 @@ import time
 import sys
 import subprocess
 
-#https://forum.openmediavault.org/index.php?thread/12070-guide-debootstrap-installing-debian-into-a-folder-in-a-running-system/
-
-# I am not sure if mounting dev sys proc is needed when I am doing this installer the way I am currently doing (3 steps)! Needs confirmaton. I will do it again.
-
-# maybe I can use multistrap
-
-# TODO: the installer needs a proper rewrite
-
-#REZA: STEP 1 BEGINS HERE
-
-os.system("sudo apt-get update")
-os.system("sudo apt-get install -y parted btrfs-progs dosfstools debootstrap tmux git")
-os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
-os.system("sudo /usr/sbin/mkfs.btrfs -L BTRFS /dev/sda2")
-os.system("sudo /usr/sbin/mkfs.vfat -F32 -n EFI /dev/sda1")
-#sudo debootstrap bullseye /mnt http://ftp.debian.org/debian
-
 args = list(sys.argv)
 
 def clear():
@@ -61,73 +44,35 @@ def main(args):
     print("Enter hostname:")
     hostname = input("> ")
 
-#    os.system("pacman -S --noconfirm archlinux-keyring")
-    os.system("export LC_ALL=C")
-    #os.system("export LC_CTYPE=C")
-    
-    # sync time in the live environment (maybe not needed after all!
-    sudo apt-get install -y ntp
-    sudo systemctl enable --now ntp && sleep 30s && ntpq -p #sometimes it's needed to restart ntp service to have time sync again!
-    
-    os.system("sudo apt update")
-#    os.system(f"mkfs.btrfs -f {args[1]}")
-
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
         efi = False
 
-    os.system(f"sudo mount {args[1]} /mnt")
     btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]
-
-    for btrdir in btrdirs:
-        os.system(f"sudo btrfs sub create /mnt/{btrdir}")
-
-    os.system(f"sudo umount /mnt")
-    os.system(f"sudo mount {args[1]} -o subvol=@,compress=zstd,noatime /mnt")
-
-    for mntdir in mntdirs:
-        os.system(f"sudo mkdir /mnt/{mntdir}")
-        os.system(f"sudo mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
-
-    for i in ("tmp", "root"):
-        os.system(f"mkdir -p /mnt/{i}")
-    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp", "var"):
-        os.system(f"mkdir -p /mnt/.snapshots/{i}")
-
-    if efi:
-        os.system("sudo mkdir /mnt/boot/efi")
-        os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
 #REZA: STEP 2 BEGINS HERE
 
 #    os.system("pacstrap /mnt base linux linux-firmware nano python3 python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub")
-#   I might use multistrap later
     os.system("sudo debootstrap bullseye /mnt http://ftp.debian.org/debian")
 
-    os.system("sudo mount -o bind /dev /mnt/dev")
+    # Should I do these mounts here?
     os.system("sudo mount -o bind /dev/pts /mnt/dev/pts")
+    os.system("sudo mount -o bind /dev /mnt/dev")
     os.system("sudo mount -t proc none /mnt/proc")
     os.system("sudo mount -t sysfs sys /mnt/sys")
+    #MAYBE this is needed as well?!!! os.system("sudo mount --bind /dev/pts /mnt/dev/pts")
 
     os.system("sudo chroot /mnt apt-get install linux-image-5.10.0-13-amd64")
 
+    # Do steps to do apt-get install inside chroot from untitled.txt
 
-###    # Do steps to do apt-get install inside chroot from untitled.txt
-    os.system("echo 'deb http://www.deb-multimedia.org bullseye main' | sudo tee -a /mnt/etc/apt/sources.list.d/multimedia.list > /dev/null")
-    os.system("sudo chroot /mnt apt update -oAcquire::AllowInsecureRepositories=true")
-    os.system("sudo chroot /mnt apt-get install deb-multimedia-keyring")
-    #os.system(sudo chmod -R 1777 /mnt/tmp)
-    os.system("sudo chroot /mnt apt-get install python3-anytree")
-
-    os.system("sudo chroot /mnt apt-get install -y python3-anytree grub-efi network-manager btrfs-progs dhcpcd5")
-###    #os.system("sudo chroot /mnt apt-get install -y efibootmgr nano") #redundant as I think efibootmgr is included in a one of the previous packages
+    os.system("sudo chroot /mnt apt-get install -y python3 python3-anytree grub-efi network-manager btrfs-progs dhcpcd5")
+    os.system("sudo chroot /mnt apt-get install -y efibootmgr nano") #redundant as I think efibootmgr is included in a one of the previous packages
 
 #    if efi:
-#        os.system("sudo chroot /mnt apt-get install -y efibootmgr")
-
-#REZA: STEP 3 BEGINS HERE
+#        os.system("pacstrap /mnt efibootmgr")
 
     mntdirs_n = mntdirs
     mntdirs_n.remove("")
@@ -154,9 +99,10 @@ def main(args):
     os.system(f"echo 'ANSI_COLOR=\"38;2;23;147;209\"' | sudo tee -a /mnt/etc/os-release")
     os.system(f"echo 'HOME_URL=\"https://github.com/CuBeRJAN/astOS\"' | sudo tee -a /mnt/etc/os-release")
     os.system(f"echo 'LOGO=astos-logo' | sudo tee -a /mnt/etc/os-release")
-###    #os.system(f"sudo cp -r /mnt/var/lib/pacman/* /mnt/usr/share/ast/db")
-###    #os.system(f"sudo sed -i s,\"#DBPath      = /var/lib/pacman/\",\"DBPath      = /usr/share/ast/db/\",g /mnt/etc/pacman.conf")
-    os.system(f"sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db")
+    #os.system(f"sudo cp -r /mnt/var/lib/pacman/* /mnt/usr/share/ast/db")
+    #os.system(f"sudo sed -i s,\"#DBPath      = /var/lib/pacman/\",\"DBPath      = /usr/share/ast/db/\",g /mnt/etc/pacman.conf")
+    
+    #os.system(f"sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db")
     #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf")
     os.system(f"echo 'DISTRIB_ID=\"astOS\"' | sudo tee /mnt/etc/lsb-release")
     os.system(f"echo 'DISTRIB_RELEASE=\"rolling\"' | sudo tee -a /mnt/etc/lsb-release")

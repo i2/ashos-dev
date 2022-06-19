@@ -1,0 +1,51 @@
+# steps to do apt-get install inside chroot
+
+### <- these are REALLY NOT NEEDED. I tested in my attempt3.
+
+###    ##Do these in the live system (not needed inside chroot)
+###    #sudo systemctl start systemd-timesyncd (not presebt in my debian!!!!)
+    
+    # sync time in the live environment (maybe not needed after all!
+    #sudo apt-get install -y ntp
+    #sudo systemctl enable --now ntp && sleep 30s && ntpq -p #sometimes it's needed to restart ntp service to have time sync again!
+###    #sudo hwclock --systohc (not needed most probably)
+    
+###    #sync time in chroot (needed to download python3-anytree) #these two lines are probably not needed (test next time)    
+###    # date_host=$(date '+%Y-%m-%d-%H:%M:%S') sudo -E chroot /mnt /bin/bash -c 'date -s $date_host'
+###    #sudo chroot /mnt date -s "2022-06-17 14:25:00"
+    
+###    #os.system("sudo wget http://bit.ly/3xV2F5o -O /mnt/tmp/anytree")
+###    #os.system("sudo chroot /mnt dpkg -i /tmp/anytree")
+    #os.system("echo "deb http://www.deb-multimedia.org bullseye main" | sudo tee -a /mnt/etc/apt/sources.list.d/multimedia.list > /dev/null
+    #os.system("sudo chroot /mnt apt update -oAcquire::AllowInsecureRepositories=true")
+    #os.system("sudo chroot /mnt apt-get install deb-multimedia-keyring") # NOT NEEDED as it says already installed (revisison: needed if not installing from bit.ly)
+#NOT SURE IF NEEDED    #os.system("sudo chroot /mnt apt-get install ca-certificates") # I believe this is needed! <--- running this spits out error that log cannot be written and complains /dev/pts not mounted, so I think I should do the 4 mounts before doing this.
+    #os.system("sudo chroot /mnt apt-get install python3-anytree")
+    
+
+
+
+
+chroot /home/mayank/chroot/codebase /bin/bash <<"EOT"
+cd /tmp/so
+ls -l
+echo $$
+EOT
+
+
+
+--------------------------------------------------------
+
+apt -o RootDir=/foo ...
+dpkg --root=/tmp/dpkgRootDir option, and apt’s RootDir setting. Both of these 
+https://searchcode.com/file/94878737/config-files/apt.conf/
+https://askubuntu.com/questions/196059/how-to-modify-settings-in-apt-conf-file-that-no-longer-exists-in-12-04
+https://www.linuxquestions.org/questions/debian-26/changing-apt-and-dpkg-paths-with-apt-conf-via-$apt_config-4175592224/
+
+
+/et/apt/apt.comf
+Dir {
+    RootDir "XYZ";
+};
+
+--------------------------------------------------------
