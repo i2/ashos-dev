@@ -216,8 +216,9 @@ def main(args):
     os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
     os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")
 #    os.system("cp --reflink=auto -r /mnt/var/* /mnt/.snapshots/var/var-tmp")
-    os.system("sudo mkdir -p /mnt/.snapshots/var/var-tmp/lib/{pacman,systemd}") #Reza #shouldl be changed for debian
-#    os.system("sudo cp --reflink=auto -r /mnt/var/lib/pacman/* /mnt/.snapshots/var/var-tmp/lib/pacman/") #Reza #shouldl be changed for debian
+    for i in ("dpkg", "systemd"):
+        os.system(f"mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")
+    os.system("sudo cp --reflink=auto -r /mnt/var/lib/dpkg/* /mnt/.snapshots/var/var-tmp/lib/dpkg/")
     os.system("sudo cp --reflink=auto -r /mnt/var/lib/systemd/* /mnt/.snapshots/var/var-tmp/lib/systemd/")
     os.system("sudo cp --reflink=auto -r /mnt/boot/* /mnt/.snapshots/boot/boot-tmp")
     os.system("sudo cp --reflink=auto -r /mnt/etc/* /mnt/.snapshots/etc/etc-tmp")
@@ -227,7 +228,8 @@ def main(args):
     os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
 
     os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
-    #os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
+#REZA: STEP 6 BEGINS HERE
+    os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
 
     os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/")
     os.system("sudo cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")

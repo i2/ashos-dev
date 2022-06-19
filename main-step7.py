@@ -61,33 +61,18 @@ def main(args):
 
     astpart = to_uuid(args[1])
 
-#REZA: STEP 6 BEGINS HERE
-    os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
-
-    os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/")
-    os.system("sudo cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")
-    os.system("sudo rm -rf /mnt/root/*")
-    os.system("sudo rm -rf /mnt/tmp/*")
-#    os.system("umount /mnt/var")
-
-    if efi:
-        os.system("sudo umount /mnt/boot/efi")
-
-    os.system("sudo umount /mnt/boot")
-#    os.system("mkdir /mnt/.snapshots/var/var-tmp")
-#    os.system("mkdir /mnt/.snapshots/boot/boot-tmp")
-#    os.system(f"mount {args[1]} -o subvol=@var,compress=zstd,noatime /mnt/.snapshots/var/var-tmp")
-    os.system(f"sudo mount {args[1]} -o subvol=@boot,compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp")
-#    os.system("cp --reflink=auto -r /mnt/.snapshots/var/var-tmp/* /mnt/var")
-    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-tmp/* /mnt/boot")
-    os.system("sudo umount /mnt/etc")
-#    os.system("mkdir /mnt/.snapshots/etc/etc-tmp")
-    os.system(f"sudo mount {args[1]} -o subvol=@etc,compress=zstd,noatime /mnt/.snapshots/etc/etc-tmp")
-    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-tmp/* /mnt/etc")
-
-    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/* /mnt/.snapshots/rootfs/snapshot-tmp/etc")
-    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/var/var-0/* /mnt/.snapshots/rootfs/snapshot-tmp/var")
-    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/* /mnt/.snapshots/rootfs/snapshot-tmp/boot")
+#REZA: STEP 7 BEGINS HERE
+    os.system("sudo umount -R /mnt")
+    os.system(f"sudo mount {args[1]} /mnt")
+    os.system("sudo btrfs sub del /mnt/@")
+    
+    os.system("sudo umount /mnt/dev")
+    os.system("sudo umount /mnt/proc")
+    os.system("sudo umount /mnt/sys")
+    os.system("sudo umount -R /mnt")
+    clear()
+    print("Installation complete")
+    print("You can reboot now :)")
 
 main(args)
 
