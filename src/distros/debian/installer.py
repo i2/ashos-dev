@@ -107,7 +107,7 @@ def main(args):
     os.system("echo 'deb http://www.deb-multimedia.org bullseye main' | sudo tee -a /mnt/etc/apt/sources.list.d/multimedia.list > /dev/null")
     os.system("sudo chroot /mnt apt update -oAcquire::AllowInsecureRepositories=true")
     os.system("sudo chroot /mnt apt-get install -y deb-multimedia-keyring")
-    os.system(sudo chmod -R 1777 /mnt/tmp) #REZA this might need to be commented out if no error
+    os.system("sudo chmod -R 1777 /mnt/tmp") #REZA this might need to be commented out if no error
     os.system("sudo chroot /mnt apt-get install -y python3-anytree grub-efi network-manager btrfs-progs dhcpcd5 locales")
 
 ###    #REZA: STEP 3 BEGINS HERE
