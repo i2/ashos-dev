@@ -99,15 +99,15 @@ def main(args):
     os.system("sudo debootstrap bullseye /mnt http://ftp.debian.org/debian")
 
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
-        os.system("sudo mount -B $i /mnt$i")
+        os.system(f"sudo mount -B {i} /mnt{i}")
 
-    os.system("sudo chroot /mnt apt-get install linux-image-5.10.0-13-amd64")
+    os.system("sudo chroot /mnt apt-get install -y linux-image-5.10.0-13-amd64")
 
     # Install anytree in chroot
     os.system("echo 'deb http://www.deb-multimedia.org bullseye main' | sudo tee -a /mnt/etc/apt/sources.list.d/multimedia.list > /dev/null")
     os.system("sudo chroot /mnt apt update -oAcquire::AllowInsecureRepositories=true")
     os.system("sudo chroot /mnt apt-get install -y deb-multimedia-keyring")
-###    #os.system(sudo chmod -R 1777 /mnt/tmp)
+    os.system(sudo chmod -R 1777 /mnt/tmp) #REZA this might need to be commented out if no error
     os.system("sudo chroot /mnt apt-get install -y python3-anytree grub-efi network-manager btrfs-progs dhcpcd5 locales")
 
 ###    #REZA: STEP 3 BEGINS HERE
