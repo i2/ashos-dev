@@ -1,5 +1,15 @@
 # steps to do apt-get install inside chroot
 
+https://distro.readthedocs.io/en/latest/#id4
+
+ast tree of many distributions
+ base 0: Arch
+ -- snapshot 01: Arch - xfce
+ -- snapshot 02: Arch - gnome
+ base 1: Debian
+ -- snapshot 11: Debian - xfce
+ -- snapshot 12: Debian - gnome
+
 put all definitions and if conditions up top in main and astpk.py so step1 to step7 are better deletable
 
 #/proc and /sysfs must be mounted (or mountable), /dev/pts is also recommended.
