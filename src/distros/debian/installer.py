@@ -48,6 +48,9 @@ def main(args):
     else:
         efi = False
 
+    btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
+    mntdirs = ["",".snapshots","home","var","etc","boot"]
+
 ###    #REZA: STEP 1 BEGINS HERE
     
     # Partitioning
@@ -70,9 +73,6 @@ def main(args):
 
     # Mount and make necessary sub-volumes and directories
     os.system(f"sudo mount {args[1]} /mnt")
-
-    btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
-    mntdirs = ["",".snapshots","home","var","etc","boot"]
 
     for btrdir in btrdirs:
         os.system(f"sudo btrfs sub create /mnt/{btrdir}")
