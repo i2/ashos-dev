@@ -57,7 +57,7 @@ def main(args):
     os.system("export LC_ALL=C LANGUAGE=C LANG=C") # So that perl does not complain (alternatively echo 'export LC_ALL=C' | tee ~/.bashrc)
     os.system("sudo apt-get remove -y --purge man-db") # make installs faster (because of trigger man-db bug)
     os.system("sudo apt-get update")
-    os.system("sudo apt autoremove")
+    os.system("sudo apt autoremove -y")
     os.system("sudo apt-get install -y parted btrfs-progs dosfstools")
     os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
     os.system("sudo /usr/sbin/mkfs.vfat -F32 -n EFI /dev/sda1")
@@ -118,7 +118,8 @@ def main(args):
         os.system('sudo chroot /mnt /bin/sh -c "LC_ALL=C apt-get install -y grub-pc"')
 
 ###    #REZA: STEP 3 BEGINS HERE
-    mntdirs_n = mntdirs.remove("")
+    mntdirs_n = mntdirs
+    mntdirs_n = mntdirs_n.remove("")
 ################# REZA attention    
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@,compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
 
