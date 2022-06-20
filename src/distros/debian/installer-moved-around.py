@@ -48,8 +48,13 @@ def main(args):
     else:
         efi = False
 
+    btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
+    mntdirs = ["",".snapshots","home","var","etc","boot"]
+    mntdirs_n = mntdirs.remove("")
+    astpart = to_uuid(args[1])
+
 ###    #REZA: STEP 1 BEGINS HERE
-    
+
     # Partitioning
     os.system("export LC_ALL=C LANGUAGE=C LANG=C") # So that perl does not complain
     os.system("sudo apt-get remove -y --purge man-db") # make installs faster (because of trigger man-db bug)
@@ -70,9 +75,6 @@ def main(args):
 
     # Mount and make necessary sub-volumes and directories
     os.system(f"sudo mount {args[1]} /mnt")
-
-    btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
-    mntdirs = ["",".snapshots","home","var","etc","boot"]
 
     for btrdir in btrdirs:
         os.system(f"sudo btrfs sub create /mnt/{btrdir}")
@@ -111,15 +113,13 @@ def main(args):
     os.system('sudo chroot /mnt /bin/sh -c "LC_ALL=C apt update -oAcquire::AllowInsecureRepositories=true"')
     os.system("sudo chmod -R 1777 /mnt/tmp") #REZA this might need to be commented out if no error
     os.system('sudo chroot /mnt /bin/sh -c "LC_ALL=C apt-get install -y python3-anytree network-manager btrfs-progs dhcpcd5 locales"')
-    
+
     if efi:
         os.system('sudo chroot /mnt /bin/sh -c "LC_ALL=C apt-get install -y grub-efi"')
     else:
         os.system('sudo chroot /mnt /bin/sh -c "LC_ALL=C apt-get install -y grub-pc"')
 
 ###    #REZA: STEP 3 BEGINS HERE
-    mntdirs_n = mntdirs
-    mntdirs_n.remove("")
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@,compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
 
     for mntdir in mntdirs_n:
@@ -130,8 +130,6 @@ def main(args):
 
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/tmp /tmp none bind 0 0' | sudo tee -a /mnt/etc/fstab")
-
-    astpart = to_uuid(args[1])
 
     os.system(f"sudo mkdir -p /mnt/usr/share/ast/db")
     os.system(f"echo '0' | sudo tee /mnt/usr/share/ast/snap")
@@ -150,7 +148,7 @@ def main(args):
     os.system(f"echo 'DISTRIB_ID=\"astOS\"' | sudo tee /mnt/etc/lsb-release")
     os.system(f"echo 'DISTRIB_RELEASE=\"rolling\"' | sudo tee -a /mnt/etc/lsb-release")
     os.system(f"echo 'DISTRIB_DESCRIPTION=astOS' | sudo tee -a /mnt/etc/lsb-release")
-    
+
     os.system(f"sudo chroot /mnt ln -sf {timezone} /etc/localtime")
 
 ###    #REZA: STEP 4 BEGINS HERE
@@ -360,11 +358,11 @@ def main(args):
 
 ###    #REZA: STEP 7 BEGINS HERE
 
-    os.system("sudo umount -R /mnt")
-    os.system(f"sudo mount {args[1]} /mnt")
+###    os.system("sudo umount -R /mnt")
+###    os.system(f"sudo mount {args[1]} /mnt")
 ###    os.system("sudo btrfs sub del /mnt/@") # it gives an error could not statfs: No such file or directory
-    os.system("sudo umount -R /mnt")
+###    os.system("sudo umount -R /mnt")
     clear()
-    print("Installation complete")
-    print("You can reboot now :)")
+###    print("Installation complete")
+###    print("You can reboot now :)")
 
