@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+
 import os
 import time
 import sys
@@ -6,21 +7,24 @@ import subprocess
 import distro
 
 # Instal pip: python3 -m ensurepip --upgrade
-# Insall pip requirements: python3 -m pip install -r src/requirements.txt
+# Insall pip requirements: python3 -m pip install -r requirements.txt
 
-# sudo in front of all comands is required for instance in Debian as live cd starts with non-root user, but it's not needed for Arch (starts as root)
-# I will unify them and even in arch all commands would start with sudo
-
-# For cross-linux distro, first I am going to assume a lot of lines are common between distros and then
-# whenever needed use 'if xyz in distro.id()' but if it becomes macaroni code, I'll move each distros installer to a subfolder
-# I believe astpk.py has to be separate file for each distro anyway! So chances are having separate installer.py for each distro
-# is a better approach in the need anyways!
+#https://forum.openmediavault.org/index.php?thread/12070-guide-debootstrap-installing-debian-into-a-folder-in-a-running-system/
 
 # I am not sure if mounting dev sys proc is needed when I am doing this installer the way I am currently doing (3 steps)! Needs confirmaton. I will do it again.
 
 # maybe I can use multistrap
 
 # TODO: the installer needs a proper rewrite
+
+#REZA: STEP 1 BEGINS HERE
+
+os.system("sudo apt-get update")
+os.system("sudo apt-get install -y parted btrfs-progs dosfstools debootstrap tmux git")
+os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
+###os.system("sudo /usr/sbin/mkfs.btrfs -L BTRFS /dev/sda2")
+os.system("sudo /usr/sbin/mkfs.vfat -F32 -n EFI /dev/sda1")
+#sudo debootstrap bullseye /mnt http://ftp.debian.org/debian
 
 args = list(sys.argv)
 
@@ -62,38 +66,22 @@ def main(args):
     print("Enter hostname:")
     hostname = input("> ")
 
+#    os.system("pacman -S --noconfirm archlinux-keyring")
+    os.system("export LC_ALL=C")
+
+    # sync time in the live environment (maybe not needed after all!
+    sudo apt-get install -y ntp
+    sudo systemctl enable --now ntp && sleep 30s && ntpq -p #sometimes it's needed to restart ntp service to have time sync again!
+
+    os.system("sudo apt update")
+    os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
+
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
         efi = False
 
-    #REZA: STEP 1 BEGINS HERE
-    if 'debian' in distro.id():
-        os.system("sudo apt-get update")
-        os.system("sudo apt-get install -y parted btrfs-progs dosfstools debootstrap tmux git")
-        os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
-        os.system("sudo /usr/sbin/mkfs.vfat -F32 -n EFI /dev/sda1")
-        #sudo debootstrap bullseye /mnt http://ftp.debian.org/debian
-    elif 'arch' in distro.id():
-        from src.distro.arch import step1 as s1 #Then usage: s1.main()
-    elif 'fedora' in distro.id():
-        from src.distro.arch import step1 as s1 #Then usage: s1.main()
-
-    if 'debian' in distro.id():
-        os.system("export LC_ALL=C LANGUAGE=C LANG=C") #the word 'export' can be omited I think
-    elif 'arch' in distro.id():
-        os.system("pacman -S --noconfirm archlinux-keyring")
-
-    if 'debian' in distro.id():
-        # sync time in the live environment (maybe not needed after all!
-        os.system("sudo apt-get install -y ntp")
-        os.system("sudo systemctl enable --now ntp && sleep 30s && ntpq -p") #sometimes it's needed to restart ntp service to have time sync again!
-        os.system("sudo apt update")
-
-    os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
-
     os.system(f"sudo mount {args[1]} /mnt")
-
     btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]
 
@@ -282,9 +270,6 @@ def main(args):
     os.system(f"sudo mount {args[1]} /mnt")
     os.system("sudo btrfs sub del /mnt/@") # it gives an error could not statfs: No such file or directory
 
-#    os.system("sudo umount /mnt/dev") #not existing (maybe not needed?)
-#    os.system("sudo umount /mnt/proc") #not existing (maybe not needed?)
-#    os.system("sudo umount /mnt/sys") #not existing (maybe not needed?)
     os.system("sudo umount -R /mnt")
     clear()
     print("Installation complete")

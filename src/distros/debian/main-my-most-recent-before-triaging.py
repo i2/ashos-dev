@@ -1,29 +1,33 @@
 #!/usr/bin/python3
+
 import os
 import time
 import sys
 import subprocess
-import distro
 
+# sudo apt update
+# sudo apt install -y python3-pip git tmux
 # Instal pip: python3 -m ensurepip --upgrade
-# Insall pip requirements: python3 -m pip install -r requirements.txt
+# Insall pip requirements: python3 -m pip install -r src/requirements.txt
 
-#https://forum.openmediavault.org/index.php?thread/12070-guide-debootstrap-installing-debian-into-a-folder-in-a-running-system/
+# For detecting distro, I chose not to use python 'distro' package becuase some distros like Debian don't have it by default.
+# The issue was: to detect os, python's distro need to be installed which need python3-pip. To install python3-pip, one needs to know the distro and its package manager!
+
+# sudo in front of all comands is required for instance in Debian as live cd starts with non-root user, but it's not needed for Arch (starts as root)
+# I will unify them and even in arch all commands would start with sudo
+
+# For cross-linux distro, first I am going to assume a lot of lines are common between distros and then
+# whenever needed use 'if xyz in distro.id()' but if it becomes macaroni code, I'll move each distros installer to a subfolder
+# I believe astpk.py has to be separate file for each distro anyway! So chances are having separate installer.py for each distro
+# is a better approach in the need anyways!
+
+# sudo apt-get remove -y --purge man-db
 
 # I am not sure if mounting dev sys proc is needed when I am doing this installer the way I am currently doing (3 steps)! Needs confirmaton. I will do it again.
 
 # maybe I can use multistrap
 
 # TODO: the installer needs a proper rewrite
-
-#REZA: STEP 1 BEGINS HERE
-
-os.system("sudo apt-get update")
-os.system("sudo apt-get install -y parted btrfs-progs dosfstools debootstrap tmux git")
-os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
-###os.system("sudo /usr/sbin/mkfs.btrfs -L BTRFS /dev/sda2")
-os.system("sudo /usr/sbin/mkfs.vfat -F32 -n EFI /dev/sda1")
-#sudo debootstrap bullseye /mnt http://ftp.debian.org/debian
 
 args = list(sys.argv)
 
@@ -33,6 +37,10 @@ def clear():
 def to_uuid(part):
     uuid = str(subprocess.check_output(f"sudo blkid -s UUID -o value {part}", shell=True))
     return uuid.replace("b'","").replace('"',"").replace("\\n'","")
+
+def detect_distro():
+    dname = str(subprocess.check_output(['sh', './src/distros/detect.sh']))
+    return dname.replace("b'","").replace('"',"").replace("\\n'","")
 
 def main(args):
 
@@ -65,22 +73,41 @@ def main(args):
     print("Enter hostname:")
     hostname = input("> ")
 
-#    os.system("pacman -S --noconfirm archlinux-keyring")
-    os.system("export LC_ALL=C")
-
-    # sync time in the live environment (maybe not needed after all!
-    sudo apt-get install -y ntp
-    sudo systemctl enable --now ntp && sleep 30s && ntpq -p #sometimes it's needed to restart ntp service to have time sync again!
-
-    os.system("sudo apt update")
-    os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
-
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
         efi = False
 
+    #REZA: STEP 1 BEGINS HERE
+
+    if 'debian' in dname:
+        os.system("sudo apt-get update")
+        os.system("sudo apt-get install -y parted btrfs-progs dosfstools debootstrap tmux git python3-pip")
+        os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
+        os.system("sudo /usr/sbin/mkfs.vfat -F32 -n EFI /dev/sda1")
+        #sudo debootstrap bullseye /mnt http://ftp.debian.org/debian
+    elif 'arch' in dname:
+        from src.distro.arch import step1 as s1 #Then usage: s1.main()
+    elif 'fedora' in dname:
+        from src.distro.arch import step1 as s1 #Then usage: s1.main()
+    else:
+        raise RuntimeError("Unsupported operating system")
+
+    if 'debian' in dname:
+        os.system("export LC_ALL=C LANGUAGE=C LANG=C")
+    elif 'arch' in dname:
+        os.system("pacman -S --noconfirm archlinux-keyring")
+
+    if 'debian' in dname:
+        # sync time in the live environment (maybe not needed after all!
+        os.system("sudo apt-get install -y ntp")
+        os.system("sudo systemctl enable --now ntp && sleep 30s && ntpq -p") #sometimes it's needed to restart ntp service to have time sync again!
+        os.system("sudo apt update")
+
+    os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
+
     os.system(f"sudo mount {args[1]} /mnt")
+
     btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]
 
@@ -269,6 +296,9 @@ def main(args):
     os.system(f"sudo mount {args[1]} /mnt")
     os.system("sudo btrfs sub del /mnt/@") # it gives an error could not statfs: No such file or directory
 
+#    os.system("sudo umount /mnt/dev") #not existing (maybe not needed?)
+#    os.system("sudo umount /mnt/proc") #not existing (maybe not needed?)
+#    os.system("sudo umount /mnt/sys") #not existing (maybe not needed?)
     os.system("sudo umount -R /mnt")
     clear()
     print("Installation complete")

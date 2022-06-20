@@ -11,10 +11,13 @@ import re
 
 args = list(sys.argv)
 
+#/proc and /sysfs must be mounted (or mountable), /dev/pts is also recommended.
+
 # TODO ------------
 # General code cleanup
 # Maybe port for other distros?
 # A clean way to completely unistall ast
+# Implement AUR package maintenance between snapshots
 # -----------------
 
 # Directories
@@ -467,8 +470,8 @@ def install(snapshot,pkg):
         print("changing base snapshot is not allowed")
     else:
         prepare(snapshot)
-        #excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} apt-get -o Dpkg::Options::="--force-overwrite" install -y {pkg}"))
-        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} apt install -f -y {pkg}"))
+        excode = str(os.system(f'chroot /.snapshots/rootfs/snapshot-chr{snapshot} apt-get -o Dpkg::Options::="--force-overwrite" install -y {pkg}'))
+        #excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} apt install -f -y {pkg}"))
         if int(excode) == 0:
             posttrans(snapshot)
             print(f"snapshot {snapshot} updated successfully")
@@ -484,6 +487,7 @@ def remove(snapshot,pkg):
     else:
         prepare(snapshot)
         excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} pacman --noconfirm -Rns {pkg}"))
+        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} apt-get remove {pkg}"))
         if int(excode) == 0:
             posttrans(snapshot)
             print(f"snapshot {snapshot} updated successfully")

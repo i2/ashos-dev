@@ -68,6 +68,7 @@ https://bedrocklinux.org/1.0beta2/strata.html
 Fedora Rawhide with ash
 
 In astpk.py, if we add sudo at the beginning of all commands, maybe it'll make it so non-root users with sudoers privelge can run ast too (which is good)
+https://manpages.debian.org/bullseye/multistrap/multistrap.1.en.html
 
 Debiash:
 #https://forum.openmediavault.org/index.php?thread/12070-guide-debootstrap-installing-debian-into-a-folder-in-a-running-system/
@@ -86,3 +87,10 @@ Centash
 
 
 https://github.com/saltstack/salt/blob/master/salt/grains/core.py#L1624
+
+
+
+
+sudo apt-get purge <PACKAGENAME>
+sudo apt-get purge $(apt-cache depends <PACKAGENAME> | awk '{ print $2 }' | tr '\n' ' ')
+sudo apt-get autoremove
