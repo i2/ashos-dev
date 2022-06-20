@@ -1,6 +1,9 @@
 #!/usr/bin/python3
 
+import sys
 import subprocess
+
+args = list(sys.argv)
 
 def detect_distro():
     dname = str(subprocess.check_output(['sh', './src/distros/detect.sh']))
@@ -12,7 +15,7 @@ def main():
     elif 'arch' in dname:
         from src.distro.arch import installer
 
-    installer()
+    installer.main(args)
 
 main()
 
