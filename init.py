@@ -4,7 +4,6 @@ import sys
 import subprocess
 
 args = list(sys.argv)
-
 dname = str(subprocess.check_output(['sh', './src/distros/detect.sh']))
 dname.replace("b'","").replace('"',"").replace("\\n'","")
 

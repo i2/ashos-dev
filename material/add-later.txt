@@ -1,5 +1,10 @@
 # steps to do apt-get install inside chroot
 
+#/proc and /sysfs must be mounted (or mountable), /dev/pts is also recommended.
+
+
+Update desktop installl 1 and 2 for debian
+
 ### <- these are REALLY NOT NEEDED. I tested in my attempt3.
 
 ###    ##Do these in the live system (not needed inside chroot)
@@ -94,3 +99,12 @@ https://github.com/saltstack/salt/blob/master/salt/grains/core.py#L1624
 sudo apt-get purge <PACKAGENAME>
 sudo apt-get purge $(apt-cache depends <PACKAGENAME> | awk '{ print $2 }' | tr '\n' ' ')
 sudo apt-get autoremove
+
+
+
+
+
+what is left:
+do step 2 but until chmod ing /mnt/tmp
+
+stop there and go to the example vm, and try installing something. If permission error on tmp, then that tmp chmod is needed, otherwise just remove that commented line
