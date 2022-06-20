@@ -10,9 +10,9 @@ dname.replace("b'","").replace('"',"").replace("\\n'","")
 
 def main():
     if 'debian' in dname:
-        from src.distro.debian import installer
+        from src.distros.debian import installer
     elif 'arch' in dname:
-        from src.distro.arch import installer
+        from src.distros.arch import installer
 
     installer.main(args)
 
