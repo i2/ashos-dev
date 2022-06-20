@@ -1,5 +1,7 @@
 # steps to do apt-get install inside chroot
 
+put all definitions and if conditions up top in main and astpk.py so step1 to step7 are better deletable
+
 #/proc and /sysfs must be mounted (or mountable), /dev/pts is also recommended.
 
 https://github.com/libguestfs/supermin

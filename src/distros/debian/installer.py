@@ -50,65 +50,15 @@ def main(args):
 
 ###    #REZA: STEP 1 BEGINS HERE
     
-    # Partitioning
-    os.system("export LC_ALL=C LANGUAGE=C LANG=C") # So that perl does not complain
-    os.system("sudo apt-get remove -y --purge man-db") # make installs faster (because of trigger man-db bug)
-    #os.system("sudo apt autoremove")
-    os.system("sudo apt-get update")
-    os.system("sudo apt-get install -y parted btrfs-progs dosfstools")
-    os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
-    os.system("sudo /usr/sbin/mkfs.vfat -F32 -n EFI /dev/sda1")
-    os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
-
-###    #sudo debootstrap bullseye /mnt http://ftp.debian.org/debian
-
-    # sync time in the live environment (maybe not needed after all!
-###    os.system("sudo apt-get install -y ntp")
-###    os.system("echo 'Installing ntp. It will pause 30s. Sometimes it's needed to restart ntp service to have time sync again'")
-###    os.system("sudo systemctl enable --now ntp && sleep 30s && ntpq -p")
-    #os.system("sudo apt update")
-
-    # Mount and make necessary sub-volumes and directories
-    os.system(f"sudo mount {args[1]} /mnt")
-
     btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]
 
-    for btrdir in btrdirs:
-        os.system(f"sudo btrfs sub create /mnt/{btrdir}")
-
-    os.system(f"sudo umount /mnt")
-    os.system(f"sudo mount {args[1]} -o subvol=@,compress=zstd,noatime /mnt")
-
-    for mntdir in mntdirs:
-        os.system(f"sudo mkdir /mnt/{mntdir}")
-        os.system(f"sudo mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
-
-    for i in ("tmp", "root"):
-        os.system(f"mkdir -p /mnt/{i}")
-    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp", "var"):
-        os.system(f"mkdir -p /mnt/.snapshots/{i}")
-
-    if efi:
-        os.system("sudo mkdir /mnt/boot/efi")
-        os.system(f"sudo mount {args[3]} /mnt/boot/efi")
-
 ###    #REZA: STEP 2 BEGINS HERE
-
-    # Debootstrap
-    os.system("sudo apt-get install -y debootstrap")
-    os.system("sudo debootstrap bullseye /mnt http://ftp.debian.org/debian")
-
-    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
-        os.system(f"sudo mount -B {i} /mnt{i}")
-
-    # Perl complains if LC_ALL is not set
-    os.system('sudo chroot /mnt /bin/sh -c "LC_ALL=C apt-get install -y linux-image-5.10.0-13-amd64"')
 
     # Install anytree in chroot
     os.system("echo 'deb http://www.deb-multimedia.org bullseye main' | sudo tee -a /mnt/etc/apt/sources.list.d/multimedia.list >/dev/null")
+    os.system('sudo chroot /mnt /bin/sh -c "LC_ALL=C apt-get install -y deb-multimedia-keyring --allow-unauthenticated"')
     os.system('sudo chroot /mnt /bin/sh -c "LC_ALL=C apt update -oAcquire::AllowInsecureRepositories=true"')
-    os.system('sudo chroot /mnt /bin/sh -c "LC_ALL=C apt-get install -y deb-multimedia-keyring"')
     os.system("sudo chmod -R 1777 /mnt/tmp") #REZA this might need to be commented out if no error
     os.system('sudo chroot /mnt /bin/sh -c "LC_ALL=C apt-get install -y python3-anytree network-manager btrfs-progs dhcpcd5 locales"')
     
