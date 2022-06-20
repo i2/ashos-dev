@@ -2,6 +2,8 @@
 
 #/proc and /sysfs must be mounted (or mountable), /dev/pts is also recommended.
 
+https://github.com/libguestfs/supermin
+febootstrap / supermin lovely
 
 Update desktop installl 1 and 2 for debian
 
