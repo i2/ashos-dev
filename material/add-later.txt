@@ -212,3 +212,6 @@ as pointer, keeypign track of what is what and where. Something like MBR, keepin
 
 
 open one of the vms debiast and see if all mountponnt are combined and scrambled even ferom before instaklers?
+
+
+the reason Im not deleting the temporary debian-ashos-installer vms is if I have some interesting useful commands in thier the bash history
