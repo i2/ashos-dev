@@ -1,0 +1,19 @@
+user@debian:~$ mount | grep /mnt
+/dev/sda2 on /mnt type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=256,subvol=/@)
+/dev/sda2 on /mnt/.snapshots type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=258,subvol=/@.snapshots)
+/dev/sda2 on /mnt/home type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=259,subvol=/@home)
+/dev/sda2 on /mnt/var type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=260,subvol=/@var)
+udev on /mnt/dev type devtmpfs (rw,nosuid,relatime,size=472888k,nr_inodes=118222,mode=755)
+devpts on /mnt/dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000)
+proc on /mnt/proc type proc (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /mnt/run type tmpfs (rw,nosuid,nodev,noexec,relatime,size=98704k,mode=755)
+sysfs on /mnt/sys type sysfs (rw,nosuid,nodev,noexec,relatime)
+efivarfs on /mnt/sys/firmware/efi/efivars type efivarfs (rw,nosuid,nodev,noexec,relatime)
+/dev/sda2 on /mnt/.snapshots/boot/boot-tmp type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=262,subvol=/@boot)
+/dev/sda2 on /mnt/.snapshots/etc/etc-tmp type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=261,subvol=/@etc)
+user@debian:~$ nano ~/.tmux.conf
+user@debian:~$ source ~/.tmux.conf
+-bash: setw: command not found
+user@debian:~$
+
+

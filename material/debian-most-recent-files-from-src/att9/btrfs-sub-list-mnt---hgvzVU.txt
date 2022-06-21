@@ -1,0 +1,18 @@
+user@debian:~$ sudo btrfs sub list /mnt
+ID 256 gen 3334 top level 5 path @
+ID 258 gen 3334 top level 5 path @.snapshots
+ID 259 gen 8 top level 5 path @home
+ID 260 gen 3325 top level 5 path @var
+ID 261 gen 3326 top level 5 path @etc
+ID 262 gen 3330 top level 5 path @boot
+ID 264 gen 3333 top level 258 path @.snapshots/rootfs/snapshot-0
+ID 265 gen 3332 top level 258 path @.snapshots/etc/etc-tmp
+ID 266 gen 3330 top level 258 path @.snapshots/var/var-tmp
+ID 267 gen 3331 top level 258 path @.snapshots/boot/boot-tmp
+ID 268 gen 3330 top level 258 path @.snapshots/var/var-0
+ID 269 gen 3331 top level 258 path @.snapshots/boot/boot-0
+ID 270 gen 3332 top level 258 path @.snapshots/etc/etc-0
+ID 271 gen 3336 top level 258 path @.snapshots/rootfs/snapshot-tmp
+user@debian:~$
+
+

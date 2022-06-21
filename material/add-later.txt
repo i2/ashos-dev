@@ -1,3 +1,7 @@
+questions:
+os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-tmp/* /mnt/boot") #why umounted /mnt/boot and then do this?
+os.system(f"sudo mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")   # i didn't have sudo here before, so probbly wasn't creating these folders!
+
 $ dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -w 'required\|important' > ~/sources.list
 os.system("echo 'dpkg-query -f "'"'"${binary:Package} ${Priority}\\n"'"'" -W | grep -w "'"'"required\|important"'"'"' | tee -a /home/me/cmDELs.list")
 
@@ -174,17 +178,37 @@ tautology
 
 #   os.system("sudo chroot /mnt modprobe efivarfs") THis may NOT be needed as when I ran without it, I got a warning: "EFI variables are not supported on this system"
 
-
+    print("echo 'Installing ntp. It will pause 30s. Sometimes it's needed to restart ntp service to have time sync again'")
 
 
 #   os.system("sudo chroot /mnt modprobe efivarfs") THis may NOT be needed as when I ran without it, I got a warning: "EFI variables are not supported on this system"
     os.system("sudo mount -o bind /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars") #maybe move this up top when I am doing all the other mountings
 
 
+#    os.system("umount /mnt/var")
+
+#    os.system("cp --reflink=auto -r /mnt/.snapshots/var/var-tmp/* /mnt/var")
+
+#    os.system("mkdir /mnt/.snapshots/etc/etc-tmp")
+
+#    os.system("mkdir /mnt/.snapshots/var/var-tmp")
+#    os.system("mkdir /mnt/.snapshots/boot/boot-tmp")
+#    os.system(f"mount {args[1]} -o subvol=@var,compress=zstd,noatime /mnt/.snapshots/var/var-tmp")
 
 #    os.system("sudo umount /mnt/dev") #not existing (maybe not needed?)
 #    os.system("sudo umount /mnt/proc") #not existing (maybe not needed?)
 #    os.system("sudo umount /mnt/sys") #not existing (maybe not needed?)
+
+    os.system("sudo umount -R /mnt")   #gives error /mnt target busy --- maybe I should use: sudo umount -R /mnt/*
+#    os.system(f"sudo mount {args[1]} /mnt")
+#os.system(f"sudo mount {args[1]} -o subvolid=5 /mnt")
+###    os.system("sudo btrfs sub del /mnt/@") # it gives an error could not statfs: No such file or directory (could not statfs, no such file or directory)
+#    os.system("sudo umount -R /mnt")
+#    clear()
+#    print("Installation complete")
+#    print("You can reboot now :)")
+
+
 
 ----------------------------------------------------------------------------------------------------------------
 visceral
