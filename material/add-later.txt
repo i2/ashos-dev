@@ -158,6 +158,10 @@ tautology
 
 
 --------------- lines removed from source files to make it smaller --------------------------------------------------------
+
+
+###    #os.system(f'sudo chroot /mnt /bin/sh -c "LC_ALL=C apt-get install -y linux-image-{ARCH}"')
+
 ### THIS LINE IS MOVED DOWN (my recent PR fix)    os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp") #This gives the error, should likely be moved to line 206
 
     #Note: After changing the default subvolume on a system with GRUB, you should run grub-install again to notify the bootloader of the changes.
@@ -227,4 +231,7 @@ the reason Im not deleting the temporary debian-ashos-installer vms is if I have
 
 
 regex for removing unnecessary f-strings when not needed: f"[^{]*"
+
+
+
 

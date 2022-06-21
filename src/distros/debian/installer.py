@@ -125,7 +125,7 @@ def main(args):
 ### STEP 1
 
     # Partitioning
-    os.system("export LC_ALL=C LANGUAGE=C LANG=C") # So that perl does not complain (alternatively echo 'export LC_ALL=C' | tee ~/.bashrc)
+    os.system("shopt -s nullglob && echo 'export LC_ALL=C LANGUAGE=C LANG=C' | tee -a $HOME/.*shrc") # Perl complains if not set
     os.system("sudo apt-get remove -y --purge man-db") # make installs faster (because of trigger man-db bug)
     os.system("sudo apt-get update")
     os.system("sudo apt-get autoremove -y")
@@ -164,8 +164,7 @@ def main(args):
 
     # Modify shell profile for debug purposes in live iso (optional temporary)
     os.system('echo "alias paste='"'"'curl -F "'"'"'"sprunge=<-"'"'"'" http://sprunge.us'"'"' " | tee -a $HOME/.*zhrc')
-    os.system("echo 'export LC_ALL=C' | tee -a $HOME/.*shrc")
-    os.system("echo 'export LC_ALL=C' | sudo tee -a /mnt/root/.*shrc")
+    os.system("shopt -s nullglob && echo 'export LC_ALL=C' | sudo tee -a /mnt/root/.*shrc")
     os.system("echo 'setw -g mode-keys vi' | tee -a $HOME/.tmux.conf")
 
 ### STEP 2
@@ -173,25 +172,21 @@ def main(args):
     # Bootstrap
     os.system("sudo apt-get install -y debootstrap")
     os.system(f"sudo debootstrap --arch {ARCH} {RELEASE} /mnt http://ftp.debian.org/debian")
-
     # Mount-points needed for chrooting
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
         os.system(f"sudo mount -B {i} /mnt{i}")
-
-    # Perl complains if LC_ALL is not set
-    os.system(f'sudo chroot /mnt /bin/sh -c "LC_ALL=C apt-get install -y linux-image-{ARCH}"')
+    os.system(f"sudo chroot /mnt apt-get install -y linux-image-{ARCH}")
 
     # Install anytree and necessary packages in chroot
     os.system(f"echo 'deb [trusted=yes] http://www.deb-multimedia.org {RELEASE} main' | sudo tee -a /mnt/etc/apt/sources.list.d/multimedia.list >/dev/null")
-    os.system('sudo chroot /mnt /bin/sh -c "LC_ALL=C apt-get install -y deb-multimedia-keyring --allow-unauthenticated"')
-    os.system('sudo chroot /mnt /bin/sh -c "LC_ALL=C apt-get update -oAcquire::AllowInsecureRepositories=true"')
-    os.system("sudo chmod -R 1777 /mnt/tmp") #REZA this might need to be commented out if no error
-    os.system('sudo chroot /mnt /bin/sh -c "LC_ALL=C apt-get install -y python3-anytree network-manager btrfs-progs dhcpcd5 locales sudo"')
-
+    os.system("sudo chroot /mnt apt-get update -oAcquire::AllowInsecureRepositories=true")
+    os.system("sudo chroot /mnt apt-get install -y deb-multimedia-keyring --allow-unauthenticated")
+    ##### os.system("sudo chmod -R 1777 /mnt/tmp") #REZA this might need to be commented out if no error
+    os.system("sudo chroot /mnt apt-get install -y python3-anytree network-manager btrfs-progs dhcpcd5 locales sudo")
     if efi:
-        os.system('sudo chroot /mnt /bin/sh -c "LC_ALL=C apt-get install -y grub-efi"')
+        os.system("sudo chroot /mnt apt-get install -y grub-efi")
     else:
-        os.system('sudo chroot /mnt /bin/sh -c "LC_ALL=C apt-get install -y grub-pc"')
+        os.system("sudo chroot /mnt apt-get install -y grub-pc")
 
 ### STEP 3
 
@@ -205,7 +200,7 @@ def main(args):
 
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/tmp /tmp none bind 0 0' | sudo tee -a /mnt/etc/fstab")
-    
+
     astpart = to_uuid(args[1]) ###THIS will be removed when partitioning happens outside this installer
 
     os.system("sudo mkdir -p /mnt/usr/share/ast/db")
@@ -226,7 +221,8 @@ def main(args):
 
     os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
 
-###    #REZA: STEP 4 BEGINS HERE
+### STEP 4
+
     os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen")
     os.system("sudo chroot /mnt locale-gen")
     os.system("sudo chroot /mnt hwclock --systohc")
