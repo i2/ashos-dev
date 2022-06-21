@@ -129,15 +129,14 @@ def main(args):
     os.system("sudo apt-get remove -y --purge man-db") # make installs faster (because of trigger man-db bug)
     os.system("sudo apt-get update")
     os.system("sudo apt-get autoremove -y")
-    os.system("sudo apt-get install -y parted btrfs-progs dosfstools")
+    os.system("sudo apt-get install -y parted btrfs-progs dosfstools ntp")
     os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
     os.system("sudo /usr/sbin/mkfs.vfat -F32 -n EFI /dev/sda1")
     os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
 
     # Sync time in the live iso (optional)
-    #os.system("sudo apt-get install -y ntp")
-    #os.system("echo 'Installing ntp. It will pause 30s. Sometimes it's needed to restart ntp service to have time sync again'")
-    #os.system("sudo systemctl enable --now ntp && sleep 30s && ntpq -p")
+    print("echo 'Installing ntp. It will pause 30s. Sometimes it's needed to restart ntp service to have time sync again'")
+    os.system("sudo systemctl enable --now ntp && sleep 30s && ntpq -p")
     #os.system("sudo apt-get update")
 
     # Mount and create necessary sub-volumes and directories
