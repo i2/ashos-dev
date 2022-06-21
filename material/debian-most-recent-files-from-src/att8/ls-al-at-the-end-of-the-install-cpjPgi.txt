@@ -1,0 +1,287 @@
+an:~/ashos-dev$ cd ..
+user@debian:~$ mv ashos-dev kkkkk
+user@debian:~$ git clone http://github.com/i2/ashos-dev
+Cloning into 'ashos-dev'...
+warning: redirecting to https://github.com/i2/ashos-dev/
+remote: Enumerating objects: 402, done.
+remote: Counting objects: 100% (402/402), done.
+remote: Compressing objects: 100% (211/211), done.
+remote: Total 402 (delta 250), reused 336 (delta 184), pack-reused 0
+Receiving objects: 100% (402/402), 592.82 KiB | 4.15 MiB/s, done.
+Resolving deltas: 100% (250/250), done.
+user@debian:~$ cd ashos-dev/
+user@debian:~/ashos-dev$ sudo btrfs sub list /mnt
+ID 256 gen 954 top level 5 path @
+ID 258 gen 7 top level 5 path @.snapshots
+ID 259 gen 1022 top level 5 path @home
+ID 260 gen 951 top level 5 path @var
+ID 261 gen 13 top level 5 path @etc
+ID 262 gen 11 top level 5 path @boot
+user@debian:~/ashos-dev$ ls -al /mnt
+total 24
+drwxr-xr-x   1 root root  214 Jun 20 14:46 .
+drwxr-xr-x   1 root root  140 Jun 20 14:37 ..
+drwxr-xr-x   1 root root    0 Jun 20 14:45 ast
+lrwxrwxrwx   1 root root    7 Jun 20 14:46 bin -> usr/bin
+drwxr-xr-x   1 root root    6 Jun 20 14:45 boot
+drwxr-xr-x   1 root root  192 Jun 20 14:46 debootstrap
+drwxr-xr-x   1 root root  128 Jun 20 14:46 dev
+drwxr-xr-x   1 root root 1090 Jun 20 14:50 etc
+drwxr-xr-x   1 root root    0 Jun 20 14:45 home
+lrwxrwxrwx   1 root root    7 Jun 20 14:46 lib -> usr/lib
+lrwxrwxrwx   1 root root    9 Jun 20 14:46 lib32 -> usr/lib32
+lrwxrwxrwx   1 root root    9 Jun 20 14:46 lib64 -> usr/lib64
+lrwxrwxrwx   1 root root   10 Jun 20 14:46 libx32 -> usr/libx32
+drwxr-xr-x   1 root root    0 Jun 20 14:46 media
+drwxr-xr-x   1 root root    0 Jun 20 14:46 mnt
+drwxr-xr-x   1 root root    0 Jun 20 14:46 opt
+dr-xr-xr-x 172 root root    0 Jun 20 14:46 proc
+drwxr-xr-x   1 root root   30 Jun 20 14:46 root
+drwxr-xr-x   1 root root    0 Jun 20 14:45 rootfs
+drwxr-xr-x   1 root root   26 Jun 20 14:46 run
+lrwxrwxrwx   1 root root    8 Jun 20 14:46 sbin -> usr/sbin
+drwxr-xr-x   1 root root  214 Jun 20 14:46 .snapshots
+drwxr-xr-x   1 root root    0 Jun 20 14:46 srv
+dr-xr-xr-x  13 root root    0 Jun 20 14:37 sys
+drwxr-xr-x   1 root root    0 Jun 20 14:50 tmp
+drwxr-xr-x   1 root root  116 Jun 20 14:46 usr
+drwxr-xr-x   1 root root   90 Jun 20 14:46 var
+user@debian:~/ashos-dev$ lsblk
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+loop0    7:0    0 687.7M  1 loop /usr/lib/live/mount/rootfs/filesystem.squashfs
+sda      8:0    0     2T  0 disk
+├─sda1   8:1    0   256M  0 part /mnt/boot/efi
+└─sda2   8:2    0     2T  0 part /mnt/boot
+sr0     11:0    1  1011M  0 rom  /usr/lib/live/mount/medium
+user@debian:~/ashos-dev$ mount | grep /mnt
+/dev/sda2 on /mnt type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=256,subvol=/@)
+/dev/sda2 on /mnt/.snapshots type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=256,subvol=/@)
+/dev/sda2 on /mnt/home type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=258,subvol=/@.snapshots)
+/dev/sda2 on /mnt/var type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=259,subvol=/@home)
+/dev/sda2 on /mnt/etc type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=260,subvol=/@var)
+/dev/sda2 on /mnt/boot type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=261,subvol=/@etc)
+/dev/sda1 on /mnt/boot/efi type vfat (rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro)
+proc on /mnt/proc type proc (rw,relatime)
+sysfs on /mnt/sys type sysfs (rw,relatime)
+user@debian:~/ashos-dev$ mount | grep /mnt
+/dev/sda2 on /mnt type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=256,subvol=/@)
+/dev/sda2 on /mnt/.snapshots type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=256,subvol=/@)
+/dev/sda2 on /mnt/home type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=258,subvol=/@.snapshots)
+/dev/sda2 on /mnt/var type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=259,subvol=/@home)
+/dev/sda2 on /mnt/etc type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=260,subvol=/@var)
+/dev/sda2 on /mnt/boot type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=261,subvol=/@etc)
+/dev/sda1 on /mnt/boot/efi type vfat (rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro)
+udev on /mnt/dev type devtmpfs (rw,nosuid,relatime,size=472888k,nr_inodes=118222,mode=755)
+devpts on /mnt/dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000)
+proc on /mnt/proc type proc (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /mnt/run type tmpfs (rw,nosuid,nodev,noexec,relatime,size=98704k,mode=755)
+sysfs on /mnt/sys type sysfs (rw,nosuid,nodev,noexec,relatime)
+efivarfs on /mnt/sys/firmware/efi/efivars type efivarfs (rw,nosuid,nodev,noexec,relatime)
+user@debian:~/ashos-dev$ ls -al /mnt
+total 40
+drwxr-xr-x   1 root root  276 Jun 20 14:59 .
+drwxr-xr-x   1 root root  140 Jun 20 14:37 ..
+drwxr-xr-x   1 root root    0 Jun 20 14:45 ast
+lrwxrwxrwx   1 root root    7 Jun 20 14:46 bin -> usr/bin
+drwxr-xr-x   1 root root  200 Jun 20 15:09 boot
+drwxr-xr-x  17 root root 3280 Jun 20 14:45 dev
+drwxr-xr-x   1 root root 2266 Jun 20 15:09 etc
+drwxr-xr-x   1 root root    0 Jun 20 14:45 home
+lrwxrwxrwx   1 root root   31 Jun 20 14:59 initrd.img -> boot/initrd.img-5.10.0-13-amd64
+lrwxrwxrwx   1 root root   31 Jun 20 14:59 initrd.img.old -> boot/initrd.img-5.10.0-13-amd64
+lrwxrwxrwx   1 root root    7 Jun 20 14:46 lib -> usr/lib
+lrwxrwxrwx   1 root root    9 Jun 20 14:46 lib32 -> usr/lib32
+lrwxrwxrwx   1 root root    9 Jun 20 14:46 lib64 -> usr/lib64
+lrwxrwxrwx   1 root root   10 Jun 20 14:46 libx32 -> usr/libx32
+drwxr-xr-x   1 root root    0 Jun 20 14:46 media
+drwxr-xr-x   1 root root    0 Jun 20 14:46 mnt
+drwxr-xr-x   1 root root    0 Jun 20 14:46 opt
+dr-xr-xr-x 170 root root    0 Jun 20 14:37 proc
+drwxr-xr-x   1 root root   30 Jun 20 14:46 root
+drwxr-xr-x   1 root root    0 Jun 20 14:45 rootfs
+drwxr-xr-x  22 root root  640 Jun 20 15:08 run
+lrwxrwxrwx   1 root root    8 Jun 20 14:46 sbin -> usr/sbin
+drwxr-xr-x   1 root root  276 Jun 20 14:59 .snapshots
+drwxr-xr-x   1 root root    0 Jun 20 14:46 srv
+dr-xr-xr-x  13 root root    0 Jun 20 14:37 sys
+drwxrwxrwt   1 root root   46 Jun 20 15:09 tmp
+drwxr-xr-x   1 root root  116 Jun 20 14:46 usr
+drwxr-xr-x   1 root root   90 Jun 20 14:46 var
+lrwxrwxrwx   1 root root   28 Jun 20 14:59 vmlinuz -> boot/vmlinuz-5.10.0-13-amd64
+lrwxrwxrwx   1 root root   28 Jun 20 14:59 vmlinuz.old -> boot/vmlinuz-5.10.0-13-amd64
+user@debian:~/ashos-dev$ lsblk
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+loop0    7:0    0 687.7M  1 loop /usr/lib/live/mount/rootfs/filesystem.squashfs
+sda      8:0    0     2T  0 disk
+├─sda1   8:1    0   256M  0 part /mnt/boot/efi
+└─sda2   8:2    0     2T  0 part /mnt/boot
+sr0     11:0    1  1011M  0 rom  /usr/lib/live/mount/medium
+user@debian:~/ashos-dev$ sudo btrfs sub list /mnt
+ID 256 gen 2968 top level 5 path @
+ID 258 gen 7 top level 5 path @.snapshots
+ID 259 gen 2972 top level 5 path @home
+ID 260 gen 2937 top level 5 path @var
+ID 261 gen 2925 top level 5 path @etc
+ID 262 gen 11 top level 5 path @boot
+user@debian:~/ashos-dev$ sudo btrfs sub list /mnt
+ID 256 gen 3128 top level 5 path @
+ID 258 gen 7 top level 5 path @.snapshots
+ID 259 gen 3128 top level 5 path @home
+ID 260 gen 3128 top level 5 path @var
+ID 261 gen 3128 top level 5 path @etc
+ID 262 gen 11 top level 5 path @boot
+user@debian:~/ashos-dev$ lsblk
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+loop0    7:0    0 687.7M  1 loop /usr/lib/live/mount/rootfs/filesystem.squashfs
+sda      8:0    0     2T  0 disk
+├─sda1   8:1    0   256M  0 part /mnt/boot/efi
+└─sda2   8:2    0     2T  0 part /mnt/boot
+sr0     11:0    1  1011M  0 rom  /usr/lib/live/mount/medium
+user@debian:~/ashos-dev$ ls -al /mnt
+total 40
+drwxr-xr-x   1 root root  276 Jun 20 14:59 .
+drwxr-xr-x   1 root root  140 Jun 20 14:37 ..
+drwxr-xr-x   1 root root   18 Jun 20 15:11 ast
+lrwxrwxrwx   1 root root    7 Jun 20 14:46 bin -> usr/bin
+drwxr-xr-x   1 root root  208 Jun 20 15:11 boot
+drwxr-xr-x  17 root root 3280 Jun 20 14:45 dev
+drwxr-xr-x   1 root root 2318 Jun 20 15:11 etc
+drwxr-xr-x   1 root root    0 Jun 20 14:45 home
+lrwxrwxrwx   1 root root   31 Jun 20 14:59 initrd.img -> boot/initrd.img-5.10.0-13-amd64
+lrwxrwxrwx   1 root root   31 Jun 20 14:59 initrd.img.old -> boot/initrd.img-5.10.0-13-amd64
+lrwxrwxrwx   1 root root    7 Jun 20 14:46 lib -> usr/lib
+lrwxrwxrwx   1 root root    9 Jun 20 14:46 lib32 -> usr/lib32
+lrwxrwxrwx   1 root root    9 Jun 20 14:46 lib64 -> usr/lib64
+lrwxrwxrwx   1 root root   10 Jun 20 14:46 libx32 -> usr/libx32
+drwxr-xr-x   1 root root    0 Jun 20 14:46 media
+drwxr-xr-x   1 root root    0 Jun 20 14:46 mnt
+drwxr-xr-x   1 root root    0 Jun 20 14:46 opt
+dr-xr-xr-x 168 root root    0 Jun 20 14:37 proc
+drwxr-xr-x   1 root root   30 Jun 20 14:46 root
+drwxr-xr-x   1 root root    0 Jun 20 14:45 rootfs
+drwxr-xr-x  22 root root  640 Jun 20 15:08 run
+lrwxrwxrwx   1 root root    8 Jun 20 14:46 sbin -> usr/sbin
+drwxr-xr-x   1 root root  276 Jun 20 14:59 .snapshots
+drwxr-xr-x   1 root root    0 Jun 20 14:46 srv
+dr-xr-xr-x  13 root root    0 Jun 20 14:37 sys
+drwxrwxrwt   1 root root    0 Jun 20 15:11 tmp
+drwxr-xr-x   1 root root  116 Jun 20 14:46 usr
+drwxr-xr-x   1 root root   90 Jun 20 14:46 var
+lrwxrwxrwx   1 root root   28 Jun 20 14:59 vmlinuz -> boot/vmlinuz-5.10.0-13-amd64
+lrwxrwxrwx   1 root root   28 Jun 20 14:59 vmlinuz.old -> boot/vmlinuz-5.10.0-13-amd64
+user@debian:~/ashos-dev$ mount | grep /mnt
+/dev/sda2 on /mnt type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=256,subvol=/@)
+/dev/sda2 on /mnt/.snapshots type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=256,subvol=/@)
+/dev/sda2 on /mnt/home type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=258,subvol=/@.snapshots)
+/dev/sda2 on /mnt/var type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=259,subvol=/@home)
+/dev/sda2 on /mnt/etc type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=260,subvol=/@var)
+/dev/sda2 on /mnt/boot type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=261,subvol=/@etc)
+/dev/sda1 on /mnt/boot/efi type vfat (rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro)
+udev on /mnt/dev type devtmpfs (rw,nosuid,relatime,size=472888k,nr_inodes=118222,mode=755)
+devpts on /mnt/dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000)
+proc on /mnt/proc type proc (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /mnt/run type tmpfs (rw,nosuid,nodev,noexec,relatime,size=98704k,mode=755)
+sysfs on /mnt/sys type sysfs (rw,nosuid,nodev,noexec,relatime)
+efivarfs on /mnt/sys/firmware/efi/efivars type efivarfs (rw,nosuid,nodev,noexec,relatime)
+user@debian:~/ashos-dev$ ls -al /mnt
+total 40
+drwxr-xr-x   1 root root  276 Jun 20 14:59 .
+drwxr-xr-x   1 root root  140 Jun 20 14:37 ..
+drwxr-xr-x   1 root root   38 Jun 20 15:13 ast
+lrwxrwxrwx   1 root root    7 Jun 20 14:46 bin -> usr/bin
+drwxr-xr-x   1 root root   28 Jun 20 15:13 boot
+drwxr-xr-x  17 root root 3280 Jun 20 14:45 dev
+drwxr-xr-x   1 root root  232 Jun 20 15:13 etc
+drwxr-xr-x   1 root root    0 Jun 20 14:45 home
+lrwxrwxrwx   1 root root   31 Jun 20 14:59 initrd.img -> boot/initrd.img-5.10.0-13-amd64
+lrwxrwxrwx   1 root root   31 Jun 20 14:59 initrd.img.old -> boot/initrd.img-5.10.0-13-amd64
+lrwxrwxrwx   1 root root    7 Jun 20 14:46 lib -> usr/lib
+lrwxrwxrwx   1 root root    9 Jun 20 14:46 lib32 -> usr/lib32
+lrwxrwxrwx   1 root root    9 Jun 20 14:46 lib64 -> usr/lib64
+lrwxrwxrwx   1 root root   10 Jun 20 14:46 libx32 -> usr/libx32
+drwxr-xr-x   1 root root    0 Jun 20 14:46 media
+drwxr-xr-x   1 root root    0 Jun 20 14:46 mnt
+drwxr-xr-x   1 root root    0 Jun 20 14:46 opt
+dr-xr-xr-x 169 root root    0 Jun 20 14:37 proc
+drwxr-xr-x   1 root root   30 Jun 20 14:46 root
+drwxr-xr-x   1 root root   44 Jun 20 15:13 rootfs
+drwxr-xr-x  22 root root  640 Jun 20 15:08 run
+lrwxrwxrwx   1 root root    8 Jun 20 14:46 sbin -> usr/sbin
+drwxr-xr-x   1 root root  276 Jun 20 14:59 .snapshots
+drwxr-xr-x   1 root root    0 Jun 20 14:46 srv
+dr-xr-xr-x  13 root root    0 Jun 20 14:37 sys
+drwxrwxrwt   1 root root    0 Jun 20 15:13 tmp
+drwxr-xr-x   1 root root  116 Jun 20 14:46 usr
+drwxr-xr-x   1 root root   90 Jun 20 14:46 var
+lrwxrwxrwx   1 root root   28 Jun 20 14:59 vmlinuz -> boot/vmlinuz-5.10.0-13-amd64
+lrwxrwxrwx   1 root root   28 Jun 20 14:59 vmlinuz.old -> boot/vmlinuz-5.10.0-13-amd64
+user@debian:~/ashos-dev$ mount | grep /mnt
+/dev/sda2 on /mnt type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=256,subvol=/@)
+/dev/sda2 on /mnt/.snapshots type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=256,subvol=/@)
+/dev/sda2 on /mnt/home type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=258,subvol=/@.snapshots)
+/dev/sda2 on /mnt/var type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=259,subvol=/@home)
+udev on /mnt/dev type devtmpfs (rw,nosuid,relatime,size=472888k,nr_inodes=118222,mode=755)
+devpts on /mnt/dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000)
+proc on /mnt/proc type proc (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /mnt/run type tmpfs (rw,nosuid,nodev,noexec,relatime,size=98704k,mode=755)
+sysfs on /mnt/sys type sysfs (rw,nosuid,nodev,noexec,relatime)
+efivarfs on /mnt/sys/firmware/efi/efivars type efivarfs (rw,nosuid,nodev,noexec,relatime)
+/dev/sda2 on /mnt/.snapshots/boot/boot-tmp type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=262,subvol=/@boot)
+/dev/sda2 on /mnt/.snapshots/etc/etc-tmp type btrfs (rw,noatime,compress=zstd:3,space_cache,subvolid=261,subvol=/@etc)
+user@debian:~/ashos-dev$ ls -al /mnt
+total 40
+drwxr-xr-x   1 root root  276 Jun 20 14:59 .
+drwxr-xr-x   1 root root  140 Jun 20 14:37 ..
+drwxr-xr-x   1 root root   38 Jun 20 15:13 ast
+lrwxrwxrwx   1 root root    7 Jun 20 14:46 bin -> usr/bin
+drwxr-xr-x   1 root root   28 Jun 20 15:13 boot
+drwxr-xr-x  17 root root 3280 Jun 20 14:45 dev
+drwxr-xr-x   1 root root  232 Jun 20 15:13 etc
+drwxr-xr-x   1 root root    0 Jun 20 14:45 home
+lrwxrwxrwx   1 root root   31 Jun 20 14:59 initrd.img -> boot/initrd.img-5.10.0-13-amd64
+lrwxrwxrwx   1 root root   31 Jun 20 14:59 initrd.img.old -> boot/initrd.img-5.10.0-13-amd64
+lrwxrwxrwx   1 root root    7 Jun 20 14:46 lib -> usr/lib
+lrwxrwxrwx   1 root root    9 Jun 20 14:46 lib32 -> usr/lib32
+lrwxrwxrwx   1 root root    9 Jun 20 14:46 lib64 -> usr/lib64
+lrwxrwxrwx   1 root root   10 Jun 20 14:46 libx32 -> usr/libx32
+drwxr-xr-x   1 root root    0 Jun 20 14:46 media
+drwxr-xr-x   1 root root    0 Jun 20 14:46 mnt
+drwxr-xr-x   1 root root    0 Jun 20 14:46 opt
+dr-xr-xr-x 169 root root    0 Jun 20 14:37 proc
+drwxr-xr-x   1 root root   30 Jun 20 14:46 root
+drwxr-xr-x   1 root root   44 Jun 20 15:13 rootfs
+drwxr-xr-x  22 root root  640 Jun 20 15:08 run
+lrwxrwxrwx   1 root root    8 Jun 20 14:46 sbin -> usr/sbin
+drwxr-xr-x   1 root root  276 Jun 20 14:59 .snapshots
+drwxr-xr-x   1 root root    0 Jun 20 14:46 srv
+dr-xr-xr-x  13 root root    0 Jun 20 14:37 sys
+drwxrwxrwt   1 root root    0 Jun 20 15:13 tmp
+drwxr-xr-x   1 root root  116 Jun 20 14:46 usr
+drwxr-xr-x   1 root root   90 Jun 20 14:46 var
+lrwxrwxrwx   1 root root   28 Jun 20 14:59 vmlinuz -> boot/vmlinuz-5.10.0-13-amd64
+lrwxrwxrwx   1 root root   28 Jun 20 14:59 vmlinuz.old -> boot/vmlinuz-5.10.0-13-amd64
+user@debian:~/ashos-dev$ lsblk
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+loop0    7:0    0 687.7M  1 loop /usr/lib/live/mount/rootfs/filesystem.squashfs
+sda      8:0    0     2T  0 disk
+├─sda1   8:1    0   256M  0 part
+└─sda2   8:2    0     2T  0 part /mnt/.snapshots/etc/etc-tmp
+sr0     11:0    1  1011M  0 rom  /usr/lib/live/mount/medium
+user@debian:~/ashos-dev$ sudo btrfs sub list /mnt
+ID 256 gen 3138 top level 5 path @
+ID 258 gen 7 top level 5 path @.snapshots
+ID 259 gen 3128 top level 5 path @home
+ID 260 gen 3129 top level 5 path @var
+ID 261 gen 3134 top level 5 path @etc
+ID 262 gen 11 top level 5 path @boot
+ID 264 gen 3137 top level 256 path rootfs/snapshot-0
+ID 265 gen 3136 top level 256 path etc/etc-tmp
+ID 266 gen 3134 top level 256 path var/var-tmp
+ID 267 gen 3135 top level 256 path boot/boot-tmp
+ID 268 gen 3134 top level 256 path var/var-0
+ID 269 gen 3135 top level 256 path boot/boot-0
+ID 270 gen 3136 top level 256 path etc/etc-0
+ID 271 gen 3138 top level 256 path rootfs/snapshot-tmp
+user@debian:~/ashos-dev$
+
+

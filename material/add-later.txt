@@ -1,4 +1,9 @@
+$ dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -w 'required\|important' > ~/sources.list
+os.system("echo 'dpkg-query -f "'"'"${binary:Package} ${Priority}\\n"'"'" -W | grep -w "'"'"required\|important"'"'"' | tee -a /home/me/cmDELs.list")
+
 # steps to do apt-get install inside chroot
+
+installer.py make code chunks as def/functions as much as possible
 
 if you choose no for was passport set properly, it throws an error that username is incorrect and it is a forver loop of crap, only way out is ctrl-z
 
