@@ -1,5 +1,7 @@
 # steps to do apt-get install inside chroot
 
+if you choose no for was passport set properly, it throws an error that username is incorrect and it is a forver loop of crap, only way out is ctrl-z
+
 is there ast under /mnt ???????????????? why? because of mountpoints scrambled? /mnt/ast
 /mnt busy: fuser -v /path
 

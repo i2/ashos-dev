@@ -50,7 +50,8 @@ def main(args):
     mntdirs = ["",".snapshots","home","var","etc","boot"]
     mntdirs_n = mntdirs
     mntdirs_n.remove("")
-###    astpart = to_uuid(args[1])
+###    astpart = to_uuid(args[1])  #why does it error out when I put this line up here?
+    release = "bullseye"
 
 ###    #REZA: STEP 1 BEGINS HERE
 
@@ -94,11 +95,16 @@ def main(args):
         os.system("sudo mkdir /mnt/boot/efi")
         os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
+    # Update bash profile (optional) - for debug purposes in live iso
+    os.system('echo "alias paste='"'"'curl -F "'"'"'"sprunge=<-"'"'"'" http://sprunge.us'"'"' " | tee -a $HOME/.*zhrc')
+    os.system("echo 'export LC_ALL=C' | tee -a $HOME/.*shrc")
+    os.system("echo 'setw -g mode-keys vi' | tee -a $HOME/.tmux.conf")
+
 ###    #REZA: STEP 2 BEGINS HERE
 
-    # Debootstrap
+    # Bootstrap
     os.system("sudo apt-get install -y debootstrap")
-    os.system("sudo debootstrap bullseye /mnt http://ftp.debian.org/debian")
+    os.system(f"sudo debootstrap {release} /mnt http://ftp.debian.org/debian")
 
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
         os.system(f"sudo mount -B {i} /mnt{i}")
@@ -107,7 +113,7 @@ def main(args):
     os.system('sudo chroot /mnt /bin/sh -c "LC_ALL=C apt-get install -y linux-image-5.10.0-13-amd64"')
 
     # Install anytree in chroot
-    os.system("echo 'deb [trusted=yes] http://www.deb-multimedia.org bullseye main' | sudo tee -a /mnt/etc/apt/sources.list.d/multimedia.list >/dev/null")
+    os.system(f"echo 'deb [trusted=yes] http://www.deb-multimedia.org {release} main' | sudo tee -a /mnt/etc/apt/sources.list.d/multimedia.list >/dev/null")
     os.system('sudo chroot /mnt /bin/sh -c "LC_ALL=C apt-get install -y deb-multimedia-keyring --allow-unauthenticated"')
     os.system('sudo chroot /mnt /bin/sh -c "LC_ALL=C apt update -oAcquire::AllowInsecureRepositories=true"')
     os.system("sudo chmod -R 1777 /mnt/tmp") #REZA this might need to be commented out if no error
@@ -361,7 +367,7 @@ def main(args):
 
 #    os.system("sudo umount -R /mnt")   #gives error /mnt target busy --- maybe I should use: sudo umount -R /mnt/*
 #    os.system(f"sudo mount {args[1]} /mnt")
-###    os.system("sudo btrfs sub del /mnt/@") # it gives an error could not statfs: No such file or directory
+###    os.system("sudo btrfs sub del /mnt/@") # it gives an error could not statfs: No such file or directory (could not statfs, no such file or directory)
 #    os.system("sudo umount -R /mnt")
 #    clear()
 #    print("Installation complete")
