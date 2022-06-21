@@ -209,3 +209,6 @@ regarding extending support to oses  that don;t support btrfs: is it possibke to
 as pointer, keeypign track of what is what and where. Something like MBR, keeping addresses on btrfs but the acual file system could be anything (xfs, ext3, dragonfly etc)
 
 
+
+
+open one of the vms debiast and see if all mountponnt are combined and scrambled even ferom before instaklers?
