@@ -57,14 +57,14 @@ def guinstall(username, packages, DesktopInstall):
     username = set_user()
     set_password(username)
     os.system(f"sudo chroot /mnt usermod -aG audio,input,video,wheel {username}")
-    os.system(f"sudo chroot /mnt passwd -l root")
-    os.system(f"sudo chmod +w /mnt/etc/sudoers")
-    os.system(f"echo '%wheel ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
-    os.system(f"sudo chmod -w /mnt/etc/sudoers")
+    os.system("sudo chroot /mnt passwd -l root")
+    os.system("sudo chmod +w /mnt/etc/sudoers")
+    os.system("echo '%wheel ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
+    os.system("sudo chmod -w /mnt/etc/sudoers")
     os.system(f"sudo chroot /mnt mkdir /home/{username}")
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /home/{username}/.bashrc")
     os.system(f"sudo chroot /mnt chown -R {username} /home/{username}")
-    os.system(f"sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db")
+    os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db")
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-1")
     os.system("sudo btrfs sub del /mnt/.snapshots/etc/etc-tmp")
     os.system("sudo btrfs sub del /mnt/.snapshots/var/var-tmp")
@@ -146,7 +146,7 @@ def main(args):
     for btrdir in btrdirs:
         os.system(f"sudo btrfs sub create /mnt/{btrdir}")
 
-    os.system(f"sudo umount /mnt")
+    os.system("sudo umount /mnt")
     os.system(f"sudo mount {args[1]} -o subvol=@,compress=zstd,noatime /mnt")
 
     for mntdir in mntdirs:
@@ -206,10 +206,10 @@ def main(args):
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/tmp /tmp none bind 0 0' | sudo tee -a /mnt/etc/fstab")
     
-    astpart = to_uuid(args[1])
+    astpart = to_uuid(args[1]) ###THIS will be removed when partitioning happens outside this installer
 
-    os.system(f"sudo mkdir -p /mnt/usr/share/ast/db")
-    os.system(f"echo '0' | sudo tee /mnt/usr/share/ast/snap")
+    os.system("sudo mkdir -p /mnt/usr/share/ast/db")
+    os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
 
     os.system(f"echo 'NAME=\"astOS\"' | sudo tee /mnt/etc/os-release")
     os.system(f"echo 'PRETTY_NAME=\"astOS\"' | sudo tee -a /mnt/etc/os-release")
@@ -218,7 +218,7 @@ def main(args):
     os.system(f"echo 'ANSI_COLOR=\"38;2;23;147;209\"' | sudo tee -a /mnt/etc/os-release")
     os.system(f"echo 'HOME_URL=\"https://github.com/CuBeRJAN/astOS\"' | sudo tee -a /mnt/etc/os-release")
     os.system(f"echo 'LOGO=astos-logo' | sudo tee -a /mnt/etc/os-release")
-    os.system(f"sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db")
+    os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db")
     #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf")
     os.system(f"echo 'DISTRIB_ID=\"astOS\"' | sudo tee /mnt/etc/lsb-release")
     os.system(f"echo 'DISTRIB_RELEASE=\"rolling\"' | sudo tee -a /mnt/etc/lsb-release")
@@ -228,9 +228,9 @@ def main(args):
 
 ###    #REZA: STEP 4 BEGINS HERE
     os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen")
-    os.system(f"sudo chroot /mnt locale-gen")
-    os.system(f"sudo chroot /mnt hwclock --systohc")
-    os.system(f"echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
+    os.system("sudo chroot /mnt locale-gen")
+    os.system("sudo chroot /mnt hwclock --systohc")
+    os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
 
     os.system("sudo sed -i '0,/@/{s,@,@.snapshots/rootfs/snapshot-tmp,}' /mnt/etc/fstab")

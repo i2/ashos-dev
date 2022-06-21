@@ -222,3 +222,9 @@ open one of the vms debiast and see if all mountponnt are combined and scrambled
 
 
 the reason Im not deleting the temporary debian-ashos-installer vms is if I have some interesting useful commands in thier the bash history
+
+
+
+
+regex for removing unnecessary f-strings when not needed: f"[^{]*"
+
