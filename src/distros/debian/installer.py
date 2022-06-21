@@ -125,7 +125,7 @@ def main(args):
 ### STEP 1
 
     # Partitioning
-    os.system("shopt -s nullglob && echo 'export LC_ALL=C LANGUAGE=C LANG=C' | tee -a $HOME/.*shrc") # Perl complains if not set
+    os.system("find $HOME -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C LANGUAGE=C LANG=C >> $1' -- {} \;") # Perl complains if not set
     os.system("sudo apt-get remove -y --purge man-db") # make installs faster (because of trigger man-db bug)
     os.system("sudo apt-get update")
     os.system("sudo apt-get autoremove -y")
@@ -162,8 +162,9 @@ def main(args):
         os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
     # Modify shell profile for debug purposes in live iso (optional temporary)
-    os.system('echo "alias paste='"'"'curl -F "'"'"'"sprunge=<-"'"'"'" http://sprunge.us'"'"' " | tee -a $HOME/.*zhrc')
+    os.system('echo "alias paste='"'"'curl -F "'"'"'"sprunge=<-"'"'"'" http://sprunge.us'"'"' " | tee -a $HOME/.*shrc')
     os.system("shopt -s nullglob && echo 'export LC_ALL=C' | sudo tee -a /mnt/root/.*shrc")
+    os.system("find /mnt/root/ -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C | sudo tee -a $1' -- {} \;")
     os.system("echo 'setw -g mode-keys vi' | tee -a $HOME/.tmux.conf")
 
 ### STEP 2
