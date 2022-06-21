@@ -1,8 +1,24 @@
 # steps to do apt-get install inside chroot
 
+is there ast under /mnt ???????????????? why? because of mountpoints scrambled? /mnt/ast
+/mnt busy: fuser -v /path
+
+
+To make sure that you see a warning while using an insecure repository, better use allow-insecure=yes instead of [trusted=yes] like below
+deb [ allow-insecure=yes ] ...
+
+echo "export LC_ALL=C" | tee -a $HOME/.profile
+echo "export LC_ALL=C" | sudo tee -a /mnt/root/.profile
+
+add user to minimal-profile too
+
 update grub.cfg for debian
 
 https://distro.readthedocs.io/en/latest/#id4
+
+sudo apt-get -o Dpkg::Options::="--force-overwrite" install <package-name>
+
+
 
 grab image from apt-cache instead of fixed linux-image-5.10.0-13-amd64
 
@@ -128,20 +144,20 @@ do step 2 but until chmod ing /mnt/tmp
 stop there and go to the example vm, and try installing something. If permission error on tmp, then that tmp chmod is needed, otherwise just remove that commented line
 
 
+tautology
 
 
 
 
 
-
-
+--------------- lines removed from source files to make it smaller --------------------------------------------------------
 ### THIS LINE IS MOVED DOWN (my recent PR fix)    os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp") #This gives the error, should likely be moved to line 206
 
     #Note: After changing the default subvolume on a system with GRUB, you should run grub-install again to notify the bootloader of the changes.
     #Changing the default subvolume with btrfs subvolume set-default will make the top level of the filesystem inaccessible, except by use of the subvol=/ or subvolid=5 mount options [6].
 
 
-tautology
+
 
 
 
@@ -158,3 +174,38 @@ tautology
 #    os.system("sudo umount /mnt/dev") #not existing (maybe not needed?)
 #    os.system("sudo umount /mnt/proc") #not existing (maybe not needed?)
 #    os.system("sudo umount /mnt/sys") #not existing (maybe not needed?)
+
+----------------------------------------------------------------------------------------------------------------
+visceral
+
+
+bind '"' split-window -c "#{pane_current_path}"
+bind % split-window -h -c "#{pane_current_path}"
+bind c new-window -c "#{pane_current_path}"
+
+
+
+
+
+
+
+
+
+
+
+
+sudo apt-get clean
+sudo apt-get autoclean
+
+
+
+
+moolah = money for mollahs
+
+
+zfs snapshots for bsdashos
+
+regarding extending support to oses  that don;t support btrfs: is it possibke to have a portion of disk formtateted as btrfs for ashos and taht would act
+as pointer, keeypign track of what is what and where. Something like MBR, keeping addresses on btrfs but the acual file system could be anything (xfs, ext3, dragonfly etc)
+
+

@@ -50,7 +50,7 @@ def main(args):
     mntdirs = ["",".snapshots","home","var","etc","boot"]
     mntdirs_n = mntdirs
     mntdirs_n.remove("")
-    astpart = to_uuid(args[1])
+###    astpart = to_uuid(args[1])
 
 ###    #REZA: STEP 1 BEGINS HERE
 
@@ -129,6 +129,8 @@ def main(args):
 
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/tmp /tmp none bind 0 0' | sudo tee -a /mnt/etc/fstab")
+    
+    astpart = to_uuid(args[1])
 
     os.system(f"sudo mkdir -p /mnt/usr/share/ast/db")
     os.system(f"echo '0' | sudo tee /mnt/usr/share/ast/snap")
@@ -357,7 +359,7 @@ def main(args):
 
 ###    #REZA: STEP 7 BEGINS HERE
 
-#    os.system("sudo umount -R /mnt")
+#    os.system("sudo umount -R /mnt")   #gives error /mnt target busy --- maybe I should use: sudo umount -R /mnt/*
 #    os.system(f"sudo mount {args[1]} /mnt")
 ###    os.system("sudo btrfs sub del /mnt/@") # it gives an error could not statfs: No such file or directory
 #    os.system("sudo umount -R /mnt")
