@@ -1,0 +1,32 @@
+an:~/ashos-dev$ lsblk
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+loop0    7:0    0 687.7M  1 loop /usr/lib/live/mount/rootfs/filesystem.squashfs
+sda      8:0    0     2T  0 disk
+├─sda1   8:1    0   256M  0 part /mnt/boot/efi
+└─sda2   8:2    0     2T  0 part /mnt/boot
+sr0     11:0    1  1011M  0 rom  /usr/lib/live/mount/medium
+user@debian:~/ashos-dev$ sudo btrfs sub list /mnt
+ID 256 gen 2365 top level 5 path @
+ID 258 gen 13 top level 5 path @.snapshots
+ID 259 gen 8 top level 5 path @home
+ID 260 gen 2368 top level 5 path @var
+ID 261 gen 2305 top level 5 path @etc
+ID 262 gen 2156 top level 5 path @boot
+user@debian:~/ashos-dev$ sudo btrfs sub list /mnt
+ID 256 gen 3589 top level 5 path @
+ID 258 gen 3589 top level 5 path @.snapshots
+ID 259 gen 8 top level 5 path @home
+ID 260 gen 3580 top level 5 path @var
+ID 261 gen 3580 top level 5 path @etc
+ID 262 gen 3585 top level 5 path @boot
+ID 264 gen 3588 top level 258 path @.snapshots/rootfs/snapshot-0
+ID 265 gen 3587 top level 258 path @.snapshots/etc/etc-tmp
+ID 266 gen 3585 top level 258 path @.snapshots/var/var-tmp
+ID 267 gen 3586 top level 258 path @.snapshots/boot/boot-tmp
+ID 268 gen 3585 top level 258 path @.snapshots/var/var-0
+ID 269 gen 3586 top level 258 path @.snapshots/boot/boot-0
+ID 270 gen 3587 top level 258 path @.snapshots/etc/etc-0
+ID 271 gen 3589 top level 258 path @.snapshots/rootfs/snapshot-tmp
+user@debian:~/ashos-dev$
+
+

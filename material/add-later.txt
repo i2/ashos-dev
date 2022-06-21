@@ -1,6 +1,10 @@
 # steps to do apt-get install inside chroot
 
+update grub.cfg for debian
+
 https://distro.readthedocs.io/en/latest/#id4
+
+grab image from apt-cache instead of fixed linux-image-5.10.0-13-amd64
 
 ast tree of many distributions
  base 0: Arch
@@ -122,3 +126,35 @@ what is left:
 do step 2 but until chmod ing /mnt/tmp
 
 stop there and go to the example vm, and try installing something. If permission error on tmp, then that tmp chmod is needed, otherwise just remove that commented line
+
+
+
+
+
+
+
+
+
+### THIS LINE IS MOVED DOWN (my recent PR fix)    os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp") #This gives the error, should likely be moved to line 206
+
+    #Note: After changing the default subvolume on a system with GRUB, you should run grub-install again to notify the bootloader of the changes.
+    #Changing the default subvolume with btrfs subvolume set-default will make the top level of the filesystem inaccessible, except by use of the subvol=/ or subvolid=5 mount options [6].
+
+
+tautology
+
+
+
+#   os.system("sudo chroot /mnt modprobe efivarfs") THis may NOT be needed as when I ran without it, I got a warning: "EFI variables are not supported on this system"
+
+
+
+
+#   os.system("sudo chroot /mnt modprobe efivarfs") THis may NOT be needed as when I ran without it, I got a warning: "EFI variables are not supported on this system"
+    os.system("sudo mount -o bind /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars") #maybe move this up top when I am doing all the other mountings
+
+
+
+#    os.system("sudo umount /mnt/dev") #not existing (maybe not needed?)
+#    os.system("sudo umount /mnt/proc") #not existing (maybe not needed?)
+#    os.system("sudo umount /mnt/sys") #not existing (maybe not needed?)

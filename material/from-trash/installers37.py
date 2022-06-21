@@ -53,7 +53,7 @@ def main(args):
 
 ###    #REZA: STEP 3 BEGINS HERE
     mntdirs_n = mntdirs
-    mntdirs_n = mntdirs_n.remove("")
+    mntdirs_n.remove("")
 ################# REZA attention
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@,compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
 
