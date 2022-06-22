@@ -157,7 +157,7 @@ def main(args):
     os.system("find /mnt/root/ -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C | sudo tee -a $1' -- {} \;")
     os.system("echo -e 'setw -g mode-keys vi\nset -g history-limit 999999' >> $HOME/.tmux.conf")
 
-    # Bootstrap
+    # Bootstrap (minimal)
     os.system("sudo apt-get install -y debootstrap")
     #os.system("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | awk '{print $1}' | tr '\n' ','")
     #h = str(subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | sed -n 's# .*\n#,#g'", shell=True))
