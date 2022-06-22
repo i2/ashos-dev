@@ -511,7 +511,7 @@ def delete(snapshot):
 # Update base
 def update_base():
     prepare("0")
-    os.system(f"chroot /.snapshots/rootfs/snapshot-chr0 pacman -Syyu")
+    os.system(f"chroot /.snapshots/rootfs/snapshot-chr0 apt-get update")
     posttrans("0")
 
 # Prepare snapshot to chroot dir to install or chroot into
@@ -582,7 +582,7 @@ def upgrade(snapshot):
         print("changing base snapshot is not allowed")
     else:
         prepare(snapshot)
-        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} pacman -Syyu")) # Default upgrade behaviour is now "safe" update, meaning failed updates get fully discarded
+        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} apt-get update")) # Default upgrade behaviour is now "safe" update, meaning failed updates get fully discarded
         if int(excode) == 0:
             posttrans(snapshot)
             print(f"snapshot {snapshot} updated successfully")
@@ -592,7 +592,7 @@ def upgrade(snapshot):
 # Noninteractive update
 def autoupgrade(snapshot):
     prepare(snapshot)
-    excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} pacman --noconfirm -Syyu"))
+    excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} apt-get update -y"))
     if int(excode) == 0:
         posttrans(snapshot)
         os.system("echo 0 > /.snapshots/ast/upstate")

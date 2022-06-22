@@ -227,7 +227,7 @@ def main(args):
         os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
 
     # GRUB
-    os.system(f"sudo chroot /mnt sed -i s,Debian,astOS,g /etc/default/grub")
+    os.system(f"sudo chroot /mnt sed -i s,Arch,astOS,g /etc/default/grub")
     os.system(f"sudo chroot /mnt grub-install {args[2]}")
     os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo sed -i '0,/subvol=@/{s,subvol=@,subvol=@.snapshots/rootfs/snapshot-tmp,g}' /mnt/boot/grub/grub.cfg")
