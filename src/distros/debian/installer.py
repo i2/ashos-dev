@@ -159,7 +159,11 @@ def main(args):
 
     # Bootstrap
     os.system("sudo apt-get install -y debootstrap")
-    os.system(f"sudo debootstrap --arch {ARCH} {RELEASE} /mnt http://ftp.debian.org/debian")
+    #os.system("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | awk '{print $1}' | tr '\n' ','")
+    #h = str(subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | sed -n 's# .*\n#,#g'", shell=True))
+    excl = str(subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | awk '{print $1}'", shell=True))
+    excl.replace("\\n",",").replace("b'","").replace(",'","")
+    os.system(f"sudo debootstrap --arch {ARCH} {RELEASE} /mnt http://ftp.debian.org/debian --exclude {excl}")
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
         os.system(f"sudo mount -B {i} /mnt{i}") # Mount-points needed for chrooting
     os.system(f"sudo chroot /mnt apt-get install -y linux-image-{ARCH}")

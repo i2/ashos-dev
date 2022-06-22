@@ -1,5 +1,12 @@
 ###################################### DEBIAN ETC ######################################
 
+In a Debian package's control file, there is a Priority field which can be set to one of: required, important, standard, optional, extra
+
+https://fekir.info/post/minimize-debian/
+localepurge 
+
+Unwanted files, like most of the files from the following sections, can be removed at install time by using dpkg filters, see dpkg(1) --path-exclude and --path-include options.
+
 set_password("root") didn't for gnome debian install?!!!!!!!!!!!!!
 
 questions:
@@ -13,7 +20,8 @@ make astpk.py more modular and therefore more common, so that it can be shared a
 Use cdebootstrap/multistrap instead of debootstrap?
 - better logging mechanism, better than appending ' | tee -a $HOME/ash.log' to all os.system commands?
 
-$ dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -w 'required\|important' > ~/sources.list
+https://unix.stackexchange.com/questions/219253/the-most-minimal-debian-sid-installed-with-debootstrap
+$ dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -w 'required\|important' > /etc/apt/sources.list
 os.system("echo 'dpkg-query -f "'"'"${binary:Package} ${Priority}\\n"'"'" -W | grep -w "'"'"required\|important"'"'"' | tee -a /home/me/cmDELs.list")
 
 # steps to do apt-get install inside chroot
