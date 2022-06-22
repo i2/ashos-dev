@@ -25,11 +25,11 @@ def set_user():
     os.system(f"sudo chroot /mnt useradd {username}")
     return username
 
-def set_password(username):
+def set_password(u):
     clear()
     print("Please enter a password:")
     while True:
-        os.system(f"sudo chroot /mnt passwd {username}")
+        os.system(f"sudo chroot /mnt passwd {u}")
         print("Was your password set properly (y/n)?")
         reply = input("> ")
         if reply.casefold() == "y":
@@ -132,6 +132,8 @@ def main(args):
     os.system("sudo /usr/sbin/mkfs.vfat -F32 -n EFI /dev/sda1")
     os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
 
+    astpart = to_uuid(args[1])
+
     # Mount and create necessary sub-volumes and directories
     os.system(f"sudo mount {args[1]} /mnt")
     for btrdir in btrdirs:
@@ -153,7 +155,7 @@ def main(args):
     os.system('echo "alias paste='"'"'curl -F "'"'"'"sprunge=<-"'"'"'" http://sprunge.us'"'"' " | tee -a $HOME/.*shrc')
     os.system("shopt -s nullglob && echo 'export LC_ALL=C' | sudo tee -a /mnt/root/.*shrc")
     os.system("find /mnt/root/ -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C | sudo tee -a $1' -- {} \;")
-    os.system("echo 'setw -g mode-keys vi' | tee -a $HOME/.tmux.conf")
+    os.system("echo -e 'setw -g mode-keys vi\nset -g history-limit 999999' >> $HOME/.tmux.conf")
 
     # Bootstrap
     os.system("sudo apt-get install -y debootstrap")
@@ -182,10 +184,8 @@ def main(args):
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/tmp /tmp none bind 0 0' | sudo tee -a /mnt/etc/fstab")
 
-    astpart = to_uuid(args[1])
-
-    os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
     os.system("sudo mkdir -p /mnt/usr/share/ast/db")
+    os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
     os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db")
     #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf")
 
@@ -212,8 +212,8 @@ def main(args):
     os.system("sudo sed -i '0,/@/{s,@,@.snapshots/rootfs/snapshot-tmp,}' /mnt/etc/fstab")
     os.system("sudo sed -i '0,/@etc/{s,@etc,@.snapshots/etc/etc-tmp,}' /mnt/etc/fstab")
     os.system("sudo sed -i '0,/@boot/{s,@boot,@.snapshots/boot/boot-tmp,}' /mnt/etc/fstab")
-    os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
 
+    os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
     os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
 
     set_password("root")
@@ -227,7 +227,7 @@ def main(args):
         os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
 
     # GRUB
-    os.system(f"sudo chroot /mnt sed -i s,Arch,astOS,g /etc/default/grub")
+    os.system(f"sudo chroot /mnt sed -i s,Debian,astOS,g /etc/default/grub")
     os.system(f"sudo chroot /mnt grub-install {args[2]}")
     os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo sed -i '0,/subvol=@/{s,subvol=@,subvol=@.snapshots/rootfs/snapshot-tmp,g}' /mnt/boot/grub/grub.cfg")
