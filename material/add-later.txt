@@ -1,5 +1,7 @@
 ###################################### DEBIAN ETC ######################################
 
+set_password("root") didn't for gnome debian install?!!!!!!!!!!!!!
+
 questions:
 os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-tmp/* /mnt/boot") #why umounted /mnt/boot and then do this?
 os.system(f"sudo mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")   # i didn't have sudo here before, so probbly wasn't creating these folders!

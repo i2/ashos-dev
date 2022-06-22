@@ -173,22 +173,23 @@ def main(args):
     else:
         os.system("sudo chroot /mnt apt-get install -y grub-pc")
 
+    # Update fstab
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@,compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
-
     for mntdir in mntdirs_n:
         os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
-
     if efi:
         os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | sudo tee -a /mnt/etc/fstab")
-
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/tmp /tmp none bind 0 0' | sudo tee -a /mnt/etc/fstab")
 
     astpart = to_uuid(args[1])
 
-    os.system("sudo mkdir -p /mnt/usr/share/ast/db")
     os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
+    os.system("sudo mkdir -p /mnt/usr/share/ast/db")
+    os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db")
+    #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf")
 
+    # Modify OS release information (optional)
     os.system(f"echo 'NAME=\"astOS\"' | sudo tee /mnt/etc/os-release")
     os.system(f"echo 'PRETTY_NAME=\"astOS\"' | sudo tee -a /mnt/etc/os-release")
     os.system(f"echo 'ID=astos' | sudo tee -a /mnt/etc/os-release")
@@ -196,19 +197,17 @@ def main(args):
     os.system(f"echo 'ANSI_COLOR=\"38;2;23;147;209\"' | sudo tee -a /mnt/etc/os-release")
     os.system(f"echo 'HOME_URL=\"https://github.com/CuBeRJAN/astOS\"' | sudo tee -a /mnt/etc/os-release")
     os.system(f"echo 'LOGO=astos-logo' | sudo tee -a /mnt/etc/os-release")
-    os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db")
-    #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf")
     os.system(f"echo 'DISTRIB_ID=\"astOS\"' | sudo tee /mnt/etc/lsb-release")
     os.system(f"echo 'DISTRIB_RELEASE=\"rolling\"' | sudo tee -a /mnt/etc/lsb-release")
     os.system(f"echo 'DISTRIB_DESCRIPTION=astOS' | sudo tee -a /mnt/etc/lsb-release")
 
-    os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
-
+    # Update hostname, locales and timezone
+    os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
     os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen")
     os.system("sudo chroot /mnt locale-gen")
-    os.system("sudo chroot /mnt hwclock --systohc")
     os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
-    os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
+    os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
+    os.system("sudo chroot /mnt hwclock --systohc")
 
     os.system("sudo sed -i '0,/@/{s,@,@.snapshots/rootfs/snapshot-tmp,}' /mnt/etc/fstab")
     os.system("sudo sed -i '0,/@etc/{s,@etc,@.snapshots/etc/etc-tmp,}' /mnt/etc/fstab")
@@ -221,17 +220,18 @@ def main(args):
 
     os.system("sudo chroot /mnt systemctl enable NetworkManager")
 
+    # Initialize fstree
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
-
     if DesktopInstall:
         os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'},{\\'name\\': \\'1\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
         os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
 
+    # GRUB
     os.system(f"sudo chroot /mnt sed -i s,Arch,astOS,g /etc/default/grub")
-
     os.system(f"sudo chroot /mnt grub-install {args[2]}")
     os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo sed -i '0,/subvol=@/{s,subvol=@,subvol=@.snapshots/rootfs/snapshot-tmp,g}' /mnt/boot/grub/grub.cfg")
+
     os.system("sudo cp ./src/distros/debian/astpk.py /mnt/usr/local/sbin/ast")
     os.system("sudo chroot /mnt chmod +x /usr/local/sbin/ast")
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
