@@ -1,9 +1,15 @@
+###################################### DEBIAN ETC ######################################
+
 questions:
 os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-tmp/* /mnt/boot") #why umounted /mnt/boot and then do this?
 os.system(f"sudo mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")   # i didn't have sudo here before, so probbly wasn't creating these folders!
 
+bug at unmounting at the end: /mnt/dev was mounted twice!!!!! so had to unmount it twice so I can unmount /mnt
+
 ToDo:
 make astpk.py more modular and therefore more common, so that it can be shared among different distro. The uncommon lines of code can maybe exported to another python file?
+Use cdebootstrap/multistrap instead of debootstrap?
+- better logging mechanism, better than appending ' | tee -a $HOME/ash.log' to all os.system commands?
 
 $ dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -w 'required\|important' > ~/sources.list
 os.system("echo 'dpkg-query -f "'"'"${binary:Package} ${Priority}\\n"'"'" -W | grep -w "'"'"required\|important"'"'"' | tee -a /home/me/cmDELs.list")
@@ -261,4 +267,14 @@ regex for removing unnecessary f-strings when not needed: f"[^{]*"
 
 
 
+####################################################################################
 
+
+
+
+###################################### GENTOO ######################################
+You may have missed some installation steps. The emerge command is not available in the LiveCD environment, it is in the stage tarball(s).
+
+After booting the LiveCD, you need to setup your partitions / filesystems, unpack a stage tarball, and chroot into it, then you will be able to use the emerge command.
+
+####################################################################################
