@@ -152,8 +152,8 @@ def main(args):
         os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
     # Modify shell profile for debug purposes in live iso (optional temporary)
-    os.system('echo "alias paste='"'"'curl -F "'"'"'"sprunge=<-"'"'"'" http://sprunge.us'"'"' " | tee -a $HOME/.*shrc')
-    os.system("shopt -s nullglob && echo 'export LC_ALL=C' | sudo tee -a /mnt/root/.*shrc")
+    #os.system('echo "alias paste='"'"'curl -F "'"'"'"sprunge=<-"'"'"'" http://sprunge.us'"'"' " | tee -a $HOME/.*shrc')
+    #os.system("shopt -s nullglob && echo 'export LC_ALL=C' | sudo tee -a /mnt/root/.*shrc")
     os.system("find /mnt/root/ -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C | sudo tee -a $1' -- {} \;")
     os.system("echo -e 'setw -g mode-keys vi\nset -g history-limit 999999' >> $HOME/.tmux.conf")
 
@@ -163,7 +163,7 @@ def main(args):
     #h = str(subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | sed -n 's# .*\n#,#g'", shell=True))
     excl = str(subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | awk '{print $1}'", shell=True))
     excl.replace("\\n",",").replace("b'","").replace(",'","")
-    os.system(f"sudo debootstrap --arch {ARCH} {RELEASE} /mnt http://ftp.debian.org/debian --exclude {excl}")
+    os.system(f"sudo debootstrap --arch {ARCH} --exclude={excl} {RELEASE} /mnt http://ftp.debian.org/debian")
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
         os.system(f"sudo mount -B {i} /mnt{i}") # Mount-points needed for chrooting
     os.system(f"sudo chroot /mnt apt-get install -y linux-image-{ARCH}")
