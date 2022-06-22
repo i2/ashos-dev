@@ -50,8 +50,8 @@ def set_timezone():
             print("Invalid Timezone!")
             continue
 
-def guinstall(username, packages, DesktopInstall):
-    os.system(f"echo {DesktopInstall} | sudo tee /mnt/usr/share/ast/snap")
+def guinstall(packages):
+    os.system("echo '1' | sudo tee /mnt/usr/share/ast/snap")
     for i in packages:
         os.system(f"sudo chroot /mnt apt-get install -y {i}")
     username = set_user()
@@ -252,11 +252,11 @@ def main(args):
 
     if DesktopInstall == 1:
         packages = ["gnome", "gnome-extra", "gnome-themes-extra", "gdm", "pipewire", "pipewire-pulse", "sudo"]
-        guinstall(username, packages)
+        guinstall(packages)
         os.system("sudo chroot /mnt systemctl enable gdm")
     elif DesktopInstall == 2:
         packages = ["plasma", "xorg", "kde-applications", "sddm", "pipewire", "pipewire-pulse", "sudo"]
-        guinstall(username, packages)
+        guinstall(packages)
         os.system("sudo chroot /mnt systemctl enable sddm")
         os.system("echo '[Theme]' | sudo tee /mnt/etc/sddm.conf")
         os.system("echo 'Current=breeze' | sudo tee -a /mnt/etc/sddm.conf")
