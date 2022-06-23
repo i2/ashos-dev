@@ -48,8 +48,8 @@ def set_password(u):
             continue
 
 def set_timezone():
-    clear()
     while True:
+        clear()
         print("Select a timezone (type list to list):")
         zone = input("> ")
         if zone == "list":
@@ -266,7 +266,8 @@ def main(args):
         guinstall(packages)
         os.system("sudo chroot /mnt systemctl enable gdm")
     elif DesktopInstall == 2:
-        packages = ["plasma", "xorg", "kde-applications", "sddm", "pipewire", "pipewire-pulse", "sudo"]
+        packages = ["kde-plasma-desktop", "xorg", "sddm",  "sudo"]
+        # "pipewire", "pipewire-pulse", kde-applications, "kde-applications"
         guinstall(packages)
         os.system("sudo chroot /mnt systemctl enable sddm")
         os.system("echo '[Theme]' | sudo tee /mnt/etc/sddm.conf")
