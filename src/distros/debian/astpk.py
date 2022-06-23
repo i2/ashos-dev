@@ -427,27 +427,27 @@ def untmp():
 def live_install(pkg):
     tmp = get_tmp()
     part = get_part()
-    os.system(f"mount --bind /.snapshots/rootfs/snapshot-{tmp} /.snapshots/rootfs/snapshot-{tmp} > /dev/null 2>&1")
-    os.system(f"mount --bind /home /.snapshots/rootfs/snapshot-{tmp}/home > /dev/null 2>&1")
-    os.system(f"mount --bind /var /.snapshots/rootfs/snapshot-{tmp}/var > /dev/null 2>&1")
-    os.system(f"mount --bind /etc /.snapshots/rootfs/snapshot-{tmp}/etc > /dev/null 2>&1")
-    os.system(f"mount --bind /tmp /.snapshots/rootfs/snapshot-{tmp}/tmp > /dev/null 2>&1")
+    os.system(f"mount --bind /.snapshots/rootfs/snapshot-{tmp} /.snapshots/rootfs/snapshot-{tmp} >/dev/null 2>&1")
+    os.system(f"mount --bind /home /.snapshots/rootfs/snapshot-{tmp}/home >/dev/null 2>&1")
+    os.system(f"mount --bind /var /.snapshots/rootfs/snapshot-{tmp}/var >/dev/null 2>&1")
+    os.system(f"mount --bind /etc /.snapshots/rootfs/snapshot-{tmp}/etc >/dev/null 2>&1")
+    os.system(f"mount --bind /tmp /.snapshots/rootfs/snapshot-{tmp}/tmp >/dev/null 2>&1")
     os.system(f"chroot /.snapshots/rootfs/snapshot-{tmp} apt-get install -y {pkg}")
-    os.system(f"umount /.snapshots/rootfs/snapshot-{tmp}/* > /dev/null 2>&1")
-    os.system(f"umount /.snapshots/rootfs/snapshot-{tmp} > /dev/null 2>&1")
+    os.system(f"umount /.snapshots/rootfs/snapshot-{tmp}/* >/dev/null 2>&1")
+    os.system(f"umount /.snapshots/rootfs/snapshot-{tmp} >/dev/null 2>&1")
 
 # Live unlocked shell
 def live_unlock():
     tmp = get_tmp()
     part = get_part()
-    os.system(f"mount --bind /.snapshots/rootfs/snapshot-{tmp} /.snapshots/rootfs/snapshot-{tmp} > /dev/null 2>&1")
-    os.system(f"mount --bind /home /.snapshots/rootfs/snapshot-{tmp}/home > /dev/null 2>&1")
-    os.system(f"mount --bind /var /.snapshots/rootfs/snapshot-{tmp}/var > /dev/null 2>&1")
-    os.system(f"mount --bind /etc /.snapshots/rootfs/snapshot-{tmp}/etc > /dev/null 2>&1")
-    os.system(f"mount --bind /tmp /.snapshots/rootfs/snapshot-{tmp}/tmp > /dev/null 2>&1")
-    os.system(f"arch-chroot /.snapshots/rootfs/snapshot-{tmp}")
-    os.system(f"umount /.snapshots/rootfs/snapshot-{tmp}/* > /dev/null 2>&1")
-    os.system(f"umount /.snapshots/rootfs/snapshot-{tmp} > /dev/null 2>&1")
+    os.system(f"mount --bind /.snapshots/rootfs/snapshot-{tmp} /.snapshots/rootfs/snapshot-{tmp} >/dev/null 2>&1")
+    os.system(f"mount --bind /home /.snapshots/rootfs/snapshot-{tmp}/home >/dev/null 2>&1")
+    os.system(f"mount --bind /var /.snapshots/rootfs/snapshot-{tmp}/var >/dev/null 2>&1")
+    os.system(f"mount --bind /etc /.snapshots/rootfs/snapshot-{tmp}/etc >/dev/null 2>&1")
+    os.system(f"mount --bind /tmp /.snapshots/rootfs/snapshot-{tmp}/tmp >/dev/null 2>&1")
+    os.system(f"chroot /.snapshots/rootfs/snapshot-{tmp}")
+    os.system(f"umount /.snapshots/rootfs/snapshot-{tmp}/* >/dev/null 2>&1")
+    os.system(f"umount /.snapshots/rootfs/snapshot-{tmp} >/dev/null 2>&1")
 
 # Install packages
 def install(snapshot,pkg):
@@ -461,7 +461,7 @@ def install(snapshot,pkg):
         #excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} apt install -f -y {pkg}"))
         if int(excode) == 0:
             posttrans(snapshot)
-            print(f"snapshot {snapshot} updated successfully")
+            print(f"Package {pkg} in snapshot {snapshot} installed successfully.")
         else:
             print("install failed, changes were discarded")
 
@@ -477,7 +477,7 @@ def remove(snapshot,pkg):
         excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} apt-get remove {pkg}"))
         if int(excode) == 0:
             posttrans(snapshot)
-            print(f"snapshot {snapshot} updated successfully")
+            print(f"Package {pkg} in snapshot {snapshot} removed successfully.")
         else:
             print("remove failed, changes were discarded")
 
@@ -557,7 +557,6 @@ def posttrans(snapshot):
     os.system(f"rm -rf /.snapshots/var/var-chr{snapshot}/* >/dev/null 2>&1")
     os.system(f"mkdir -p /.snapshots/var/var-chr{snapshot}/lib/systemd >/dev/null 2>&1")
     os.system(f"cp -r --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/var/lib/systemd/* /.snapshots/var/var-chr{snapshot}/lib/systemd >/dev/null 2>&1")
-    #os.system(f"cp -r --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/var/lib/pacman/* /.snapshots/var/var-chr{snapshot}/lib/pacman >/dev/null 2>&1")
     os.system(f"cp -r -n --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/var/cache/apt/* /var/cache/apt/ >/dev/null 2>&1")
     os.system(f"rm -rf /.snapshots/boot/boot-chr{snapshot}/* >/dev/null 2>&1")
     os.system(f"cp -r --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/boot/* /.snapshots/boot/boot-chr{snapshot} >/dev/null 2>&1")
@@ -585,9 +584,24 @@ def upgrade(snapshot):
         excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} apt-get update")) # Default upgrade behaviour is now "safe" update, meaning failed updates get fully discarded
         if int(excode) == 0:
             posttrans(snapshot)
-            print(f"snapshot {snapshot} updated successfully")
+            print(f"Snapshot {snapshot} upgraded successfully.")
         else:
-            print("update failed, changes were discarded")
+            print("Failed upgrading. Changes were discarded.")
+
+# Refresh snapshot
+def refresh(snapshot):
+    if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
+        print("cannot refresh, snapshot doesn't exist")
+    elif snapshot == "0":
+        print("changing base snapshot is not allowed")
+    else:
+        prepare(snapshot)
+        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} pacman -Syy"))
+        if int(excode) == 0:
+            posttrans(snapshot)
+            print(f"Snapshot {snapshot} refreshed successfully.")
+        else:
+            print("Failed refreshing. Changes were discarded.")
 
 # Noninteractive update
 def autoupgrade(snapshot):
@@ -807,6 +821,10 @@ def main(args):
     elif arg == "upgrade" or arg == "up" and (lock != True):
         ast_lock()
         upgrade(args[args.index(arg)+1])
+        ast_unlock()
+    elif arg == "refresh" or arg == "ref" and (lock != True):
+        ast_lock()
+        refresh(args[args.index(arg)+1])
         ast_unlock()
     elif arg == "etc-update" or arg == "etc" and (lock != True):
         ast_lock()

@@ -7,8 +7,7 @@ def clear():
     os.system("#clear")
 
 def to_uuid(part):
-    uuid = str(subprocess.check_output(f"sudo blkid -s UUID -o value {part}", shell=True))
-    return uuid.replace("b'","").replace('"',"").replace("\\n'","")
+    return subprocess.check_output(f"sudo blkid -s UUID -o value {part}", shell=True).decode('utf-8').replace("\n","")
 
 def set_user():
     clear()
@@ -39,6 +38,7 @@ def set_password(u):
             continue
 
 def set_timezone():
+    clear()
     while True:
         print("Select a timezone (type list to list):")
         zone = input("> ")
@@ -86,14 +86,22 @@ def guinstall(packages):
 
 def main(args):
 
+    # Partitioning and formatting
+    os.system("find $HOME -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C LANGUAGE=C LANG=C >> $1' -- {} \;") # Perl complains if not set
+    os.system("sudo apt-get remove -y --purge man-db") # make installs faster (because of trigger man-db bug)
+    os.system("sudo apt-get update -y")
+    os.system("sudo apt-get install -y parted btrfs-progs dosfstools ntp")
+    os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
+    os.system("sudo /usr/sbin/mkfs.vfat -F32 -n EFI /dev/sda1")
+    os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
+
     # Define variables
+    RELEASE = "bullseye"
+    ARCH = "amd64"
     btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]
     mntdirs_n = mntdirs[1:]
-    #astpart = to_uuid(args[1])  # if partitioning is not done yet, this will error
-    RELEASE = "bullseye"
-    ARCH = "amd64"
-    DesktopInstall = None
+    astpart = to_uuid(args[1])
 
     while True:
         clear()
@@ -110,7 +118,6 @@ def main(args):
             DesktopInstall = 2
             break
 
-    clear()
     tz = set_timezone()
 
     clear()
@@ -121,18 +128,6 @@ def main(args):
         efi = True
     else:
         efi = False
-
-    # Partitioning
-    os.system("find $HOME -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C LANGUAGE=C LANG=C >> $1' -- {} \;") # Perl complains if not set
-    os.system("sudo apt-get remove -y --purge man-db") # make installs faster (because of trigger man-db bug)
-    os.system("sudo apt-get update -y")
-    os.system("sudo apt-get autoremove -y")
-    os.system("sudo apt-get install -y parted btrfs-progs dosfstools ntp")
-    os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
-    os.system("sudo /usr/sbin/mkfs.vfat -F32 -n EFI /dev/sda1")
-    os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
-
-    astpart = to_uuid(args[1])
 
     # Mount and create necessary sub-volumes and directories
     os.system(f"sudo mount {args[1]} /mnt")
@@ -159,10 +154,7 @@ def main(args):
 
     # Bootstrap (minimal)
     os.system("sudo apt-get install -y debootstrap")
-    #os.system("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | awk '{print $1}' | tr '\n' ','")
-    #h = str(subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | sed -n 's# .*\n#,#g'", shell=True))
-    excl = str(subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | awk '{print $1}'", shell=True))
-    excl.replace("\\n",",").replace("b'","").replace(",'","")
+    excl = subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | awk '{print $1}'", shell=True).decode('utf-8').replace("\n",",")
     os.system(f"sudo debootstrap --arch {ARCH} --exclude={excl} {RELEASE} /mnt http://ftp.debian.org/debian")
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
         os.system(f"sudo mount -B {i} /mnt{i}") # Mount-points needed for chrooting
@@ -253,6 +245,7 @@ def main(args):
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-0")
     os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
 
+######
     if DesktopInstall == 1:
         packages = ["gnome", "gnome-extra", "gnome-themes-extra", "gdm", "pipewire", "pipewire-pulse", "sudo"]
         guinstall(packages)
@@ -272,24 +265,27 @@ def main(args):
     os.system("sudo rm -rf /mnt/root/*")
     os.system("sudo rm -rf /mnt/tmp/*")
 
+    # Clean unnecessary packages (optional)
+    os.system("sudo apt-get autoremove -y")
+    os.system("sudo apt-get autoclean -y")
+
+    # Copy boot and etc from snapshot's tmp to common
     if efi:
         os.system("sudo umount /mnt/boot/efi")
-
     os.system("sudo umount /mnt/boot")
     os.system(f"sudo mount {args[1]} -o subvol=@boot,compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp")
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-tmp/* /mnt/boot")
     os.system("sudo umount /mnt/etc")
     os.system(f"sudo mount {args[1]} -o subvol=@etc,compress=zstd,noatime /mnt/.snapshots/etc/etc-tmp")
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-tmp/* /mnt/etc")
-
     if DesktopInstall:
+        os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-1/* /mnt/.snapshots/rootfs/snapshot-tmp/boot")
         os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-1/* /mnt/.snapshots/rootfs/snapshot-tmp/etc")
         os.system("sudo cp --reflink=auto -r /mnt/.snapshots/var/var-1/* /mnt/.snapshots/rootfs/snapshot-tmp/var")
-        os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-1/* /mnt/.snapshots/rootfs/snapshot-tmp/boot")
     else:
+        os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/* /mnt/.snapshots/rootfs/snapshot-tmp/boot")
         os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/* /mnt/.snapshots/rootfs/snapshot-tmp/etc")
         os.system("sudo cp --reflink=auto -r /mnt/.snapshots/var/var-0/* /mnt/.snapshots/rootfs/snapshot-tmp/var")
-        os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/* /mnt/.snapshots/rootfs/snapshot-tmp/boot")
 
     # Unmount everything
     os.system("sudo umount -R /mnt")
