@@ -60,8 +60,8 @@ def set_timezone():
             print("Invalid Timezone!")
             continue
 
-def share_notfinishedyet(v,astpart):
-    os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
+def share_notfinishedyet(v, a):
+    os.system(f"echo '{a}' | sudo tee /mnt/.snapshots/ast/part")
     for i in ("dpkg", "systemd"):
         os.system(f"sudo mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")
     os.system("sudo cp --reflink=auto -r /mnt/var/lib/dpkg/* /mnt/.snapshots/var/var-tmp/lib/dpkg/")
@@ -74,7 +74,7 @@ def share_notfinishedyet(v,astpart):
     os.system(f"sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-{v} /mnt/.snapshots/rootfs/snapshot-tmp")
     os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
 
-def guinstall(packages,DesktopInstall):
+def guinstall(packages, v):
     os.system("echo '1' | sudo tee /mnt/usr/share/ast/snap")
     for i in packages:
         os.system(f"sudo chroot /mnt apt-get install -y {i}")
@@ -92,7 +92,7 @@ def guinstall(packages,DesktopInstall):
     os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp")
     os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
 
-    share_notfinishedyet(variant, astpart)
+    share_notfinishedyet(v, astpart)
 
 def main(args):
 #   Partition and format
@@ -228,7 +228,7 @@ def main(args):
 
     set_password("root")
 
-    #os.system("sudo chroot /mnt systemctl enable NetworkManager")
+###enablelater    os.system("sudo chroot /mnt systemctl enable NetworkManager")
 
 #   GRUB
     os.system(f"sudo chroot /mnt sed -i s,Arch,astOS,g /etc/default/grub")
@@ -249,19 +249,19 @@ def main(args):
     if DesktopInstall == 1:
         os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'},{\\'name\\': \\'1\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
         packages = ["gnome", "gnome-extra", "gnome-themes-extra", "gdm", "pipewire", "pipewire-pulse", "sudo"]
-        guinstall(packages,DesktopInstall)
+        guinstall(packages, variant)
         os.system("sudo chroot /mnt systemctl enable gdm")
     elif DesktopInstall == 2:
         os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'},{\\'name\\': \\'1\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
         packages = ["kde-plasma-desktop", "xorg", "sddm",  "sudo"]
         # "pipewire", "pipewire-pulse", kde-applications, "kde-applications"
-        guinstall(packages,DesktopInstall)
+        guinstall(packages, variant)
         os.system("sudo chroot /mnt systemctl enable sddm")
         os.system("echo '[Theme]' | sudo tee /mnt/etc/sddm.conf")
         os.system("echo 'Current=breeze' | sudo tee -a /mnt/etc/sddm.conf")
     else:
         os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
-        share_notfinishedyet(DesktopInstall)
+        share_notfinishedyet(variant, astpart)
         #username = get_username()
         #set_user(username)
         #set_password(username)
@@ -284,14 +284,10 @@ def main(args):
     os.system("sudo umount /mnt/etc")
     os.system(f"sudo mount {args[1]} -o subvol=@etc,compress=zstd,noatime /mnt/.snapshots/etc/etc-tmp")
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-tmp/* /mnt/etc")
-    if DesktopInstall:
-        os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-1/* /mnt/.snapshots/rootfs/snapshot-tmp/boot")
-        os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-1/* /mnt/.snapshots/rootfs/snapshot-tmp/etc")
-        os.system("sudo cp --reflink=auto -r /mnt/.snapshots/var/var-1/* /mnt/.snapshots/rootfs/snapshot-tmp/var")
-    else:
-        os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/* /mnt/.snapshots/rootfs/snapshot-tmp/boot")
-        os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/* /mnt/.snapshots/rootfs/snapshot-tmp/etc")
-        os.system("sudo cp --reflink=auto -r /mnt/.snapshots/var/var-0/* /mnt/.snapshots/rootfs/snapshot-tmp/var")
+
+    os.system(f"sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-{variant}/* /mnt/.snapshots/rootfs/snapshot-tmp/boot")
+    os.system(f"sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-{variant}/* /mnt/.snapshots/rootfs/snapshot-tmp/etc")
+    os.system(f"sudo cp --reflink=auto -r /mnt/.snapshots/var/var-{variant}/* /mnt/.snapshots/rootfs/snapshot-tmp/var")
 
 #   Unmount everything
     os.system("sudo umount -R /mnt")
