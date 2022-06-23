@@ -60,7 +60,7 @@ def set_timezone():
             print("Invalid Timezone!")
             continue
 
-def share_notfinishedyet(t):
+def share_notfinishedyet(v,astpart):
     os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
     for i in ("dpkg", "systemd"):
         os.system(f"sudo mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")
@@ -68,10 +68,10 @@ def share_notfinishedyet(t):
     os.system("sudo cp --reflink=auto -r /mnt/var/lib/systemd/* /mnt/.snapshots/var/var-tmp/lib/systemd/")
     os.system("sudo cp --reflink=auto -r /mnt/boot/* /mnt/.snapshots/boot/boot-tmp")
     os.system("sudo cp --reflink=auto -r /mnt/etc/* /mnt/.snapshots/etc/etc-tmp")
-    os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-{t}")
-    os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-{t}")
-    os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-{t}")
-    os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-1 /mnt/.snapshots/rootfs/snapshot-tmp")
+    os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-{v}")
+    os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-{v}")
+    os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-{v}")
+    os.system(f"sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-{v} /mnt/.snapshots/rootfs/snapshot-tmp")
     os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
 
 def guinstall(packages,DesktopInstall):
@@ -92,7 +92,7 @@ def guinstall(packages,DesktopInstall):
     os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp")
     os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
 
-    share_notfinishedyet(DesktopInstall)
+    share_notfinishedyet(variant, astpart)
 
 def main(args):
 #   Partition and format
@@ -120,12 +120,15 @@ def main(args):
         InstallProfile = str(input("> "))
         if InstallProfile == "1":
             DesktopInstall = 0
+            variant = 0
             break
         if InstallProfile == "2":
             DesktopInstall = 1
+            variant = 1
             break
         if InstallProfile == "3":
             DesktopInstall = 2
+            variant = 1
             break
 
     tz = set_timezone()
@@ -175,7 +178,8 @@ def main(args):
     os.system(f"echo 'deb [trusted=yes] http://www.deb-multimedia.org {RELEASE} main' | sudo tee -a /mnt/etc/apt/sources.list.d/multimedia.list >/dev/null")
     os.system("sudo chroot /mnt apt-get update -y -oAcquire::AllowInsecureRepositories=true")
     os.system("sudo chroot /mnt apt-get install -y deb-multimedia-keyring --allow-unauthenticated")
-    os.system("sudo chroot /mnt apt-get install -y python3-anytree network-manager btrfs-progs dhcpcd5 locales sudo")
+    #os.system("sudo chroot /mnt apt-get install -y python3-anytree network-manager btrfs-progs dhcpcd5 locales sudo")
+    os.system("sudo chroot /mnt apt-get install -y python3-anytree btrfs-progs locales sudo")
     if efi:
         os.system("sudo chroot /mnt apt-get install -y grub-efi")
     else:
