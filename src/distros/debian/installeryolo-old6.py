@@ -1,5 +1,27 @@
 #!/usr/bin/python3
 
+#1   Pre-installation
+#1.1	Set the console keyboard layout
+#1.2	Verify the boot mode
+#1.3	Connect to the internet
+#1.4	Update the system clock
+#1.5	Partition the disks
+#1.6	Format the partitions
+#1.7	Mount the file systems
+#2	Installation
+#2.1	Select the mirrors
+#2.2	Install essential packages
+#3	Configure the system
+#3.1	Fstab
+#3.2	Chroot
+#3.3	Time zone
+#3.4	Localization
+#3.5	Network configuration
+#3.6	Initramfs
+#3.7	Root password
+#3.8	Boot loader
+#4	Post-installation
+
 import os
 import subprocess
 
@@ -8,6 +30,19 @@ def clear():
 
 def to_uuid(part):
     return subprocess.check_output(f"sudo blkid -s UUID -o value {part}", shell=True).decode('utf-8').strip()
+
+def set_timezone():
+    while True:
+        clear()
+        print("Select a timezone (type list to list):")
+        zone = input("> ")
+        if zone == "list":
+            os.system("ls /usr/share/zoneinfo | less")
+        elif os.path.isfile(f"/usr/share/zoneinfo/{zone}"):
+            return str(f"/usr/share/zoneinfo/{zone}")
+        else:
+            print("Invalid Timezone!")
+            continue
 
 def get_username():
     while True:
@@ -33,7 +68,7 @@ def set_user(u):
     os.system(f"sudo chroot /mnt mkdir /home/{u}")
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /home/{u}/.bashrc")
     os.system(f"sudo chroot /mnt chown -R {u} /home/{u}")
-    
+
 def set_password(u):
     while True:
         clear()
@@ -47,56 +82,76 @@ def set_password(u):
             clear()
             continue
 
-def set_timezone():
-    while True:
-        clear()
-        print("Select a timezone (type list to list):")
-        zone = input("> ")
-        if zone == "list":
-            os.system("ls /usr/share/zoneinfo | less")
-        elif os.path.isfile(f"/usr/share/zoneinfo/{zone}"):
-            return str(f"/usr/share/zoneinfo/{zone}")
-        else:
-            print("Invalid Timezone!")
-            continue
+def share_notfinishedyet(v, a):
+### CHECK IF THIS PARAGRAPH COMES BEFORE THE NEXT PAR IN ORIGINAL main.py too
+    os.system(f"echo {v} | sudo tee /mnt/usr/share/ast/snap") #SHARED-A-DONE
+    os.system(f"sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-{v}")
+    if v == 1:
+        os.system("sudo btrfs sub del /mnt/.snapshots/boot/boot-tmp")
+        os.system("sudo btrfs sub del /mnt/.snapshots/etc/etc-tmp")
+        os.system("sudo btrfs sub del /mnt/.snapshots/var/var-tmp")
+    os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")
+    os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp")
+    os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
 
-def share_notfinishedyet(t):
+    os.system("echo XXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+    print("echo XXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+
+    if os.path.isfile("/mnt/usr/share/ast/snap"):
+        os.system("echo snappped")
+        print("echo snappped")
+        print("echo %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+    
+    os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db") #SHARED-A-DONE
+    os.system(f"echo '{a}' | sudo tee /mnt/.snapshots/ast/part")
     for i in ("dpkg", "systemd"):
         os.system(f"sudo mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")
     os.system("sudo cp --reflink=auto -r /mnt/var/lib/dpkg/* /mnt/.snapshots/var/var-tmp/lib/dpkg/")
     os.system("sudo cp --reflink=auto -r /mnt/var/lib/systemd/* /mnt/.snapshots/var/var-tmp/lib/systemd/")
     os.system("sudo cp --reflink=auto -r /mnt/boot/* /mnt/.snapshots/boot/boot-tmp")
     os.system("sudo cp --reflink=auto -r /mnt/etc/* /mnt/.snapshots/etc/etc-tmp")
-    os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-{t}")
-    os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-{t}")
-    os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-{t}")
-
-def guinstall(packages,DesktopInstall):
-    os.system("echo '1' | sudo tee /mnt/usr/share/ast/snap")
-    for i in packages:
-        os.system(f"sudo chroot /mnt apt-get install -y {i}")
-#   Set user and password    
+    os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-{v}")
+    os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-{v}")
+    os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-{v}")
+    os.system(f"sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-{v} /mnt/.snapshots/rootfs/snapshot-tmp") #shouldn't this be DesktopInstall instead of v
+    os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
+#   Set user and password
+    set_password("root")
     username = get_username()
     set_user(username)
     set_password(username)
-    
-    os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db")
-    os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-1")
-    os.system("sudo btrfs sub del /mnt/.snapshots/boot/boot-tmp")
-    os.system("sudo btrfs sub del /mnt/.snapshots/etc/etc-tmp")
-    os.system("sudo btrfs sub del /mnt/.snapshots/var/var-tmp")
-    os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")
-    os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp")
-    os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
 
-    share_notfinishedyet(DesktopInstall)
-
-#### SHARED
-    os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-1 /mnt/.snapshots/rootfs/snapshot-tmp")
-    os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
-####
+def guinstall(packages, v):
+    for i in packages:
+        os.system(f"sudo chroot /mnt apt-get install -y {i}")
+    share_notfinishedyet(v, astpart)
 
 def main(args):
+#   Greet
+    while True:
+        clear()
+        print("Welcome to the astOS installer!\n\n\n\n\n")
+        print("Select installation profile:\n1. Minimal install - suitable for embedded devices or servers\n2. Desktop install (Gnome) - suitable for workstations\n3. Desktop install (KDE Plasma)")
+        InstallProfile = str(input("> "))
+        if InstallProfile == "1":
+            DesktopInstall = 0
+            variant = 0
+            break
+        if InstallProfile == "2":
+            DesktopInstall = 1
+            variant = 1
+            break
+        if InstallProfile == "3":
+            DesktopInstall = 2
+            variant = 1
+            break
+
+    tz = set_timezone()
+
+    clear()
+    print("Enter hostname:")
+    hostname = input("> ")
+
 #   Partition and format
     os.system("find $HOME -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C LANGUAGE=C LANG=C >> $1' -- {} \;") # Perl complains if not set
     os.system("sudo apt-get remove -y --purge man-db") # make installs faster (because of trigger man-db bug)
@@ -114,28 +169,6 @@ def main(args):
     mntdirs_n = mntdirs[1:]
     astpart = to_uuid(args[1])
 
-#   Greet
-    while True:
-        clear()
-        print("Welcome to the astOS installer!\n\n\n\n\n")
-        print("Select installation profile:\n1. Minimal install - suitable for embedded devices or servers\n2. Desktop install (Gnome) - suitable for workstations\n3. Desktop install (KDE Plasma)")
-        InstallProfile = str(input("> "))
-        if InstallProfile == "1":
-            DesktopInstall = 0
-            break
-        if InstallProfile == "2":
-            DesktopInstall = 1
-            break
-        if InstallProfile == "3":
-            DesktopInstall = 2
-            break
-
-    tz = set_timezone()
-
-    clear()
-    print("Enter hostname:")
-    hostname = input("> ")
-
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
@@ -147,6 +180,7 @@ def main(args):
         os.system(f"sudo btrfs sub create /mnt/{btrdir}")
     os.system("sudo umount /mnt")
     os.system(f"sudo mount {args[1]} -o subvol=@,compress=zstd,noatime /mnt")
+### for mntdir in mntdirs_n:
     for mntdir in mntdirs:
         os.system(f"sudo mkdir /mnt/{mntdir}")
         os.system(f"sudo mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
@@ -158,9 +192,11 @@ def main(args):
         os.system("sudo mkdir /mnt/boot/efi")
         os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
+### In Arch pacstrap happens here
+
 #   Modify shell profile for debug purposes in live iso (optional temporary)
     #os.system('echo "alias paste='"'"'curl -F "'"'"'"sprunge=<-"'"'"'" http://sprunge.us'"'"' " | tee -a $HOME/.*shrc')
-    os.system("shopt -s nullglob && echo 'export LC_ALL=C' | sudo tee -a /mnt/root/.*shrc")
+    #os.system("shopt -s nullglob && echo 'export LC_ALL=C' | sudo tee -a /mnt/root/.*shrc")
     #os.system("find /mnt/root/ -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C | sudo tee -a $1' -- {} \;")
     #os.system("echo -e 'setw -g mode-keys vi\nset -g history-limit 999999' >> $HOME/.tmux.conf")
 
@@ -177,7 +213,8 @@ def main(args):
     os.system(f"echo 'deb [trusted=yes] http://www.deb-multimedia.org {RELEASE} main' | sudo tee -a /mnt/etc/apt/sources.list.d/multimedia.list >/dev/null")
     os.system("sudo chroot /mnt apt-get update -y -oAcquire::AllowInsecureRepositories=true")
     os.system("sudo chroot /mnt apt-get install -y deb-multimedia-keyring --allow-unauthenticated")
-    os.system("sudo chroot /mnt apt-get install -y python3-anytree network-manager btrfs-progs dhcpcd5 locales sudo")
+    #os.system("sudo chroot /mnt apt-get install -y python3-anytree network-manager btrfs-progs dhcpcd5 locales sudo")
+    os.system("sudo chroot /mnt apt-get install -y python3-anytree btrfs-progs locales sudo")
     if efi:
         os.system("sudo chroot /mnt apt-get install -y grub-efi")
     else:
@@ -191,10 +228,13 @@ def main(args):
         os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/tmp /tmp none bind 0 0' | sudo tee -a /mnt/etc/fstab")
+################################### Moved from below
+    os.system("sudo sed -i '0,/@/{s,@,@.snapshots/rootfs/snapshot-tmp,}' /mnt/etc/fstab")
+    os.system("sudo sed -i '0,/@etc/{s,@etc,@.snapshots/etc/etc-tmp,}' /mnt/etc/fstab")
+    os.system("sudo sed -i '0,/@boot/{s,@boot,@.snapshots/boot/boot-tmp,}' /mnt/etc/fstab")
 
     os.system("sudo mkdir -p /mnt/usr/share/ast/db")
-    os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
-    os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db")
+##################################### originally this line was here: os.system(f"echo '0' > /mnt/usr/share/ast/snap")
     #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf")
 
 #   Modify OS release information (optional)
@@ -217,22 +257,12 @@ def main(args):
     os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
     os.system("sudo chroot /mnt hwclock --systohc")
 
-    os.system("sudo sed -i '0,/@/{s,@,@.snapshots/rootfs/snapshot-tmp,}' /mnt/etc/fstab")
-    os.system("sudo sed -i '0,/@etc/{s,@etc,@.snapshots/etc/etc-tmp,}' /mnt/etc/fstab")
-    os.system("sudo sed -i '0,/@boot/{s,@boot,@.snapshots/boot/boot-tmp,}' /mnt/etc/fstab")
-
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
     os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
 
-    set_password("root")
+    #set_password("root")
 
-    os.system("sudo chroot /mnt systemctl enable NetworkManager")
-
-#   Initialize fstree
-    os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
-    if DesktopInstall:
-        os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'},{\\'name\\': \\'1\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
-        os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
+###enablelater    os.system("sudo chroot /mnt systemctl enable NetworkManager")
 
 #   GRUB
     os.system(f"sudo chroot /mnt sed -i s,Arch,astOS,g /etc/default/grub")
@@ -242,42 +272,33 @@ def main(args):
 
     os.system("sudo cp ./src/distros/debian/astpk.py /mnt/usr/local/sbin/ast")
     os.system("sudo chroot /mnt chmod +x /usr/local/sbin/ast")
-    
-    os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
-    os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")
-    os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp")
-    os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
-    
-    share_notfinishedyet(DesktopInstall)
-    
-    os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
 
+#   Initialize fstree and other stuff? (what to call them?)
 ######
     if DesktopInstall == 1:
+        os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'},{\\'name\\': \\'1\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
         packages = ["gnome", "gnome-extra", "gnome-themes-extra", "gdm", "pipewire", "pipewire-pulse", "sudo"]
-        guinstall(packages,DesktopInstall)
+        guinstall(packages, variant)
         os.system("sudo chroot /mnt systemctl enable gdm")
     elif DesktopInstall == 2:
+        os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'},{\\'name\\': \\'1\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
         packages = ["kde-plasma-desktop", "xorg", "sddm",  "sudo"]
         # "pipewire", "pipewire-pulse", kde-applications, "kde-applications"
-        guinstall(packages,DesktopInstall)
+        guinstall(packages, variant)
         os.system("sudo chroot /mnt systemctl enable sddm")
         os.system("echo '[Theme]' | sudo tee /mnt/etc/sddm.conf")
         os.system("echo 'Current=breeze' | sudo tee -a /mnt/etc/sddm.conf")
     else:
-#### SHARED
-        os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
-        os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
-####
+        os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
+        share_notfinishedyet(variant, astpart)
+        #username = get_username()
+        #set_user(username)
+        #set_password(username)
 
-    os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/")
+    os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/") #what are these 2 lines for? Why not /mnt/.snapshots/rootfs/snap-v/root ?
     os.system("sudo cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")
     os.system("sudo rm -rf /mnt/root/*")
     os.system("sudo rm -rf /mnt/tmp/*")
-
-#   Clean unnecessary packages (optional)
-    os.system("sudo apt-get autoremove -y")
-    os.system("sudo apt-get autoclean -y")
 
 #   Copy boot and etc from snapshot's tmp to common
     if efi:
@@ -288,14 +309,14 @@ def main(args):
     os.system("sudo umount /mnt/etc")
     os.system(f"sudo mount {args[1]} -o subvol=@etc,compress=zstd,noatime /mnt/.snapshots/etc/etc-tmp")
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-tmp/* /mnt/etc")
-    if DesktopInstall:
-        os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-1/* /mnt/.snapshots/rootfs/snapshot-tmp/boot")
-        os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-1/* /mnt/.snapshots/rootfs/snapshot-tmp/etc")
-        os.system("sudo cp --reflink=auto -r /mnt/.snapshots/var/var-1/* /mnt/.snapshots/rootfs/snapshot-tmp/var")
-    else:
-        os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/* /mnt/.snapshots/rootfs/snapshot-tmp/boot")
-        os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/* /mnt/.snapshots/rootfs/snapshot-tmp/etc")
-        os.system("sudo cp --reflink=auto -r /mnt/.snapshots/var/var-0/* /mnt/.snapshots/rootfs/snapshot-tmp/var")
+
+    os.system(f"sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-{variant}/* /mnt/.snapshots/rootfs/snapshot-tmp/boot")
+    os.system(f"sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-{variant}/* /mnt/.snapshots/rootfs/snapshot-tmp/etc")
+    os.system(f"sudo cp --reflink=auto -r /mnt/.snapshots/var/var-{variant}/* /mnt/.snapshots/rootfs/snapshot-tmp/var")
+
+#   Clean unnecessary packages (optional)
+    os.system("sudo apt-get autoremove -y")
+    os.system("sudo apt-get autoclean -y")
 
 #   Unmount everything
     os.system("sudo umount -R /mnt")

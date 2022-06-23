@@ -82,49 +82,42 @@ def set_password(u):
             clear()
             continue
 
-def share_notfinishedyet(v, a):
+def share_notfinishedyet(v, a, p):
+    #   Set user and password
+    set_password("root")
+    username = get_username()
+    set_user(username)
+    set_password(username)
+    for i in p:
+        os.system(f"sudo chroot /mnt apt-get install -y {i}")
+### I am currently reviewing up til line 125
+    os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
+    os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
 ### CHECK IF THIS PARAGRAPH COMES BEFORE THE NEXT PAR IN ORIGINAL main.py too
-    os.system(f"echo {v} | sudo tee /mnt/usr/share/ast/snap") #SHARED-A-DONE
-    os.system(f"sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-{v}")
+    os.system(f"echo {v} | sudo tee /mnt/usr/share/ast/snap") #SHARED-A-DONE   101 (for 0) and 174 (for 1)
+#REZA#################3 originally setting tz, hostname, locale, os-relaseinfo happened here + fstabupdate-part2 (lines 125-129)
+    os.system(f"sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-{v}") #O 157
     if v == 1:
         os.system("sudo btrfs sub del /mnt/.snapshots/boot/boot-tmp")
         os.system("sudo btrfs sub del /mnt/.snapshots/etc/etc-tmp")
         os.system("sudo btrfs sub del /mnt/.snapshots/var/var-tmp")
-    os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")
-    os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp")
-    os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
+    os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp") #O 160
+    os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp") #O 158
+    os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp") #O 159
 
-    os.system("echo XXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-    print("echo XXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-
-    if os.path.isfile("/mnt/usr/share/ast/snap"):
-        os.system("echo snappped")
-        print("echo snappped")
-        print("echo %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-    
-    os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db") #SHARED-A-DONE
-    os.system(f"echo '{a}' | sudo tee /mnt/.snapshots/ast/part")
-    for i in ("dpkg", "systemd"):
+    os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db") #O 110 #SHARED-A-DONE
+    os.system(f"echo '{a}' | sudo tee /mnt/.snapshots/ast/part") #O 171
+    for i in ("dpkg", "systemd"):                               #O 162
         os.system(f"sudo mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")
     os.system("sudo cp --reflink=auto -r /mnt/var/lib/dpkg/* /mnt/.snapshots/var/var-tmp/lib/dpkg/")
     os.system("sudo cp --reflink=auto -r /mnt/var/lib/systemd/* /mnt/.snapshots/var/var-tmp/lib/systemd/")
     os.system("sudo cp --reflink=auto -r /mnt/boot/* /mnt/.snapshots/boot/boot-tmp")
     os.system("sudo cp --reflink=auto -r /mnt/etc/* /mnt/.snapshots/etc/etc-tmp")
-    os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-{v}")
+    os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-{v}") #O 168
     os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-{v}")
     os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-{v}")
     os.system(f"sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-{v} /mnt/.snapshots/rootfs/snapshot-tmp") #shouldn't this be DesktopInstall instead of v
     os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
-#   Set user and password
-    set_password("root")
-    username = get_username()
-    set_user(username)
-    set_password(username)
-
-def guinstall(packages, v):
-    for i in packages:
-        os.system(f"sudo chroot /mnt apt-get install -y {i}")
-    share_notfinishedyet(v, astpart)
 
 def main(args):
 #   Greet
@@ -257,9 +250,6 @@ def main(args):
     os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
     os.system("sudo chroot /mnt hwclock --systohc")
 
-    os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
-    os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
-
     #set_password("root")
 
 ###enablelater    os.system("sudo chroot /mnt systemctl enable NetworkManager")
@@ -278,7 +268,7 @@ def main(args):
     if DesktopInstall == 1:
         os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'},{\\'name\\': \\'1\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
         packages = ["gnome", "gnome-extra", "gnome-themes-extra", "gdm", "pipewire", "pipewire-pulse", "sudo"]
-        guinstall(packages, variant)
+        share_notfinishedyet(variant, astpart, packages)
         os.system("sudo chroot /mnt systemctl enable gdm")
     elif DesktopInstall == 2:
         os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'},{\\'name\\': \\'1\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
@@ -290,7 +280,8 @@ def main(args):
         os.system("echo 'Current=breeze' | sudo tee -a /mnt/etc/sddm.conf")
     else:
         os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
-        share_notfinishedyet(variant, astpart)
+        packages = []
+        share_notfinishedyet(variant, astpart, packages)
         #username = get_username()
         #set_user(username)
         #set_password(username)
