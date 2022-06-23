@@ -7,7 +7,7 @@ def clear():
     os.system("#clear")
 
 def to_uuid(part):
-    return subprocess.check_output(f"sudo blkid -s UUID -o value {part}", shell=True).decode('utf-8').replace("\n","")
+    return subprocess.check_output(f"sudo blkid -s UUID -o value {part}", shell=True).decode('utf-8').strip()
 
 def set_user():
     clear()
@@ -154,7 +154,7 @@ def main(args):
 
     # Bootstrap (minimal)
     os.system("sudo apt-get install -y debootstrap")
-    excl = subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | awk '{print $1}'", shell=True).decode('utf-8').replace("\n",",")
+    excl = subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | awk '{print $1}'", shell=True).decode('utf-8').strip().replace("\n",",")
     os.system(f"sudo debootstrap --arch {ARCH} --exclude={excl} {RELEASE} /mnt http://ftp.debian.org/debian")
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
         os.system(f"sudo mount -B {i} /mnt{i}") # Mount-points needed for chrooting
