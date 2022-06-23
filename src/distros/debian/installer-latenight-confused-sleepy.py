@@ -242,17 +242,15 @@ def main(args):
     os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp")
     os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
     
-#   Initialize fstree
-    if DesktopInstall:
-        os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'},{\\'name\\': \\'1\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
-        os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
-    else:
-        os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
-
-    share_notfinishedyet(DesktopInstall)
+    
     
     os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
 
+#   Initialize fstree
+    os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
+    if DesktopInstall:
+        os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'},{\\'name\\': \\'1\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
+        os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
 
 ######
     if DesktopInstall == 1:
@@ -267,6 +265,7 @@ def main(args):
         os.system("echo '[Theme]' | sudo tee /mnt/etc/sddm.conf")
         os.system("echo 'Current=breeze' | sudo tee -a /mnt/etc/sddm.conf")
     else:
+        share_notfinishedyet(DesktopInstall)
 #### SHARED
         os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
         os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")

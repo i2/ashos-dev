@@ -228,6 +228,12 @@ def main(args):
 
     os.system("sudo chroot /mnt systemctl enable NetworkManager")
 
+#   Initialize fstree
+    os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
+    if DesktopInstall:
+        os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'},{\\'name\\': \\'1\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
+        os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
+
 #   GRUB
     os.system(f"sudo chroot /mnt sed -i s,Arch,astOS,g /etc/default/grub")
     os.system(f"sudo chroot /mnt grub-install {args[2]}")
@@ -242,17 +248,9 @@ def main(args):
     os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp")
     os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
     
-#   Initialize fstree
-    if DesktopInstall:
-        os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'},{\\'name\\': \\'1\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
-        os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
-    else:
-        os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
-
     share_notfinishedyet(DesktopInstall)
     
     os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
-
 
 ######
     if DesktopInstall == 1:

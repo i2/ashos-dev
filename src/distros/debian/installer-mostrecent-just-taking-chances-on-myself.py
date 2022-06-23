@@ -61,6 +61,7 @@ def set_timezone():
             continue
 
 def share_notfinishedyet(t):
+    os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
     for i in ("dpkg", "systemd"):
         os.system(f"sudo mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")
     os.system("sudo cp --reflink=auto -r /mnt/var/lib/dpkg/* /mnt/.snapshots/var/var-tmp/lib/dpkg/")
@@ -70,6 +71,8 @@ def share_notfinishedyet(t):
     os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-{t}")
     os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-{t}")
     os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-{t}")
+    os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-1 /mnt/.snapshots/rootfs/snapshot-tmp")
+    os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
 
 def guinstall(packages,DesktopInstall):
     os.system("echo '1' | sudo tee /mnt/usr/share/ast/snap")
@@ -80,7 +83,7 @@ def guinstall(packages,DesktopInstall):
     set_user(username)
     set_password(username)
     
-    os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db")
+    os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db") #SHAREDZ
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-1")
     os.system("sudo btrfs sub del /mnt/.snapshots/boot/boot-tmp")
     os.system("sudo btrfs sub del /mnt/.snapshots/etc/etc-tmp")
@@ -90,11 +93,6 @@ def guinstall(packages,DesktopInstall):
     os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
 
     share_notfinishedyet(DesktopInstall)
-
-#### SHARED
-    os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-1 /mnt/.snapshots/rootfs/snapshot-tmp")
-    os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
-####
 
 def main(args):
 #   Partition and format
@@ -191,10 +189,14 @@ def main(args):
         os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/tmp /tmp none bind 0 0' | sudo tee -a /mnt/etc/fstab")
+### Moved from below
+    os.system("sudo sed -i '0,/@/{s,@,@.snapshots/rootfs/snapshot-tmp,}' /mnt/etc/fstab")
+    os.system("sudo sed -i '0,/@etc/{s,@etc,@.snapshots/etc/etc-tmp,}' /mnt/etc/fstab")
+    os.system("sudo sed -i '0,/@boot/{s,@boot,@.snapshots/boot/boot-tmp,}' /mnt/etc/fstab")
 
     os.system("sudo mkdir -p /mnt/usr/share/ast/db")
     os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
-    os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db")
+    os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db") #SHAREDZ
     #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf")
 
 #   Modify OS release information (optional)
@@ -217,10 +219,6 @@ def main(args):
     os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
     os.system("sudo chroot /mnt hwclock --systohc")
 
-    os.system("sudo sed -i '0,/@/{s,@,@.snapshots/rootfs/snapshot-tmp,}' /mnt/etc/fstab")
-    os.system("sudo sed -i '0,/@etc/{s,@etc,@.snapshots/etc/etc-tmp,}' /mnt/etc/fstab")
-    os.system("sudo sed -i '0,/@boot/{s,@boot,@.snapshots/boot/boot-tmp,}' /mnt/etc/fstab")
-
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
     os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
 
@@ -241,25 +239,16 @@ def main(args):
     os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")
     os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp")
     os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
-    
-#   Initialize fstree
-    if DesktopInstall:
-        os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'},{\\'name\\': \\'1\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
-        os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
-    else:
-        os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
 
-    share_notfinishedyet(DesktopInstall)
-    
-    os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
-
-
+#   Initialize fstree and other stuff? (what to call them?)
 ######
     if DesktopInstall == 1:
+        os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'},{\\'name\\': \\'1\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
         packages = ["gnome", "gnome-extra", "gnome-themes-extra", "gdm", "pipewire", "pipewire-pulse", "sudo"]
         guinstall(packages,DesktopInstall)
         os.system("sudo chroot /mnt systemctl enable gdm")
     elif DesktopInstall == 2:
+        os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'},{\\'name\\': \\'1\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
         packages = ["kde-plasma-desktop", "xorg", "sddm",  "sudo"]
         # "pipewire", "pipewire-pulse", kde-applications, "kde-applications"
         guinstall(packages,DesktopInstall)
@@ -267,10 +256,8 @@ def main(args):
         os.system("echo '[Theme]' | sudo tee /mnt/etc/sddm.conf")
         os.system("echo 'Current=breeze' | sudo tee -a /mnt/etc/sddm.conf")
     else:
-#### SHARED
-        os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
-        os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
-####
+        os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
+        share_notfinishedyet(DesktopInstall)
 
     os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/")
     os.system("sudo cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")
