@@ -1,5 +1,27 @@
 #!/usr/bin/python3
 
+#1   Pre-installation
+#1.1	Set the console keyboard layout
+#1.2	Verify the boot mode
+#1.3	Connect to the internet
+#1.4	Update the system clock
+#1.5	Partition the disks
+#1.6	Format the partitions
+#1.7	Mount the file systems
+#2	Installation
+#2.1	Select the mirrors
+#2.2	Install essential packages
+#3	Configure the system
+#3.1	Fstab
+#3.2	Chroot
+#3.3	Time zone
+#3.4	Localization
+#3.5	Network configuration
+#3.6	Initramfs
+#3.7	Root password
+#3.8	Boot loader
+#4	Post-installation
+
 import os
 import subprocess
 
@@ -8,6 +30,19 @@ def clear():
 
 def to_uuid(part):
     return subprocess.check_output(f"sudo blkid -s UUID -o value {part}", shell=True).decode('utf-8').strip()
+
+def set_timezone():
+    while True:
+        clear()
+        print("Select a timezone (type list to list):")
+        zone = input("> ")
+        if zone == "list":
+            os.system("ls /usr/share/zoneinfo | less")
+        elif os.path.isfile(f"/usr/share/zoneinfo/{zone}"):
+            return str(f"/usr/share/zoneinfo/{zone}")
+        else:
+            print("Invalid Timezone!")
+            continue
 
 def get_username():
     while True:
@@ -47,21 +82,9 @@ def set_password(u):
             clear()
             continue
 
-def set_timezone():
-    while True:
-        clear()
-        print("Select a timezone (type list to list):")
-        zone = input("> ")
-        if zone == "list":
-            os.system("ls /usr/share/zoneinfo | less")
-        elif os.path.isfile(f"/usr/share/zoneinfo/{zone}"):
-            return str(f"/usr/share/zoneinfo/{zone}")
-        else:
-            print("Invalid Timezone!")
-            continue
-
 def share_notfinishedyet(v, a):
 ### CHECK IF THIS PARAGRAPH COMES BEFORE THE NEXT PAR IN ORIGINAL main.py too
+    os.system(f"echo {v} | sudo tee /mnt/usr/share/ast/snap") #SHARED-A-DONE
     os.system(f"sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-{v}")
     if v == 1:
         os.system("sudo btrfs sub del /mnt/.snapshots/boot/boot-tmp")
@@ -73,9 +96,11 @@ def share_notfinishedyet(v, a):
 
     os.system("echo XXXXXXXXXXXXXXXXXXXXXXXXXXXX")
     print("echo XXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-    os.system(f"echo {v} | sudo tee /mnt/usr/share/ast/snap") #SHARED-A-DONE
-    os.system("echo XXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-    print("echo %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+
+    if os.path.isfile("/mnt/usr/share/ast/snap"):
+        os.system("echo snappped")
+        print("echo snappped")
+        print("echo %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     
     os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db") #SHARED-A-DONE
     os.system(f"echo '{a}' | sudo tee /mnt/.snapshots/ast/part")
@@ -90,12 +115,11 @@ def share_notfinishedyet(v, a):
     os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-{v}")
     os.system(f"sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-{v} /mnt/.snapshots/rootfs/snapshot-tmp") #shouldn't this be DesktopInstall instead of v
     os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
-    set_password("root")
 #   Set user and password
-    if(v):
-        username = get_username()
-        set_user(username)
-        set_password(username)
+    set_password("root")
+    username = get_username()
+    set_user(username)
+    set_password(username)
 
 def guinstall(packages, v):
     for i in packages:
@@ -103,23 +127,6 @@ def guinstall(packages, v):
     share_notfinishedyet(v, astpart)
 
 def main(args):
-#   Partition and format
-    os.system("find $HOME -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C LANGUAGE=C LANG=C >> $1' -- {} \;") # Perl complains if not set
-    os.system("sudo apt-get remove -y --purge man-db") # make installs faster (because of trigger man-db bug)
-    os.system("sudo apt-get update -y")
-    os.system("sudo apt-get install -y parted btrfs-progs dosfstools ntp")
-    os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
-    os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}")
-    os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
-
-#   Define variables
-    RELEASE = "bullseye"
-    ARCH = "amd64"
-    btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
-    mntdirs = ["",".snapshots","home","var","etc","boot"]
-    mntdirs_n = mntdirs[1:]
-    astpart = to_uuid(args[1])
-
 #   Greet
     while True:
         clear()
@@ -145,6 +152,23 @@ def main(args):
     print("Enter hostname:")
     hostname = input("> ")
 
+#   Partition and format
+    os.system("find $HOME -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C LANGUAGE=C LANG=C >> $1' -- {} \;") # Perl complains if not set
+    os.system("sudo apt-get remove -y --purge man-db") # make installs faster (because of trigger man-db bug)
+    os.system("sudo apt-get update -y")
+    os.system("sudo apt-get install -y parted btrfs-progs dosfstools ntp")
+    os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
+    os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}")
+    os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
+
+#   Define variables
+    RELEASE = "bullseye"
+    ARCH = "amd64"
+    btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
+    mntdirs = ["",".snapshots","home","var","etc","boot"]
+    mntdirs_n = mntdirs[1:]
+    astpart = to_uuid(args[1])
+
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
@@ -156,6 +180,7 @@ def main(args):
         os.system(f"sudo btrfs sub create /mnt/{btrdir}")
     os.system("sudo umount /mnt")
     os.system(f"sudo mount {args[1]} -o subvol=@,compress=zstd,noatime /mnt")
+### for mntdir in mntdirs_n:
     for mntdir in mntdirs:
         os.system(f"sudo mkdir /mnt/{mntdir}")
         os.system(f"sudo mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
@@ -166,6 +191,8 @@ def main(args):
     if efi:
         os.system("sudo mkdir /mnt/boot/efi")
         os.system(f"sudo mount {args[3]} /mnt/boot/efi")
+
+### In Arch pacstrap happens here
 
 #   Modify shell profile for debug purposes in live iso (optional temporary)
     #os.system('echo "alias paste='"'"'curl -F "'"'"'"sprunge=<-"'"'"'" http://sprunge.us'"'"' " | tee -a $HOME/.*shrc')
@@ -201,12 +228,13 @@ def main(args):
         os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/tmp /tmp none bind 0 0' | sudo tee -a /mnt/etc/fstab")
-### Moved from below
+################################### Moved from below
     os.system("sudo sed -i '0,/@/{s,@,@.snapshots/rootfs/snapshot-tmp,}' /mnt/etc/fstab")
     os.system("sudo sed -i '0,/@etc/{s,@etc,@.snapshots/etc/etc-tmp,}' /mnt/etc/fstab")
     os.system("sudo sed -i '0,/@boot/{s,@boot,@.snapshots/boot/boot-tmp,}' /mnt/etc/fstab")
 
     os.system("sudo mkdir -p /mnt/usr/share/ast/db")
+##################################### originally this line was here: os.system(f"echo '0' > /mnt/usr/share/ast/snap")
     #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf")
 
 #   Modify OS release information (optional)
