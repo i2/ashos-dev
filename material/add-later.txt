@@ -1,5 +1,22 @@
 ###################################### DEBIAN ETC ######################################
 
+Ideal ashos installer:
+- Step 1: Do the ashos prep steps, mounts, folders, etc.
+- Step 2: Use best/official installer for whatever os
+- Step 3: Update fstab using ashos method (even if the official installer of that os has created/modified fstab)
+
+PROBLEM/BUG:
+- ast clone 0  (create tree number X)
+- ast chroot X
+- touch ~/tree-X.txt (inside chroot, create a file)
+- exit
+- ast deploy X
+- reboot
+- file tree-X.txt doesn't exist in ~ but rather it exists in /.snapshots/rootfs/snapshot-1/root/ (which is defined by -{variant} right now I think!
+
+Find the latest commit (I think it is c28d408) before I did any crazy re-organization to debian/installer.py and compare. For any case of DesktopInstaller, do a line-by-line
+mental execution of code step-by-step to make sure every step matches the original. I am hopeul it is.
+
 commit# baa20d7 06/23 - 01:31:35 WAS NOT SUCCESSFUL FOR KDE <--- investigate if minimal works on it?
 
 sudo apt-get remove -y --purge man-db

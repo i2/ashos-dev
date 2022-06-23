@@ -33,7 +33,7 @@ def set_user(u):
     os.system(f"sudo chroot /mnt mkdir /home/{u}")
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /home/{u}/.bashrc")
     os.system(f"sudo chroot /mnt chown -R {u} /home/{u}")
-    
+
 def set_password(u):
     while True:
         clear()
@@ -61,6 +61,18 @@ def set_timezone():
             continue
 
 def share_notfinishedyet(v, a):
+### CHECK IF THIS PARAGRAPH COMES BEFORE THE NEXT PAR IN ORIGINAL main.py too
+    os.system(f"sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-{v}")
+    if v == 1:
+        os.system("sudo btrfs sub del /mnt/.snapshots/boot/boot-tmp")
+        os.system("sudo btrfs sub del /mnt/.snapshots/etc/etc-tmp")
+        os.system("sudo btrfs sub del /mnt/.snapshots/var/var-tmp")
+    os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")
+    os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp")
+    os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
+
+    os.system(f"echo {variant} | sudo tee /mnt/usr/share/ast/snap") #SHARED-A-DONE
+    os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db") #SHARED-A-DONE
     os.system(f"echo '{a}' | sudo tee /mnt/.snapshots/ast/part")
     for i in ("dpkg", "systemd"):
         os.system(f"sudo mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")
@@ -71,26 +83,16 @@ def share_notfinishedyet(v, a):
     os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-{v}")
     os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-{v}")
     os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-{v}")
-    os.system(f"sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-{v} /mnt/.snapshots/rootfs/snapshot-tmp")
+    os.system(f"sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-{v} /mnt/.snapshots/rootfs/snapshot-tmp") #shouldn't this be DesktopInstall instead of v
     os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
 
 def guinstall(packages, v):
-    os.system("echo '1' | sudo tee /mnt/usr/share/ast/snap")
     for i in packages:
         os.system(f"sudo chroot /mnt apt-get install -y {i}")
-#   Set user and password    
+#   Set user and password
     username = get_username()
     set_user(username)
     set_password(username)
-    
-    os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db") #SHAREDZ
-    os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-1")
-    os.system("sudo btrfs sub del /mnt/.snapshots/boot/boot-tmp")
-    os.system("sudo btrfs sub del /mnt/.snapshots/etc/etc-tmp")
-    os.system("sudo btrfs sub del /mnt/.snapshots/var/var-tmp")
-    os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")
-    os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp")
-    os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
 
     share_notfinishedyet(v, astpart)
 
@@ -199,8 +201,6 @@ def main(args):
     os.system("sudo sed -i '0,/@boot/{s,@boot,@.snapshots/boot/boot-tmp,}' /mnt/etc/fstab")
 
     os.system("sudo mkdir -p /mnt/usr/share/ast/db")
-    os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
-    os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db") #SHAREDZ
     #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf")
 
 #   Modify OS release information (optional)
@@ -238,11 +238,6 @@ def main(args):
 
     os.system("sudo cp ./src/distros/debian/astpk.py /mnt/usr/local/sbin/ast")
     os.system("sudo chroot /mnt chmod +x /usr/local/sbin/ast")
-    
-    os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
-    os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")
-    os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp")
-    os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
 
 #   Initialize fstree and other stuff? (what to call them?)
 ######
@@ -266,7 +261,7 @@ def main(args):
         #set_user(username)
         #set_password(username)
 
-    os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/")
+    os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/") #what are these 2 lines for? Why not /mnt/.snapshots/rootfs/snap-v/root ?
     os.system("sudo cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")
     os.system("sudo rm -rf /mnt/root/*")
     os.system("sudo rm -rf /mnt/tmp/*")
