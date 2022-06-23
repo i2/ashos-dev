@@ -71,12 +71,7 @@ def share_notfinishedyet(v, a):
     os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp")
     os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
 
-    os.system("echo XXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-    print("echo XXXXXXXXXXXXXXXXXXXXXXXXXXXX")
     os.system(f"echo {v} | sudo tee /mnt/usr/share/ast/snap") #SHARED-A-DONE
-    os.system("echo XXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-    print("echo %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-    
     os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db") #SHARED-A-DONE
     os.system(f"echo '{a}' | sudo tee /mnt/.snapshots/ast/part")
     for i in ("dpkg", "systemd"):
@@ -90,16 +85,15 @@ def share_notfinishedyet(v, a):
     os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-{v}")
     os.system(f"sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-{v} /mnt/.snapshots/rootfs/snapshot-tmp") #shouldn't this be DesktopInstall instead of v
     os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
-    set_password("root")
-#   Set user and password
-    if(v):
-        username = get_username()
-        set_user(username)
-        set_password(username)
 
 def guinstall(packages, v):
     for i in packages:
         os.system(f"sudo chroot /mnt apt-get install -y {i}")
+#   Set user and password
+    username = get_username()
+    set_user(username)
+    set_password(username)
+
     share_notfinishedyet(v, astpart)
 
 def main(args):
@@ -232,7 +226,7 @@ def main(args):
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
     os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
 
-    #set_password("root")
+    set_password("root")
 
 ###enablelater    os.system("sudo chroot /mnt systemctl enable NetworkManager")
 

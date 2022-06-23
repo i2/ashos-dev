@@ -1,5 +1,7 @@
 ###################################### DEBIAN ETC ######################################
 
+att20-mostyolo: eror: no /usr/share/ast/snap found
+
 These are the last bugs left:
 Initial step:
     mkdir: cannot create directory '/mnt/': File exists
