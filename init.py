@@ -8,9 +8,9 @@ distro = str(subprocess.check_output(['sh', './src/distros/detect.sh']))
 distro.replace("b'","").replace('"',"").replace("\\n'","")
 
 if 'debian' in distro:
-    from src.distros.debian import installer
+    from src.distros.debian import installeryolo
 elif 'arch' in distro:
-    from src.distros.arch import installer
+    from src.distros.arch import installeryolo
 
-installer.main(args)
+installeryolo.main(args)
 
