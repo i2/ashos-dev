@@ -262,9 +262,9 @@ def main(args):
     else:
         os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
         share_notfinishedyet(DesktopInstall)
-        username = get_username()
-        set_user(username)
-        set_password(username)
+        #username = get_username()
+        #set_user(username)
+        #set_password(username)
 
     os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/")
     os.system("sudo cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")
