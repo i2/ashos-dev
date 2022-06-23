@@ -2,6 +2,8 @@
 
 Tree Traversal in C
 
+in installer, the parts for desktopinstall can be done using functions from astpk.py because desktopinstall=1 includes 0 as base and then branching.
+
 In a Debian package's control file, there is a Priority field which can be set to one of: required, important, standard, optional, extra
 
 Combine all mkdir in one bunch
@@ -292,3 +294,7 @@ You may have missed some installation steps. The emerge command is not available
 After booting the LiveCD, you need to setup your partitions / filesystems, unpack a stage tarball, and chroot into it, then you will be able to use the emerge command.
 
 ####################################################################################
+
+
+
+green sleeves song

@@ -9,7 +9,7 @@ def clear():
 def to_uuid(part):
     return subprocess.check_output(f"sudo blkid -s UUID -o value {part}", shell=True).decode('utf-8').strip()
 
-def set_user():
+def get_username():
     clear()
     while True:
         print("Enter username (all lowercase, max 8 letters)")
@@ -21,9 +21,19 @@ def set_user():
                 break
             else:
                 continue
-    os.system(f"sudo chroot /mnt useradd {username}")
     return username
 
+def set_user(u):
+    os.system(f"sudo chroot /mnt useradd {u}")
+    os.system(f"sudo chroot /mnt usermod -aG audio,input,video,wheel {u}")
+    os.system("sudo chroot /mnt passwd -l root")
+    os.system("sudo chmod +w /mnt/etc/sudoers")
+    os.system("echo '%wheel ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
+    os.system("sudo chmod -w /mnt/etc/sudoers")
+    os.system(f"sudo chroot /mnt mkdir /home/{u}")
+    os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /home/{u}/.bashrc")
+    os.system(f"sudo chroot /mnt chown -R {u} /home/{u}")
+    
 def set_password(u):
     clear()
     print("Please enter a password:")
@@ -54,16 +64,11 @@ def guinstall(packages):
     os.system("echo '1' | sudo tee /mnt/usr/share/ast/snap")
     for i in packages:
         os.system(f"sudo chroot /mnt apt-get install -y {i}")
-    username = set_user()
+#   Set user and password    
+    username = get_username()
+    set_user(username)
     set_password(username)
-    os.system(f"sudo chroot /mnt usermod -aG audio,input,video,wheel {username}")
-    os.system("sudo chroot /mnt passwd -l root")
-    os.system("sudo chmod +w /mnt/etc/sudoers")
-    os.system("echo '%wheel ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
-    os.system("sudo chmod -w /mnt/etc/sudoers")
-    os.system(f"sudo chroot /mnt mkdir /home/{username}")
-    os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /home/{username}/.bashrc")
-    os.system(f"sudo chroot /mnt chown -R {username} /home/{username}")
+    
     os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db")
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-1")
     os.system("sudo btrfs sub del /mnt/.snapshots/etc/etc-tmp")
@@ -72,21 +77,26 @@ def guinstall(packages):
     os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp")
     os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
     os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")
+
+#### SHARED
     for i in ("dpkg", "systemd"):
         os.system(f"sudo mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")
-    os.system("sudo cp --reflink=auto -r /mnt/var/lib/dpkge/* /mnt/.snapshots/var/var-tmp/lib/dpkg/")
+    os.system("sudo cp --reflink=auto -r /mnt/var/lib/dpkg/* /mnt/.snapshots/var/var-tmp/lib/dpkg/")
     os.system("sudo cp --reflink=auto -r /mnt/var/lib/systemd/* /mnt/.snapshots/var/var-tmp/lib/systemd/")
     os.system("sudo cp --reflink=auto -r /mnt/boot/* /mnt/.snapshots/boot/boot-tmp")
     os.system("sudo cp --reflink=auto -r /mnt/etc/* /mnt/.snapshots/etc/etc-tmp")
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-1")
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-1")
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-1")
+####
+
+#### SHARED
     os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-1 /mnt/.snapshots/rootfs/snapshot-tmp")
     os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
+####
 
 def main(args):
-
-    # Partitioning and formatting
+#   Partitioning and formatting
     os.system("find $HOME -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C LANGUAGE=C LANG=C >> $1' -- {} \;") # Perl complains if not set
     os.system("sudo apt-get remove -y --purge man-db") # make installs faster (because of trigger man-db bug)
     os.system("sudo apt-get update -y")
@@ -95,7 +105,7 @@ def main(args):
     os.system("sudo /usr/sbin/mkfs.vfat -F32 -n EFI /dev/sda1")
     os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
 
-    # Define variables
+#   Define variables
     RELEASE = "bullseye"
     ARCH = "amd64"
     btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
@@ -103,6 +113,7 @@ def main(args):
     mntdirs_n = mntdirs[1:]
     astpart = to_uuid(args[1])
 
+#   Greet
     while True:
         clear()
         print("Welcome to the astOS installer!\n\n\n\n\n")
@@ -129,7 +140,7 @@ def main(args):
     else:
         efi = False
 
-    # Mount and create necessary sub-volumes and directories
+#   Mount and create necessary sub-volumes and directories
     os.system(f"sudo mount {args[1]} /mnt")
     for btrdir in btrdirs:
         os.system(f"sudo btrfs sub create /mnt/{btrdir}")
@@ -146,13 +157,13 @@ def main(args):
         os.system("sudo mkdir /mnt/boot/efi")
         os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
-    # Modify shell profile for debug purposes in live iso (optional temporary)
+#   Modify shell profile for debug purposes in live iso (optional temporary)
     #os.system('echo "alias paste='"'"'curl -F "'"'"'"sprunge=<-"'"'"'" http://sprunge.us'"'"' " | tee -a $HOME/.*shrc')
     #os.system("shopt -s nullglob && echo 'export LC_ALL=C' | sudo tee -a /mnt/root/.*shrc")
     os.system("find /mnt/root/ -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C | sudo tee -a $1' -- {} \;")
     os.system("echo -e 'setw -g mode-keys vi\nset -g history-limit 999999' >> $HOME/.tmux.conf")
 
-    # Bootstrap (minimal)
+#   Bootstrap (minimal)
     os.system("sudo apt-get install -y debootstrap")
     excl = subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | awk '{print $1}'", shell=True).decode('utf-8').strip().replace("\n",",")
     os.system(f"sudo debootstrap --arch {ARCH} --exclude={excl} {RELEASE} /mnt http://ftp.debian.org/debian")
@@ -160,7 +171,7 @@ def main(args):
         os.system(f"sudo mount -B {i} /mnt{i}") # Mount-points needed for chrooting
     os.system(f"sudo chroot /mnt apt-get install -y linux-image-{ARCH}")
 
-    # Install anytree and necessary packages in chroot
+#   Install anytree and necessary packages in chroot
     os.system("sudo systemctl enable --now ntp && sleep 30s && ntpq -p") # Sync time in the live iso
     os.system(f"echo 'deb [trusted=yes] http://www.deb-multimedia.org {RELEASE} main' | sudo tee -a /mnt/etc/apt/sources.list.d/multimedia.list >/dev/null")
     os.system("sudo chroot /mnt apt-get update -y -oAcquire::AllowInsecureRepositories=true")
@@ -171,7 +182,7 @@ def main(args):
     else:
         os.system("sudo chroot /mnt apt-get install -y grub-pc")
 
-    # Update fstab
+#   Update fstab
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@,compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
     for mntdir in mntdirs_n:
         os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
@@ -185,7 +196,7 @@ def main(args):
     os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db")
     #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf")
 
-    # Modify OS release information (optional)
+#   Modify OS release information (optional)
     os.system(f"echo 'NAME=\"astOS\"' | sudo tee /mnt/etc/os-release")
     os.system(f"echo 'PRETTY_NAME=\"astOS\"' | sudo tee -a /mnt/etc/os-release")
     os.system(f"echo 'ID=astos' | sudo tee -a /mnt/etc/os-release")
@@ -197,7 +208,7 @@ def main(args):
     os.system(f"echo 'DISTRIB_RELEASE=\"rolling\"' | sudo tee -a /mnt/etc/lsb-release")
     os.system(f"echo 'DISTRIB_DESCRIPTION=astOS' | sudo tee -a /mnt/etc/lsb-release")
 
-    # Update hostname, locales and timezone
+#   Update hostname, locales and timezone
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
     os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen")
     os.system("sudo chroot /mnt locale-gen")
@@ -216,13 +227,13 @@ def main(args):
 
     os.system("sudo chroot /mnt systemctl enable NetworkManager")
 
-    # Initialize fstree
+#   Initialize fstree
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
     if DesktopInstall:
         os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'},{\\'name\\': \\'1\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
         os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
 
-    # GRUB
+#   GRUB
     os.system(f"sudo chroot /mnt sed -i s,Arch,astOS,g /etc/default/grub")
     os.system(f"sudo chroot /mnt grub-install {args[2]}")
     os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
@@ -234,6 +245,8 @@ def main(args):
     os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp")
     os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
     os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")
+    
+#### SHARED
     for i in ("dpkg", "systemd"):
         os.system(f"sudo mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")
     os.system("sudo cp --reflink=auto -r /mnt/var/lib/dpkg/* /mnt/.snapshots/var/var-tmp/lib/dpkg/")
@@ -243,6 +256,8 @@ def main(args):
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-0")
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-0")
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-0")
+####
+    
     os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
 
 ######
@@ -257,19 +272,21 @@ def main(args):
         os.system("echo '[Theme]' | sudo tee /mnt/etc/sddm.conf")
         os.system("echo 'Current=breeze' | sudo tee -a /mnt/etc/sddm.conf")
     else:
+#### SHARED
         os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
         os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
+####
 
     os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/")
     os.system("sudo cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")
     os.system("sudo rm -rf /mnt/root/*")
     os.system("sudo rm -rf /mnt/tmp/*")
 
-    # Clean unnecessary packages (optional)
+#   Clean unnecessary packages (optional)
     os.system("sudo apt-get autoremove -y")
     os.system("sudo apt-get autoclean -y")
 
-    # Copy boot and etc from snapshot's tmp to common
+#   Copy boot and etc from snapshot's tmp to common
     if efi:
         os.system("sudo umount /mnt/boot/efi")
     os.system("sudo umount /mnt/boot")
@@ -287,7 +304,7 @@ def main(args):
         os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/* /mnt/.snapshots/rootfs/snapshot-tmp/etc")
         os.system("sudo cp --reflink=auto -r /mnt/.snapshots/var/var-0/* /mnt/.snapshots/rootfs/snapshot-tmp/var")
 
-    # Unmount everything
+#   Unmount everything
     os.system("sudo umount -R /mnt")
     os.system(f"sudo mount {args[1]} -o subvolid=5 /mnt")
     os.system("sudo btrfs sub del /mnt/@")
