@@ -71,7 +71,7 @@ def share_notfinishedyet(v, a):
     os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp")
     os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
 
-    os.system(f"echo {variant} | sudo tee /mnt/usr/share/ast/snap") #SHARED-A-DONE
+    os.system(f"echo {v} | sudo tee /mnt/usr/share/ast/snap") #SHARED-A-DONE
     os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db") #SHARED-A-DONE
     os.system(f"echo '{a}' | sudo tee /mnt/.snapshots/ast/part")
     for i in ("dpkg", "systemd"):
