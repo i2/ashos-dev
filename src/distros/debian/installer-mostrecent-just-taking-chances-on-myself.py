@@ -266,10 +266,6 @@ def main(args):
     os.system("sudo rm -rf /mnt/root/*")
     os.system("sudo rm -rf /mnt/tmp/*")
 
-#   Clean unnecessary packages (optional)
-    os.system("sudo apt-get autoremove -y")
-    os.system("sudo apt-get autoclean -y")
-
 #   Copy boot and etc from snapshot's tmp to common
     if efi:
         os.system("sudo umount /mnt/boot/efi")
@@ -283,6 +279,10 @@ def main(args):
     os.system(f"sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-{variant}/* /mnt/.snapshots/rootfs/snapshot-tmp/boot")
     os.system(f"sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-{variant}/* /mnt/.snapshots/rootfs/snapshot-tmp/etc")
     os.system(f"sudo cp --reflink=auto -r /mnt/.snapshots/var/var-{variant}/* /mnt/.snapshots/rootfs/snapshot-tmp/var")
+
+#   Clean unnecessary packages (optional)
+    os.system("sudo apt-get autoremove -y")
+    os.system("sudo apt-get autoclean -y")
 
 #   Unmount everything
     os.system("sudo umount -R /mnt")

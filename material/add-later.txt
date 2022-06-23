@@ -8,6 +8,7 @@ mid-step:
     No diversion 'diversion of /usr/share/initramfs-tools/hooks/klibc to /usr/share/initramfs-tools/hooks/klibc^i-t by klibc-utils', none removed.
     W: An error occurred dring signature verification. GPG error: ftp.debian.org/debian bullseye InRelease: couldn't create temporary file /tmp/apt.conf.aNvw3l for passing config file to apt-key
     W: GPG error deb-multimedia.orf couldn't create temporary file
+    solution might be either chmod 1777 /tmp or adding key
 final step:
     No DKMS packages installed: not changing secure boot validation state.
 
