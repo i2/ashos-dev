@@ -345,3 +345,18 @@ green sleeves song
 ...     "grep -E -o '([0-9]{1,3}[\.]){3}[0-9]{1,3}' | "
 ...     "tr -d '\n'", shell=True)
 '172.17.174.160'
+
+
+
+
+
+
+
+
+
+
+
+
+Maybe beter descriptionfor these:
+print(f"Branch {i} was added to parent of {snapshot}.")
+print(f"Branch {i} was added under snapshot {snapshot}.")
