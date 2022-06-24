@@ -59,15 +59,18 @@ def get_username():
     return username
 
 def set_user(u):
-    os.system(f"sudo chroot /mnt useradd {u}")
-    os.system(f"sudo chroot /mnt usermod -aG audio,input,video,wheel {u}")
-    os.system("sudo chroot /mnt passwd -l root")
-    os.system("sudo chmod +w /mnt/etc/sudoers")
-    os.system("echo '%wheel ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
-    os.system("sudo chmod -w /mnt/etc/sudoers")
-    os.system(f"sudo chroot /mnt mkdir /home/{u}")
+    os.system(f"sudo chroot /mnt useradd -m -G sudo -s /bin/bash {u}")
+    os.system("echo '%sudo ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /home/{u}/.bashrc")
-    os.system(f"sudo chroot /mnt chown -R {u} /home/{u}")
+    #os.system(f"sudo chroot /mnt useradd {u}")
+    #os.system(f"sudo chroot /mnt usermod -aG audio,input,video,wheel {u}")
+    #os.system("sudo chroot /mnt passwd -l root")
+    #os.system("sudo chmod +w /mnt/etc/sudoers")
+    #os.system("echo '%wheel ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
+    #os.system("sudo chmod -w /mnt/etc/sudoers")
+    #os.system(f"sudo chroot /mnt mkdir /home/{u}")
+    #os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /home/{u}/.bashrc")
+    #os.system(f"sudo chroot /mnt chown -R {u} /home/{u}")
 
 def set_password(u):
     while True:
