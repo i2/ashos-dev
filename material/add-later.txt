@@ -22,11 +22,16 @@ My vision: ashos should not be bugged down by providing desktop environments for
 #3.8	Boot loader
 #4	Post-installation
 
+What does ast tree look like when installing gnome or kde?
+Is it:
+0 - base node
+    1 - gnome
+Also, what is content of /mnt/usr/share/ast/snap? Is it 1?
 
 
 
 
-
+install multiple packages or package groups (whatever fedora calls them?!) using ast install
 
 
 

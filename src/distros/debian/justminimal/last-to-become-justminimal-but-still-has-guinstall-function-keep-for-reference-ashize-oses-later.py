@@ -1,0 +1,1 @@
+/home/me/Documents/dev/i2/ashos-dev/src/distros/debian/installeryolo-justminimal-based-on-before-drousy_THIS_IS_WHERE_ID_FINISH_MY_WORK_FROM_OTHER_FILES.py
