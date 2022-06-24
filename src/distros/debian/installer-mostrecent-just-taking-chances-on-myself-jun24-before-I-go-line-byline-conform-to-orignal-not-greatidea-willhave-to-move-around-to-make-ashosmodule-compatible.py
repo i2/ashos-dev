@@ -6,20 +6,20 @@
 #1.3	Connect to the internet
 #1.4	Update the system clock
 #1.5	Partition the disks
-#1.6	Format the partitions
-#1.7	Mount the file systems
+#1.6	Format the partitions   *ASH* ashosmodule
+#1.7	Mount the file systems  *ASH* ashosmodule
 #2	Installation
 #2.1	Select the mirrors
 #2.2	Install essential packages
 #3	Configure the system
-#3.1	Fstab
-#3.2	Chroot
+#3.1	Fstab                   *ASH* ashosmodule
+#3.2	Chroot                  *ASH* ashosmodule
 #3.3	Time zone
 #3.4	Localization
 #3.5	Network configuration
 #3.6	Initramfs
 #3.7	Root password
-#3.8	Boot loader
+#3.8	Boot loader             *ASH* maybe?
 #4	Post-installation
 
 import os
@@ -30,6 +30,20 @@ def clear():
 
 def to_uuid(part):
     return subprocess.check_output(f"sudo blkid -s UUID -o value {part}", shell=True).decode('utf-8').strip()
+
+def get_hostname():
+    while True:
+        clear()
+        print("Enter hostname:")
+        hostname = input("> ")
+        if hostname:
+            print("Happy with your username (y/n)?")
+            reply = input("> ")
+            if reply.casefold() == "y":
+                break
+            else:
+                continue
+    return hostname
 
 def set_timezone():
     while True:
@@ -144,10 +158,7 @@ def main(args):
             break
 
     tz = set_timezone()
-
-    clear()
-    print("Enter hostname:")
-    hostname = input("> ")
+    hostname = get_hostname()
 
 #   Partition and format
     os.system("find $HOME -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C LANGUAGE=C LANG=C >> $1' -- {} \;") # Perl complains if not set
@@ -225,16 +236,18 @@ def main(args):
         os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/tmp /tmp none bind 0 0' | sudo tee -a /mnt/etc/fstab")
-################################### Moved from below
+
+    os.system("sudo mkdir -p /mnt/usr/share/ast/db")
+#####################################REZA originally this line was here: os.system(f"echo '0' > /mnt/usr/share/ast/snap")
+    #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf")
+
+################################### Moved from below #REZA #fstab-part2
     os.system("sudo sed -i '0,/@/{s,@,@.snapshots/rootfs/snapshot-tmp,}' /mnt/etc/fstab")
     os.system("sudo sed -i '0,/@etc/{s,@etc,@.snapshots/etc/etc-tmp,}' /mnt/etc/fstab")
     os.system("sudo sed -i '0,/@boot/{s,@boot,@.snapshots/boot/boot-tmp,}' /mnt/etc/fstab")
 
-    os.system("sudo mkdir -p /mnt/usr/share/ast/db")
-##################################### originally this line was here: os.system(f"echo '0' > /mnt/usr/share/ast/snap")
-    #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf")
 
-#   Modify OS release information (optional)
+#   Modify OS release information (optional) -- ADD to SHARED - but remove later as this is not ashosmodule
     os.system(f"echo 'NAME=\"astOS\"' | sudo tee /mnt/etc/os-release")
     os.system(f"echo 'PRETTY_NAME=\"astOS\"' | sudo tee -a /mnt/etc/os-release")
     os.system(f"echo 'ID=astos' | sudo tee -a /mnt/etc/os-release")
