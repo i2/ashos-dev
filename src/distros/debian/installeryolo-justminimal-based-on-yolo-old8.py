@@ -1,27 +1,5 @@
 #!/usr/bin/python3
 
-#1   Pre-installation
-#1.1	Set the console keyboard layout
-#1.2	Verify the boot mode
-#1.3	Connect to the internet
-#1.4	Update the system clock
-#1.5	Partition the disks
-#1.6	Format the partitions   *ASH* ashosmodule
-#1.7	Mount the file systems  *ASH* ashosmodule
-#2	Installation
-#2.1	Select the mirrors
-#2.2	Install essential packages
-#3	Configure the system
-#3.1	Fstab                   *ASH* ashosmodule
-#3.2	Chroot                  *ASH* ashosmodule
-#3.3	Time zone
-#3.4	Localization
-#3.5	Network configuration
-#3.6	Initramfs
-#3.7	Root password
-#3.8	Boot loader             *ASH* maybe?
-#4	Post-installation
-
 import os
 import subprocess
 
@@ -77,15 +55,6 @@ def set_user(u):
     os.system("echo '%sudo ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
     os.system(f"sudo chroot /mnt mkdir /home/{u}")
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /home/{u}/.bashrc")
-    #os.system(f"sudo chroot /mnt useradd {u}")
-    #os.system(f"sudo chroot /mnt usermod -aG audio,input,video,wheel {u}")
-    #os.system("sudo chroot /mnt passwd -l root")
-    #os.system("sudo chmod +w /mnt/etc/sudoers")
-    #os.system("echo '%wheel ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
-    #os.system("sudo chmod -w /mnt/etc/sudoers")
-    #os.system(f"sudo chroot /mnt mkdir /home/{u}")
-    #os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /home/{u}/.bashrc")
-    #os.system(f"sudo chroot /mnt chown -R {u} /home/{u}")
 
 def set_password(u):
     while True:
@@ -100,7 +69,20 @@ def set_password(u):
             clear()
             continue
 
-def create_bev_snapshots(v):
+def share_notfinishedyet(v, a, p):
+    #   Set user and password
+    set_password("root")
+    username = get_username()
+    set_user(username)
+    set_password(username)
+    for i in p:
+        os.system(f"sudo chroot /mnt apt-get install -y {i}")
+### I am currently reviewing up til line 125
+    os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
+    os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
+### CHECK IF THIS PARAGRAPH COMES BEFORE THE NEXT PAR IN ORIGINAL main.py too
+    os.system(f"echo {v} | sudo tee /mnt/usr/share/ast/snap") #SHARED-A-DONE   101 (for 0) and 174 (for 1)
+#REZA#################3 originally setting tz, hostname, locale, os-relaseinfo happened here + fstabupdate-part2 (lines 125-129)
     os.system(f"sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-{v}") #O 157
     if v == 1:
         os.system("sudo btrfs sub del /mnt/.snapshots/boot/boot-tmp")
@@ -110,77 +92,8 @@ def create_bev_snapshots(v):
     os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp") #O 158
     os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp") #O 159
 
-def share_notfinishedyet(v, a, p):
-    os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots") #this is where I like to have this line
-    ###MOVED os.system(f"echo {v} | sudo tee /mnt/usr/share/ast/snap") #SHARED-A-DONE   101 (for 0) and 174 (for 1)
-
-#   Modify OS release information (optional) -- ADD to SHARED - but remove later as this is not ashosmodule
-    os.system(f"echo 'NAME=\"astOS\"' | sudo tee /mnt/etc/os-release")
-    os.system(f"echo 'PRETTY_NAME=\"astOS\"' | sudo tee -a /mnt/etc/os-release")
-    os.system(f"echo 'ID=astos' | sudo tee -a /mnt/etc/os-release")
-    os.system(f"echo 'BUILD_ID=rolling' | sudo tee -a /mnt/etc/os-release")
-    os.system(f"echo 'ANSI_COLOR=\"38;2;23;147;209\"' | sudo tee -a /mnt/etc/os-release")
-    os.system(f"echo 'HOME_URL=\"https://github.com/CuBeRJAN/astOS\"' | sudo tee -a /mnt/etc/os-release")
-    os.system(f"echo 'LOGO=astos-logo' | sudo tee -a /mnt/etc/os-release")
-    os.system(f"echo 'DISTRIB_ID=\"astOS\"' | sudo tee /mnt/etc/lsb-release")
-    os.system(f"echo 'DISTRIB_RELEASE=\"rolling\"' | sudo tee -a /mnt/etc/lsb-release")
-    os.system(f"echo 'DISTRIB_DESCRIPTION=astOS' | sudo tee -a /mnt/etc/lsb-release")
-
-    os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db") #O 110 #SHARED-A-DONE #####REVIEW_LATER ###ORIGINALWAY HERE
-
-#   Update hostname, locales and timezone
-    os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
-    os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen")
-    os.system("sudo chroot /mnt locale-gen")
-    os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
-    os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
-    os.system("sudo chroot /mnt hwclock --systohc")
-
-################################### Moved from below #REZA #fstab-part2
-    os.system("sudo sed -i '0,/@/{s,@,@.snapshots/rootfs/snapshot-tmp,}' /mnt/etc/fstab")
-    os.system("sudo sed -i '0,/@etc/{s,@etc,@.snapshots/etc/etc-tmp,}' /mnt/etc/fstab")
-    os.system("sudo sed -i '0,/@boot/{s,@boot,@.snapshots/boot/boot-tmp,}' /mnt/etc/fstab")
-
-    #REZE originally here but I moved it up os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
-    os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
-### CHECK IF THIS PARAGRAPH COMES BEFORE THE NEXT PAR IN ORIGINAL main.py too
-
-    #   Set user and password
-#OLDWAY    set_password("root")
-#OLDWAY    username = get_username()
-#OLDWAY    set_user(username)
-#OLDWAY    set_password(username)
-
-###enablelater   os.system("sudo chroot /mnt systemctl enable NetworkManager") #REZA where original astos-public has it. I will most likely move it somewhere else to compatible with ashosmodule idea
-
-###    #REZA originally it is here but in my version I have it ##### os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} > /mnt/.snapshots/ast/fstree")
-#    if v==0:
-#        os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} > /mnt/.snapshots/ast/fstree")
-#    elif v==1:
-#        os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'},{\\'name\\': \\'1\\'}]} > /mnt/.snapshots/ast/fstree")
-
-# REZA    # originally this line is here: os.system(f"echo '{astpart}' > /mnt/.snapshots/ast/part")
-
-#OLDWAY-MYWAY    for i in p:
-#OLDWAY-MYWAY        os.system(f"sudo chroot /mnt apt-get install -y {i}")
-
-
-#REZA#################3 originally setting tz, hostname, locale, os-relaseinfo happened here + fstabupdate-part2 (lines 125-129)
-#MYWAY    os.system(f"sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-{v}") #O 157
-#MYWAY    if v == 1:
-#MYWAY        os.system("sudo btrfs sub del /mnt/.snapshots/boot/boot-tmp")
-#MYWAY        os.system("sudo btrfs sub del /mnt/.snapshots/etc/etc-tmp")
-#MYWAY        os.system("sudo btrfs sub del /mnt/.snapshots/var/var-tmp")
-#MYWAY    os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp") #O 160
-#MYWAY    os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp") #O 158
-#MYWAY    os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp") #O 159
-
-    create_bev_snapshots("0")   #NEWWAY
-#NEWWAY    if variant:
-#NEWWAY        create_bev_snapshots()
-#####################HERE
-##    os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db") #O 110 #SHARED-A-DONE #####REVIEW_LATER
-###    #os.system(f"echo '{a}' | sudo tee /mnt/.snapshots/ast/part") #O 171 #####REVIEW_LATER
+    os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db") #O 110 #SHARED-A-DONE
+    os.system(f"echo '{a}' | sudo tee /mnt/.snapshots/ast/part") #O 171
     for i in ("dpkg", "systemd"):                               #O 162
         os.system(f"sudo mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")
     os.system("sudo cp --reflink=auto -r /mnt/var/lib/dpkg/* /mnt/.snapshots/var/var-tmp/lib/dpkg/")
@@ -190,27 +103,7 @@ def share_notfinishedyet(v, a, p):
     os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-{v}") #O 168
     os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-{v}")
     os.system(f"sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-{v}")
-    
-    os.system(f"echo '{a}' | sudo tee /mnt/.snapshots/ast/part") #O 171 #####REVIEW_LATER
-    
-    #########HERE-NOW LATEST (variant=0 goes straight to line *&$#@, so all is good for that. For variant=1 I need to review
-    
-
-
-    os.system(f"echo {v} | sudo tee /mnt/usr/share/ast/snap") #NEWWAY
-    for i in p:
-        os.system(f"sudo chroot /mnt apt-get install -y {i}")
-
-#   Set user and password
-    set_password("root")
-    username = get_username()
-    set_user(username)
-    set_password(username)
-    
-    ######## HERE-NOW-13:04 GDM should be out of this HEART/SHARED/COMMON functionality
-
-    os.system(f"sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-{v} /mnt/.snapshots/rootfs/snapshot-tmp") #shouldn't this be DesktopInstall instead of {v} *&$#@
-
+    os.system(f"sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-{v} /mnt/.snapshots/rootfs/snapshot-tmp") #shouldn't this be DesktopInstall instead of v
     os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
 
 def main(args):
@@ -235,6 +128,10 @@ def main(args):
 
     tz = set_timezone()
     hostname = get_hostname()
+
+#JUSTMIN    clear()
+#JUSTMIN    print("Enter hostname:")
+#JUSTMIN    hostname = input("> ")
 
 #   Partition and format
     os.system("find $HOME -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C LANGUAGE=C LANG=C >> $1' -- {} \;") # Perl complains if not set
@@ -312,48 +209,70 @@ def main(args):
         os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/tmp /tmp none bind 0 0' | sudo tee -a /mnt/etc/fstab")
+################################### Moved from below
+    os.system("sudo sed -i '0,/@/{s,@,@.snapshots/rootfs/snapshot-tmp,}' /mnt/etc/fstab")
+    os.system("sudo sed -i '0,/@etc/{s,@etc,@.snapshots/etc/etc-tmp,}' /mnt/etc/fstab")
+    os.system("sudo sed -i '0,/@boot/{s,@boot,@.snapshots/boot/boot-tmp,}' /mnt/etc/fstab")
 
     os.system("sudo mkdir -p /mnt/usr/share/ast/db")
-#####################################REZA originally this line was here: os.system(f"echo '0' > /mnt/usr/share/ast/snap")
+##################################### originally this line was here: os.system(f"echo '0' > /mnt/usr/share/ast/snap")
     #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf")
+
+#   Modify OS release information (optional)
+    os.system(f"echo 'NAME=\"astOS\"' | sudo tee /mnt/etc/os-release")
+    os.system(f"echo 'PRETTY_NAME=\"astOS\"' | sudo tee -a /mnt/etc/os-release")
+    os.system(f"echo 'ID=astos' | sudo tee -a /mnt/etc/os-release")
+    os.system(f"echo 'BUILD_ID=rolling' | sudo tee -a /mnt/etc/os-release")
+    os.system(f"echo 'ANSI_COLOR=\"38;2;23;147;209\"' | sudo tee -a /mnt/etc/os-release")
+    os.system(f"echo 'HOME_URL=\"https://github.com/CuBeRJAN/astOS\"' | sudo tee -a /mnt/etc/os-release")
+    os.system(f"echo 'LOGO=astos-logo' | sudo tee -a /mnt/etc/os-release")
+    os.system(f"echo 'DISTRIB_ID=\"astOS\"' | sudo tee /mnt/etc/lsb-release")
+    os.system(f"echo 'DISTRIB_RELEASE=\"rolling\"' | sudo tee -a /mnt/etc/lsb-release")
+    os.system(f"echo 'DISTRIB_DESCRIPTION=astOS' | sudo tee -a /mnt/etc/lsb-release")
+
+#   Update hostname, locales and timezone
+    os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
+    os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen")
+    os.system("sudo chroot /mnt locale-gen")
+    os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
+    os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
+    os.system("sudo chroot /mnt hwclock --systohc")
 
     #set_password("root")
 
-###enablelater  WHERE I HAD IT  os.system("sudo chroot /mnt systemctl enable NetworkManager")
+###enablelater    os.system("sudo chroot /mnt systemctl enable NetworkManager")
 
-#   Initialize fstree and other stuff? (what to call them?)
-######
-    if DesktopInstall == 1:
-        os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'},{\\'name\\': \\'1\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
-        packages = ["gnome", "gnome-extra", "gnome-themes-extra", "gdm", "pipewire", "pipewire-pulse", "sudo"]
-        share_notfinishedyet(variant, astpart, packages)
-        os.system("sudo chroot /mnt systemctl enable gdm")
-    elif DesktopInstall == 2:
-        os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'},{\\'name\\': \\'1\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
-        packages = ["kde-plasma-desktop", "xorg", "sddm",  "sudo"]
-        # "pipewire", "pipewire-pulse", kde-applications, "kde-applications"
-        guinstall(packages, variant)
-        os.system("sudo chroot /mnt systemctl enable sddm")
-        os.system("echo '[Theme]' | sudo tee /mnt/etc/sddm.conf")
-        os.system("echo 'Current=breeze' | sudo tee -a /mnt/etc/sddm.conf")
-    else:
-        os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
-        packages = []
-        share_notfinishedyet(variant, astpart, packages)
-        #username = get_username()
-        #set_user(username)
-        #set_password(username)
-
-# REZA #MYWAY-was-befor-initialize-fstree-and-after-Update-fstab-OUTSIDE-of-sharednotfinishedyet
 #   GRUB
     os.system(f"sudo chroot /mnt sed -i s,Arch,astOS,g /etc/default/grub")
     os.system(f"sudo chroot /mnt grub-install {args[2]}")
     os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo sed -i '0,/subvol=@/{s,subvol=@,subvol=@.snapshots/rootfs/snapshot-tmp,g}' /mnt/boot/grub/grub.cfg")
-    # Copy astpk
+
     os.system("sudo cp ./src/distros/debian/astpk.py /mnt/usr/local/sbin/ast")
     os.system("sudo chroot /mnt chmod +x /usr/local/sbin/ast")
 
+#   Initialize fstree and other stuff? (what to call them?)
+######
+#JUSTMIN    if DesktopInstall == 1:
+#JUSTMIN        os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'},{\\'name\\': \\'1\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
+#JUSTMIN        packages = ["gnome", "gnome-extra", "gnome-themes-extra", "gdm", "pipewire", "pipewire-pulse", "sudo"]
+#JUSTMIN        share_notfinishedyet(variant, astpart, packages)
+#JUSTMIN        os.system("sudo chroot /mnt systemctl enable gdm")
+#JUSTMIN    elif DesktopInstall == 2:
+#JUSTMIN        os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'},{\\'name\\': \\'1\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
+#JUSTMIN        packages = ["kde-plasma-desktop", "xorg", "sddm",  "sudo"]
+#JUSTMIN        # "pipewire", "pipewire-pulse", kde-applications, "kde-applications"
+#JUSTMIN        guinstall(packages, variant)
+#JUSTMIN        os.system("sudo chroot /mnt systemctl enable sddm")
+#JUSTMIN        os.system("echo '[Theme]' | sudo tee /mnt/etc/sddm.conf")
+#JUSTMIN        os.system("echo 'Current=breeze' | sudo tee -a /mnt/etc/sddm.conf")
+#JUSTMIN    else:
+    os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
+    packages = []
+    share_notfinishedyet(variant, astpart, packages)
+    username = get_username()
+    set_user(username)
+    set_password(username)
 
     os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/") #what are these 2 lines for? Why not /mnt/.snapshots/rootfs/snap-v/root ?
     os.system("sudo cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")
