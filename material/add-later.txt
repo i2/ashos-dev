@@ -1,5 +1,13 @@
 As of june 23, 2022, the best version of my ashos installer for justminimal (my new vision for the project) is: installery_justminimal.py
 
+Can I combine power of ashos and bedrock linux?
+I THINK IT IS A GREAT IDEA. AshOS can be a great base for bedrock linux.
+Error: subvol or ZFS detected in /boot/grub/grub.cconf <- use another bootloader other than GRUB!!!
+
+Install i3: packages needed are i3 and xorg
+ast install {snapshot} i3 xorg
+
+- have a profile.txt for each desktop-environments e.g. gnome.txt -> and then list of packages needed to 
 
 My vision: ashos should not be bugged down by providing desktop environments for billion DEs. DEs are just packages. With power of snapshotting, we only provide a solid minimal profile and AST will take care of DEs on top of that!
 

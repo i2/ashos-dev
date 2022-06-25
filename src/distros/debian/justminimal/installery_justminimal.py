@@ -53,7 +53,7 @@ def get_username():
 def create_user(u):
     os.system(f"sudo chroot /mnt useradd -m -G sudo -s /bin/bash {u}")
     os.system("echo '%sudo ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
-    os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /home/{u}/.bashrc")
+    os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /mnt/home/{u}/.bashrc")
 
 def set_password(u):
     while True:
@@ -183,7 +183,7 @@ def main(args):
     set_password("root")
     username = get_username()
     create_user(username)
-    set_password(username)
+    set_password(u)
 
     os.system("sudo chroot /mnt systemctl enable NetworkManager")
 
@@ -198,7 +198,7 @@ def main(args):
 
 #   Copy astpk
     os.system("sudo cp ./src/distros/debian/astpk.py /mnt/usr/sbin/ast")
-    os.system("sudo chroot /mnt chmod +x /usr/local/sbin/ast")
+    os.system("sudo chroot /mnt chmod +x /usr/sbin/ast")
 
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")
@@ -212,9 +212,9 @@ def main(args):
     os.system("sudo cp --reflink=auto -r /mnt/var/lib/systemd/* /mnt/.snapshots/var/var-tmp/lib/systemd/")
     os.system("sudo cp --reflink=auto -r /mnt/boot/* /mnt/.snapshots/boot/boot-tmp")
     os.system("sudo cp --reflink=auto -r /mnt/etc/* /mnt/.snapshots/etc/etc-tmp")
-    os.system("sudo btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-0")
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-0")
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-0")
+    os.system("sudo btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-0")
 ####
 
     os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
