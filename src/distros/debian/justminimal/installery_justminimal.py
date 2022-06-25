@@ -23,7 +23,7 @@ def get_hostname():
                 continue
     return hostname
 
-def set_timezone():
+def get_timezone():
     while True:
         clear()
         print("Select a timezone (type list to list):")
@@ -53,7 +53,6 @@ def get_username():
 def create_user(u):
     os.system(f"sudo chroot /mnt useradd -m -G sudo -s /bin/bash {u}")
     os.system("echo '%sudo ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
-    os.system(f"sudo chroot /mnt mkdir /home/{u}")
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /home/{u}/.bashrc")
 
 def set_password(u):
@@ -86,30 +85,14 @@ def main(args):
     mntdirs = ["",".snapshots","home","var","etc","boot"]
     mntdirs_n = mntdirs[1:]
     astpart = to_uuid(args[1])
-
-#   Greet
-    while True:
-        clear()
-        print("Welcome to the astOS installer!\n\n\n\n\n")
-        print("Select installation profile:\n1. Minimal install - suitable for embedded devices or servers\n2. Desktop install (Gnome) - suitable for workstations\n3. Desktop install (KDE Plasma)")
-        InstallProfile = str(input("> "))
-        if InstallProfile == "1":
-            DesktopInstall = 0
-            break
-        if InstallProfile == "2":
-            DesktopInstall = 1
-            break
-        if InstallProfile == "3":
-            DesktopInstall = 2
-            break
-
-    tz = set_timezone()
-    hostname = get_hostname()
-
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
         efi = False
+
+    print("Welcome to the astOS installer!\n\n\n\n\n")
+    tz = get_timezone()
+    hostname = get_hostname()
 
 ### Mount and create necessary sub-volumes and directories
     os.system(f"sudo mount {args[1]} /mnt")
@@ -211,6 +194,7 @@ def main(args):
     os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo sed -i '0,/subvol=@/{s,subvol=@,subvol=@.snapshots/rootfs/snapshot-tmp,g}' /mnt/boot/grub/grub.cfg")
 
+#   Copy astpk
     os.system("sudo cp ./src/distros/debian/astpk.py /mnt/usr/local/sbin/ast")
     os.system("sudo chroot /mnt chmod +x /usr/local/sbin/ast")
 

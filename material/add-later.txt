@@ -29,7 +29,7 @@ Is it:
 Also, what is content of /mnt/usr/share/ast/snap? Is it 1?
 
 
-
+add /etc/hosts as without it you'll get unable to resolve host explained
 
 install multiple packages or package groups (whatever fedora calls them?!) using ast install
 
