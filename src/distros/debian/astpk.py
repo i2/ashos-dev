@@ -457,8 +457,8 @@ def install(snapshot,pkg):
         print("F: changing base snapshot is not allowed.")
     else:
         prepare(snapshot)
-        excode = str(os.system(f'chroot /.snapshots/rootfs/snapshot-chr{snapshot} apt-get -o Dpkg::Options::="--force-overwrite" install -y {pkg}'))
-        #excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} apt install -f -y {pkg}"))
+        #excode = str(os.system(f'chroot /.snapshots/rootfs/snapshot-chr{snapshot} apt-get -o Dpkg::Options::="--force-overwrite" install -y {pkg}'))
+        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} apt install -f -y {pkg}"))
         if int(excode) == 0:
             posttrans(snapshot)
             print(f"Package {pkg} installed in snapshot {snapshot} successfully.")
@@ -473,7 +473,6 @@ def remove(snapshot,pkg):
         print("F: changing base snapshot is not allowed.")
     else:
         prepare(snapshot)
-        #excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} pacman --noconfirm -Rns {pkg}"))
         excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} apt-get remove {pkg}"))
         if int(excode) == 0:
             posttrans(snapshot)
