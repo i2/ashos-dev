@@ -15,7 +15,7 @@ def get_hostname():
         print("Enter hostname:")
         hostname = input("> ")
         if hostname:
-            print("Happy with your username (y/n)?")
+            print("Happy with your hostname (y/n)?")
             reply = input("> ")
             if reply.casefold() == "y":
                 break
@@ -58,7 +58,7 @@ def create_user(u):
 def set_password(u):
     while True:
         clear()
-        print("Please enter a password:")
+        print(f"Setting a password for '{u}':")
         os.system(f"sudo chroot /mnt passwd {u}")
         print("Was your password set properly (y/n)?")
         reply = input("> ")
@@ -69,8 +69,10 @@ def set_password(u):
             continue
 
 def main(args):
+    print("Welcome to the astOS installer!\n\n\n\n\n")
+
 #   Partition and format
-    os.system("find $HOME -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C LANGUAGE=C LANG=C >> $1' -- {} \;") # Perl complains if not set
+    #os.system("find $HOME -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C LANGUAGE=C LANG=C >> $1' -- {} \;") # Perl complains if not set
     os.system("sudo apt-get remove -y --purge man-db") # make installs faster (because of trigger man-db bug)
     os.system("sudo apt-get update -y")
     os.system("sudo apt-get install -y parted btrfs-progs dosfstools ntp")
@@ -90,11 +92,10 @@ def main(args):
     else:
         efi = False
 
-    print("Welcome to the astOS installer!\n\n\n\n\n")
     tz = get_timezone()
     hostname = get_hostname()
 
-### Mount and create necessary sub-volumes and directories
+#   Mount and create necessary sub-volumes and directories
     os.system(f"sudo mount {args[1]} /mnt")
     for btrdir in btrdirs:
         os.system(f"sudo btrfs sub create /mnt/{btrdir}")
@@ -114,8 +115,8 @@ def main(args):
 #   Modify shell profile for debug purposes in live iso (optional temporary)
     #os.system('echo "alias paste='"'"'curl -F "'"'"'"sprunge=<-"'"'"'" http://sprunge.us'"'"' " | tee -a $HOME/.*shrc')
     #os.system("shopt -s nullglob && echo 'export LC_ALL=C' | sudo tee -a /mnt/root/.*shrc")
-    os.system("find /mnt/root/ -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C | sudo tee -a $1' -- {} \;")
-    os.system("echo -e 'setw -g mode-keys vi\nset -g history-limit 999999' >> $HOME/.tmux.conf")
+    #os.system("find /mnt/root/ -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C | sudo tee -a $1' -- {} \;")
+    #os.system("echo -e 'setw -g mode-keys vi\nset -g history-limit 999999' >> $HOME/.tmux.conf")
 
 #   Bootstrap (minimal)
     os.system("sudo apt-get install -y debootstrap")
@@ -179,9 +180,9 @@ def main(args):
 
 #   Create user and set password
     set_password("root")
-    username = get_username() #############################3
-    create_user(username) #############################3
-    set_password(username) #############################3
+    username = get_username()
+    create_user(username)
+    set_password(username)
 
     os.system("sudo chroot /mnt systemctl enable NetworkManager")
 
