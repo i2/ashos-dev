@@ -108,11 +108,11 @@ def main(args):
         os.system(f"mount {args[3]} /mnt/boot/efi")
 
 #   Install anytree and necessary packages in chroot
-    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
-        os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
     os.system("pacstrap /mnt base linux linux-firmware nano python3 python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub")
     if efi:
         os.system("pacstrap /mnt efibootmgr")
+    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
+        os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
 
 #   Update fstab
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@,compress=zstd,noatime,ro 0 0' | tee /mnt/etc/fstab")
@@ -159,7 +159,7 @@ def main(args):
     set_password("root")
     username = get_username()
     create_user(username)
-    set_password(u)
+    set_password(username)
 
     os.system("chroot /mnt systemctl enable NetworkManager")
 

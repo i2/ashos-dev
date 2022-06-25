@@ -1,3 +1,6 @@
+curl -L -O https://bit.ly/astos042022
+tar xvf astos042022
+
 As of june 23, 2022, the best version of my ashos installer for justminimal (my new vision for the project) is: installery_justminimal.py
 
 Can I combine power of ashos and bedrock linux?
