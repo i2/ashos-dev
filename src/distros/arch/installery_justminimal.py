@@ -108,7 +108,7 @@ def main(args):
         os.system(f"mount {args[3]} /mnt/boot/efi")
 
 #   Install anytree and necessary packages in chroot
-    os.system("pacstrap /mnt base linux linux-firmware nano python3 python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub")
+    os.system("pacstrap /mnt base linux linux-firmware nano python3 python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo")
     if efi:
         os.system("pacstrap /mnt efibootmgr")
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
@@ -173,7 +173,7 @@ def main(args):
     os.system("sed -i '0,/subvol=@/{s,subvol=@,subvol=@.snapshots/rootfs/snapshot-tmp,g}' /mnt/boot/grub/grub.cfg")
 
 #   Copy astpk
-    os.system("cp ./src/distros/debian/astpk.py /mnt/usr/sbin/ast")
+    os.system("cp ./src/distros/arch/astpk.py /mnt/usr/sbin/ast")
     os.system("chroot /mnt chmod +x /usr/sbin/ast")
 
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
