@@ -101,7 +101,8 @@ def main(args):
         os.system(f"sudo btrfs sub create /mnt/{btrdir}")
     os.system("sudo umount /mnt")
     os.system(f"sudo mount {args[1]} -o subvol=@,compress=zstd,noatime /mnt")
-    for mntdir in mntdirs:
+    #for mntdir in mntdirs:
+    for mntdir in mntdirs_n:
         os.system(f"sudo mkdir /mnt/{mntdir}")
         os.system(f"sudo mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
     for i in ("tmp", "root"):
@@ -152,16 +153,16 @@ def main(args):
     #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf")
 
 #   Modify OS release information (optional)
-    os.system(f"echo 'NAME=\"astOS\"' | sudo tee /mnt/etc/os-release")
-    os.system(f"echo 'PRETTY_NAME=\"astOS\"' | sudo tee -a /mnt/etc/os-release")
-    os.system(f"echo 'ID=astos' | sudo tee -a /mnt/etc/os-release")
-    os.system(f"echo 'BUILD_ID=rolling' | sudo tee -a /mnt/etc/os-release")
-    os.system(f"echo 'ANSI_COLOR=\"38;2;23;147;209\"' | sudo tee -a /mnt/etc/os-release")
-    os.system(f"echo 'HOME_URL=\"https://github.com/CuBeRJAN/astOS\"' | sudo tee -a /mnt/etc/os-release")
-    os.system(f"echo 'LOGO=astos-logo' | sudo tee -a /mnt/etc/os-release")
-    os.system(f"echo 'DISTRIB_ID=\"astOS\"' | sudo tee /mnt/etc/lsb-release")
-    os.system(f"echo 'DISTRIB_RELEASE=\"rolling\"' | sudo tee -a /mnt/etc/lsb-release")
-    os.system(f"echo 'DISTRIB_DESCRIPTION=astOS' | sudo tee -a /mnt/etc/lsb-release")
+#    os.system(f"echo 'NAME=\"astOS\"' | sudo tee /mnt/etc/os-release")
+#    os.system(f"echo 'PRETTY_NAME=\"astOS\"' | sudo tee -a /mnt/etc/os-release")
+#    os.system(f"echo 'ID=astos' | sudo tee -a /mnt/etc/os-release")
+#    os.system(f"echo 'BUILD_ID=rolling' | sudo tee -a /mnt/etc/os-release")
+#    os.system(f"echo 'ANSI_COLOR=\"38;2;23;147;209\"' | sudo tee -a /mnt/etc/os-release")
+#    os.system(f"echo 'HOME_URL=\"https://github.com/CuBeRJAN/astOS\"' | sudo tee -a /mnt/etc/os-release")
+#    os.system(f"echo 'LOGO=astos-logo' | sudo tee -a /mnt/etc/os-release")
+#    os.system(f"echo 'DISTRIB_ID=\"astOS\"' | sudo tee /mnt/etc/lsb-release")
+#    os.system(f"echo 'DISTRIB_RELEASE=\"rolling\"' | sudo tee -a /mnt/etc/lsb-release")
+#    os.system(f"echo 'DISTRIB_DESCRIPTION=astOS' | sudo tee -a /mnt/etc/lsb-release")
 
 #   Update hostname, locales and timezone
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
@@ -196,7 +197,7 @@ def main(args):
     os.system("sudo sed -i '0,/subvol=@/{s,subvol=@,subvol=@.snapshots/rootfs/snapshot-tmp,g}' /mnt/boot/grub/grub.cfg")
 
 #   Copy astpk
-    os.system("sudo cp ./src/distros/debian/astpk.py /mnt/usr/local/sbin/ast")
+    os.system("sudo cp ./src/distros/debian/astpk.py /mnt/usr/sbin/ast")
     os.system("sudo chroot /mnt chmod +x /usr/local/sbin/ast")
 
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")

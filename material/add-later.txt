@@ -1,7 +1,13 @@
+As of june 23, 2022, the best version of my ashos installer for justminimal (my new vision for the project) is: installery_justminimal.py
+
+
 My vision: ashos should not be bugged down by providing desktop environments for billion DEs. DEs are just packages. With power of snapshotting, we only provide a solid minimal profile and AST will take care of DEs on top of that!
 
 check XDG_RUNTIME_DIR and ssl-cert in that file iinx xfce
 sudo sed -i '/backuppc/d' /var/lib/dpkg/statoverride resolved the initial issue with installing gnome (kind of but it fails for aome other reasons)
+
+set /etc/hosts:
+add {username}  127.0.0.1 to /etc/hosts
 
 my assumption is that that error is because xfce and gnome share same /usr/shaxxxxxxxxxxxxxxxx
 
