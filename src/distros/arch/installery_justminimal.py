@@ -68,7 +68,7 @@ def set_password(u):
             clear()
             continue
 
-def main(args, distro):
+def main(args):
     print("Welcome to the astOS installer!\n\n\n\n\n")
 
 #   Partition and format
@@ -76,8 +76,11 @@ def main(args, distro):
     os.system("pacman -Syy --noconfirm archlinux-keyring")
 
 #   Define variables
-    btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
+    DISTRO = "arch"
+    #btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
+    btrdirs = [f"@_{DISTRO}",f"@.snapshots_{DISTRO}",f"@home_{DISTRO}",f"@var_{DISTRO}",f"@etc_{DISTRO}",f"@boot_{DISTRO}"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]
+    #mntdirs = [f'"",".snapshots_{DISTRO}","home_{DISTRO}","var_{DISTRO}","etc_{DISTRO}","boot_{DISTRO}"']
     mntdirs_n = mntdirs[1:]
     astpart = to_uuid(args[1])
     if os.path.exists("/sys/firmware/efi"):
@@ -93,7 +96,7 @@ def main(args, distro):
     for btrdir in btrdirs:
         os.system(f"btrfs sub create /mnt/{btrdir}")
     os.system("umount /mnt")
-    os.system(f"mount {args[1]} -o subvol=@,compress=zstd,noatime /mnt")
+    os.system(f"mount {args[1]} -o subvol=@_{DISTRO},compress=zstd,noatime /mnt")
     for mntdir in mntdirs_n:
         os.system(f"mkdir /mnt/{mntdir}")
         os.system(f"mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
@@ -113,9 +116,9 @@ def main(args, distro):
         os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
 
 #   Update fstab
-    os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@,compress=zstd,noatime,ro 0 0' | tee /mnt/etc/fstab")
+    os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@_{DISTRO},compress=zstd,noatime,ro 0 0' | tee /mnt/etc/fstab")
     for mntdir in mntdirs_n:
-        os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir},compress=zstd,noatime 0 0' | tee -a /mnt/etc/fstab")
+        os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}_{DISTRO},compress=zstd,noatime 0 0' | tee -a /mnt/etc/fstab")
     if efi:
         os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | tee -a /mnt/etc/fstab")
@@ -146,9 +149,9 @@ def main(args, distro):
     os.system(f"chroot /mnt ln -sf {tz} /etc/localtime")
     os.system("chroot /mnt hwclock --systohc")
 
-    os.system("sed -i '0,/@/{s,@,@.snapshots/rootfs/snapshot-tmp,}' /mnt/etc/fstab")
-    os.system("sed -i '0,/@boot/{s,@boot,@.snapshots/boot/boot-tmp,}' /mnt/etc/fstab")
-    os.system("sed -i '0,/@etc/{s,@etc,@.snapshots/etc/etc-tmp,}' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@_{DISTRO}/s,@,@.snapshots/rootfs/snapshot-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@boot_{DISTRO}/s,@boot,@.snapshots/boot/boot-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@etc_{DISTRO}/s,@etc,@.snapshots/etc/etc-tmp,' /mnt/etc/fstab")
 
     os.system("mkdir -p /mnt/.snapshots/ast/snapshots")
     os.system("chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
@@ -168,10 +171,10 @@ def main(args, distro):
     os.system(f"chroot /mnt sed -i s,Arch,astOS,g /etc/default/grub")
     os.system(f"chroot /mnt grub-install {args[2]}")
     os.system(f"chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
-    os.system("sed -i '0,/subvol=@/{s,subvol=@,subvol=@.snapshots/rootfs/snapshot-tmp,g}' /mnt/boot/grub/grub.cfg")
+    os.system(f"sudo sed -i '0,/subvol=@_{DISTRO}/s,subvol=@_{DISTRO},subvol=@.snapshots_{DISTRO}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
 
 #   Copy astpk
-    os.system(f"cp ./src/distros/{distro}/astpk.py /mnt/usr/sbin/ast")
+    os.system(f"cp ./src/distros/{DISTRO}/astpk.py /mnt/usr/sbin/ast")
     os.system("chroot /mnt chmod +x /usr/sbin/ast")
 
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")

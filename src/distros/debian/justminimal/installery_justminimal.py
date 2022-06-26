@@ -5,7 +5,7 @@ import subprocess
 
 def clear():
     os.system("#clear")
-d
+
 def to_uuid(part):
     return subprocess.check_output(f"sudo blkid -s UUID -o value {part}", shell=True).decode('utf-8').strip()
 
@@ -84,9 +84,10 @@ def main(args):
     DISTRO = "debian"
     RELEASE = "bullseye"
     ARCH = "amd64"
+    #btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
     btrdirs = [f"@_{DISTRO}",f"@.snapshots_{DISTRO}",f"@home_{DISTRO}",f"@var_{DISTRO}",f"@etc_{DISTRO}",f"@boot_{DISTRO}"]
-    #mntdirs = [f'"",".snapshots_{DISTRO}","home_{DISTRO}","var_{DISTRO}","etc_{DISTRO}","boot_{DISTRO}"']
     mntdirs = ["",".snapshots","home","var","etc","boot"]
+    #mntdirs = [f'"",".snapshots_{DISTRO}","home_{DISTRO}","var_{DISTRO}","etc_{DISTRO}","boot_{DISTRO}"']
     mntdirs_n = mntdirs[1:]
     astpart = to_uuid(args[1])
     if os.path.exists("/sys/firmware/efi"):
@@ -143,7 +144,7 @@ def main(args):
 #   Update fstab
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@_{DISTRO},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
     for mntdir in mntdirs_n:
-        os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
+        os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}_{DISTRO},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
     if efi:
         os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
