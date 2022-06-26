@@ -1,3 +1,10 @@
+AshOS (Alternative/Any Snapshot Hierarchical OS)
+
+NixOS + AshOS
+--- ast base-update ----> clone the node, do the update and hash it. If it works successfuly, propose to user that previous node can be removed.
+--- There should be a difference between nodes that are just updates and nodes that add new packages
+--- associate a hash to nodes
+
 curl -L -O https://bit.ly/astos042022
 tar xvf astos042022
 
@@ -434,3 +441,9 @@ print(f"Branch {i} was added under snapshot {snapshot}.")
 -------- FreeBSD ----------
 https://www.youtube.com/watch?v=s1WvmIW_b8o
 ---------------------------
+
+
+
+
+
+box:/# parted /dev/xvde -s mklabel gpt mkpart primary 1 50% mkpart primary 50% 100% set 1 boot on set 2 lvm on p
