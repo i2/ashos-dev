@@ -453,3 +453,7 @@ box:/# parted /dev/xvde -s mklabel gpt mkpart primary 1 50% mkpart primary 50% 1
 
 
 I'm going to retract from my proposal for incorporating @boot under @.snapshots... at least for now.
+
+
+dnf --installroot=$target --releasever=rawhide group install "Fedora Workstation"
+dnf -y system-upgrade download --allowerasing --releasever=rawhide

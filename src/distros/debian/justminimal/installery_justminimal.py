@@ -175,9 +175,9 @@ def main(args, DISTRO):
     os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
     os.system("sudo chroot /mnt hwclock --systohc")
 
-    os.system(f"sudo sed -i '0,/@_{DISTRO}/s,@,@.snapshots/rootfs/snapshot-tmp,' /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@boot_{DISTRO}/s,@boot,@.snapshots/boot/boot-tmp,' /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@etc_{DISTRO}/s,@etc,@.snapshots/etc/etc-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@_{DISTRO}/s,@,@_{DISTRO}.snapshots/rootfs/snapshot-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@boot_{DISTRO}/s,@boot_{DISTRO},@.snapshots_{DISTRO}/boot/boot-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@etc_{DISTRO}/s,@etc_{DISTRO},@.snapshots_{DISTRO}/etc/etc-tmp,' /mnt/etc/fstab")
 
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
     os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
@@ -200,7 +200,7 @@ def main(args, DISTRO):
     os.system(f"sudo sed -i '0,/subvol=@_{DISTRO}/s,subvol=@_{DISTRO},subvol=@.snapshots_{DISTRO}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
 
 #   Copy astpk
-    os.system(f"sudo cp ./src/DISTROs/{DISTRO}/astpk.py /mnt/usr/sbin/ast")
+    os.system(f"sudo cp ./src/distros/{DISTRO}/astpk.py /mnt/usr/sbin/ast")
     os.system("sudo chroot /mnt chmod +x /usr/sbin/ast")
 
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
