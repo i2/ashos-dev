@@ -83,7 +83,7 @@ def main(args, distro):
 #   Define variables
     RELEASE = "bullseye"
     ARCH = "amd64"
-    btrdirs = [f'"@_{distro}","@.snapshots_{distro}","@home_{distro}","@var_{distro}","@etc_{distro}","@boot_{distro}"']
+    btrdirs = [f"@_{distro}",f"@.snapshots_{distro}",f"@home_{distro}",f"@var_{distro}",f"@etc_{distro}",f"@boot_{distro}"]
     #mntdirs = [f'"",".snapshots_{distro}","home_{distro}","var_{distro}","etc_{distro}","boot_{distro}"']
     mntdirs = ["",".snapshots","home","var","etc","boot"]
     mntdirs_n = mntdirs[1:]
