@@ -68,7 +68,7 @@ def set_password(u):
             clear()
             continue
 
-def main(args):
+def main(args, DISTRO):
     print("Welcome to the astOS installer!\n\n\n\n\n")
 
 #   Partition and format
@@ -76,7 +76,7 @@ def main(args):
     os.system("pacman -Syy --noconfirm archlinux-keyring")
 
 #   Define variables
-    DISTRO = "arch"
+    #DISTRO = "arch"
     #btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
     btrdirs = [f"@_{DISTRO}",f"@.snapshots_{DISTRO}",f"@home_{DISTRO}",f"@var_{DISTRO}",f"@etc_{DISTRO}",f"@boot_{DISTRO}"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]

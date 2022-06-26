@@ -68,7 +68,7 @@ def set_password(u):
             clear()
             continue
 
-def main(args):
+def main(args, DISTRO):
     print("Welcome to the astOS installer!\n\n\n\n\n")
 
 #   Partition and format
@@ -81,7 +81,7 @@ def main(args):
     os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
 
 #   Define variables
-    DISTRO = "debian"
+    #DISTRO = "debian"
     RELEASE = "bullseye"
     ARCH = "amd64"
     #btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
