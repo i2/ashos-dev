@@ -71,6 +71,7 @@ def set_password(u):
 def main(args, distro):
     print("Welcome to the astOS installer!\n\n\n\n\n")
     multiboot=True
+    DISTRO = ""
     
 #   Partition and format
     #os.system("find $HOME -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C LANGUAGE=C LANG=C >> $1' -- {} \;") # Perl complains if not set
