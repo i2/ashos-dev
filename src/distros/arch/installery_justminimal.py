@@ -68,12 +68,10 @@ def set_password(u):
             clear()
             continue
 
-def main(args):
+def main(args, distro):
     print("Welcome to the astOS installer!\n\n\n\n\n")
 
 #   Partition and format
-    os.system("parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
-    os.system(f"/usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}")
     os.system(f"/usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
     os.system("pacman -Syy --noconfirm archlinux-keyring")
 
@@ -173,7 +171,7 @@ def main(args):
     os.system("sed -i '0,/subvol=@/{s,subvol=@,subvol=@.snapshots/rootfs/snapshot-tmp,g}' /mnt/boot/grub/grub.cfg")
 
 #   Copy astpk
-    os.system("cp ./src/distros/arch/astpk.py /mnt/usr/sbin/ast")
+    os.system(f"cp ./src/distros/{distro}/astpk.py /mnt/usr/sbin/ast")
     os.system("chroot /mnt chmod +x /usr/sbin/ast")
 
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")

@@ -447,3 +447,6 @@ https://www.youtube.com/watch?v=s1WvmIW_b8o
 
 
 box:/# parted /dev/xvde -s mklabel gpt mkpart primary 1 50% mkpart primary 50% 100% set 1 boot on set 2 lvm on p
+
+
+I'm going to retract from my proposal for incorporating @boot under @.snapshots... at least for now.

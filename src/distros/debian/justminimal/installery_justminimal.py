@@ -68,7 +68,7 @@ def set_password(u):
             clear()
             continue
 
-def main(args):
+def main(args, distro):
     print("Welcome to the astOS installer!\n\n\n\n\n")
 
 #   Partition and format
@@ -173,8 +173,8 @@ def main(args):
     os.system("sudo chroot /mnt hwclock --systohc")
 
     os.system("sudo sed -i '0,/@/{s,@,@.snapshots/rootfs/snapshot-tmp,}' /mnt/etc/fstab")
-    os.system("sudo sed -i '0,/@etc/{s,@etc,@.snapshots/etc/etc-tmp,}' /mnt/etc/fstab")
     os.system("sudo sed -i '0,/@boot/{s,@boot,@.snapshots/boot/boot-tmp,}' /mnt/etc/fstab")
+    os.system("sudo sed -i '0,/@etc/{s,@etc,@.snapshots/etc/etc-tmp,}' /mnt/etc/fstab")
 
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
     os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
@@ -183,7 +183,7 @@ def main(args):
     set_password("root")
     username = get_username()
     create_user(username)
-    set_password(u)
+    set_password(username)
 
     os.system("sudo chroot /mnt systemctl enable NetworkManager")
 
@@ -197,7 +197,7 @@ def main(args):
     os.system("sudo sed -i '0,/subvol=@/{s,subvol=@,subvol=@.snapshots/rootfs/snapshot-tmp,g}' /mnt/boot/grub/grub.cfg")
 
 #   Copy astpk
-    os.system("sudo cp ./src/distros/debian/astpk.py /mnt/usr/sbin/ast")
+    os.system(f"sudo cp ./src/distros/{distro}/astpk.py /mnt/usr/sbin/ast")
     os.system("sudo chroot /mnt chmod +x /usr/sbin/ast")
 
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
