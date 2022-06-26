@@ -12,5 +12,5 @@ if 'debian' in distro:
 elif 'arch' in distro:
     from src.distros.arch import installery_justminimal
 
-installery_justminimal.main(args, distro)
+installery_justminimal.main(args)
 

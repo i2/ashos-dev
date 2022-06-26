@@ -1,5 +1,8 @@
 AshOS (Alternative/Any Snapshot Hierarchical OS)
 
+For different Linuxes, use one btrfs partition:
+name subvolumes as subvol_DEBIAN but when grub loading it rename them:
+
 NixOS + AshOS
 --- ast base-update ----> clone the node, do the update and hash it. If it works successfuly, propose to user that previous node can be removed.
 --- There should be a difference between nodes that are just updates and nodes that add new packages
