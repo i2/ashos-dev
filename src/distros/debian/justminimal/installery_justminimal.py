@@ -68,26 +68,30 @@ def set_password(u):
             clear()
             continue
 
-def main(args, DISTRO):
+def main(args, distro):
     print("Welcome to the astOS installer!\n\n\n\n\n")
-
+    multiboot=True
+    
 #   Partition and format
     #os.system("find $HOME -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C LANGUAGE=C LANG=C >> $1' -- {} \;") # Perl complains if not set
     os.system("sudo apt-get remove -y --purge man-db") # make installs faster (because of trigger man-db bug)
     os.system("sudo apt-get update -y")
     os.system("sudo apt-get install -y parted btrfs-progs dosfstools ntp")
     os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
-    os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}")
-    os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
+    if not multiboot:
+        os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}")
+        os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
+    else:
+        DISTRO = f"_{distro}" # Ro distinguish between snapshots of different Linux
 
 #   Define variables
     #DISTRO = "debian"
     RELEASE = "bullseye"
     ARCH = "amd64"
     #btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
-    btrdirs = [f"@_{DISTRO}",f"@.snapshots_{DISTRO}",f"@home_{DISTRO}",f"@var_{DISTRO}",f"@etc_{DISTRO}",f"@boot_{DISTRO}"]
+    btrdirs = [f"@{DISTRO}",f"@.snapshots{DISTRO}",f"@home{DISTRO}",f"@var{DISTRO}",f"@etc{DISTRO}",f"@boot{DISTRO}"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]
-    #mntdirs = [f'"",".snapshots_{DISTRO}","home_{DISTRO}","var_{DISTRO}","etc_{DISTRO}","boot_{DISTRO}"']
+    #mntdirs = [f'"",".snapshots{DISTRO}","home{DISTRO}","var{DISTRO}","etc{DISTRO}","boot{DISTRO}"']
     mntdirs_n = mntdirs[1:]
     astpart = to_uuid(args[1])
     if os.path.exists("/sys/firmware/efi"):
@@ -103,7 +107,7 @@ def main(args, DISTRO):
     for btrdir in btrdirs:
         os.system(f"sudo btrfs sub create /mnt/{btrdir}")
     os.system("sudo umount /mnt")
-    os.system(f"sudo mount {args[1]} -o subvol=@_{DISTRO},compress=zstd,noatime /mnt")
+    os.system(f"sudo mount {args[1]} -o subvol=@{DISTRO},compress=zstd,noatime /mnt")
     #for mntdir in mntdirs:
     for mntdir in mntdirs_n:
         os.system(f"sudo mkdir /mnt/{mntdir}")
@@ -142,9 +146,9 @@ def main(args, DISTRO):
         os.system("sudo chroot /mnt apt-get install -y grub-pc")
 
 #   Update fstab
-    os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@_{DISTRO},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
+    os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{DISTRO},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
     for mntdir in mntdirs_n:
-        os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}_{DISTRO},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
+        os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}{DISTRO},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
     if efi:
         os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
@@ -175,9 +179,9 @@ def main(args, DISTRO):
     os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
     os.system("sudo chroot /mnt hwclock --systohc")
 
-    os.system(f"sudo sed -i '0,/@_{DISTRO}/s,@,@_{DISTRO}.snapshots/rootfs/snapshot-tmp,' /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@boot_{DISTRO}/s,@boot_{DISTRO},@.snapshots_{DISTRO}/boot/boot-tmp,' /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@etc_{DISTRO}/s,@etc_{DISTRO},@.snapshots_{DISTRO}/etc/etc-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@{DISTRO}/s,@,@{DISTRO}.snapshots/rootfs/snapshot-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@boot{DISTRO}/s,@boot{DISTRO},@.snapshots{DISTRO}/boot/boot-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@etc{DISTRO}/s,@etc{DISTRO},@.snapshots{DISTRO}/etc/etc-tmp,' /mnt/etc/fstab")
 
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
     os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
@@ -197,10 +201,10 @@ def main(args, DISTRO):
     os.system(f"sudo chroot /mnt sed -i s,Arch,astOS,g /etc/default/grub")
     os.system(f"sudo chroot /mnt grub-install {args[2]}")
     os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
-    os.system(f"sudo sed -i '0,/subvol=@_{DISTRO}/s,subvol=@_{DISTRO},subvol=@.snapshots_{DISTRO}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
+    os.system(f"sudo sed -i '0,/subvol=@{DISTRO}/s,subvol=@{DISTRO},subvol=@.snapshots{DISTRO}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
 
 #   Copy astpk
-    os.system(f"sudo cp ./src/distros/{DISTRO}/astpk.py /mnt/usr/sbin/ast")
+    os.system(f"sudo cp ./src/distros/{distro}/astpk.py /mnt/usr/bin/ast")
     os.system("sudo chroot /mnt chmod +x /usr/sbin/ast")
 
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
@@ -240,10 +244,10 @@ def main(args, DISTRO):
     if efi:
         os.system("sudo umount /mnt/boot/efi")
     os.system("sudo umount /mnt/boot")
-    os.system(f"sudo mount {args[1]} -o subvol=@boot_{DISTRO},compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp")
+    os.system(f"sudo mount {args[1]} -o subvol=@boot{DISTRO},compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp")
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-tmp/* /mnt/boot")
     os.system("sudo umount /mnt/etc")
-    os.system(f"sudo mount {args[1]} -o subvol=@etc_{DISTRO},compress=zstd,noatime /mnt/.snapshots/etc/etc-tmp")
+    os.system(f"sudo mount {args[1]} -o subvol=@etc{DISTRO},compress=zstd,noatime /mnt/.snapshots/etc/etc-tmp")
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-tmp/* /mnt/etc")
 
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/* /mnt/.snapshots/rootfs/snapshot-tmp/boot")
@@ -253,7 +257,7 @@ def main(args, DISTRO):
 #   Unmount everything
     os.system("sudo umount -R /mnt")
     os.system(f"sudo mount {args[1]} -o subvolid=5 /mnt")
-    os.system(f"sudo btrfs sub del /mnt/@_{DISTRO}")
+    os.system(f"sudo btrfs sub del /mnt/@{DISTRO}")
     os.system("sudo umount -R /mnt")
     clear()
     print("Installation complete")
