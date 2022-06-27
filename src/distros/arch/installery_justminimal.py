@@ -128,7 +128,8 @@ def main(args, distro):
 
 #   Install anytree and necessary packages in chroot
     #os.system("pacstrap /mnt base linux linux-firmware nano python3 python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo")
-    os.system("pacstrap /mnt base linux nano python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo")
+    #os.system("pacstrap /mnt base linux nano python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo")
+    os.system("pacstrap /mnt base linux nano python-anytree btrfs-progs grub")
     if efi:
         os.system("pacstrap /mnt efibootmgr")
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
@@ -235,7 +236,7 @@ def main(args, distro):
     print("mount {args[1]} -o subvolid=5 /mnt")
     os.system(f"mount {args[1]} -o subvolid=5 /mnt")
     print("btrfs sub del /mnt/@{DISTRO}")
-    os.system("btrfs sub del /mnt/@{DISTRO}")
+    os.system(f"btrfs sub del /mnt/@{DISTRO}")
     print("umount -R /mnt")
     os.system("umount -R /mnt")
     clear()
