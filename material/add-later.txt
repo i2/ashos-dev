@@ -3,6 +3,10 @@ AshOS (Alternative/Any Snapshot Hierarchical OS)
 For different Linuxes, use one btrfs partition:
 name subvolumes as subvol_DEBIAN but when grub loading it rename them:
 
+dual-boot might not be as difficult as thought with winbtrfs
+
+refind + zfs ?
+
 NixOS + AshOS
 --- ast base-update ----> clone the node, do the update and hash it. If it works successfuly, propose to user that previous node can be removed.
 --- There should be a difference between nodes that are just updates and nodes that add new packages
@@ -457,3 +461,20 @@ I'm going to retract from my proposal for incorporating @boot under @.snapshots.
 
 dnf --installroot=$target --releasever=rawhide group install "Fedora Workstation"
 dnf -y system-upgrade download --allowerasing --releasever=rawhide
+
+
+
+
+
+Is this going to be a multi-boot setup? y/n
+y: 
+Are you adding to an already ashos installation? y/n
+
+Please choose one of the following:
+1. Single OS installation
+2. Initiate a multi-boot ashos setup
+3. Adding to an already installed ashos
+
+1 => is_multiboot=False, MB=""
+2 => is_multiboot=True, MB=f'_{distro}'
+3 => rename_subvolumes, multiboot=True, MB=f'_{distro}'

@@ -4,14 +4,32 @@ import os
 import subprocess
 
 def clear():
-    os.system("#clear")
+    os.system("clear")
 
 def to_uuid(part):
     return subprocess.check_output(f"sudo blkid -s UUID -o value {part}", shell=True).decode('utf-8').strip()
 
-def get_hostname():
+def get_multiboot(dist):
+    clear()
     while True:
-        clear()
+        print("Please choose one of the following:\n1. Single OS installation\n2. Initiate a multi-boot ashos setup\n3. Adding to an already installed ashos")
+        i = input("> ")
+        if i == "1":
+            return False,""
+            break
+        elif i == "2":
+            return True,f"_{dist}"
+            break
+        elif i == "3":
+            return True,f"_{dist}"
+            break
+        else:
+            print("Invalid choice!")
+            continue
+
+def get_hostname():
+    clear()
+    while True:
         print("Enter hostname:")
         hostname = input("> ")
         if hostname:
@@ -24,8 +42,8 @@ def get_hostname():
     return hostname
 
 def get_timezone():
+    clear()
     while True:
-        clear()
         print("Select a timezone (type list to list):")
         zone = input("> ")
         if zone == "list":
@@ -37,8 +55,8 @@ def get_timezone():
             continue
 
 def get_username():
+    clear()
     while True:
-        clear()
         print("Enter username (all lowercase, max 8 letters)")
         username = input("> ")
         if username:
@@ -56,8 +74,8 @@ def create_user(u):
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /mnt/home/{u}/.bashrc")
 
 def set_password(u):
+    clear()
     while True:
-        clear()
         print(f"Setting a password for '{u}':")
         os.system(f"sudo chroot /mnt passwd {u}")
         print("Was your password set properly (y/n)?")
@@ -70,8 +88,7 @@ def set_password(u):
 
 def main(args, distro):
     print("Welcome to the astOS installer!\n\n\n\n\n")
-    multiboot=True
-    DISTRO = ""
+    multiboot, DISTRO = get_multiboot(distro)
     
 #   Partition and format
     #os.system("find $HOME -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C LANGUAGE=C LANG=C >> $1' -- {} \;") # Perl complains if not set
@@ -82,8 +99,8 @@ def main(args, distro):
     if not multiboot:
         os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}")
         os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
-    else:
-        DISTRO = f"_{distro}" # Ro distinguish between snapshots of different Linux
+    #else:
+    #    DISTRO = f"_{distro}" # Ro distinguish between snapshots of different Linux
 
 #   Define variables
     #DISTRO = "debian"
@@ -164,13 +181,13 @@ def main(args, distro):
 #    os.system(f"echo 'NAME=\"astOS\"' | sudo tee /mnt/etc/os-release")
 #    os.system(f"echo 'PRETTY_NAME=\"astOS\"' | sudo tee -a /mnt/etc/os-release")
 #    os.system(f"echo 'ID=astos' | sudo tee -a /mnt/etc/os-release")
-#    os.system(f"echo 'BUILD_ID=rolling' | sudo tee -a /mnt/etc/os-release")
-#    os.system(f"echo 'ANSI_COLOR=\"38;2;23;147;209\"' | sudo tee -a /mnt/etc/os-release")
+#    os.system(f"echo 'BUILD_ID=rolling' | sudo tee -a /mnt/etc/os-release") #missing-in-vanilla-debian
+#    os.system(f"echo 'ANSI_COLOR=\"38;2;23;147;209\"' | sudo tee -a /mnt/etc/os-release") #missing-in-vanilla-debian
 #    os.system(f"echo 'HOME_URL=\"https://github.com/CuBeRJAN/astOS\"' | sudo tee -a /mnt/etc/os-release")
-#    os.system(f"echo 'LOGO=astos-logo' | sudo tee -a /mnt/etc/os-release")
-#    os.system(f"echo 'DISTRIB_ID=\"astOS\"' | sudo tee /mnt/etc/lsb-release")
-#    os.system(f"echo 'DISTRIB_RELEASE=\"rolling\"' | sudo tee -a /mnt/etc/lsb-release")
-#    os.system(f"echo 'DISTRIB_DESCRIPTION=astOS' | sudo tee -a /mnt/etc/lsb-release")
+#    os.system(f"echo 'LOGO=astos-logo' | sudo tee -a /mnt/etc/os-release") #missing-in-vanilla-debian
+#    os.system(f"echo 'DISTRIB_ID=\"astOS\"' | sudo tee /mnt/etc/lsb-release") #missing-in-vanilla-debian
+#    os.system(f"echo 'DISTRIB_RELEASE=\"rolling\"' | sudo tee -a /mnt/etc/lsb-release") #missing-in-vanilla-debian
+#    os.system(f"echo 'DISTRIB_DESCRIPTION=astOS' | sudo tee -a /mnt/etc/lsb-release") #missing-in-vanilla-debian
 
 #   Update hostname, locales and timezone
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
