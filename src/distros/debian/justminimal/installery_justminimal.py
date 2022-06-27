@@ -130,7 +130,8 @@ def main(args, distro):
     mntdirs_n = mntdirs #PR29
     #os.system(f"sudo mount {args[1]} -o subvol=@{DISTRO},compress=zstd,noatime /mnt")  #PR 28
     for mntdir in mntdirs_n:
-        os.system(f"sudo mkdir /mnt/{mntdir}")
+        #os.system(f"sudo mkdir /mnt/{mntdir}") #before PR29 (I add -p to remove the nagging that /mnt exists)
+        os.system(f"sudo mkdir -p /mnt/{mntdir}")
         os.system(f"sudo mount {args[1]} -o subvol={btrdirs[mntdirs_n.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
     for i in ("tmp", "root"):
         os.system(f"mkdir -p /mnt/{i}")
