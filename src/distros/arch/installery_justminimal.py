@@ -90,7 +90,10 @@ def main(args, distro):
     multiboot, DISTRO = get_multiboot(distro)
     
 #   Partition and format
-    os.system(f"/usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
+    #PR29 os.system(f"/usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
+    if not multiboot:
+        os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}")
+        os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
     os.system("pacman -Syy --noconfirm archlinux-keyring")
 
 #   Define variables
