@@ -102,7 +102,6 @@ def main(args, distro):
     #    DISTRO = f"_{distro}" # Ro distinguish between snapshots of different Linux
 
 #   Define variables
-    #DISTRO = "debian"
     RELEASE = "bullseye"
     ARCH = "amd64"
     #btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
@@ -176,9 +175,9 @@ def main(args, distro):
     #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf")
 
 #   Modify OS release information (optional)
-    os.system(f"sed -i '/^NAME/ s/Arch Linux/Arch Linux (ashos)/' /mnt/etc/os-release")
-    os.system(f"sed -i '/PRETTY_NAME/ s/Arch Linux/Arch Linux (ashos)/' /mnt/etc/os-release")
-    os.system(f"sed -i '/^ID/ s/arch/arch_ashos/' /mnt/etc/os-release")
+    os.system(f"sed -i '/^NAME/ s/Debian/Debian (ashos)/' /mnt/etc/os-release")
+    os.system(f"sed -i '/PRETTY_NAME/ s/Debian/Debian (ashos)/' /mnt/etc/os-release")
+    os.system(f"sed -i '/^ID/ s/debian/debian_ashos/' /mnt/etc/os-release")
 
 #   Update hostname, locales and timezone
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")

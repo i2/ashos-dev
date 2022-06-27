@@ -1,5 +1,8 @@
 AshOS (Alternative/Any Snapshot Hierarchical OS)
 
+-Would Refind be better than GRUB?
+- auto discover efi files?
+
 For different Linuxes, use one btrfs partition:
 name subvolumes as subvol_DEBIAN but when grub loading it rename them:
 

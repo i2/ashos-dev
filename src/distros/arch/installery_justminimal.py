@@ -94,7 +94,6 @@ def main(args, distro):
     os.system("pacman -Syy --noconfirm archlinux-keyring")
 
 #   Define variables
-    #DISTRO = "arch"
     #btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
     btrdirs = [f"@{DISTRO}",f"@.snapshots{DISTRO}",f"@home{DISTRO}",f"@var{DISTRO}",f"@etc{DISTRO}",f"@boot{DISTRO}"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]
