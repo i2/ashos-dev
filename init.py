@@ -9,7 +9,7 @@ distro = subprocess.check_output(['sh', './src/distros/detect.sh']).decode('utf-
 if 'debian' in distro:
     from src.distros.debian.justminimal import installery_justminimal
 elif 'arch' in distro:
-    from src.distros.arch import installery_justminimal
+    from src.distros.arch import installery_justminimal_arch_chroot
 
 installery_justminimal.main(args, distro)
 
