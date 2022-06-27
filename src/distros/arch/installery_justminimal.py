@@ -115,7 +115,7 @@ def main(args, distro):
     for btrdir in btrdirs:
         os.system(f"btrfs sub create /mnt/{btrdir}")
     os.system("umount /mnt")
-    os.system(f"mount {args[1]} -o subvol=@_{DISTRO},compress=zstd,noatime /mnt")
+    os.system(f"mount {args[1]} -o subvol=@{DISTRO},compress=zstd,noatime /mnt")
     for mntdir in mntdirs_n:
         os.system(f"mkdir /mnt/{mntdir}")
         os.system(f"mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
