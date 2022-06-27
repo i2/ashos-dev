@@ -128,11 +128,12 @@ def main(args, distro):
         os.system(f"mount {args[3]} /mnt/boot/efi")
 
 #   Install anytree and necessary packages in arch-chroot
-    os.system("pacstrap /mnt base linux linux-firmware nano python3 python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo")
+    #os.system("pacstrap /mnt base linux linux-firmware nano python3 python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo")
+    os.system("pacstrap /mnt base linux nano python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo")
     if efi:
         os.system("pacstrap /mnt efibootmgr")
-    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
-        os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for arch-chrooting
+#    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
+#        os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for arch-chrooting
 
 #   Update fstab
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{DISTRO},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
