@@ -269,17 +269,20 @@ def main(args, distro):
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/* /mnt/.snapshots/rootfs/snapshot-tmp/etc")
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/var/var-0/* /mnt/.snapshots/rootfs/snapshot-tmp/var")
 
+    print("TRYYYYYY MORE")
 #   Unmount everything
-    os.system("sudo umount -R /mnt")
-    print("mount {args[1]} -o subvolid=5 /mnt")
-    os.system(f"sudo mount {args[1]} -o subvolid=5 /mnt")
-    print("btrfs sub del /mnt/@{DISTRO}")
-    os.system(f"sudo btrfs sub del /mnt/@{DISTRO}")
-    print("umount -R /mnt")
+###### PR29
+#    os.system("sudo umount -R /mnt")
+#    print("mount {args[1]} -o subvolid=5 /mnt")
+#    os.system(f"sudo mount {args[1]} -o subvolid=5 /mnt")
+#    print("btrfs sub del /mnt/@{DISTRO}")
+#    os.system(f"sudo btrfs sub del /mnt/@{DISTRO}")
+#    print("umount -R /mnt")
     os.system("sudo umount -R /mnt")
     clear()
-    print("Installation complete")
-    print("You can reboot now :)")
+#    print("Installation complete")
+#    print("You can reboot now :)")
+
 
 # This is based off of files:
 # last-to-become-justminimal-but-still-has-guinstall-function-keep-for-reference-ashize-oses-later.py which is just a symlink to
