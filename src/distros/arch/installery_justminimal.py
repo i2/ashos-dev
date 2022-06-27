@@ -69,7 +69,7 @@ def get_username():
     return username
 
 def create_user(u):
-    os.system(f"chroot /mnt useradd -m -G wheel -s /bin/bash {u}")
+    os.system(f"arch-chroot /mnt useradd -m -G wheel -s /bin/bash {u}")
     os.system("echo '%wheel ALL=(ALL:ALL) ALL' | tee -a /mnt/etc/sudoers")
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | tee -a /mnt/home/{u}/.bashrc")
 
@@ -78,7 +78,7 @@ def set_password(u):
     while True:
         clear()
         print(f"Setting a password for '{u}':")
-        os.system(f"chroot /mnt passwd {u}")
+        os.system(f"arch-chroot /mnt passwd {u}")
         print("Was your password set properly (y/n)?")
         reply = input("> ")
         if reply.casefold() == "y":
@@ -127,12 +127,12 @@ def main(args, distro):
         os.system("mkdir /mnt/boot/efi")
         os.system(f"mount {args[3]} /mnt/boot/efi")
 
-#   Install anytree and necessary packages in chroot
+#   Install anytree and necessary packages in arch-chroot
     os.system("pacstrap /mnt base linux linux-firmware nano python3 python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo")
     if efi:
         os.system("pacstrap /mnt efibootmgr")
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
-        os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
+        os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for arch-chrooting
 
 #   Update fstab
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{DISTRO},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
@@ -163,17 +163,17 @@ def main(args, distro):
 #   Update hostname, locales and timezone
     os.system(f"echo {hostname} | tee /mnt/etc/hostname")
     os.system("sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen")
-    os.system("chroot /mnt locale-gen")
+    os.system("arch-chroot /mnt locale-gen")
     os.system("echo 'LANG=en_US.UTF-8' | tee /mnt/etc/locale.conf")
-    os.system(f"chroot /mnt ln -sf {tz} /etc/localtime")
-    os.system("chroot /mnt hwclock --systohc")
+    os.system(f"arch-chroot /mnt ln -sf {tz} /etc/localtime")
+    os.system("arch-chroot /mnt hwclock --systohc")
 
     os.system(f"sudo sed -i '0,/@{DISTRO}/s,@,@{DISTRO}.snapshots/rootfs/snapshot-tmp,' /mnt/etc/fstab")
     os.system(f"sudo sed -i '0,/@boot{DISTRO}/s,@boot{DISTRO},@.snapshots{DISTRO}/boot/boot-tmp,' /mnt/etc/fstab")
     os.system(f"sudo sed -i '0,/@etc{DISTRO}/s,@etc{DISTRO},@.snapshots{DISTRO}/etc/etc-tmp,' /mnt/etc/fstab")
 
     os.system("mkdir -p /mnt/.snapshots/ast/snapshots")
-    os.system("chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
+    os.system("arch-chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
 
 #   Create user and set password
     set_password("root")
@@ -181,20 +181,20 @@ def main(args, distro):
     create_user(username)
     set_password(username)
 
-    os.system("chroot /mnt systemctl enable NetworkManager")
+    os.system("arch-chroot /mnt systemctl enable NetworkManager")
 
 #   Initialize fstree
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | tee /mnt/.snapshots/ast/fstree")
 
 #   GRUB
-    os.system(f"chroot /mnt sed -i s,Arch,astOS,g /etc/default/grub")
-    os.system(f"chroot /mnt grub-install {args[2]}")
-    os.system(f"chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
+    os.system(f"arch-chroot /mnt sed -i s,Arch,astOS,g /etc/default/grub")
+    os.system(f"arch-chroot /mnt grub-install {args[2]}")
+    os.system(f"arch-chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system(f"sudo sed -i '0,/subvol=@{DISTRO}/s,subvol=@{DISTRO},subvol=@.snapshots{DISTRO}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
 
 #   Copy astpk
     os.system(f"cp ./src/distros/{distro}/astpk.py /mnt/usr/bin/ast")
-    os.system("chroot /mnt chmod +x /usr/sbin/ast")
+    os.system("arch-chroot /mnt chmod +x /usr/sbin/ast")
 
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")
@@ -214,7 +214,7 @@ def main(args, distro):
     os.system(f"echo '{astpart}' | tee /mnt/.snapshots/ast/part")
 
     os.system("btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
-    os.system("chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
+    os.system("arch-chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
 
     os.system("cp -r /mnt/root/. /mnt/.snapshots/root/")
     os.system("cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")
