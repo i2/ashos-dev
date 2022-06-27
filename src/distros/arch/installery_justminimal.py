@@ -98,7 +98,7 @@ def main(args, distro):
     btrdirs = [f"@{DISTRO}",f"@.snapshots{DISTRO}",f"@home{DISTRO}",f"@var{DISTRO}",f"@etc{DISTRO}",f"@boot{DISTRO}"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]
     #mntdirs = [f'"",".snapshots{DISTRO}","home{DISTRO}","var{DISTRO}","etc{DISTRO}","boot{DISTRO}"']
-    mntdirs_n = mntdirs[1:]
+    #PR29 mntdirs_n = mntdirs[1:]
     astpart = to_uuid(args[1])
     if os.path.exists("/sys/firmware/efi"):
         efi = True
@@ -117,6 +117,7 @@ def main(args, distro):
     for btrdir in btrdirs:
         os.system(f"btrfs sub create /mnt/{btrdir}")
     os.system("umount /mnt")
+    mntdirs_n = mntdirs #PR29
     #os.system(f"mount {args[1]} -o subvol=@{DISTRO},compress=zstd,noatime /mnt")
     for mntdir in mntdirs_n:
         os.system(f"mkdir /mnt/{mntdir}")
