@@ -4,7 +4,7 @@ import os
 import subprocess
 
 def clear():
-    os.system("clear")
+    os.system("#clear")
 
 def to_uuid(part):
     return subprocess.check_output(f"sudo blkid -s UUID -o value {part}", shell=True).decode('utf-8').strip()
@@ -83,7 +83,6 @@ def set_password(u):
         if reply.casefold() == "y":
             break
         else:
-            clear()
             continue
 
 def main(args, distro):
@@ -126,7 +125,6 @@ def main(args, distro):
         os.system(f"sudo btrfs sub create /mnt/{btrdir}")
     os.system("sudo umount /mnt")
     os.system(f"sudo mount {args[1]} -o subvol=@{DISTRO},compress=zstd,noatime /mnt")
-    #for mntdir in mntdirs:
     for mntdir in mntdirs_n:
         os.system(f"sudo mkdir /mnt/{mntdir}")
         os.system(f"sudo mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
