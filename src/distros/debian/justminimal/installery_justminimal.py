@@ -270,6 +270,9 @@ def main(args, distro):
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/var/var-0/* /mnt/.snapshots/rootfs/snapshot-tmp/var")
 
     print("TRYYYYYY MORE")
+###    os.system(f"mount {args[1]} -o subvolid=0 /mnt") #COMMIT 41d1120c566611cc65c3d410a7a92e7e704d02eb
+#    print("mount {args[1]} -o subvolid=0 /mnt")  #PR
+
 #   Unmount everything
 ###### PR29
 #    os.system("sudo umount -R /mnt")
@@ -278,8 +281,8 @@ def main(args, distro):
 #    print("btrfs sub del /mnt/@{DISTRO}")
 #    os.system(f"sudo btrfs sub del /mnt/@{DISTRO}")
 #    print("umount -R /mnt")
-    os.system("sudo umount -R /mnt")
-    clear()
+#    os.system("sudo umount -R /mnt")
+#    clear()
 #    print("Installation complete")
 #    print("You can reboot now :)")
 
