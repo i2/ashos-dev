@@ -214,6 +214,7 @@ def main(args, distro):
     os.system("btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-0")
     os.system("btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-0")
 
+    print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxecho '{astpart}' >> /mnt/.snapshots/ast/part") #PR29
     os.system(f"echo '{astpart}' | tee /mnt/.snapshots/ast/part")
 
     os.system("btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")

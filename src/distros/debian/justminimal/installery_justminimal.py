@@ -94,7 +94,7 @@ def main(args, distro):
     os.system("sudo apt-get remove -y --purge man-db") # make installs faster (because of trigger man-db bug)
     os.system("sudo apt-get update -y")
     os.system("sudo apt-get install -y parted btrfs-progs dosfstools ntp")
-    os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
+    #os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
     if not multiboot:
         os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}")
         os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
@@ -108,7 +108,7 @@ def main(args, distro):
     btrdirs = [f"@{DISTRO}",f"@.snapshots{DISTRO}",f"@home{DISTRO}",f"@var{DISTRO}",f"@etc{DISTRO}",f"@boot{DISTRO}"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]
     #mntdirs = [f'"",".snapshots{DISTRO}","home{DISTRO}","var{DISTRO}","etc{DISTRO}","boot{DISTRO}"']
-    mntdirs_n = mntdirs[1:]
+    #mntdirs_n = mntdirs[1:]
     astpart = to_uuid(args[1])
     if os.path.exists("/sys/firmware/efi"):
         efi = True
@@ -127,6 +127,7 @@ def main(args, distro):
     for btrdir in btrdirs:
         os.system(f"sudo btrfs sub create /mnt/{btrdir}")
     os.system("sudo umount /mnt")
+    mntdirs_n = mntdirs #PR29
     #os.system(f"sudo mount {args[1]} -o subvol=@{DISTRO},compress=zstd,noatime /mnt")  #PR 28
     for mntdir in mntdirs_n:
         os.system(f"sudo mkdir /mnt/{mntdir}")
@@ -235,7 +236,7 @@ def main(args, distro):
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-0")
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-0")
 ####
-
+    print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxecho '{astpart}' >> /mnt/.snapshots/ast/part") #PR29
     os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
 
 #### SHARED
