@@ -113,7 +113,7 @@ def main(args, distro):
     if not multiboot:
         os.system(f"sudo mount {args[1]} /mnt")
     else:
-        os.system(f"sudo mount {args[1]} subvolid=5 /mnt")
+        os.system(f"sudo mount -o subvolid=5 {args[1]} /mnt")
     for btrdir in btrdirs:
         os.system(f"btrfs sub create /mnt/{btrdir}")
     os.system("umount /mnt")
