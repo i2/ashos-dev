@@ -160,7 +160,7 @@ def main(args, distro):
     os.system(f"echo 'deb [trusted=yes] http://www.deb-multimedia.org {RELEASE} main' | sudo tee -a /mnt/etc/apt/sources.list.d/multimedia.list >/dev/null")
     os.system("sudo chroot /mnt apt-get update -y -oAcquire::AllowInsecureRepositories=true")
     os.system("sudo chroot /mnt apt-get install -y deb-multimedia-keyring --allow-unauthenticated")
-    #os.system("sudo chroot /mnt apt-get install -y python3-anytree network-manager btrfs-progs dhcpcd5 locales sudo") #PR29
+    #os.system("sudo chroot /mnt apt-get install -y python3-anytree network-manager btrfs-progs dhcpcd5 locales sudo os-proer") #PR29
     os.system("sudo chroot /mnt apt-get install -y btrfs-progs locales sudo") #PR29 to make install test faster, revert later
     if efi:
         os.system("sudo chroot /mnt apt-get install -y grub-efi")

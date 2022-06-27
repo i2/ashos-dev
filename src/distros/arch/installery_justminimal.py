@@ -135,8 +135,8 @@ def main(args, distro):
         os.system(f"mount {args[3]} /mnt/boot/efi")
 
 #   Install anytree and necessary packages in chroot
-    #os.system("pacstrap /mnt base linux linux-firmware nano python3 python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo")
-    #os.system("pacstrap /mnt base linux nano python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo")
+    #os.system("pacstrap /mnt base linux linux-firmware nano python3 python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo os-prober")
+    #os.system("pacstrap /mnt base linux nano python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo os-prober")
     os.system("pacstrap /mnt base linux nano python-anytree btrfs-progs grub")
     if efi:
         os.system("pacstrap /mnt efibootmgr")
