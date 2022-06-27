@@ -102,6 +102,7 @@ def main(args, distro):
     #    DISTRO = f"_{distro}" # Ro distinguish between snapshots of different Linux
 
 #   Define variables
+    #DISTRO = "debian"
     RELEASE = "bullseye"
     ARCH = "amd64"
     #btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
@@ -119,11 +120,7 @@ def main(args, distro):
     hostname = get_hostname()
 
 #   Mount and create necessary sub-volumes and directories
-    #os.system(f"mount {args[1]} /mnt")
-    if not multiboot:
-        os.system(f"sudo mount {args[1]} /mnt")
-    else:
-        os.system(f"sudo mount {args[1]} subvolid=5 /mnt")
+    os.system(f"sudo mount {args[1]} /mnt")
     for btrdir in btrdirs:
         os.system(f"sudo btrfs sub create /mnt/{btrdir}")
     os.system("sudo umount /mnt")
@@ -179,9 +176,9 @@ def main(args, distro):
     #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf")
 
 #   Modify OS release information (optional)
-    os.system(f"sed -i '/^NAME/ s/Debian/Debian (ashos)/' /mnt/etc/os-release")
-    os.system(f"sed -i '/PRETTY_NAME/ s/Debian/Debian (ashos)/' /mnt/etc/os-release")
-    os.system(f"sed -i '/^ID/ s/debian/debian_ashos/' /mnt/etc/os-release")
+    os.system(f"sed -i '/^NAME/ s/Arch Linux/Arch Linux (ashos)/' /mnt/etc/os-release")
+    os.system(f"sed -i '/PRETTY_NAME/ s/Arch Linux/Arch Linux (ashos)/' /mnt/etc/os-release")
+    os.system(f"sed -i '/^ID/ s/arch/arch_ashos/' /mnt/etc/os-release")
 
 #   Update hostname, locales and timezone
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
@@ -210,7 +207,7 @@ def main(args, distro):
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
 
 #   GRUB
-    os.system(f"sudo chroot /mnt sed -i s,Debian,astOS,g /etc/default/grub")
+    os.system(f"sudo chroot /mnt sed -i s,Arch,astOS,g /etc/default/grub")
     os.system(f"sudo chroot /mnt grub-install {args[2]}")
     os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system(f"sudo sed -i '0,/subvol=@{DISTRO}/s,subvol=@{DISTRO},subvol=@.snapshots{DISTRO}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")

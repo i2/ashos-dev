@@ -109,7 +109,11 @@ def main(args, distro):
     hostname = get_hostname()
 
 #   Mount and create necessary sub-volumes and directories
-    os.system(f"mount {args[1]} /mnt")
+    #os.system(f"mount {args[1]} /mnt")
+    if not multiboot:
+        os.system(f"sudo mount {args[1]} /mnt")
+    else:
+        os.system(f"sudo mount {args[1]} subvolid=5 /mnt")
     for btrdir in btrdirs:
         os.system(f"btrfs sub create /mnt/{btrdir}")
     os.system("umount /mnt")
