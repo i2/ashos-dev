@@ -176,16 +176,9 @@ def main(args, distro):
     #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf")
 
 #   Modify OS release information (optional)
-#    os.system(f"echo 'NAME=\"astOS\"' | sudo tee /mnt/etc/os-release")
-#    os.system(f"echo 'PRETTY_NAME=\"astOS\"' | sudo tee -a /mnt/etc/os-release")
-#    os.system(f"echo 'ID=astos' | sudo tee -a /mnt/etc/os-release")
-#    os.system(f"echo 'BUILD_ID=rolling' | sudo tee -a /mnt/etc/os-release") #missing-in-vanilla-debian
-#    os.system(f"echo 'ANSI_COLOR=\"38;2;23;147;209\"' | sudo tee -a /mnt/etc/os-release") #missing-in-vanilla-debian
-#    os.system(f"echo 'HOME_URL=\"https://github.com/CuBeRJAN/astOS\"' | sudo tee -a /mnt/etc/os-release")
-#    os.system(f"echo 'LOGO=astos-logo' | sudo tee -a /mnt/etc/os-release") #missing-in-vanilla-debian
-#    os.system(f"echo 'DISTRIB_ID=\"astOS\"' | sudo tee /mnt/etc/lsb-release") #missing-in-vanilla-debian
-#    os.system(f"echo 'DISTRIB_RELEASE=\"rolling\"' | sudo tee -a /mnt/etc/lsb-release") #missing-in-vanilla-debian
-#    os.system(f"echo 'DISTRIB_DESCRIPTION=astOS' | sudo tee -a /mnt/etc/lsb-release") #missing-in-vanilla-debian
+    os.system(f"sed -i '/^NAME/ s/Arch Linux/Arch Linux (ashos)/' /mnt/etc/os-release")
+    os.system(f"sed -i '/PRETTY_NAME/ s/Arch Linux/Arch Linux (ashos)/' /mnt/etc/os-release")
+    os.system(f"sed -i '/^ID/ s/arch/arch_ashos/' /mnt/etc/os-release")
 
 #   Update hostname, locales and timezone
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
@@ -195,9 +188,9 @@ def main(args, distro):
     os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
     os.system("sudo chroot /mnt hwclock --systohc")
 
-    os.system(f"sudo sed -i '0,/@{DISTRO}/s,@,@{DISTRO}.snapshots/rootfs/snapshot-tmp,' /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@boot{DISTRO}/s,@boot{DISTRO},@.snapshots{DISTRO}/boot/boot-tmp,' /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@etc{DISTRO}/s,@etc{DISTRO},@.snapshots{DISTRO}/etc/etc-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@{DISTRO}/ s,@,@{DISTRO}.snapshots/rootfs/snapshot-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@boot{DISTRO}/ s,@boot{DISTRO},@.snapshots{DISTRO}/boot/boot-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@etc{DISTRO}/ s,@etc{DISTRO},@.snapshots{DISTRO}/etc/etc-tmp,' /mnt/etc/fstab")
 
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
     os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
@@ -244,6 +237,7 @@ def main(args, distro):
 
 #### SHARED
     os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
+    print("chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
     os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
 ####
 
@@ -272,8 +266,11 @@ def main(args, distro):
 
 #   Unmount everything
     os.system("sudo umount -R /mnt")
+    print("mount {args[1]} -o subvolid=5 /mnt")
     os.system(f"sudo mount {args[1]} -o subvolid=5 /mnt")
+    print("btrfs sub del /mnt/@{DISTRO}")
     os.system(f"sudo btrfs sub del /mnt/@{DISTRO}")
+    print("umount -R /mnt")
     os.system("sudo umount -R /mnt")
     clear()
     print("Installation complete")
