@@ -203,6 +203,8 @@ def main(args, distro):
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
     os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
 
+    # ATTEMO7 no errors up till here
+
 #   Create user and set password
     set_password("root")
     username = get_username()
@@ -217,12 +219,13 @@ def main(args, distro):
 #   GRUB
     os.system(f"sudo chroot /mnt sed -i s,Debian,astOS,g /etc/default/grub")
     os.system(f"sudo chroot /mnt grub-install {args[2]}")
+    # MAYBE do some extra operations here if multiboot?!
     os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system(f"sudo sed -i '0,/subvol=@{DISTRO}/s,subvol=@{DISTRO},subvol=@.snapshots{DISTRO}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
 
 #   Copy astpk
     os.system(f"sudo cp ./src/distros/{distro}/astpk.py /mnt/usr/bin/ast")
-    os.system("sudo chroot /mnt chmod +x /usr/sbin/ast")
+    os.system("sudo chroot /mnt chmod +x /usr/bin/ast")
 
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")
@@ -273,18 +276,19 @@ def main(args, distro):
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/var/var-0/* /mnt/.snapshots/rootfs/snapshot-tmp/var")
 
     print("TRYYYYYY MORE")
-###    os.system(f"mount {args[1]} -o subvolid=0 /mnt") #COMMIT 41d1120c566611cc65c3d410a7a92e7e704d02eb
-#    print("mount {args[1]} -o subvolid=0 /mnt")  #PR
+###    os.system(f"sudo mount {args[1]} -o subvolid=0 /mnt") #COMMIT 41d1120c566611cc65c3d410a7a92e7e704d02eb
+#    print("sudo mount {args[1]} -o subvolid=0 /mnt")  #PR
 
 #   Unmount everything
 ###### PR29
-#    os.system("sudo umount -R /mnt")
-#    print("mount {args[1]} -o subvolid=5 /mnt")
-#    os.system(f"sudo mount {args[1]} -o subvolid=5 /mnt")
-#    print("btrfs sub del /mnt/@{DISTRO}")
-#    os.system(f"sudo btrfs sub del /mnt/@{DISTRO}")
-#    print("umount -R /mnt")
-#    os.system("sudo umount -R /mnt")
+##########    os.system("sudo umount -R /mnt")                           #1. DONE SUCCESSFULLY AFTER TRYYYYY MORE STEP in atteo7
+##########    os.system(f"sudo mount {args[1]} -o subvolid=0 /mnt")      #2. DONE SUCCESSFULLY AFTER TRYYYYY MORE STEP in atteo7
+#  ignore this line  print("mount {args[1]} -o subvolid=5 /mnt")
+#  ignore this line  os.system(f"sudo mount {args[1]} -o subvolid=5 /mnt")
+#  ignore this line    print("btrfs sub del /mnt/@{DISTRO}")
+#########    os.system(f"sudo btrfs sub del /mnt/@{DISTRO}")             #3. DONE SUCCESSFULLY AFTER TRYYYYY MORE STEP in atteo7
+#  ignore this line#    print("umount -R /mnt")
+#    os.system("sudo umount -R /mnt")                                    #4. DONE SUCCESSFULLY AFTER TRYYYYY MORE STEP in atteo7
 #    clear()
 #    print("Installation complete")
 #    print("You can reboot now :)")

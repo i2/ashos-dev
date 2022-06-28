@@ -1,0 +1,30 @@
+an:~$ sudo umount /tmp/sda2_subvolid5
+user@debian:~$ sudo umount /tmp/sda2_subvolid0
+user@debian:~$ sudo ls -al /tmp/sda
+sda1/           sda2_subvolid0/ sda2_subvolid5/
+user@debian:~$ sudo ls -al /tmp/sda1/EFI/
+arch_ashos/ astos/      debian/
+user@debian:~$ sudo ls -al /tmp/sda1
+total 1
+drwxr-xr-x  3 root root 512 Jan  1  1970 .
+drwxrwxrwt 13 root root 260 Jun 27 23:08 ..
+drwxr-xr-x  5 root root 512 Jun 27 23:00 EFI
+user@debian:~$ sudo ls -al /tmp/sda1/EFI/
+total 3
+drwxr-xr-x 5 root root 512 Jun 27 23:00 .
+drwxr-xr-x 3 root root 512 Jan  1  1970 ..
+drwxr-xr-x 2 root root 512 Jun 27 14:45 arch_ashos
+drwxr-xr-x 2 root root 512 Jun 27 22:56 astos
+drwxr-xr-x 2 root root 512 Jun 27 23:02 debian
+user@debian:~$ sudo mv /tmp/sda1/EFI/debian /tmp/sda1/EFI/debian_ashos
+user@debian:~$ lsblk
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+loop0    7:0    0 687.7M  1 loop /usr/lib/live/mount/rootfs/filesystem.squashfs
+sda      8:0    0     2T  0 disk
+|-sda1   8:1    0   256M  0 part /tmp/sda1
+|-sda2   8:2    0 409.3G  0 part /mnt/.snapshots/etc/etc-tmp
+`-sda3   8:3    0 409.6G  0 part
+sr0     11:0    1  1011M  0 rom  /usr/lib/live/mount/medium
+user@debian:~$
+
+

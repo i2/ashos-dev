@@ -1,0 +1,60 @@
+an:~$ lsblk
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+loop0    7:0    0 687.7M  1 loop /usr/lib/live/mount/rootfs/filesystem.squashfs
+sda      8:0    0     2T  0 disk
+|-sda1   8:1    0   256M  0 part /tmp/sda1
+|-sda2   8:2    0 409.3G  0 part /mnt/.snapshots/etc/etc-tmp
+`-sda3   8:3    0 409.6G  0 part
+sr0     11:0    1  1011M  0 rom  /usr/lib/live/mount/medium
+user@debian:~$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            966M     0  966M   0% /dev
+tmpfs           198M  576K  197M   1% /run
+/dev/sr0       1011M 1011M     0 100% /run/live/medium
+/dev/loop0      688M  688M     0 100% /run/live/rootfs/filesystem.squashfs
+tmpfs           986M  229M  757M  24% /run/live/overlay
+overlay         986M  229M  757M  24% /
+tmpfs           986M     0  986M   0% /dev/shm
+tmpfs           5.0M  4.0K  5.0M   1% /run/lock
+tmpfs           986M     0  986M   0% /tmp
+tmpfs           198M  4.0K  198M   1% /run/user/1000
+/dev/sda2       410G  1.5G  406G   1% /mnt
+/dev/sda2       410G  1.5G  406G   1% /mnt/.snapshots
+/dev/sda2       410G  1.5G  406G   1% /mnt/home
+/dev/sda2       410G  1.5G  406G   1% /mnt/var
+/dev/sda2       410G  1.5G  406G   1% /mnt/.snapshots/boot/boot-tmp
+/dev/sda2       410G  1.5G  406G   1% /mnt/.snapshots/etc/etc-tmp
+/dev/sda1       253M  7.1M  245M   3% /tmp/sda1
+user@debian:~$ sudo btrfs sub list /mnt
+ID 257 gen 58 top level 5 path @.snapshots_arch
+ID 258 gen 54 top level 5 path @home_arch
+ID 259 gen 58 top level 5 path @var_arch
+ID 260 gen 20 top level 5 path @etc_arch
+ID 261 gen 20 top level 5 path @boot_arch
+ID 262 gen 16 top level 259 path @var_arch/lib/portables
+ID 263 gen 17 top level 259 path @var_arch/lib/machines
+ID 264 gen 27 top level 257 path @.snapshots_arch/rootfs/snapshot-0
+ID 265 gen 24 top level 257 path @.snapshots_arch/boot/boot-tmp
+ID 266 gen 57 top level 257 path @.snapshots_arch/etc/etc-tmp
+ID 267 gen 26 top level 257 path @.snapshots_arch/var/var-tmp
+ID 268 gen 24 top level 257 path @.snapshots_arch/boot/boot-0
+ID 269 gen 25 top level 257 path @.snapshots_arch/etc/etc-0
+ID 270 gen 26 top level 257 path @.snapshots_arch/var/var-0
+ID 271 gen 45 top level 257 path @.snapshots_arch/rootfs/snapshot-tmp
+ID 272 gen 2809 top level 5 path @_debian
+ID 274 gen 2806 top level 5 path @.snapshots_debian
+ID 275 gen 2798 top level 5 path @home_debian
+ID 276 gen 2797 top level 5 path @var_debian
+ID 277 gen 2798 top level 5 path @etc_debian
+ID 278 gen 2806 top level 5 path @boot_debian
+ID 281 gen 2805 top level 274 path @.snapshots_debian/rootfs/snapshot-0
+ID 282 gen 2802 top level 274 path @.snapshots_debian/boot/boot-tmp
+ID 283 gen 2803 top level 274 path @.snapshots_debian/etc/etc-tmp
+ID 284 gen 2804 top level 274 path @.snapshots_debian/var/var-tmp
+ID 285 gen 2802 top level 274 path @.snapshots_debian/boot/boot-0
+ID 286 gen 2803 top level 274 path @.snapshots_debian/etc/etc-0
+ID 287 gen 2804 top level 274 path @.snapshots_debian/var/var-0
+ID 288 gen 2808 top level 274 path @.snapshots_debian/rootfs/snapshot-tmp
+user@debian:~$
+
+

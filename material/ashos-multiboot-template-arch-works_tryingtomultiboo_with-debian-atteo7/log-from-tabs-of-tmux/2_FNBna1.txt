@@ -1,0 +1,349 @@
+an:~$ lsblk
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+loop0    7:0    0 687.7M  1 loop /usr/lib/live/mount/rootfs/filesystem.squashfs
+sda      8:0    0     2T  0 disk
+|-sda1   8:1    0   256M  0 part /mnt/boot/efi
+|-sda2   8:2    0 409.3G  0 part /mnt/boot
+`-sda3   8:3    0 409.6G  0 part
+sr0     11:0    1  1011M  0 rom  /usr/lib/live/mount/medium
+user@debian:~$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            966M     0  966M   0% /dev
+tmpfs           198M  568K  197M   1% /run
+/dev/sr0       1011M 1011M     0 100% /run/live/medium
+/dev/loop0      688M  688M     0 100% /run/live/rootfs/filesystem.squashfs
+tmpfs           986M  229M  757M  24% /run/live/overlay
+overlay         986M  229M  757M  24% /
+tmpfs           986M     0  986M   0% /dev/shm
+tmpfs           5.0M  4.0K  5.0M   1% /run/lock
+tmpfs           986M     0  986M   0% /tmp
+tmpfs           198M  4.0K  198M   1% /run/user/1000
+/dev/sda2       410G  1.2G  407G   1% /mnt
+/dev/sda2       410G  1.2G  407G   1% /mnt/.snapshots
+/dev/sda2       410G  1.2G  407G   1% /mnt/home
+/dev/sda2       410G  1.2G  407G   1% /mnt/var
+/dev/sda2       410G  1.2G  407G   1% /mnt/etc
+/dev/sda2       410G  1.2G  407G   1% /mnt/boot
+/dev/sda1       253M  594K  252M   1% /mnt/boot/efi
+user@debian:~$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            966M     0  966M   0% /dev
+tmpfs           198M  568K  197M   1% /run
+/dev/sr0       1011M 1011M     0 100% /run/live/medium
+/dev/loop0      688M  688M     0 100% /run/live/rootfs/filesystem.squashfs
+tmpfs           986M  229M  757M  24% /run/live/overlay
+overlay         986M  229M  757M  24% /
+tmpfs           986M     0  986M   0% /dev/shm
+tmpfs           5.0M  4.0K  5.0M   1% /run/lock
+tmpfs           986M     0  986M   0% /tmp
+tmpfs           198M  4.0K  198M   1% /run/user/1000
+/dev/sda2       410G  1.2G  407G   1% /mnt
+/dev/sda2       410G  1.2G  407G   1% /mnt/.snapshots
+/dev/sda2       410G  1.2G  407G   1% /mnt/home
+/dev/sda2       410G  1.2G  407G   1% /mnt/var
+/dev/sda2       410G  1.2G  407G   1% /mnt/etc
+/dev/sda2       410G  1.2G  407G   1% /mnt/boot
+/dev/sda1       253M  594K  252M   1% /mnt/boot/efi
+user@debian:~$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            966M     0  966M   0% /dev
+tmpfs           198M  568K  197M   1% /run
+/dev/sr0       1011M 1011M     0 100% /run/live/medium
+/dev/loop0      688M  688M     0 100% /run/live/rootfs/filesystem.squashfs
+tmpfs           986M  229M  757M  24% /run/live/overlay
+overlay         986M  229M  757M  24% /
+tmpfs           986M     0  986M   0% /dev/shm
+tmpfs           5.0M  4.0K  5.0M   1% /run/lock
+tmpfs           986M     0  986M   0% /tmp
+tmpfs           198M  4.0K  198M   1% /run/user/1000
+/dev/sda2       410G  1.2G  407G   1% /mnt
+/dev/sda2       410G  1.2G  407G   1% /mnt/.snapshots
+/dev/sda2       410G  1.2G  407G   1% /mnt/home
+/dev/sda2       410G  1.2G  407G   1% /mnt/var
+/dev/sda2       410G  1.2G  407G   1% /mnt/etc
+/dev/sda2       410G  1.2G  407G   1% /mnt/boot
+/dev/sda1       253M  594K  252M   1% /mnt/boot/efi
+user@debian:~$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            966M     0  966M   0% /dev
+tmpfs           198M  568K  197M   1% /run
+/dev/sr0       1011M 1011M     0 100% /run/live/medium
+/dev/loop0      688M  688M     0 100% /run/live/rootfs/filesystem.squashfs
+tmpfs           986M  229M  757M  24% /run/live/overlay
+overlay         986M  229M  757M  24% /
+tmpfs           986M     0  986M   0% /dev/shm
+tmpfs           5.0M  4.0K  5.0M   1% /run/lock
+tmpfs           986M     0  986M   0% /tmp
+tmpfs           198M  4.0K  198M   1% /run/user/1000
+/dev/sda2       410G  1.2G  407G   1% /mnt
+/dev/sda2       410G  1.2G  407G   1% /mnt/.snapshots
+/dev/sda2       410G  1.2G  407G   1% /mnt/home
+/dev/sda2       410G  1.2G  407G   1% /mnt/var
+/dev/sda2       410G  1.2G  407G   1% /mnt/etc
+/dev/sda2       410G  1.2G  407G   1% /mnt/boot
+/dev/sda1       253M  594K  252M   1% /mnt/boot/efi
+user@debian:~$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            966M     0  966M   0% /dev
+tmpfs           198M  568K  197M   1% /run
+/dev/sr0       1011M 1011M     0 100% /run/live/medium
+/dev/loop0      688M  688M     0 100% /run/live/rootfs/filesystem.squashfs
+tmpfs           986M  229M  757M  24% /run/live/overlay
+overlay         986M  229M  757M  24% /
+tmpfs           986M     0  986M   0% /dev/shm
+tmpfs           5.0M  4.0K  5.0M   1% /run/lock
+tmpfs           986M     0  986M   0% /tmp
+tmpfs           198M  4.0K  198M   1% /run/user/1000
+/dev/sda2       410G  1.2G  407G   1% /mnt
+/dev/sda2       410G  1.2G  407G   1% /mnt/.snapshots
+/dev/sda2       410G  1.2G  407G   1% /mnt/home
+/dev/sda2       410G  1.2G  407G   1% /mnt/var
+/dev/sda2       410G  1.2G  407G   1% /mnt/etc
+/dev/sda2       410G  1.2G  407G   1% /mnt/boot
+/dev/sda1       253M  594K  252M   1% /mnt/boot/efi
+user@debian:~$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            966M     0  966M   0% /dev
+tmpfs           198M  568K  197M   1% /run
+/dev/sr0       1011M 1011M     0 100% /run/live/medium
+/dev/loop0      688M  688M     0 100% /run/live/rootfs/filesystem.squashfs
+tmpfs           986M  229M  757M  24% /run/live/overlay
+overlay         986M  229M  757M  24% /
+tmpfs           986M     0  986M   0% /dev/shm
+tmpfs           5.0M  4.0K  5.0M   1% /run/lock
+tmpfs           986M     0  986M   0% /tmp
+tmpfs           198M  4.0K  198M   1% /run/user/1000
+/dev/sda2       410G  1.2G  407G   1% /mnt
+/dev/sda2       410G  1.2G  407G   1% /mnt/.snapshots
+/dev/sda2       410G  1.2G  407G   1% /mnt/home
+/dev/sda2       410G  1.2G  407G   1% /mnt/var
+/dev/sda2       410G  1.2G  407G   1% /mnt/etc
+/dev/sda2       410G  1.2G  407G   1% /mnt/boot
+/dev/sda1       253M  594K  252M   1% /mnt/boot/efi
+user@debian:~$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            966M     0  966M   0% /dev
+tmpfs           198M  568K  197M   1% /run
+/dev/sr0       1011M 1011M     0 100% /run/live/medium
+/dev/loop0      688M  688M     0 100% /run/live/rootfs/filesystem.squashfs
+tmpfs           986M  229M  757M  24% /run/live/overlay
+overlay         986M  229M  757M  24% /
+tmpfs           986M     0  986M   0% /dev/shm
+tmpfs           5.0M  4.0K  5.0M   1% /run/lock
+tmpfs           986M     0  986M   0% /tmp
+tmpfs           198M  4.0K  198M   1% /run/user/1000
+/dev/sda2       410G  1.2G  407G   1% /mnt
+/dev/sda2       410G  1.2G  407G   1% /mnt/.snapshots
+/dev/sda2       410G  1.2G  407G   1% /mnt/home
+/dev/sda2       410G  1.2G  407G   1% /mnt/var
+/dev/sda2       410G  1.2G  407G   1% /mnt/etc
+/dev/sda2       410G  1.2G  407G   1% /mnt/boot
+/dev/sda1       253M  594K  252M   1% /mnt/boot/efi
+user@debian:~$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            966M     0  966M   0% /dev
+tmpfs           198M  568K  197M   1% /run
+/dev/sr0       1011M 1011M     0 100% /run/live/medium
+/dev/loop0      688M  688M     0 100% /run/live/rootfs/filesystem.squashfs
+tmpfs           986M  229M  757M  24% /run/live/overlay
+overlay         986M  229M  757M  24% /
+tmpfs           986M     0  986M   0% /dev/shm
+tmpfs           5.0M  4.0K  5.0M   1% /run/lock
+tmpfs           986M     0  986M   0% /tmp
+tmpfs           198M  4.0K  198M   1% /run/user/1000
+/dev/sda2       410G  1.2G  407G   1% /mnt
+/dev/sda2       410G  1.2G  407G   1% /mnt/.snapshots
+/dev/sda2       410G  1.2G  407G   1% /mnt/home
+/dev/sda2       410G  1.2G  407G   1% /mnt/var
+/dev/sda2       410G  1.2G  407G   1% /mnt/etc
+/dev/sda2       410G  1.2G  407G   1% /mnt/boot
+/dev/sda1       253M  594K  252M   1% /mnt/boot/efi
+user@debian:~$ ls -al /mnt
+total 24
+drwxr-xr-x   1 root root  196 Jun 27 21:17 .
+drwxr-xr-x   1 root root  140 Jun 27 21:06 ..
+drwxr-xr-x   1 root root   52 Jun 27 21:16 .snapshots
+lrwxrwxrwx   1 root root    7 Jun 27 21:17 bin -> usr/bin
+drwxr-xr-x   1 root root    6 Jun 27 21:16 boot
+drwxr-xr-x   1 root root  192 Jun 27 21:17 debootstrap
+drwxr-xr-x   1 root root  128 Jun 27 21:17 dev
+drwxr-xr-x   1 root root 1766 Jun 27 21:28 etc
+drwxr-xr-x   1 root root    0 Jun 27 21:16 home
+lrwxrwxrwx   1 root root    7 Jun 27 21:17 lib -> usr/lib
+lrwxrwxrwx   1 root root    9 Jun 27 21:17 lib32 -> usr/lib32
+lrwxrwxrwx   1 root root    9 Jun 27 21:17 lib64 -> usr/lib64
+lrwxrwxrwx   1 root root   10 Jun 27 21:17 libx32 -> usr/libx32
+drwxr-xr-x   1 root root    0 Jun 27 21:17 media
+drwxr-xr-x   1 root root    0 Jun 27 21:17 mnt
+drwxr-xr-x   1 root root    0 Jun 27 21:17 opt
+dr-xr-xr-x 170 root root    0 Jun 27 21:17 proc
+drwxr-xr-x   1 root root   30 Jun 27 21:17 root
+drwxr-xr-x   1 root root   26 Jun 27 21:17 run
+lrwxrwxrwx   1 root root    8 Jun 27 21:17 sbin -> usr/sbin
+drwxr-xr-x   1 root root    0 Jun 27 21:17 srv
+dr-xr-xr-x  13 root root    0 Jun 27 21:06 sys
+drwxr-xr-x   1 root root    0 Jun 27 21:21 tmp
+drwxr-xr-x   1 root root  116 Jun 27 21:17 usr
+drwxr-xr-x   1 root root   90 Jun 27 21:17 var
+user@debian:~$ ls -al /mnt
+total 40
+drwxr-xr-x   1 root root  258 Jun 27 21:32 .
+drwxr-xr-x   1 root root  140 Jun 27 21:06 ..
+drwxr-xr-x   1 root root   52 Jun 27 21:16 .snapshots
+lrwxrwxrwx   1 root root    7 Jun 27 21:17 bin -> usr/bin
+drwxr-xr-x   1 root root  200 Jun 27 21:33 boot
+drwxr-xr-x  17 root root 3300 Jun 27 21:15 dev
+drwxr-xr-x   1 root root 1706 Jun 27 21:30 etc
+drwxr-xr-x   1 root root    0 Jun 27 21:16 home
+lrwxrwxrwx   1 root root   31 Jun 27 21:32 initrd.img -> boot/initrd.img-5.10.0-13-amd64
+lrwxrwxrwx   1 root root   31 Jun 27 21:32 initrd.img.old -> boot/initrd.img-5.10.0-13-amd64
+lrwxrwxrwx   1 root root    7 Jun 27 21:17 lib -> usr/lib
+lrwxrwxrwx   1 root root    9 Jun 27 21:17 lib32 -> usr/lib32
+lrwxrwxrwx   1 root root    9 Jun 27 21:17 lib64 -> usr/lib64
+lrwxrwxrwx   1 root root   10 Jun 27 21:17 libx32 -> usr/libx32
+drwxr-xr-x   1 root root    0 Jun 27 21:17 media
+drwxr-xr-x   1 root root    0 Jun 27 21:17 mnt
+drwxr-xr-x   1 root root    0 Jun 27 21:17 opt
+dr-xr-xr-x 188 root root    0 Jun 27 21:06 proc
+drwxr-xr-x   1 root root   30 Jun 27 21:17 root
+drwxr-xr-x  21 root root  620 Jun 27 21:06 run
+lrwxrwxrwx   1 root root    8 Jun 27 21:17 sbin -> usr/sbin
+drwxr-xr-x   1 root root    0 Jun 27 21:17 srv
+dr-xr-xr-x  13 root root    0 Jun 27 21:06 sys
+drwxr-xr-x   1 root root    0 Jun 27 21:32 tmp
+drwxr-xr-x   1 root root  116 Jun 27 21:17 usr
+drwxr-xr-x   1 root root   90 Jun 27 21:17 var
+lrwxrwxrwx   1 root root   28 Jun 27 21:32 vmlinuz -> boot/vmlinuz-5.10.0-13-amd64
+lrwxrwxrwx   1 root root   28 Jun 27 21:32 vmlinuz.old -> boot/vmlinuz-5.10.0-13-amd64
+user@debian:~$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            966M     0  966M   0% /dev
+tmpfs           198M  572K  197M   1% /run
+/dev/sr0       1011M 1011M     0 100% /run/live/medium
+/dev/loop0      688M  688M     0 100% /run/live/rootfs/filesystem.squashfs
+tmpfs           986M  229M  757M  24% /run/live/overlay
+overlay         986M  229M  757M  24% /
+tmpfs           986M     0  986M   0% /dev/shm
+tmpfs           5.0M  4.0K  5.0M   1% /run/lock
+tmpfs           986M     0  986M   0% /tmp
+tmpfs           198M  4.0K  198M   1% /run/user/1000
+/dev/sda2       410G  1.4G  407G   1% /mnt
+/dev/sda2       410G  1.4G  407G   1% /mnt/.snapshots
+/dev/sda2       410G  1.4G  407G   1% /mnt/home
+/dev/sda2       410G  1.4G  407G   1% /mnt/var
+/dev/sda2       410G  1.4G  407G   1% /mnt/etc
+/dev/sda2       410G  1.4G  407G   1% /mnt/boot
+/dev/sda1       253M  594K  252M   1% /mnt/boot/efi
+user@debian:~$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            966M     0  966M   0% /dev
+tmpfs           198M  572K  197M   1% /run
+/dev/sr0       1011M 1011M     0 100% /run/live/medium
+/dev/loop0      688M  688M     0 100% /run/live/rootfs/filesystem.squashfs
+tmpfs           986M  229M  757M  24% /run/live/overlay
+overlay         986M  229M  757M  24% /
+tmpfs           986M     0  986M   0% /dev/shm
+tmpfs           5.0M  4.0K  5.0M   1% /run/lock
+tmpfs           986M     0  986M   0% /tmp
+tmpfs           198M  4.0K  198M   1% /run/user/1000
+/dev/sda2       410G  1.4G  407G   1% /mnt
+/dev/sda2       410G  1.4G  407G   1% /mnt/.snapshots
+/dev/sda2       410G  1.4G  407G   1% /mnt/home
+/dev/sda2       410G  1.4G  407G   1% /mnt/var
+/dev/sda2       410G  1.4G  407G   1% /mnt/etc
+/dev/sda2       410G  1.4G  407G   1% /mnt/boot
+/dev/sda1       253M  594K  252M   1% /mnt/boot/efi
+user@debian:~$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            966M     0  966M   0% /dev
+tmpfs           198M  572K  197M   1% /run
+/dev/sr0       1011M 1011M     0 100% /run/live/medium
+/dev/loop0      688M  688M     0 100% /run/live/rootfs/filesystem.squashfs
+tmpfs           986M  229M  757M  24% /run/live/overlay
+overlay         986M  229M  757M  24% /
+tmpfs           986M     0  986M   0% /dev/shm
+tmpfs           5.0M  4.0K  5.0M   1% /run/lock
+tmpfs           986M     0  986M   0% /tmp
+tmpfs           198M  4.0K  198M   1% /run/user/1000
+/dev/sda2       410G  1.4G  407G   1% /mnt
+/dev/sda2       410G  1.4G  407G   1% /mnt/.snapshots
+/dev/sda2       410G  1.4G  407G   1% /mnt/home
+/dev/sda2       410G  1.4G  407G   1% /mnt/var
+/dev/sda2       410G  1.4G  407G   1% /mnt/etc
+/dev/sda2       410G  1.4G  407G   1% /mnt/boot
+/dev/sda1       253M  594K  252M   1% /mnt/boot/efi
+user@debian:~$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            966M     0  966M   0% /dev
+tmpfs           198M  572K  197M   1% /run
+/dev/sr0       1011M 1011M     0 100% /run/live/medium
+/dev/loop0      688M  688M     0 100% /run/live/rootfs/filesystem.squashfs
+tmpfs           986M  229M  757M  24% /run/live/overlay
+overlay         986M  229M  757M  24% /
+tmpfs           986M     0  986M   0% /dev/shm
+tmpfs           5.0M  4.0K  5.0M   1% /run/lock
+tmpfs           986M     0  986M   0% /tmp
+tmpfs           198M  4.0K  198M   1% /run/user/1000
+/dev/sda2       410G  1.4G  407G   1% /mnt
+/dev/sda2       410G  1.4G  407G   1% /mnt/.snapshots
+/dev/sda2       410G  1.4G  407G   1% /mnt/home
+/dev/sda2       410G  1.4G  407G   1% /mnt/var
+/dev/sda2       410G  1.4G  407G   1% /mnt/etc
+/dev/sda2       410G  1.4G  407G   1% /mnt/boot
+/dev/sda1       253M  594K  252M   1% /mnt/boot/efi
+user@debian:~$ ls -al /mnt
+total 40
+drwxr-xr-x   1 root root  258 Jun 27 21:32 .
+drwxr-xr-x   1 root root  140 Jun 27 21:06 ..
+drwxr-xr-x   1 root root   52 Jun 27 21:16 .snapshots
+lrwxrwxrwx   1 root root    7 Jun 27 21:17 bin -> usr/bin
+drwxr-xr-x   1 root root  208 Jun 27 22:46 boot
+drwxr-xr-x  17 root root 3300 Jun 27 21:15 dev
+drwxr-xr-x   1 root root 1912 Jun 27 22:46 etc
+drwxr-xr-x   1 root root    0 Jun 27 21:16 home
+lrwxrwxrwx   1 root root   31 Jun 27 21:32 initrd.img -> boot/initrd.img-5.10.0-13-amd64
+lrwxrwxrwx   1 root root   31 Jun 27 21:32 initrd.img.old -> boot/initrd.img-5.10.0-13-amd64
+lrwxrwxrwx   1 root root    7 Jun 27 21:17 lib -> usr/lib
+lrwxrwxrwx   1 root root    9 Jun 27 21:17 lib32 -> usr/lib32
+lrwxrwxrwx   1 root root    9 Jun 27 21:17 lib64 -> usr/lib64
+lrwxrwxrwx   1 root root   10 Jun 27 21:17 libx32 -> usr/libx32
+drwxr-xr-x   1 root root    0 Jun 27 21:17 media
+drwxr-xr-x   1 root root    0 Jun 27 21:17 mnt
+drwxr-xr-x   1 root root    0 Jun 27 21:17 opt
+dr-xr-xr-x 170 root root    0 Jun 27 21:06 proc
+drwxr-xr-x   1 root root   30 Jun 27 21:17 root
+drwxr-xr-x  21 root root  640 Jun 27 21:33 run
+lrwxrwxrwx   1 root root    8 Jun 27 21:17 sbin -> usr/sbin
+drwxr-xr-x   1 root root    0 Jun 27 21:17 srv
+dr-xr-xr-x  13 root root    0 Jun 27 21:06 sys
+drwxr-xr-x   1 root root    0 Jun 27 22:46 tmp
+drwxr-xr-x   1 root root  116 Jun 27 21:17 usr
+drwxr-xr-x   1 root root   90 Jun 27 21:17 var
+lrwxrwxrwx   1 root root   28 Jun 27 21:32 vmlinuz -> boot/vmlinuz-5.10.0-13-amd64
+lrwxrwxrwx   1 root root   28 Jun 27 21:32 vmlinuz.old -> boot/vmlinuz-5.10.0-13-amd64
+user@debian:~$ ls -al /boot/
+System.map-5.10.0-13-amd64  initrd.img-5.10.0-13-amd64
+config-5.10.0-13-amd64      vmlinuz-5.10.0-13-amd64
+user@debian:~$ ls -al /mnt/boot/
+System.map-5.10.0-13-amd64  efi/                        initrd.img-5.10.0-13-amd64
+config-5.10.0-13-amd64      grub/                       vmlinuz-5.10.0-13-amd64
+user@debian:~$ ls -al /mnt/boot/grub/unicode.pf2
+.bash_logout   .kde/          .su-to-rootrc  ashos-dev/
+.bashrc        .profile       .tmux.cong
+user@debian:~$ ls -al /mnt/boot/efi/EFI/a
+arch_ashos/ astos/
+user@debian:~$ ls -al /mnt/.snapshots/
+ast/    boot/   etc/    root/   rootfs/ tmp/    var/
+user@debian:~$ ls -al /mnt/.snapshots/ast/
+total 0
+drwxr-xr-x 1 root root 18 Jun 27 22:46 .
+drwxr-xr-x 1 root root 52 Jun 27 21:16 ..
+drwxr-xr-x 1 root root  0 Jun 27 22:46 snapshots
+user@debian:~$ ls -al /mnt/etc/de
+debconf.conf    debian_version  default/        deluser.conf
+user@debian:~$ ls -al /mnt/etc/default/grub
+grub    grub.d/
+user@debian:~$ vi /mnt/etc/default/grub
+user@debian:~$
+
+

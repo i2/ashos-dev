@@ -1,0 +1,37 @@
+an:~$ sudo umount -R /mnt
+user@debian:~$ ls -al /mnt/
+total 0
+drwxr-xr-x 2 root root   3 Mar 26 15:22 .
+drwxr-xr-x 1 root root 140 Jun 27 21:06 ..
+user@debian:~$ sudo mount /dev/sda2 -o subvolid=0 /tmp/sda
+sda1/           sda2_subvolid0/ sda2_subvolid5/
+user@debian:~$ sudo mount /dev/sda2 -o subvolid=0 /tmp/sda2_subvolid0/
+user@debian:~$ ls -al /tmp/sda2_subvolid0/
+total 16
+drwxr-xr-x  1 root root  252 Jun 27 14:48 .
+drwxrwxrwt 13 root root  260 Jun 27 23:08 ..
+drwxr-xr-x  1 root root   52 Jun 27 14:42 @.snapshots_arch
+drwxr-xr-x  1 root root   52 Jun 27 21:16 @.snapshots_debian
+drwxr-xr-x  1 root root  258 Jun 27 21:32 @_debian
+drwxr-xr-x  1 root root  134 Jun 27 14:44 @boot_arch
+drwxr-xr-x  1 root root  208 Jun 27 22:46 @boot_debian
+drwxr-xr-x  1 root root 1664 Jun 27 14:44 @etc_arch
+drwxr-xr-x  1 root root 1940 Jun 27 22:55 @etc_debian
+drwxr-xr-x  1 root root    4 Jun 27 14:44 @home_arch
+drwxr-xr-x  1 root root    4 Jun 27 22:55 @home_debian
+drwxr-xr-x  1 root root  116 Jun 27 15:04 @var_arch
+drwxr-xr-x  1 root root   90 Jun 27 21:17 @var_debian
+user@debian:~$ sudo btrfs sub del /tmp/sda2_subvolid0/@_debian
+Delete subvolume (no-commit): '/tmp/sda2_subvolid0/@_debian'
+user@debian:~$ sudo umount -R /tmp/sda2_subvolid0
+user@debian:~$ lsblk
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+loop0    7:0    0 687.7M  1 loop /usr/lib/live/mount/rootfs/filesystem.squashfs
+sda      8:0    0     2T  0 disk
+|-sda1   8:1    0   256M  0 part
+|-sda2   8:2    0 409.3G  0 part
+`-sda3   8:3    0 409.6G  0 part
+sr0     11:0    1  1011M  0 rom  /usr/lib/live/mount/medium
+user@debian:~$
+
+

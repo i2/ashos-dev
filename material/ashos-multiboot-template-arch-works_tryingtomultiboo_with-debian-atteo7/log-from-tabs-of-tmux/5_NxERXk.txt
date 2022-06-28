@@ -1,0 +1,38 @@
+an:~$ sudo mount /dev/sda2 -o subvolid=5 /tmp/sda2_subvolid5
+user@debian:~$ ls -al /tmp/sda2_subvolid5/@
+@.snapshots_arch/   @boot_arch/         @etc_debian/        @var_arch/
+@.snapshots_debian/ @boot_debian/       @home_arch/         @var_debian/
+@_debian/           @etc_arch/          @home_debian/
+user@debian:~$ ls -al /tmp/sda2_subvolid5/
+total 16
+drwxr-xr-x  1 root root  252 Jun 27 14:48 .
+drwxrwxrwt 13 root root  260 Jun 27 23:08 ..
+drwxr-xr-x  1 root root   52 Jun 27 14:42 @.snapshots_arch
+drwxr-xr-x  1 root root   52 Jun 27 21:16 @.snapshots_debian
+drwxr-xr-x  1 root root  258 Jun 27 21:32 @_debian
+drwxr-xr-x  1 root root  134 Jun 27 14:44 @boot_arch
+drwxr-xr-x  1 root root  208 Jun 27 22:46 @boot_debian
+drwxr-xr-x  1 root root 1664 Jun 27 14:44 @etc_arch
+drwxr-xr-x  1 root root 1940 Jun 27 22:55 @etc_debian
+drwxr-xr-x  1 root root    4 Jun 27 14:44 @home_arch
+drwxr-xr-x  1 root root    4 Jun 27 22:55 @home_debian
+drwxr-xr-x  1 root root  116 Jun 27 15:04 @var_arch
+drwxr-xr-x  1 root root   90 Jun 27 21:17 @var_debian
+user@debian:~$ ls -al /tmp/sda2_subvolid0/
+total 16
+drwxr-xr-x  1 root root  252 Jun 27 14:48 .
+drwxrwxrwt 13 root root  260 Jun 27 23:08 ..
+drwxr-xr-x  1 root root   52 Jun 27 14:42 @.snapshots_arch
+drwxr-xr-x  1 root root   52 Jun 27 21:16 @.snapshots_debian
+drwxr-xr-x  1 root root  258 Jun 27 21:32 @_debian
+drwxr-xr-x  1 root root  134 Jun 27 14:44 @boot_arch
+drwxr-xr-x  1 root root  208 Jun 27 22:46 @boot_debian
+drwxr-xr-x  1 root root 1664 Jun 27 14:44 @etc_arch
+drwxr-xr-x  1 root root 1940 Jun 27 22:55 @etc_debian
+drwxr-xr-x  1 root root    4 Jun 27 14:44 @home_arch
+drwxr-xr-x  1 root root    4 Jun 27 22:55 @home_debian
+drwxr-xr-x  1 root root  116 Jun 27 15:04 @var_arch
+drwxr-xr-x  1 root root   90 Jun 27 21:17 @var_debian
+user@debian:~$
+
+

@@ -1,0 +1,129 @@
+an:~$ mkdir /tmp/sda1_subvolid0
+user@debian:~$ mount /dev/sda2 -o subvolid-0 /tmp/sda1
+sda1/           sda1_subvolid0/
+user@debian:~$ xxxxxxxxxxxxxmount /dev/sda2 -o subvolid-0 /tmp/sda1
+-bash: xxxxxxxxxxxxxmount: command not found
+user@debian:~$ mv /tmp/sda1_subvolid0 /tmp/sda2_subvolid0
+user@debian:~$ mount /dev/sda2 -o subvolid-0 /tmp/sda2_subvolid0/
+mount: /tmp/sda2_subvolid0: must be superuser to use mount.
+user@debian:~$ sudo mount /dev/sda2 -o subvolid-0 /tmp/sda2_subvolid0
+user@debian:~$ ls -al /tmp/sda2_subvolid0/
+.snapshots/     home/           lib64/          proc/           sys/            vmlinuz.old
+bin/            initrd.img      libx32/         root/           tmp/
+boot/           initrd.img.old  media/          run/            usr/
+dev/            lib/            mnt/            sbin/           var/
+etc/            lib32/          opt/            srv/            vmlinuz
+user@debian:~$ ls -al /tmp/sda2_subvolid0/
+total 40
+drwxr-xr-x  1 root root  258 Jun 27 21:32 .
+drwxrwxrwt 12 root root  240 Jun 27 23:05 ..
+drwxr-xr-x  1 root root    0 Jun 27 21:16 .snapshots
+lrwxrwxrwx  1 root root    7 Jun 27 21:17 bin -> usr/bin
+drwxr-xr-x  1 root root  208 Jun 27 22:56 boot
+drwxr-xr-x  1 root root  128 Jun 27 21:17 dev
+drwxr-xr-x  1 root root 1922 Jun 27 22:56 etc
+drwxr-xr-x  1 root root    0 Jun 27 21:16 home
+lrwxrwxrwx  1 root root   31 Jun 27 21:32 initrd.img -> boot/initrd.img-5.10.0-13-amd64
+lrwxrwxrwx  1 root root   31 Jun 27 21:32 initrd.img.old -> boot/initrd.img-5.10.0-13-amd64
+lrwxrwxrwx  1 root root    7 Jun 27 21:17 lib -> usr/lib
+lrwxrwxrwx  1 root root    9 Jun 27 21:17 lib32 -> usr/lib32
+lrwxrwxrwx  1 root root    9 Jun 27 21:17 lib64 -> usr/lib64
+lrwxrwxrwx  1 root root   10 Jun 27 21:17 libx32 -> usr/libx32
+drwxr-xr-x  1 root root    0 Jun 27 21:17 media
+drwxr-xr-x  1 root root    0 Jun 27 21:17 mnt
+drwxr-xr-x  1 root root    0 Jun 27 21:17 opt
+drwxr-xr-x  1 root root    0 Mar 19 13:46 proc
+drwxr-xr-x  1 root root   30 Jun 27 21:17 root
+drwxr-xr-x  1 root root   26 Jun 27 21:17 run
+lrwxrwxrwx  1 root root    8 Jun 27 21:17 sbin -> usr/sbin
+drwxr-xr-x  1 root root    0 Jun 27 21:17 srv
+drwxr-xr-x  1 root root    0 Mar 19 13:46 sys
+drwxr-xr-x  1 root root    0 Jun 27 22:56 tmp
+drwxr-xr-x  1 root root  116 Jun 27 21:17 usr
+drwxr-xr-x  1 root root    6 Jun 27 22:56 var
+lrwxrwxrwx  1 root root   28 Jun 27 21:32 vmlinuz -> boot/vmlinuz-5.10.0-13-amd64
+lrwxrwxrwx  1 root root   28 Jun 27 21:32 vmlinuz.old -> boot/vmlinuz-5.10.0-13-amd64
+user@debian:~$ vi /mnt/.snapshots/boot/boot-
+boot-0/   boot-tmp/
+user@debian:~$ vi /mnt/.snapshots/boot/boot-0/
+System.map-5.10.0-13-amd64  efi/                        initrd.img-5.10.0-13-amd64
+config-5.10.0-13-amd64      grub/                       vmlinuz-5.10.0-13-amd64
+user@debian:~$ vi /mnt/.snapshots/boot/boot-0/grub/
+fonts/       grub.cfg     grubenv      locale/      unicode.pf2  x86_64-efi/
+user@debian:~$ vi /mnt/.snapshots/boot/boot-0/grub/grub.cfg
+user@debian:~$ vi /mnt/.snapshots/boot/boot-tmp/
+System.map-5.10.0-13-amd64  efi/                        initrd.img-5.10.0-13-amd64
+config-5.10.0-13-amd64      grub/                       vmlinuz-5.10.0-13-amd64
+user@debian:~$ vi /mnt/.snapshots/boot/boot-tmp/grub/
+fonts/       grub.cfg     grubenv      locale/      unicode.pf2  x86_64-efi/
+user@debian:~$ vi /mnt/.snapshots/boot/boot-tmp/grub/grub.cfg
+user@debian:~$ mkdir /tmp/sda2_subvolid5
+user@debian:~$ sudo mount /dev/sda2 -o subvolid-5 /tmp/sda2_subvolid0
+user@debian:~$ ccssudo mount /dev/sda2 -o subvolid=5 /tmp/sda2_subvolid5
+-bash: ccssudo: command not found
+user@debian:~$ sudo umount /tmp/sda2_subvolid0
+user@debian:~$ ccssudo mount /dev/sda2 -o subvolid=0 /tmp/sda2_subvolid0
+-bash: ccssudo: command not found
+user@debian:~$ sudo mount /dev/sda2 -o subvolid=0 /tmp/sda2_subvolid0
+user@debian:~$ ls -al /tmp/sda2_subvolid
+ls: cannot access '/tmp/sda2_subvolid': No such file or directory
+user@debian:~$ ls -al /tmp/sda2_subvolid
+sda2_subvolid0/ sda2_subvolid5/
+user@debian:~$ sudo ls -al /tmp/sda2_subvolid0/
+total 16
+drwxr-xr-x  1 root root  252 Jun 27 14:48 .
+drwxrwxrwt 13 root root  260 Jun 27 23:08 ..
+drwxr-xr-x  1 root root   52 Jun 27 14:42 @.snapshots_arch
+drwxr-xr-x  1 root root   52 Jun 27 21:16 @.snapshots_debian
+drwxr-xr-x  1 root root  258 Jun 27 21:32 @_debian
+drwxr-xr-x  1 root root  134 Jun 27 14:44 @boot_arch
+drwxr-xr-x  1 root root  208 Jun 27 22:46 @boot_debian
+drwxr-xr-x  1 root root 1664 Jun 27 14:44 @etc_arch
+drwxr-xr-x  1 root root 1940 Jun 27 22:55 @etc_debian
+drwxr-xr-x  1 root root    4 Jun 27 14:44 @home_arch
+drwxr-xr-x  1 root root    4 Jun 27 22:55 @home_debian
+drwxr-xr-x  1 root root  116 Jun 27 15:04 @var_arch
+drwxr-xr-x  1 root root   90 Jun 27 21:17 @var_debian
+user@debian:~$ sudo ls -al /tmp/sda2_subvolid0/@
+@.snapshots_arch/   @boot_arch/         @etc_debian/        @var_arch/
+@.snapshots_debian/ @boot_debian/       @home_arch/         @var_debian/
+@_debian/           @etc_arch/          @home_debian/
+user@debian:~$ sudo ls -al /tmp/sda2_subvolid0/@_debian/
+.snapshots/     home/           lib64/          proc/           sys/            vmlinuz.old
+bin/            initrd.img      libx32/         root/           tmp/
+boot/           initrd.img.old  media/          run/            usr/
+dev/            lib/            mnt/            sbin/           var/
+etc/            lib32/          opt/            srv/            vmlinuz
+user@debian:~$ sudo ls -al /tmp/sda2_subvolid0/@_debian/
+total 56
+drwxr-xr-x 1 root root  258 Jun 27 21:32 .
+drwxr-xr-x 1 root root  252 Jun 27 14:48 ..
+drwxr-xr-x 1 root root    0 Jun 27 21:16 .snapshots
+lrwxrwxrwx 1 root root    7 Jun 27 21:17 bin -> usr/bin
+drwxr-xr-x 1 root root  208 Jun 27 22:56 boot
+drwxr-xr-x 1 root root  128 Jun 27 21:17 dev
+drwxr-xr-x 1 root root 1922 Jun 27 22:56 etc
+drwxr-xr-x 1 root root    0 Jun 27 21:16 home
+lrwxrwxrwx 1 root root   31 Jun 27 21:32 initrd.img -> boot/initrd.img-5.10.0-13-amd64
+lrwxrwxrwx 1 root root   31 Jun 27 21:32 initrd.img.old -> boot/initrd.img-5.10.0-13-amd64
+lrwxrwxrwx 1 root root    7 Jun 27 21:17 lib -> usr/lib
+lrwxrwxrwx 1 root root    9 Jun 27 21:17 lib32 -> usr/lib32
+lrwxrwxrwx 1 root root    9 Jun 27 21:17 lib64 -> usr/lib64
+lrwxrwxrwx 1 root root   10 Jun 27 21:17 libx32 -> usr/libx32
+drwxr-xr-x 1 root root    0 Jun 27 21:17 media
+drwxr-xr-x 1 root root    0 Jun 27 21:17 mnt
+drwxr-xr-x 1 root root    0 Jun 27 21:17 opt
+drwxr-xr-x 1 root root    0 Mar 19 13:46 proc
+drwxr-xr-x 1 root root   30 Jun 27 21:17 root
+drwxr-xr-x 1 root root   26 Jun 27 21:17 run
+lrwxrwxrwx 1 root root    8 Jun 27 21:17 sbin -> usr/sbin
+drwxr-xr-x 1 root root    0 Jun 27 21:17 srv
+drwxr-xr-x 1 root root    0 Mar 19 13:46 sys
+drwxr-xr-x 1 root root    0 Jun 27 22:56 tmp
+drwxr-xr-x 1 root root  116 Jun 27 21:17 usr
+drwxr-xr-x 1 root root    0 Jun 27 21:16 var
+lrwxrwxrwx 1 root root   28 Jun 27 21:32 vmlinuz -> boot/vmlinuz-5.10.0-13-amd64
+lrwxrwxrwx 1 root root   28 Jun 27 21:32 vmlinuz.old -> boot/vmlinuz-5.10.0-13-amd64
+user@debian:~$
+
+

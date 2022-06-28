@@ -1,0 +1,80 @@
+an:~$ cd ashos-dev/
+user@debian:~/ashos-dev$
+user@debian:~/ashos-dev$ git pull
+hint: Pulling without specifying how to reconcile divergent branches is
+hint: discouraged. You can squelch this message by running one of the following
+hint: commands sometime before your next pull:
+hint:
+hint:   git config pull.rebase false  # merge (the default strategy)
+hint:   git config pull.rebase true   # rebase
+hint:   git config pull.ff only       # fast-forward only
+hint:
+hint: You can replace "git config" with "git config --global" to set a default
+hint: preference for all repositories. You can also pass --rebase, --no-rebase,
+hint: or --ff-only on the command line to override the configured default per
+hint: invocation.
+warning: redirecting to https://github.com/i2/ashos-dev/
+remote: Enumerating objects: 13, done.
+remote: Counting objects: 100% (13/13), done.
+remote: Compressing objects: 100% (1/1), done.
+remote: Total 7 (delta 6), reused 7 (delta 6), pack-reused 0
+Unpacking objects: 100% (7/7), 616 bytes | 102.00 KiB/s, done.
+From http://github.com/i2/ashos-dev
+   e524981..da1bded  debian     -> origin/debian
+Updating e524981..da1bded
+Fast-forward
+ src/distros/debian/justminimal/installery_justminimal.py | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
+user@debian:~/ashos-dev$ git pull
+hint: Pulling without specifying how to reconcile divergent branches is
+hint: discouraged. You can squelch this message by running one of the following
+hint: commands sometime before your next pull:
+hint:
+hint:   git config pull.rebase false  # merge (the default strategy)
+hint:   git config pull.rebase true   # rebase
+hint:   git config pull.ff only       # fast-forward only
+hint:
+hint: You can replace "git config" with "git config --global" to set a default
+hint: preference for all repositories. You can also pass --rebase, --no-rebase,
+hint: or --ff-only on the command line to override the configured default per
+hint: invocation.
+warning: redirecting to https://github.com/i2/ashos-dev/
+remote: Enumerating objects: 37, done.
+remote: Counting objects: 100% (37/37), done.
+remote: Compressing objects: 100% (18/18), done.
+remote: Total 30 (delta 25), reused 17 (delta 12), pack-reused 0
+Unpacking objects: 100% (30/30), 4.58 KiB | 156.00 KiB/s, done.
+From http://github.com/i2/ashos-dev
+   da1bded..a79dcf8  debian     -> origin/debian
+Updating da1bded..a79dcf8
+Fast-forward
+ src/distros/arch/installery_justminimal.py               |  4 ++--
+ src/distros/debian/justminimal/installery_justminimal.py | 14 ++++++++++----
+ 2 files changed, 12 insertions(+), 6 deletions(-)
+user@debian:~/ashos-dev$ lsblk
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+loop0    7:0    0 687.7M  1 loop /usr/lib/live/mount/rootfs/filesystem.squashfs
+sda      8:0    0     2T  0 disk
+|-sda1   8:1    0   256M  0 part
+|-sda2   8:2    0 409.3G  0 part
+`-sda3   8:3    0 409.6G  0 part
+sr0     11:0    1  1011M  0 rom  /usr/lib/live/mount/medium
+user@debian:~/ashos-dev$ lsblk
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+loop0    7:0    0 687.7M  1 loop /usr/lib/live/mount/rootfs/filesystem.squashfs
+sda      8:0    0     2T  0 disk
+|-sda1   8:1    0   256M  0 part /mnt/boot/efi
+|-sda2   8:2    0 409.3G  0 part /mnt/boot
+`-sda3   8:3    0 409.6G  0 part
+sr0     11:0    1  1011M  0 rom  /usr/lib/live/mount/medium
+user@debian:~/ashos-dev$ lsblk
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+loop0    7:0    0 687.7M  1 loop /usr/lib/live/mount/rootfs/filesystem.squashfs
+sda      8:0    0     2T  0 disk
+|-sda1   8:1    0   256M  0 part /mnt/boot/efi
+|-sda2   8:2    0 409.3G  0 part /mnt/boot
+`-sda3   8:3    0 409.6G  0 part
+sr0     11:0    1  1011M  0 rom  /usr/lib/live/mount/medium
+user@debian:~/ashos-dev$
+
+

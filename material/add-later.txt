@@ -1,3 +1,22 @@
+TD insurance:
+- Adjusted quote
+- shop around
+
+- what are the days of shut down at CKDU?
+
+Bonavista Newfoundland
+
+The way would be:
+ast deploy DISTRO node#7
+
+
+-----------------
+Add debian/other grub to sda1
+mkdir /tmp/sda1
+mount /dev/sda1 /tmp/sda1
+cp -r /tmp/sda1/EFI/astOS/* /tmp/sda1/EFI/debian
+------------
+
 AshOS (Alternative/Any Snapshot Hierarchical OS)
 
 -Would Refind be better than GRUB?
@@ -9,6 +28,7 @@ name subvolumes as subvol_DEBIAN but when grub loading it rename them:
 dual-boot might not be as difficult as thought with winbtrfs
 
 refind + zfs ?
+clover installer as bootloader for ashos?
 
 NixOS + AshOS
 --- ast base-update ----> clone the node, do the update and hash it. If it works successfuly, propose to user that previous node can be removed.

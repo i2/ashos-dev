@@ -1,0 +1,31 @@
+an:~$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            966M     0  966M   0% /dev
+tmpfs           198M  576K  197M   1% /run
+/dev/sr0       1011M 1011M     0 100% /run/live/medium
+/dev/loop0      688M  688M     0 100% /run/live/rootfs/filesystem.squashfs
+tmpfs           986M  229M  757M  24% /run/live/overlay
+overlay         986M  229M  757M  24% /
+tmpfs           986M     0  986M   0% /dev/shm
+tmpfs           5.0M  4.0K  5.0M   1% /run/lock
+tmpfs           986M     0  986M   0% /tmp
+tmpfs           198M  4.0K  198M   1% /run/user/1000
+/dev/sda2       410G  1.5G  406G   1% /mnt
+/dev/sda2       410G  1.5G  406G   1% /mnt/.snapshots
+/dev/sda2       410G  1.5G  406G   1% /mnt/home
+/dev/sda2       410G  1.5G  406G   1% /mnt/var
+/dev/sda2       410G  1.5G  406G   1% /mnt/.snapshots/boot/boot-tmp
+/dev/sda2       410G  1.5G  406G   1% /mnt/.snapshots/etc/etc-tmp
+/dev/sda1       253M  7.1M  245M   3% /tmp/sda1
+user@debian:~$ lsblk
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+loop0    7:0    0 687.7M  1 loop /usr/lib/live/mount/rootfs/filesystem.squashfs
+sda      8:0    0     2T  0 disk
+|-sda1   8:1    0   256M  0 part /tmp/sda1
+|-sda2   8:2    0 409.3G  0 part /mnt/.snapshots/etc/etc-tmp
+`-sda3   8:3    0 409.6G  0 part
+sr0     11:0    1  1011M  0 rom  /usr/lib/live/mount/medium
+user@debian:~$ sudo umount /tmp/sda1
+user@debian:~$
+
+
