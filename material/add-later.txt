@@ -6,6 +6,8 @@ TD insurance:
 
 Bonavista Newfoundland
 
+how to boot from netinst
+
 The way would be:
 ast deploy DISTRO node#7
 

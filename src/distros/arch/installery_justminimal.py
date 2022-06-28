@@ -9,6 +9,8 @@ def clear():
 def to_uuid(part):
     return subprocess.check_output(f"blkid -s UUID -o value {part}", shell=True).decode('utf-8').strip()
 
+#   This function returns a tuple: (1. choice whether partitioning and formatting should happen
+#   2. Underscore plus name of distro if it should be appended to sub-volume names
 def get_multiboot(dist):
     clear()
     while True:
@@ -18,7 +20,7 @@ def get_multiboot(dist):
             return False,""
             break
         elif i == "2":
-            return True,f"_{dist}"
+            return False,f"_{dist}"
             break
         elif i == "3":
             return True,f"_{dist}"
