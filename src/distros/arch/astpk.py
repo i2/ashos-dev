@@ -41,11 +41,34 @@ def get_distro():
         return ""
 
 #   Rename grub in sda1 from default ashos to distro_ashos
-def backup_grub(p):
+def rename_ashos_grub(d, p):
     tmp_efi= subprocess.check_output("cat /dev/urandom | od -x | tr -d ' ' | head -n 1", shell=True).decode('utf-8').strip()
     os.system(f"mkdir /tmp/{tmp_efi}")
-    os.system(f"mount /dev/{p} /tmp/${tmp_efi}")
-    os.system(f"cp /tmp/${tmp_efi}/EFI/${distro}_ashos/")
+    os.system(f"mount /dev/{p} /tmp/{tmp_efi}")
+    os.system(f"mkdir /tmp/{tmp_efi}/ashos")
+    os.system(f"cp /tmp/{tmp_efi}/EFI/${d}_ashos/")
+    # DO STUFF
+    os.system(f"umount /dev/{p}")
+    #os.system(f"rm -rf /tmp/{tmp_efi}") ##if successful umount ( check result of 'echo $?' )
+
+############# BOTH WHEN INSTALLING ASHOS / UPDATING AKA DEPLOYING FROM AST, CREATE A BACKUP OF FILES
+############# sudo mv /tmp/{tmp_efi}/EFI/ashos/grub.cfg /tmp/{tmp_efi}/EFI/ashos/grub.cfg{DISTRO}
+############# sudo mv /tmp/{tmp_efi}/EFI/ashos/grubx64.efi /tmp/{tmp_efi}/EFI/ashos/grubx64.efi{DISTRO}
+############# sudo mv /tmp/{tmp_efi}/EFI/ashos/grub{NEXTDISTRO}.cfg /tmp/{tmp_efi}/EFI/ashos/grub.cfg
+############# sudo mv /tmp/{tmp_efi}/EFI/ashos/grubx64.efi{NEXTDISTRO} /tmp/{tmp_efi}/EFI/ashos/grubx64.efi
+
+#IF THE GRUB IN INSTALLER OF A DISTRO DIDN'T CREATE {THAT "REFERENCE" grub.cfg} in /dev/sda1 (for example arch doesn't -- maybe it creates it in /dev/sda2 ???? double check!)
+# CREATE IT FROM MY CACHE (either store in astpk.py or installer.py as a paragraph) and copy it over to /tmp/{tmp_efi}/EFI/ashos/ as grub.cfg
+
+def detect_previous_distro(p):
+    tmp_efi= subprocess.check_output("cat /dev/urandom | od -x | tr -d ' ' | head -n 1", shell=True).decode('utf-8').strip()
+    os.system(f"mkdir /tmp/{tmp_efi}")
+    os.system(f"mount /dev/{p} /tmp/{tmp_efi}")
+    return subprocess.check_output(['sh', f'detect-os.sh /tmp/{tmp_efi}/']).decode('utf-8').replace('"',"").strip()
+
+    # DO STUFF
+    os.system(f"umount /dev/{p}")
+    #os.system(f"rm -rf /tmp/{tmp_efi}") ##if successful umount ( check result of 'echo $?' )
 
 #   Import filesystem tree file in this function
 def import_tree_file(treename):

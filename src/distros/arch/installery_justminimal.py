@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+import astpk
 
 def clear():
     os.system("#clear")
@@ -190,6 +191,12 @@ def main(args, distro):
 #######        prev_distro = subprocess.check_output(['sh', '/usr/local/sbin/detect-os.sh /tmp/s']).decode('utf-8').replace('"',"").strip()
         
 #######        os.system(f"mv /mnt/boot/efi/ashos /mnt/boot/efi/ashos_BAK") #TODO: Get name of previous installed distro from user or use detect-os.sh
+    if choice == "3":
+        #detect name of previous distro that's mounted at default subvolume
+        astpk.detect_previous_distro(args[1])
+        pdistro = subprocess.check_output(['sh', './src/distros/detect.sh']).decode('utf-8').replace('"',"").strip()
+        astpk.rename_ashos_grub(pdistro, args[3])
+        os.system("")
     os.system(f"chroot /mnt sed -i s,Arch,AshOS,g /etc/default/grub")
     os.system(f"chroot /mnt grub-install {args[2]}")
 ###    # MAYBE do some extra operations here if multiboot?!
@@ -199,8 +206,8 @@ def main(args, distro):
 #   Copy astpk
     os.system(f"cp ./src/distros/{distro}/astpk.py /mnt/usr/bin/ast")
     os.system("chroot /mnt chmod +x /usr/sbin/ast")
-    os.system(f"cp ./src/distros/detect.sh /mnt/usr/local/sbin/detect_os.sh")
-    os.system("chroot /mnt chmod +x /usr/local/sbin/detect_os.sh")
+    os.system(f"cp ./src/distros/detect.sh /mnt/usr/bin/detect_os.sh")
+    os.system("chroot /mnt chmod +x /usr/bin/detect_os.sh")
 
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")
