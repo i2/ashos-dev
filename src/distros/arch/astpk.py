@@ -1,9 +1,5 @@
 #!/usr/bin/python3
 
-#########   In attempt to make ashos multi-distro, here are the changes I have made:
-#########   @.snapshots/rootfs ====> @.snapshots{DISTRO}/rootfs
-#########   @boot ====> @boot{DISTRO}
-
 import sys
 import ast
 import subprocess
@@ -15,7 +11,6 @@ import re
 
 args = list(sys.argv)
 distro = subprocess.check_output(['sh', '/usr/local/sbin/detect-os.sh']).decode('utf-8').replace('"',"").strip()
-DISTRO = get_distro()
 
 # TODO ------------
 # General code cleanup
@@ -41,9 +36,16 @@ DISTRO = get_distro()
 #   This function returns either empty string or underscore plus name of distro if it was appended to sub-volume names to distinguish
 def get_distro():
     if "ashos" in distro:
-        return f"_{distro}"
+        return f'_{distro.replace("_ashos","")}'
     else:
         return ""
+
+#   Rename grub in sda1 from default ashos to distro_ashos
+def backup_grub(p):
+    tmp_efi= subprocess.check_output("cat /dev/urandom | od -x | tr -d ' ' | head -n 1", shell=True).decode('utf-8').strip()
+    os.system(f"mkdir /tmp/{tmp_efi}")
+    os.system(f"mount /dev/{p} /tmp/${tmp_efi}")
+    os.system(f"cp /tmp/${tmp_efi}/EFI/${distro}_ashos/")
 
 #   Import filesystem tree file in this function
 def import_tree_file(treename):
@@ -389,7 +391,7 @@ def update_boot(snapshot):
         prepare(snapshot)
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} grub-mkconfig {part} -o /boot/grub/grub.cfg")
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i s,snapshot-chr{snapshot},snapshot-{tmp},g /boot/grub/grub.cfg")
-        os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i '0,/astOS\ Linux/s//astOS\ Linux\ snapshot\ {snapshot}/' /boot/grub/grub.cfg")
+        os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i '0,/AshOS\ Linux/s//AshOS\ Linux\ snapshot\ {snapshot}/' /boot/grub/grub.cfg")
         posttrans(snapshot)
 
 #   Chroot into snapshot
@@ -661,6 +663,7 @@ def rollback():
 
 #   Switch between /tmp deployments
 def switchtmp():
+    DISTRO = get_distro()
     mount = get_tmp()
     part = get_part()
     # This part is useless? Dumb stuff
@@ -703,9 +706,9 @@ def switchtmp():
         gconf = gconf.replace("snapshot-tmp0","snapshot-tmp")
     else:
         gconf = gconf.replace("snapshot-tmp", "snapshot-tmp0")
-    if "astOS Linux" in gconf:
+    if "AshOS Linux" in gconf:
         gconf = re.sub('\d', '', gconf)
-        gconf = gconf.replace(f"astOS Linux snapshot",f"astOS last booted deployment (snapshot {snap})")
+        gconf = gconf.replace(f"AshOS Linux snapshot",f"AshOS last booted deployment (snapshot {snap})")
     grubconf.close()
     os.system("sed -i '$ d' /etc/mnt/boot/grub/grub.cfg")
     grubconf = open("/etc/mnt/boot/grub/grub.cfg", "a")
@@ -727,9 +730,9 @@ def switchtmp():
         gconf = gconf.replace("snapshot-tmp0","snapshot-tmp")
     else:
         gconf = gconf.replace("snapshot-tmp", "snapshot-tmp0")
-    if "astOS Linux" in gconf:
+    if "AshOS Linux" in gconf:
         gconf = re.sub('\d', '', gconf)
-        gconf = gconf.replace(f"astOS Linux snapshot", f"astOS last booted deployment (snapshot {snap})")
+        gconf = gconf.replace(f"AshOS Linux snapshot", f"AshOS last booted deployment (snapshot {snap})")
     grubconf.close()
     os.system("sed -i '$ d' /.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg")
     grubconf = open("/.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg", "a")
@@ -768,6 +771,7 @@ def findnew():
 
 #   Main function
 def main(args):
+    DISTRO = get_distro()
     snapshot = get_snapshot() # Get current snapshot
     etc = snapshot
     importer = DictImporter() # Dict importer

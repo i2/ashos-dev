@@ -4,3 +4,6 @@ mount /dev/sda1 /tmp/$tmp_efi
 cp /tmp/$tmp_efi/EFI/$distro_ashos/
 
 umount /dev/sda1
+#if successful umount:
+rm -r /tmp/$tmp_efi
+

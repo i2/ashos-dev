@@ -1,3 +1,5 @@
+FOCUS IS ON EFI right now, I'll fix it for Legacy BIOS soon!
+
 TD insurance:
 - Adjusted quote
 - shop around
@@ -5,6 +7,10 @@ TD insurance:
 - what are the days of shut down at CKDU?
 
 Bonavista Newfoundland
+
+#########   In attempt to make ashos multi-distro, here are the changes I have made in astpk.py:
+#########   @.snapshots/rootfs ====> @.snapshots{DISTRO}/rootfs
+#########   @boot ====> @boot{DISTRO}
 
 how to boot from netinst
 
@@ -39,6 +45,8 @@ NixOS + AshOS
 
 curl -L -O https://bit.ly/astos042022
 tar xvf astos042022
+
+https://github.com/i2/ashos-dev/archive/refs/tags/v0.5.tar.gz
 
 As of june 23, 2022, the best version of my ashos installer for justminimal (my new vision for the project) is: installery_justminimal.py
 

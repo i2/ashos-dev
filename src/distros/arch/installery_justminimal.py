@@ -15,15 +15,16 @@ def get_multiboot(dist):
     clear()
     while True:
         print("Please choose one of the following:\n1. Single OS installation\n2. Initiate a multi-boot ashos setup\n3. Adding to an already installed ashos")
+        print(f"Please be aware choosing option 1 and 2 will wipe {args[1]}")
         i = input("> ")
         if i == "1":
-            return False,""
+            return i,""
             break
         elif i == "2":
-            return False,f"_{dist}"
+            return i,f"_{dist}"
             break
         elif i == "3":
-            return True,f"_{dist}"
+            return i,f"_{dist}"
             break
         else:
             print("Invalid choice!")
@@ -89,11 +90,11 @@ def set_password(u):
 
 def main(args, distro):
     print("Welcome to the astOS installer!\n\n\n\n\n")
-    multiboot, DISTRO = get_multiboot(distro)
+    choice, DISTRO = get_multiboot(distro)
     
 #   Partition and format
-    if not multiboot:
-        os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}")
+    if choice != "3":
+        os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}") ###DELETE THIS LINE WHEN PRODUCTION READY
         os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
     os.system("pacman -Syy --noconfirm archlinux-keyring")
 
@@ -110,7 +111,8 @@ def main(args, distro):
     hostname = get_hostname()
 
 #   Mount and create necessary sub-volumes and directories
-    if not multiboot:
+    #if not multiboot: #choice = 1 or 2
+    if choice != "3":
         os.system(f"sudo mount {args[1]} /mnt")
     else:
         os.system(f"sudo mount -o subvolid=5 {args[1]} /mnt")
@@ -182,6 +184,12 @@ def main(args, distro):
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | tee /mnt/.snapshots/ast/fstree")
 
 #   GRUB
+#######    if multiboot: # if there is already a grub efi/cfg in /dev/sda1 #TODO for bios systems
+        #create tmp dir for mounting /dev/sda2 #(assumingly has OS and default subvol is the last OS booting)
+        
+#######        prev_distro = subprocess.check_output(['sh', '/usr/local/sbin/detect-os.sh /tmp/s']).decode('utf-8').replace('"',"").strip()
+        
+#######        os.system(f"mv /mnt/boot/efi/ashos /mnt/boot/efi/ashos_BAK") #TODO: Get name of previous installed distro from user or use detect-os.sh
     os.system(f"chroot /mnt sed -i s,Arch,AshOS,g /etc/default/grub")
     os.system(f"chroot /mnt grub-install {args[2]}")
 ###    # MAYBE do some extra operations here if multiboot?!
@@ -235,17 +243,10 @@ def main(args, distro):
 
 #   Unmount everything
     os.system("sudo umount -R /mnt")
-    os.system(f"sudo mount {args[1]} -o subvolid=0 /mnt")
+    os.system(f"sudo mount {args[1]} -o subvolid=0 /mnt") # subvolid=5 for any cases?
     os.system(f"sudo btrfs sub del /mnt/@{DISTRO}")
     os.system("sudo umount -R /mnt")
 
-#    os.system("umount -R /mnt")
-#    print("mount {args[1]} -o subvolid=5 /mnt")
-#    os.system(f"mount {args[1]} -o subvolid=5 /mnt")
-#    print("btrfs sub del /mnt/@{DISTRO}")
-#    os.system(f"btrfs sub del /mnt/@{DISTRO}")
-#    print("umount -R /mnt")
-#    os.system("umount -R /mnt")
 #    clear()
 #    print("Installation complete")
 #    print("You can reboot now :)")
