@@ -1,5 +1,9 @@
 #!/usr/bin/python3
 
+#########   In attempt to make ashos multi-distro, here are the changes I have made:
+#########   @.snapshots/rootfs ====> @.snapshots{DISTRO}/rootfs
+#########   @boot ====> @boot{DISTRO}
+
 import sys
 import ast
 import subprocess
@@ -11,6 +15,7 @@ import re
 
 args = list(sys.argv)
 distro = subprocess.check_output(['sh', '/usr/local/sbin/detect-os.sh']).decode('utf-8').replace('"',"").strip()
+DISTRO = get_distro()
 
 # TODO ------------
 # General code cleanup
@@ -32,6 +37,13 @@ distro = subprocess.check_output(['sh', '/usr/local/sbin/detect-os.sh']).decode(
 # /usr/share/ast == files that store current snapshot info
 # /usr/share/ast/db == package database
 # /var/lib/ast(/fstree) == ast files, stores fstree, symlink to /.snapshots/ast
+
+#   This function returns either empty string or underscore plus name of distro if it was appended to sub-volume names to distinguish
+def get_distro():
+    if "ashos" in distro:
+        return f"_{distro}"
+    else:
+        return ""
 
 #   Import filesystem tree file in this function
 def import_tree_file(treename):
@@ -653,25 +665,25 @@ def switchtmp():
     part = get_part()
     # This part is useless? Dumb stuff
     os.system(f"mkdir -p /etc/mnt/boot >/dev/null 2>&1")
-    os.system(f"mount {part} -o subvol=@boot /etc/mnt/boot") # Mount boot partition for writing
+    os.system(f"mount {part} -o subvol=@boot{DISTRO} /etc/mnt/boot") # Mount boot partition for writing
     if "tmp0" in mount:
-        os.system("cp --reflink=auto -r /.snapshots/rootfs/snapshot-tmp/boot/* /etc/mnt/boot")
-        os.system("sed -i 's,@.snapshots/rootfs/snapshot-tmp0,@.snapshots/rootfs/snapshot-tmp,g' /etc/mnt/boot/grub/grub.cfg") # Overwrite grub config boot subvolume
-        os.system("sed -i 's,@.snapshots/rootfs/snapshot-tmp0,@.snapshots/rootfs/snapshot-tmp,g' /.snapshots/rootfs/snapshot-tmp/boot/grub/grub.cfg")
-        os.system("sed -i 's,@.snapshots/rootfs/snapshot-tmp0,@.snapshots/rootfs/snapshot-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab") # Write fstab for new deployment
-        os.system("sed -i 's,@.snapshots/etc/etc-tmp0,@.snapshots/etc/etc-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
-        os.system("sed -i 's,@.snapshots/boot/boot-tmp0,@.snapshots/boot/boot-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
+        os.system("cp --reflink=auto -r /.snapshots/rootfs/snapshot-tmp/boot/* /etc/mnt/boot")  ######REZA WHATABOUTTHIS?
+        os.system(f"sed -i 's,@.snapshots{DISTRO}/rootfs/snapshot-tmp0,@.snapshots{DISTRO}/rootfs/snapshot-tmp,g' /etc/mnt/boot/grub/grub.cfg") # Overwrite grub config boot subvolume
+        os.system(f"sed -i 's,@.snapshots{DISTRO}/rootfs/snapshot-tmp0,@.snapshots{DISTRO}/rootfs/snapshot-tmp,g' /.snapshots/rootfs/snapshot-tmp/boot/grub/grub.cfg")
+        os.system(f"sed -i 's,@.snapshots{DISTRO}/rootfs/snapshot-tmp0,@.snapshots{DISTRO}/rootfs/snapshot-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab") # Write fstab for new deployment
+        os.system(f"sed -i 's,@.snapshots{DISTRO}/etc/etc-tmp0,@.snapshots{DISTRO}/etc/etc-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
+        os.system(f"sed -i 's,@.snapshots{DISTRO}/boot/boot-tmp0,@.snapshots{DISTRO}/boot/boot-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
         sfile = open("/.snapshots/rootfs/snapshot-tmp0/usr/share/ast/snap","r")
         snap = sfile.readline()
         snap = snap.replace(" ", "")
         sfile.close()
     else:
         os.system("cp --reflink=auto -r /.snapshots/rootfs/snapshot-tmp0/boot/* /etc/mnt/boot")
-        os.system("sed -i 's,@.snapshots/rootfs/snapshot-tmp,@.snapshots/rootfs/snapshot-tmp0,g' /etc/mnt/boot/grub/grub.cfg")
-        os.system("sed -i 's,@.snapshots/rootfs/snapshot-tmp,@.snapshots/rootfs/snapshot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg")
-        os.system("sed -i 's,@.snapshots/rootfs/snapshot-tmp,@.snapshots/rootfs/snapshot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
-        os.system("sed -i 's,@.snapshots/etc/etc-tmp,@.snapshots/etc/etc-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
-        os.system("sed -i 's,@.snapshots/boot/boot-tmp,@.snapshots/boot/boot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
+        os.system(f"sed -i 's,@.snapshots{DISTRO}/rootfs/snapshot-tmp,@.snapshots{DISTRO}/rootfs/snapshot-tmp0,g' /etc/mnt/boot/grub/grub.cfg")
+        os.system(f"sed -i 's,@.snapshots{DISTRO}/rootfs/snapshot-tmp,@.snapshots{DISTRO}/rootfs/snapshot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg")
+        os.system(f"sed -i 's,@.snapshots{DISTRO}/rootfs/snapshot-tmp,@.snapshots{DISTRO}/rootfs/snapshot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
+        os.system(f"sed -i 's,@.snapshots{DISTRO}/etc/etc-tmp,@.snapshots{DISTRO}/etc/etc-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
+        os.system(f"sed -i 's,@.snapshots{DISTRO}/boot/boot-tmp,@.snapshots{DISTRO}/boot/boot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
         sfile = open("/.snapshots/rootfs/snapshot-tmp/usr/share/ast/snap", "r")
         snap = sfile.readline()
         snap = snap.replace(" ","")
