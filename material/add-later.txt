@@ -1,3 +1,7 @@
+CANGE all /* to /. and prefereablt use cp -a
+
+
+
 FOCUS IS ON EFI right now, I'll fix it for Legacy BIOS soon!
 
 TD insurance:

@@ -10,7 +10,7 @@ import os
 import re
 
 args = list(sys.argv)
-distro = subprocess.check_output(['sh', '/usr/local/sbin/detect-os.sh']).decode('utf-8').replace('"',"").strip()
+distro = subprocess.check_output(['sh', '/usr/local/sbin/detect_os.sh']).decode('utf-8').replace('"',"").strip()
 
 # TODO ------------
 # General code cleanup
@@ -40,15 +40,18 @@ def get_distro():
     else:
         return ""
 
-#   Rename grub in sda1 from default ashos to distro_ashos
-def rename_ashos_grub(d, p):
+#   Rename grub in sda1 from default ashos to pdistro_ashos
+def rename_ashos_grub(p, pd):
     tmp_efi= subprocess.check_output("cat /dev/urandom | od -x | tr -d ' ' | head -n 1", shell=True).decode('utf-8').strip()
     os.system(f"mkdir /tmp/{tmp_efi}")
     os.system(f"mount /dev/{p} /tmp/{tmp_efi}")
-    os.system(f"mkdir /tmp/{tmp_efi}/ashos")
-    os.system(f"cp /tmp/{tmp_efi}/EFI/${d}_ashos/")
-    # DO STUFF
-    os.system(f"umount /dev/{p}")
+    #os.system(f"mkdir /tmp/{tmp_efi}/ashos")
+    #os.system(f"cp -r /tmp/{tmp_efi}/EFI/${d}_ashos/")
+
+    #os.system(f"mkdir /tmp/{tmp_efi}/ashos_{pd}") #THIS IS REDUNDANT as cp -a creates the dest folder even if doesn't exist
+    #os.system(f"cp -a /tmp/{tmp_efi}/EFI/ashos/. /tmp/{tmp_efi}/EFI/ashos_{pd}/")
+    os.system(f"cp -a /tmp/{tmp_efi}/EFI/ashos /tmp/{tmp_efi}/EFI/ashos_{pd}")
+    os.system(f"umount /tmp/{tmp_efi}")
     #os.system(f"rm -rf /tmp/{tmp_efi}") ##if successful umount ( check result of 'echo $?' )
 
 ############# BOTH WHEN INSTALLING ASHOS / UPDATING AKA DEPLOYING FROM AST, CREATE A BACKUP OF FILES
@@ -61,13 +64,32 @@ def rename_ashos_grub(d, p):
 # CREATE IT FROM MY CACHE (either store in astpk.py or installer.py as a paragraph) and copy it over to /tmp/{tmp_efi}/EFI/ashos/ as grub.cfg
 
 def detect_previous_distro(p):
+    tmp_sda2 = subprocess.check_output("cat /dev/urandom | od -x | tr -d ' ' | head -n 1", shell=True).decode('utf-8').strip()
+    os.system(f"mkdir /tmp/{tmp_sda2}")
+    os.system(f"mount /dev/{p} /tmp/{tmp_sda2}")
+    pd = subprocess.check_output(['sh', f'detect_os.sh /tmp/{tmp_sda2}/']).decode('utf-8').replace('"',"").strip()
+    os.system(f"umount /tmp/{tmp_sda2}")
+    return pd
+    #os.system(f"rm -rf /tmp/{tmp_sda2}") ##if successful umount ( check result of 'echo $?' )
+
+def rename_distro_subvolumes(p):  ### Maybe can reuse ast functions from cuberjan3? #potentially receive 3 arguments: partition, string1 (suffix right now) and string2 (desired suffix)
+     tmp_sda2 = subprocess.check_output("cat /dev/urandom | od -x | tr -d ' ' | head -n 1", shell=True).decode('utf-8').strip()
+###     os.system(f"mkdir /tmp/{tmp_sda2}")
+###     os.system(f"mount -o subvolid=5 /dev/{p} /tmp/{tmp_sda2}")
+        for i in ["@.snapshots", "@boot", "@etc", "@home", "var"]:
+            os.system(f'mv "/tmp/{tmp_sda2}/{i}" "/tmp/{tmp_sda2}/{i}_{d}"')
+###     pd = subprocess.check_output(['sh', f'detect_os.sh /tmp/{tmp_sda2}/']).decode('utf-8').replace('"',"").strip()
+###     os.system(f"umount /tmp/{tmp_sda2}")
+###     return pd
+    #os.system(f"rm -rf /tmp/{tmp_sda2}") ##if successful umount ( check result of 'echo $?' )
+
+def rename_distro_bare_grub(p, currd): # In case someone is installing on a system that was previously chosen option 1 but changed opinion
     tmp_efi= subprocess.check_output("cat /dev/urandom | od -x | tr -d ' ' | head -n 1", shell=True).decode('utf-8').strip()
     os.system(f"mkdir /tmp/{tmp_efi}")
     os.system(f"mount /dev/{p} /tmp/{tmp_efi}")
-    return subprocess.check_output(['sh', f'detect-os.sh /tmp/{tmp_efi}/']).decode('utf-8').replace('"',"").strip()
-
-    # DO STUFF
-    os.system(f"umount /dev/{p}")
+    os.system(f"sed -i 's/@boot\/grub/@boot_arch\/grub/' /tmp/{tmp_efi}/EFI/ashos/grub.cfg")
+    # IS THIS A GOOD PLACE TO COPY GRUBX64.EFI AND GRUB.CFG TO /tmp/{tmp_efi} ?
+    os.system(f"umount /tmp/{tmp_efi}")
     #os.system(f"rm -rf /tmp/{tmp_efi}") ##if successful umount ( check result of 'echo $?' )
 
 #   Import filesystem tree file in this function
@@ -691,25 +713,25 @@ def switchtmp():
     part = get_part()
     # This part is useless? Dumb stuff
     os.system(f"mkdir -p /etc/mnt/boot >/dev/null 2>&1")
-    os.system(f"mount {part} -o subvol=@boot{DISTRO} /etc/mnt/boot") # Mount boot partition for writing
+    os.system(f"mount {part} -o subvol=@boot{udistro} /etc/mnt/boot") # Mount boot partition for writing
     if "tmp0" in mount:
         os.system("cp --reflink=auto -r /.snapshots/rootfs/snapshot-tmp/boot/* /etc/mnt/boot")  ######REZA WHATABOUTTHIS?
-        os.system(f"sed -i 's,@.snapshots{DISTRO}/rootfs/snapshot-tmp0,@.snapshots{DISTRO}/rootfs/snapshot-tmp,g' /etc/mnt/boot/grub/grub.cfg") # Overwrite grub config boot subvolume
-        os.system(f"sed -i 's,@.snapshots{DISTRO}/rootfs/snapshot-tmp0,@.snapshots{DISTRO}/rootfs/snapshot-tmp,g' /.snapshots/rootfs/snapshot-tmp/boot/grub/grub.cfg")
-        os.system(f"sed -i 's,@.snapshots{DISTRO}/rootfs/snapshot-tmp0,@.snapshots{DISTRO}/rootfs/snapshot-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab") # Write fstab for new deployment
-        os.system(f"sed -i 's,@.snapshots{DISTRO}/etc/etc-tmp0,@.snapshots{DISTRO}/etc/etc-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
-        os.system(f"sed -i 's,@.snapshots{DISTRO}/boot/boot-tmp0,@.snapshots{DISTRO}/boot/boot-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
+        os.system(f"sed -i 's,@.snapshots{udistro}/rootfs/snapshot-tmp0,@.snapshots{udistro}/rootfs/snapshot-tmp,g' /etc/mnt/boot/grub/grub.cfg") # Overwrite grub config boot subvolume
+        os.system(f"sed -i 's,@.snapshots{udistro}/rootfs/snapshot-tmp0,@.snapshots{udistro}/rootfs/snapshot-tmp,g' /.snapshots/rootfs/snapshot-tmp/boot/grub/grub.cfg")
+        os.system(f"sed -i 's,@.snapshots{udistro}/rootfs/snapshot-tmp0,@.snapshots{udistro}/rootfs/snapshot-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab") # Write fstab for new deployment
+        os.system(f"sed -i 's,@.snapshots{udistro}/etc/etc-tmp0,@.snapshots{udistro}/etc/etc-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
+        os.system(f"sed -i 's,@.snapshots{udistro}/boot/boot-tmp0,@.snapshots{udistro}/boot/boot-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
         sfile = open("/.snapshots/rootfs/snapshot-tmp0/usr/share/ast/snap","r")
         snap = sfile.readline()
         snap = snap.replace(" ", "")
         sfile.close()
     else:
         os.system("cp --reflink=auto -r /.snapshots/rootfs/snapshot-tmp0/boot/* /etc/mnt/boot")
-        os.system(f"sed -i 's,@.snapshots{DISTRO}/rootfs/snapshot-tmp,@.snapshots{DISTRO}/rootfs/snapshot-tmp0,g' /etc/mnt/boot/grub/grub.cfg")
-        os.system(f"sed -i 's,@.snapshots{DISTRO}/rootfs/snapshot-tmp,@.snapshots{DISTRO}/rootfs/snapshot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg")
-        os.system(f"sed -i 's,@.snapshots{DISTRO}/rootfs/snapshot-tmp,@.snapshots{DISTRO}/rootfs/snapshot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
-        os.system(f"sed -i 's,@.snapshots{DISTRO}/etc/etc-tmp,@.snapshots{DISTRO}/etc/etc-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
-        os.system(f"sed -i 's,@.snapshots{DISTRO}/boot/boot-tmp,@.snapshots{DISTRO}/boot/boot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
+        os.system(f"sed -i 's,@.snapshots{udistro}/rootfs/snapshot-tmp,@.snapshots{udistro}/rootfs/snapshot-tmp0,g' /etc/mnt/boot/grub/grub.cfg")
+        os.system(f"sed -i 's,@.snapshots{udistro}/rootfs/snapshot-tmp,@.snapshots{udistro}/rootfs/snapshot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg")
+        os.system(f"sed -i 's,@.snapshots{udistro}/rootfs/snapshot-tmp,@.snapshots{udistro}/rootfs/snapshot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
+        os.system(f"sed -i 's,@.snapshots{udistro}/etc/etc-tmp,@.snapshots{udistro}/etc/etc-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
+        os.system(f"sed -i 's,@.snapshots{udistro}/boot/boot-tmp,@.snapshots{udistro}/boot/boot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
         sfile = open("/.snapshots/rootfs/snapshot-tmp/usr/share/ast/snap", "r")
         snap = sfile.readline()
         snap = snap.replace(" ","")
@@ -794,7 +816,7 @@ def findnew():
 
 #   Main function
 def main(args):
-    DISTRO = get_distro()
+    udistro = get_distro()
     snapshot = get_snapshot() # Get current snapshot
     etc = snapshot
     importer = DictImporter() # Dict importer

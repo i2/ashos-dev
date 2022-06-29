@@ -91,8 +91,8 @@ def set_password(u):
 
 def main(args, distro):
     print("Welcome to the astOS installer!\n\n\n\n\n")
-    choice, DISTRO = get_multiboot(distro)
-    
+    choice, udistro = get_multiboot(distro)
+
 #   Partition and format
     if choice != "3":
         os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}") ###DELETE THIS LINE WHEN PRODUCTION READY
@@ -100,7 +100,7 @@ def main(args, distro):
     os.system("pacman -Syy --noconfirm archlinux-keyring")
 
 #   Define variables
-    btrdirs = [f"@{DISTRO}",f"@.snapshots{DISTRO}",f"@home{DISTRO}",f"@var{DISTRO}",f"@etc{DISTRO}",f"@boot{DISTRO}"]
+    btrdirs = [f"@{udistro}",f"@.snapshots{udistro}",f"@home{udistro}",f"@var{udistro}",f"@etc{udistro}",f"@boot{udistro}"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]
     astpart = to_uuid(args[1])
     if os.path.exists("/sys/firmware/efi"):
@@ -139,9 +139,9 @@ def main(args, distro):
         os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
 
 #   Update fstab
-    os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{DISTRO},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
+    os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{udistro},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
     for mntdir in mntdirs:
-        os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}{DISTRO},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
+        os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}{udistro},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
     if efi:
         os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | tee -a /mnt/etc/fstab")
@@ -166,9 +166,9 @@ def main(args, distro):
     os.system(f"chroot /mnt ln -sf {tz} /etc/localtime")
     os.system("chroot /mnt hwclock --systohc")
 
-    os.system(f"sudo sed -i '0,/@{DISTRO}/ s,@,@{DISTRO}.snapshots/rootfs/snapshot-tmp,' /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@boot{DISTRO}/ s,@boot{DISTRO},@.snapshots{DISTRO}/boot/boot-tmp,' /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@etc{DISTRO}/ s,@etc{DISTRO},@.snapshots{DISTRO}/etc/etc-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@{udistro}/ s,@,@{udistro}.snapshots/rootfs/snapshot-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@boot{udistro}/ s,@boot{udistro},@.snapshots{udistro}/boot/boot-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@etc{udistro}/ s,@etc{udistro},@.snapshots{udistro}/etc/etc-tmp,' /mnt/etc/fstab")
 
     os.system("mkdir -p /mnt/.snapshots/ast/snapshots")
     os.system("chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
@@ -187,26 +187,27 @@ def main(args, distro):
 #   GRUB
 #######    if multiboot: # if there is already a grub efi/cfg in /dev/sda1 #TODO for bios systems
         #create tmp dir for mounting /dev/sda2 #(assumingly has OS and default subvol is the last OS booting)
-        
-#######        prev_distro = subprocess.check_output(['sh', '/usr/local/sbin/detect-os.sh /tmp/s']).decode('utf-8').replace('"',"").strip()
-        
-#######        os.system(f"mv /mnt/boot/efi/ashos /mnt/boot/efi/ashos_BAK") #TODO: Get name of previous installed distro from user or use detect-os.sh
-    if choice == "3":
-        #detect name of previous distro that's mounted at default subvolume
-        astpk.detect_previous_distro(args[1])
-        pdistro = subprocess.check_output(['sh', './src/distros/detect.sh']).decode('utf-8').replace('"',"").strip()
-        astpk.rename_ashos_grub(pdistro, args[3])
-        os.system("")
+
+#######        prev_distro = subprocess.check_output(['sh', '/usr/local/sbin/detect_os.sh /tmp/s']).decode('utf-8').replace('"',"").strip()
+
+#######        os.system(f"mv /mnt/boot/efi/ashos /mnt/boot/efi/ashos_BAK") #TODO: Get name of previous installed distro from user or use detect_os.sh
+    if choice == "3":   # COULD BE BETTER TO CHECK FOR EXISTENCE OF 'ashos' in /dev/sda1
+        print("#detect name of previous distro that's mounted at default subvolume")
+        pdistro = astpk.detect_previous_distro(args[1])
+        print(f"name of previous default distro is: {pdistro}")
+        #pdistro = subprocess.check_output(['sh', './src/distros/detect_os.sh']).decode('utf-8').replace('"',"").strip()
+        print("rename ashos grub")
+        astpk.rename_ashos_grub(args[3], pdistro)
     os.system(f"chroot /mnt sed -i s,Arch,AshOS,g /etc/default/grub")
     os.system(f"chroot /mnt grub-install {args[2]}")
 ###    # MAYBE do some extra operations here if multiboot?!
     os.system(f"chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
-    os.system(f"sudo sed -i '0,/subvol=@{DISTRO}/s,subvol=@{DISTRO},subvol=@.snapshots{DISTRO}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
+    os.system(f"sudo sed -i '0,/subvol=@{udistro}/s,subvol=@{udistro},subvol=@.snapshots{udistro}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
 
 #   Copy astpk
     os.system(f"cp ./src/distros/{distro}/astpk.py /mnt/usr/bin/ast")
     os.system("chroot /mnt chmod +x /usr/sbin/ast")
-    os.system(f"cp ./src/distros/detect.sh /mnt/usr/bin/detect_os.sh")
+    os.system(f"cp ./src/distros/detect_os.sh /mnt/usr/bin/detect_os.sh")
     os.system("chroot /mnt chmod +x /usr/bin/detect_os.sh")
 
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
@@ -234,14 +235,19 @@ def main(args, distro):
     os.system("rm -rf /mnt/root/*")
     os.system("rm -rf /mnt/tmp/*")
 
+###    # Copy GOOD grub.cfg (the reference one) and maybe grubx64.efi from sda2 to sda1
+### os.system(f"sed -i 's/UUID/{to_uuid(args[1])}/' -i 's/BOOT/boot{udistro}/' /mnt/boot/efi/EFI/ashos/grub.cfg") #MAKE SURE THIS IS THE ONE IN /dev/sda1 not sda2
+### os.system("cp /mnt/boot/e /mnt/boot/efi/EFI/ashos/ "
+###
+
 #   Copy boot and etc from snapshot's tmp to common
     if efi:
         os.system("umount /mnt/boot/efi")
     os.system("umount /mnt/boot")
-    os.system(f"mount {args[1]} -o subvol=@boot{DISTRO},compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp")
+    os.system(f"mount {args[1]} -o subvol=@boot{udistro},compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp")
     os.system("cp --reflink=auto -r /mnt/.snapshots/boot/boot-tmp/* /mnt/boot")
     os.system("umount /mnt/etc")
-    os.system(f"mount {args[1]} -o subvol=@etc{DISTRO},compress=zstd,noatime /mnt/.snapshots/etc/etc-tmp")
+    os.system(f"mount {args[1]} -o subvol=@etc{udistro},compress=zstd,noatime /mnt/.snapshots/etc/etc-tmp")
     os.system("cp --reflink=auto -r /mnt/.snapshots/etc/etc-tmp/* /mnt/etc")
 
     os.system("cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/* /mnt/.snapshots/rootfs/snapshot-tmp/boot")
@@ -251,7 +257,7 @@ def main(args, distro):
 #   Unmount everything
     os.system("sudo umount -R /mnt")
     os.system(f"sudo mount {args[1]} -o subvolid=0 /mnt") # subvolid=5 for any cases?
-    os.system(f"sudo btrfs sub del /mnt/@{DISTRO}")
+    os.system(f"sudo btrfs sub del /mnt/@{udistro}")
     os.system("sudo umount -R /mnt")
 
 #    clear()
