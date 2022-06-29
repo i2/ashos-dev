@@ -92,18 +92,14 @@ def main(args, distro):
     multiboot, DISTRO = get_multiboot(distro)
     
 #   Partition and format
-    #PR29 os.system(f"/usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
     if not multiboot:
         os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}")
         os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
     os.system("pacman -Syy --noconfirm archlinux-keyring")
 
 #   Define variables
-    #btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
     btrdirs = [f"@{DISTRO}",f"@.snapshots{DISTRO}",f"@home{DISTRO}",f"@var{DISTRO}",f"@etc{DISTRO}",f"@boot{DISTRO}"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]
-    #mntdirs = [f'"",".snapshots{DISTRO}","home{DISTRO}","var{DISTRO}","etc{DISTRO}","boot{DISTRO}"']
-    #PR29 mntdirs_n = mntdirs[1:]
     astpart = to_uuid(args[1])
     if os.path.exists("/sys/firmware/efi"):
         efi = True
@@ -114,7 +110,6 @@ def main(args, distro):
     hostname = get_hostname()
 
 #   Mount and create necessary sub-volumes and directories
-    #os.system(f"mount {args[1]} /mnt")
     if not multiboot:
         os.system(f"sudo mount {args[1]} /mnt")
     else:
@@ -122,10 +117,7 @@ def main(args, distro):
     for btrdir in btrdirs:
         os.system(f"btrfs sub create /mnt/{btrdir}")
     os.system("umount /mnt")
-    #mntdirs_n = mntdirs #PR29
-    #os.system(f"mount {args[1]} -o subvol=@{DISTRO},compress=zstd,noatime /mnt")
     for mntdir in mntdirs:
-        #os.system(f"mkdir /mnt/{mntdir}") #before PR29 (I add -p to remove the nagging that /mnt exists)
         os.system(f"mkdir -p /mnt/{mntdir}")
         os.system(f"mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
     for i in ("tmp", "root"):
@@ -137,7 +129,7 @@ def main(args, distro):
         os.system(f"mount {args[3]} /mnt/boot/efi")
 
 #   Install anytree and necessary packages in chroot
-    #os.system("pacstrap /mnt base linux linux-firmware nano python3 python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo os-prober")
+    os.system("pacstrap /mnt base linux linux-firmware nano python3 python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo os-prober")
     if efi:
         os.system("pacstrap /mnt efibootmgr")
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
@@ -217,11 +209,9 @@ def main(args, distro):
     os.system("btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-0")
     os.system("btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-0")
 
-    print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxecho '{astpart}' >> /mnt/.snapshots/ast/part") #PR29
     os.system(f"echo '{astpart}' | tee /mnt/.snapshots/ast/part")
 
     os.system("btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
-    print("chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
     os.system("chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
 
     os.system("cp -r /mnt/root/. /mnt/.snapshots/root/")
@@ -244,14 +234,19 @@ def main(args, distro):
     os.system("cp --reflink=auto -r /mnt/.snapshots/var/var-0/* /mnt/.snapshots/rootfs/snapshot-tmp/var")
 
 #   Unmount everything
-    os.system("umount -R /mnt")
-    print("mount {args[1]} -o subvolid=5 /mnt")
-    os.system(f"mount {args[1]} -o subvolid=5 /mnt")
-    print("btrfs sub del /mnt/@{DISTRO}")
-    os.system(f"btrfs sub del /mnt/@{DISTRO}")
-    print("umount -R /mnt")
-    os.system("umount -R /mnt")
-    clear()
-    print("Installation complete")
-    print("You can reboot now :)")
+    os.system("sudo umount -R /mnt")
+    os.system(f"sudo mount {args[1]} -o subvolid=0 /mnt")
+    os.system(f"sudo btrfs sub del /mnt/@{DISTRO}")
+    os.system("sudo umount -R /mnt")
+
+#    os.system("umount -R /mnt")
+#    print("mount {args[1]} -o subvolid=5 /mnt")
+#    os.system(f"mount {args[1]} -o subvolid=5 /mnt")
+#    print("btrfs sub del /mnt/@{DISTRO}")
+#    os.system(f"btrfs sub del /mnt/@{DISTRO}")
+#    print("umount -R /mnt")
+#    os.system("umount -R /mnt")
+#    clear()
+#    print("Installation complete")
+#    print("You can reboot now :)")
 
