@@ -163,13 +163,11 @@ def main(args, distro):
     os.system(f"echo 'deb [trusted=yes] http://www.deb-multimedia.org {RELEASE} main' | sudo tee -a /mnt/etc/apt/sources.list.d/multimedia.list >/dev/null")
     os.system("sudo chroot /mnt apt-get update -y -oAcquire::AllowInsecureRepositories=true")
     os.system("sudo chroot /mnt apt-get install -y deb-multimedia-keyring --allow-unauthenticated")
-    os.system("sudo chroot /mnt apt-get install -y python3-anytree network-manager btrfs-progs dhcpcd5 locales sudo") #PR29
+    os.system("sudo chroot /mnt apt-get install -y python3-anytree network-manager btrfs-progs dhcpcd5 locales sudo os-prober") #PR29
     if efi:
         os.system("sudo chroot /mnt apt-get install -y grub-efi")
     else:
         os.system("sudo chroot /mnt apt-get install -y grub-pc")
-    if multiboot:
-        os.system("sudo chroot /mnt apt-get install -y os-proer")
 
 #   Update fstab
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{DISTRO},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
@@ -189,6 +187,7 @@ def main(args, distro):
     os.system(f"sed -i '/^NAME/ s/Debian/Debian (ashos)/' /mnt/etc/os-release")
     os.system(f"sed -i '/PRETTY_NAME/ s/Debian/Debian (ashos)/' /mnt/etc/os-release")
     os.system(f"sed -i '/^ID/ s/debian/debian_ashos/' /mnt/etc/os-release")
+    #os.system("echo 'HOME_URL=\"https://github.com/astos/astos\"' | tee -a /mnt/etc/os-release")
 
 #   Update hostname, locales and timezone
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
@@ -213,7 +212,7 @@ def main(args, distro):
     create_user(username)
     set_password(username)
 
-    #PR29 to make install test faster will revert later### os.system("sudo chroot /mnt systemctl enable NetworkManager")
+    os.system("sudo chroot /mnt systemctl enable NetworkManager")
 
 #   Initialize fstree
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
@@ -221,7 +220,7 @@ def main(args, distro):
 #   GRUB
     os.system(f"sudo chroot /mnt sed -i s,Debian,AshOS,g /etc/default/grub")
     os.system(f"sudo chroot /mnt grub-install {args[2]}")
-    # MAYBE do some extra operations here if multiboot?!
+###    # MAYBE do some extra operations here if multiboot?!
     os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system(f"sudo sed -i '0,/subvol=@{DISTRO}/s,subvol=@{DISTRO},subvol=@.snapshots{DISTRO}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
 

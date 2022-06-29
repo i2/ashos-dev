@@ -138,8 +138,6 @@ def main(args, distro):
 
 #   Install anytree and necessary packages in chroot
     #os.system("pacstrap /mnt base linux linux-firmware nano python3 python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo os-prober")
-    #os.system("pacstrap /mnt base linux nano python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo os-prober")
-    os.system("pacstrap /mnt base linux nano python-anytree btrfs-progs grub")
     if efi:
         os.system("pacstrap /mnt efibootmgr")
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
@@ -194,6 +192,7 @@ def main(args, distro):
 #   GRUB
     os.system(f"chroot /mnt sed -i s,Arch,AshOS,g /etc/default/grub")
     os.system(f"chroot /mnt grub-install {args[2]}")
+###    # MAYBE do some extra operations here if multiboot?!
     os.system(f"chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system(f"sudo sed -i '0,/subvol=@{DISTRO}/s,subvol=@{DISTRO},subvol=@.snapshots{DISTRO}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
 
