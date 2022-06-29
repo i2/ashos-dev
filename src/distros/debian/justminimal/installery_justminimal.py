@@ -9,6 +9,8 @@ def clear():
 def to_uuid(part):
     return subprocess.check_output(f"sudo blkid -s UUID -o value {part}", shell=True).decode('utf-8').strip()
 
+#   This function returns a tuple: (1. choice whether partitioning and formatting should happen
+#   2. Underscore plus name of distro if it should be appended to sub-volume names
 def get_multiboot(dist):
     clear()
     while True:
@@ -18,7 +20,7 @@ def get_multiboot(dist):
             return False,""
             break
         elif i == "2":
-            return True,f"_{dist}"
+            return False,f"_{dist}"
             break
         elif i == "3":
             return True,f"_{dist}"
@@ -127,12 +129,12 @@ def main(args, distro):
     for btrdir in btrdirs:
         os.system(f"sudo btrfs sub create /mnt/{btrdir}")
     os.system("sudo umount /mnt")
-    mntdirs_n = mntdirs #PR29
+    #mntdirs_n = mntdirs #PR29
     #os.system(f"sudo mount {args[1]} -o subvol=@{DISTRO},compress=zstd,noatime /mnt")  #PR 28
-    for mntdir in mntdirs_n:
+    for mntdir in mntdirs:
         #os.system(f"sudo mkdir /mnt/{mntdir}") #before PR29 (I add -p to remove the nagging that /mnt exists)
         os.system(f"sudo mkdir -p /mnt/{mntdir}")
-        os.system(f"sudo mount {args[1]} -o subvol={btrdirs[mntdirs_n.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
+        os.system(f"sudo mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
     for i in ("tmp", "root"):
         os.system(f"mkdir -p /mnt/{i}")
     for i in ("ast", "boot", "etc", "root", "rootfs", "tmp", "var"):
@@ -161,17 +163,17 @@ def main(args, distro):
     os.system(f"echo 'deb [trusted=yes] http://www.deb-multimedia.org {RELEASE} main' | sudo tee -a /mnt/etc/apt/sources.list.d/multimedia.list >/dev/null")
     os.system("sudo chroot /mnt apt-get update -y -oAcquire::AllowInsecureRepositories=true")
     os.system("sudo chroot /mnt apt-get install -y deb-multimedia-keyring --allow-unauthenticated")
-    #os.system("sudo chroot /mnt apt-get install -y python3-anytree network-manager btrfs-progs dhcpcd5 locales sudo os-proer") #PR29
-    os.system("sudo chroot /mnt apt-get install -y btrfs-progs locales sudo") #PR29 to make install test faster, revert later
+    os.system("sudo chroot /mnt apt-get install -y python3-anytree network-manager btrfs-progs dhcpcd5 locales sudo") #PR29
     if efi:
         os.system("sudo chroot /mnt apt-get install -y grub-efi")
     else:
         os.system("sudo chroot /mnt apt-get install -y grub-pc")
-    print("%%%%%%%%%%%%%%%%%%%%              grub installed in chroot                                                            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                                                                          %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                                                                          %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+    if multiboot:
+        os.system("sudo chroot /mnt apt-get install -y os-proer")
 
 #   Update fstab
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{DISTRO},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
-    for mntdir in mntdirs_n:
+    for mntdir in mntdirs:
         os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}{DISTRO},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
     if efi:
         os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | sudo tee -a /mnt/etc/fstab")
@@ -217,15 +219,17 @@ def main(args, distro):
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
 
 #   GRUB
-    os.system(f"sudo chroot /mnt sed -i s,Debian,astOS,g /etc/default/grub")
+    os.system(f"sudo chroot /mnt sed -i s,Debian,AshOS,g /etc/default/grub")
     os.system(f"sudo chroot /mnt grub-install {args[2]}")
     # MAYBE do some extra operations here if multiboot?!
     os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system(f"sudo sed -i '0,/subvol=@{DISTRO}/s,subvol=@{DISTRO},subvol=@.snapshots{DISTRO}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
 
 #   Copy astpk
-    os.system(f"sudo cp ./src/distros/{distro}/astpk.py /mnt/usr/bin/ast")
-    os.system("sudo chroot /mnt chmod +x /usr/bin/ast")
+    os.system(f"cp ./src/distros/{distro}/astpk.py /mnt/usr/bin/ast")
+    os.system("chroot /mnt chmod +x /usr/sbin/ast")
+    os.system(f"cp ./src/distros/detect.sh /mnt/usr/local/sbin/detect_os.sh")
+    os.system("chroot /mnt chmod +x /usr/local/sbin/detect_os.sh")
 
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")

@@ -503,3 +503,34 @@ Please choose one of the following:
 1 => is_multiboot=False, MB=""
 2 => is_multiboot=True, MB=f'_{distro}'
 3 => rename_subvolumes, multiboot=True, MB=f'_{distro}'
+
+
+
+
+
+
+
+================================
+
+In my vanilla (non-multiboot) arch astos, here is what I have in /dev/sda1 here is what I have:
+/dev/sda1/EFI/astos/grubx64.efi (so no .../efi/EFI/... business)
+
+Here is what I have in /boot (without mounting /dev/sda1 to /boot/efi):
+efi
+grub
+initram falback
+initram
+vmlinuz
+in efi:
+/boot/efi/EFI/astos/grubx64.efi
+grub.cfg is a full-fledged grub
+
+the two grubx64.efi are same
+
+================================
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+================================
+
+In my multiboot (arch installed first and then debian), here is what I have in /boot (without mounting /dev/sda1 to /boot/efi):
+
+================================

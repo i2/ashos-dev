@@ -10,6 +10,7 @@ import os
 import re
 
 args = list(sys.argv)
+distro = subprocess.check_output(['sh', '/usr/local/sbin/detect-os.sh']).decode('utf-8').replace('"',"").strip()
 
 # TODO ------------
 # General code cleanup
@@ -902,6 +903,7 @@ def main(args):
     else:
         print("Operation not found.")
 
-# Call main
-main(args)
+#   Call main
+if __name__ == "__main__":
+    main(args)
 

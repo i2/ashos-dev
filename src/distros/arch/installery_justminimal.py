@@ -122,12 +122,12 @@ def main(args, distro):
     for btrdir in btrdirs:
         os.system(f"btrfs sub create /mnt/{btrdir}")
     os.system("umount /mnt")
-    mntdirs_n = mntdirs #PR29
+    #mntdirs_n = mntdirs #PR29
     #os.system(f"mount {args[1]} -o subvol=@{DISTRO},compress=zstd,noatime /mnt")
-    for mntdir in mntdirs_n:
+    for mntdir in mntdirs:
         #os.system(f"mkdir /mnt/{mntdir}") #before PR29 (I add -p to remove the nagging that /mnt exists)
         os.system(f"mkdir -p /mnt/{mntdir}")
-        os.system(f"mount {args[1]} -o subvol={btrdirs[mntdirs_n.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
+        os.system(f"mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
     for i in ("tmp", "root"):
         os.system(f"mkdir -p /mnt/{i}")
     for i in ("ast", "boot", "etc", "root", "rootfs", "tmp", "var"):
@@ -147,7 +147,7 @@ def main(args, distro):
 
 #   Update fstab
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{DISTRO},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
-    for mntdir in mntdirs_n:
+    for mntdir in mntdirs:
         os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}{DISTRO},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
     if efi:
         os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | tee -a /mnt/etc/fstab")
@@ -192,7 +192,7 @@ def main(args, distro):
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | tee /mnt/.snapshots/ast/fstree")
 
 #   GRUB
-    os.system(f"chroot /mnt sed -i s,Arch,astOS,g /etc/default/grub")
+    os.system(f"chroot /mnt sed -i s,Arch,AshOS,g /etc/default/grub")
     os.system(f"chroot /mnt grub-install {args[2]}")
     os.system(f"chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system(f"sudo sed -i '0,/subvol=@{DISTRO}/s,subvol=@{DISTRO},subvol=@.snapshots{DISTRO}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
@@ -200,6 +200,8 @@ def main(args, distro):
 #   Copy astpk
     os.system(f"cp ./src/distros/{distro}/astpk.py /mnt/usr/bin/ast")
     os.system("chroot /mnt chmod +x /usr/sbin/ast")
+    os.system(f"cp ./src/distros/detect.sh /mnt/usr/local/sbin/detect_os.sh")
+    os.system("chroot /mnt chmod +x /usr/local/sbin/detect_os.sh")
 
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")
