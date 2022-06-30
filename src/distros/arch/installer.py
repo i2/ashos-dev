@@ -204,7 +204,7 @@ def main(args, distro):
         print("#detect name of previous distro that's mounted at default subvolume")
         pdistro = astpk.detect_previous_distro(args[1])
         print(f"name of previous default distro is: {pdistro}")
-        #pdistro = subprocess.check_output(['sh', './src/distros/detect_os.sh']).decode('utf-8').replace('"',"").strip()
+        #pdistro = subprocess.check_output(['sh', './src/detect_os.sh']).decode('utf-8').replace('"',"").strip()
         print("rename ashos grub")
         astpk.rename_ashos_grub(args[3], pdistro)
     os.system(f"chroot /mnt sed -i s,Arch,AshOS,g /etc/default/grub")
@@ -219,7 +219,7 @@ def main(args, distro):
 #   Copy astpk
     os.system(f"cp ./src/distros/{distro}/astpk.py /mnt/usr/bin/ast")
     os.system("chroot /mnt chmod +x /usr/sbin/ast")
-    os.system(f"cp ./src/distros/detect_os.sh /mnt/usr/bin/detect_os.sh")
+    os.system(f"cp ./src/detect_os.sh /mnt/usr/bin/detect_os.sh")
     os.system("chroot /mnt chmod +x /usr/bin/detect_os.sh")
 
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")

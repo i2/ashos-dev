@@ -120,8 +120,8 @@ def main(args, distro):
     #os.system("find $HOME -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C LANGUAGE=C LANG=C >> $1' -- {} \;") # Perl complains if not set
     os.system("sudo apt-get remove -y --purge man-db") # make installs faster (because of trigger man-db bug)
     os.system("sudo apt-get update -y")
-    os.system("sudo apt-get install -y parted dosfstools") #REZA ###DELETE THIS LINE WHEN PRODUCTION READY
-    os.system("sudo apt-get install -y btrfs-progs ntp")
+    os.system("sudo apt-get install -y --fix-broken parted dosfstools") #REZA ###DELETE THIS LINE WHEN PRODUCTION READY
+    os.system("sudo apt-get install -y --fix-broken btrfs-progs ntp") # Add this to the first apt-get install to fix any broken package
     #os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
     if choice != "3":
         os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}") ###DELETE THIS LINE WHEN PRODUCTION READY
@@ -235,7 +235,7 @@ def main(args, distro):
         print("#detect name of previous distro that's mounted at default subvolume")
         pdistro = astpk.detect_previous_distro(args[1])
         print(f"name of previous default distro is: {pdistro}")
-        #pdistro = subprocess.check_output(['sh', './src/distros/detect_os.sh']).decode('utf-8').replace('"',"").strip()
+        #pdistro = subprocess.check_output(['sh', './src/detect_os.sh']).decode('utf-8').replace('"',"").strip()
         print("rename ashos grub")
         astpk.rename_ashos_grub(args[3], pdistro)
     os.system(f"sudo chroot /mnt sed -i s,Debian,AshOS,g /etc/default/grub")
@@ -250,7 +250,7 @@ def main(args, distro):
 #   Copy astpk
     os.system(f"cp ./src/distros/{distro}/astpk.py /mnt/usr/bin/ast")
     os.system("chroot /mnt chmod +x /usr/sbin/ast")
-    os.system(f"cp ./src/distros/detect_os.sh /mnt/usr/bin/detect_os.sh")
+    os.system(f"cp ./src/detect_os.sh /mnt/usr/bin/detect_os.sh")
     os.system("chroot /mnt chmod +x /usr/bin/detect_os.sh")
 
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
