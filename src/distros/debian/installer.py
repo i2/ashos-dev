@@ -173,7 +173,8 @@ def main(args, distro):
     os.system("sudo chroot /mnt apt-get install -y deb-multimedia-keyring --allow-unauthenticated")
     #os.system("sudo chroot /mnt apt-get install -y python3-anytree network-manager btrfs-progs dhcpcd5 locales sudo os-prober")
     #os.system("sudo chroot /mnt chown -R 1777 /tmp") NOT NEEDED
-    os.system("sudo chroot /mnt apt-get install -y python3-anytree btrfs-progs locales sudo")
+    #os.system("sudo chroot /mnt apt-get install -y python3-anytree btrfs-progs locales sudo")
+    os.system("sudo chroot /mnt apt-get install -y btrfs-progs locales")
     if efi:
         os.system("sudo chroot /mnt apt-get install -y grub-efi")
     else:
