@@ -3,9 +3,9 @@
 import sys
 import ast
 import subprocess
-from anytree.importer import DictImporter
-from anytree.exporter import DictExporter
-import anytree
+#from anytree.importer import DictImporter
+#from anytree.exporter import DictExporter
+#import anytree
 import os
 import re
 
@@ -73,11 +73,11 @@ def detect_previous_distro(p):
     #os.system(f"rm -rf /tmp/{tmp_sda2}") ##if successful umount ( check result of 'echo $?' )
 
 def rename_distro_subvolumes(p):  ### Maybe can reuse ast functions from cuberjan3? #potentially receive 3 arguments: partition, string1 (suffix right now) and string2 (desired suffix)
-     tmp_sda2 = subprocess.check_output("cat /dev/urandom | od -x | tr -d ' ' | head -n 1", shell=True).decode('utf-8').strip()
+    tmp_sda2 = subprocess.check_output("cat /dev/urandom | od -x | tr -d ' ' | head -n 1", shell=True).decode('utf-8').strip()
 ###     os.system(f"mkdir /tmp/{tmp_sda2}")
 ###     os.system(f"mount -o subvolid=5 /dev/{p} /tmp/{tmp_sda2}")
-        for i in ["@.snapshots", "@boot", "@etc", "@home", "var"]:
-            os.system(f'mv "/tmp/{tmp_sda2}/{i}" "/tmp/{tmp_sda2}/{i}_{d}"')
+    for i in ["@.snapshots", "@boot", "@etc", "@home", "var"]:
+        os.system(f'mv "/tmp/{tmp_sda2}/{i}" "/tmp/{tmp_sda2}/{i}_{d}"')
 ###     pd = subprocess.check_output(['sh', f'detect_os.sh /tmp/{tmp_sda2}/']).decode('utf-8').replace('"',"").strip()
 ###     os.system(f"umount /tmp/{tmp_sda2}")
 ###     return pd
@@ -969,5 +969,9 @@ def main(args):
 
 #   Call main
 if __name__ == "__main__":
+    from anytree.importer import DictImporter
+    from anytree.exporter import DictExporter
+    import anytree
+
     main(args)
 

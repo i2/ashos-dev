@@ -3,9 +3,9 @@
 import sys
 import ast
 import subprocess
-from anytree.importer import DictImporter
-from anytree.exporter import DictExporter
-import anytree
+#from anytree.importer import DictImporter
+#from anytree.exporter import DictExporter
+#import anytree
 import os
 import re
 
@@ -904,5 +904,8 @@ def main(args):
 
 #   Call main
 if __name__ == "__main__":
+    from anytree.importer import DictImporter
+    from anytree.exporter import DictExporter
+    import anytree
     main(args)
 

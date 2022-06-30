@@ -2,7 +2,7 @@
 
 import os
 import subprocess
-import astpk
+from src.distros.arch import astpk
 
 def clear():
     os.system("#clear")
@@ -20,7 +20,7 @@ def get_multiboot(dist):
     clear()
     while True:
         print("Please choose one of the following:\n1. Single OS installation\n2. Initiate a multi-boot ashos setup\n3. Adding to an already installed ashos")
-        print(f"Please be aware choosing option 1 and 2 will wipe {args[1]}")
+        print("Please be aware choosing option 1 and 2 will wipe {args[1]}")
         i = input("> ")
         if i == "1":
             return i,""
@@ -217,7 +217,7 @@ def main(args, distro):
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")
     os.system("btrfs sub create /mnt/.snapshots/etc/etc-tmp")
-    os.system("btrfs sub create /mnt/.snapshots/var/var-tmp")
+### probably unnecessary    os.system("btrfs sub create /mnt/.snapshots/var/var-tmp")
 
     for i in ("pacman", "systemd"):
         os.system(f"mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")
@@ -227,7 +227,7 @@ def main(args, distro):
     os.system("cp --reflink=auto -r /mnt/etc/* /mnt/.snapshots/etc/etc-tmp")
     os.system("btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-0")
     os.system("btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-0")
-    os.system("btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-0")
+### probably unnecessary    os.system("btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-0")
 
     os.system(f"echo '{astpart}' | tee /mnt/.snapshots/ast/part")
 

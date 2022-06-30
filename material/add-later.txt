@@ -1,6 +1,6 @@
 CANGE all /* to /. and prefereablt use cp -a
 
-
+Disadvantage of importing astpk is having to install python-anytree in live iso environment
 
 
 FOCUS IS ON EFI right now, I'll fix it for Legacy BIOS soon!

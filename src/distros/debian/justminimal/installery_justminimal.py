@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+import astpk
 
 def clear():
     os.system("#clear")
@@ -9,21 +10,29 @@ def clear():
 def to_uuid(part):
     return subprocess.check_output(f"sudo blkid -s UUID -o value {part}", shell=True).decode('utf-8').strip()
 
+###def grub_ords(part):
+###    letter = 
+    ###return ord(letter.lower())-ord('a'), 
+
 #   This function returns a tuple: (1. choice whether partitioning and formatting should happen
 #   2. Underscore plus name of distro if it should be appended to sub-volume names
 def get_multiboot(dist):
     clear()
     while True:
         print("Please choose one of the following:\n1. Single OS installation\n2. Initiate a multi-boot ashos setup\n3. Adding to an already installed ashos")
+        print(f"Please be aware choosing option 1 and 2 will wipe {args[1]}")
         i = input("> ")
         if i == "1":
-            return False,""
+            return i,""
+            #return False,""
             break
         elif i == "2":
-            return False,f"_{dist}"
+            return i,f"_{dist}"
+            #return False,f"_{dist}"
             break
         elif i == "3":
-            return True,f"_{dist}"
+            return i,f"_{dist}"
+            #return True,f"_{dist}"
             break
         else:
             print("Invalid choice!")
@@ -89,7 +98,8 @@ def set_password(u):
 
 def main(args, distro):
     print("Welcome to the astOS installer!\n\n\n\n\n")
-    multiboot, DISTRO = get_multiboot(distro)
+    choice, udistro = get_multiboot(distro)
+    #multiboot, DISTRO = get_multiboot(distro)
     
 #   Partition and format
     #os.system("find $HOME -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C LANGUAGE=C LANG=C >> $1' -- {} \;") # Perl complains if not set
@@ -107,7 +117,8 @@ def main(args, distro):
     RELEASE = "bullseye"
     ARCH = "amd64"
     #btrdirs = ["@","@.snapshots","@home","@var","@etc","@boot"]
-    btrdirs = [f"@{DISTRO}",f"@.snapshots{DISTRO}",f"@home{DISTRO}",f"@var{DISTRO}",f"@etc{DISTRO}",f"@boot{DISTRO}"]
+    btrdirs = [f"@{udistro}",f"@.snapshots{udistro}",f"@home{udistro}",f"@var{udistro}",f"@etc{udistro}",f"@boot{udistro}"]
+    #btrdirs = [f"@{DISTRO}",f"@.snapshots{DISTRO}",f"@home{DISTRO}",f"@var{DISTRO}",f"@etc{DISTRO}",f"@boot{DISTRO}"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]
     #mntdirs = [f'"",".snapshots{DISTRO}","home{DISTRO}","var{DISTRO}","etc{DISTRO}","boot{DISTRO}"']
     #mntdirs_n = mntdirs[1:]
@@ -122,7 +133,8 @@ def main(args, distro):
 
 #   Mount and create necessary sub-volumes and directories
     #os.system(f"mount {args[1]} /mnt")
-    if not multiboot:
+    if choice != "3":
+    #if not multiboot:
         os.system(f"sudo mount {args[1]} /mnt")
     else:
         os.system(f"sudo mount -o subvolid=5 {args[1]} /mnt")
@@ -170,9 +182,9 @@ def main(args, distro):
         os.system("sudo chroot /mnt apt-get install -y grub-pc")
 
 #   Update fstab
-    os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{DISTRO},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
+    os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{udistro},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
     for mntdir in mntdirs:
-        os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}{DISTRO},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
+        os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}{udistro},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
     if efi:
         os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
@@ -197,9 +209,9 @@ def main(args, distro):
     os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
     os.system("sudo chroot /mnt hwclock --systohc")
 
-    os.system(f"sudo sed -i '0,/@{DISTRO}/ s,@,@{DISTRO}.snapshots/rootfs/snapshot-tmp,' /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@boot{DISTRO}/ s,@boot{DISTRO},@.snapshots{DISTRO}/boot/boot-tmp,' /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@etc{DISTRO}/ s,@etc{DISTRO},@.snapshots{DISTRO}/etc/etc-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@{udistro}/ s,@,@{udistro}.snapshots/rootfs/snapshot-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@boot{udistro}/ s,@boot{udistro},@.snapshots{udistro}/boot/boot-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@etc{udistro}/ s,@etc{udistro},@.snapshots{udistro}/etc/etc-tmp,' /mnt/etc/fstab")
 
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
     os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
@@ -222,7 +234,7 @@ def main(args, distro):
     os.system(f"sudo chroot /mnt grub-install {args[2]}")
 ###    # MAYBE do some extra operations here if multiboot?!
     os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
-    os.system(f"sudo sed -i '0,/subvol=@{DISTRO}/s,subvol=@{DISTRO},subvol=@.snapshots{DISTRO}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
+    os.system(f"sudo sed -i '0,/subvol=@{udistro}/s,subvol=@{udistro},subvol=@.snapshots{udistro}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
 
 #   Copy astpk
     os.system(f"cp ./src/distros/{distro}/astpk.py /mnt/usr/bin/ast")
@@ -233,7 +245,7 @@ def main(args, distro):
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")
     os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp")
-    os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
+### probably unnecessary    os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
 
 #### SHARED
     for i in ("dpkg", "systemd"):
@@ -244,7 +256,7 @@ def main(args, distro):
     os.system("sudo cp --reflink=auto -r /mnt/etc/* /mnt/.snapshots/etc/etc-tmp")
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-0")
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-0")
-    os.system("sudo btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-0")
+### probably unnecessary    os.system("sudo btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-0")
 ####
     print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxecho '{astpart}' >> /mnt/.snapshots/ast/part") #PR29
     os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
@@ -268,10 +280,10 @@ def main(args, distro):
     if efi:
         os.system("sudo umount /mnt/boot/efi")
     os.system("sudo umount /mnt/boot")
-    os.system(f"sudo mount {args[1]} -o subvol=@boot{DISTRO},compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp")
+    os.system(f"sudo mount {args[1]} -o subvol=@boot{udistro},compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp")
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-tmp/* /mnt/boot")
     os.system("sudo umount /mnt/etc")
-    os.system(f"sudo mount {args[1]} -o subvol=@etc{DISTRO},compress=zstd,noatime /mnt/.snapshots/etc/etc-tmp")
+    os.system(f"sudo mount {args[1]} -o subvol=@etc{udistro},compress=zstd,noatime /mnt/.snapshots/etc/etc-tmp")
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-tmp/* /mnt/etc")
 
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/* /mnt/.snapshots/rootfs/snapshot-tmp/boot")
@@ -288,8 +300,8 @@ def main(args, distro):
 ##########    os.system(f"sudo mount {args[1]} -o subvolid=0 /mnt")      #2. DONE SUCCESSFULLY AFTER TRYYYYY MORE STEP in atteo7
 #  ignore this line  print("mount {args[1]} -o subvolid=5 /mnt")
 #  ignore this line  os.system(f"sudo mount {args[1]} -o subvolid=5 /mnt")
-#  ignore this line    print("btrfs sub del /mnt/@{DISTRO}")
-#########    os.system(f"sudo btrfs sub del /mnt/@{DISTRO}")             #3. DONE SUCCESSFULLY AFTER TRYYYYY MORE STEP in atteo7
+#  ignore this line    print("btrfs sub del /mnt/@{udistro}")
+#########    os.system(f"sudo btrfs sub del /mnt/@{udistro}")             #3. DONE SUCCESSFULLY AFTER TRYYYYY MORE STEP in atteo7
 #  ignore this line#    print("umount -R /mnt")
 #    os.system("sudo umount -R /mnt")                                    #4. DONE SUCCESSFULLY AFTER TRYYYYY MORE STEP in atteo7
 #    clear()
