@@ -1,9 +1,21 @@
-CANGE all /* to /. and prefereablt use cp -a
+https://gist.github.com/superboum/1c7adcd967d3e15dfbd30d04b9ae6144
+
+https://www.reddit.com/r/btrfs/comments/ivruap/the_adventure_of_installing_multiple_oses_on_one/
+
+FIGURE OUT THE STEP THAT ADDS ALL THAT LOTS OF GRUB FILES TO /DEV/SDA{1} BY DIVIFING THE SCRIPT TO SMALL BITS
+For Arch, even up until creation of user accounts, there is only initramfs and vmlinuz in /dev/sda2/boot/ and nothing in neither /mnt/boot/efi nor /dev/sda1/
+
+CHANGE all /* to /. and prefereablt use cp -a
 
 Disadvantage of importing astpk is having to install python-anytree in live iso environment
 
+immutable windows on winbtrfs?
 
-FOCUS IS ON EFI right now, I'll fix it for Legacy BIOS soon!
+might be just better to mv subvolumes as /mnt/sda2/@.snapshot_XYZ => @.snapshts_ZUK and so on!
+
+A. FOCUS IS ON EFI right now
+B. Port installer to other OSes
+C: I'll fix it for Legacy BIOS soon!
 
 TD insurance:
 - Adjusted quote

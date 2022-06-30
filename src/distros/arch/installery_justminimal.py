@@ -95,16 +95,9 @@ def set_password(u):
 
 def main(args, distro):
     print("Welcome to the astOS installer!\n\n\n\n\n")
-    choice, udistro = get_multiboot(distro)
-
-#   Partition and format
-    if choice != "3":
-        os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}") ###DELETE THIS LINE WHEN PRODUCTION READY
-        os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
-    os.system("pacman -Syy --noconfirm archlinux-keyring")
 
 #   Define variables
-    btrdirs = [f"@{udistro}",f"@.snapshots{udistro}",f"@home{udistro}",f"@var{udistro}",f"@etc{udistro}",f"@boot{udistro}"]
+    btrdirs = [f"@{distro_suffix}",f"@.snapshots{distro_suffix}",f"@home{distro_suffix}",f"@var{distro_suffix}",f"@etc{distro_suffix}",f"@boot{distro_suffix}"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]
     astpart = to_uuid(args[1])
     if os.path.exists("/sys/firmware/efi"):
@@ -112,11 +105,17 @@ def main(args, distro):
     else:
         efi = False
 
+    choice, distro_suffix = get_multiboot(distro)
     tz = get_timezone()
     hostname = get_hostname()
 
+#   Partition and format
+    if choice != "3":
+        os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}") ###DELETE THIS LINE WHEN PRODUCTION READY
+        os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
+    os.system("pacman -Syy --noconfirm archlinux-keyring")
+
 #   Mount and create necessary sub-volumes and directories
-    #if not multiboot: #choice = 1 or 2
     if choice != "3":
         os.system(f"sudo mount {args[1]} /mnt")
     else:
@@ -125,7 +124,7 @@ def main(args, distro):
         os.system(f"btrfs sub create /mnt/{btrdir}")
     os.system("umount /mnt")
     for mntdir in mntdirs:
-        os.system(f"mkdir -p /mnt/{mntdir}")
+        os.system(f"mkdir -p /mnt/{mntdir}") # -p to ignore /mnt exists complaint
         os.system(f"mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
     for i in ("tmp", "root"):
         os.system(f"mkdir -p /mnt/{i}")
@@ -135,17 +134,23 @@ def main(args, distro):
         os.system("mkdir /mnt/boot/efi")
         os.system(f"mount {args[3]} /mnt/boot/efi")
 
-#   Install anytree and necessary packages in chroot
+#   Modify shell profile for debug purposes in live iso (optional temporary)
+    #os.system('echo "alias paste='"'"'curl -F "'"'"'"sprunge=<-"'"'"'" http://sprunge.us'"'"' " | tee -a $HOME/.*shrc')
+    #os.system("shopt -s nullglob && echo 'export LC_ALL=C' | sudo tee -a /mnt/root/.*shrc")
+    #os.system("find /mnt/root/ -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C | sudo tee -a $1' -- {} \;")
+    #os.system("echo -e 'setw -g mode-keys vi\nset -g history-limit 999999' >> $HOME/.tmux.conf")
+
+#   Pacstrap then install anytree and necessary packages in chroot
     os.system("pacstrap /mnt base linux linux-firmware nano python3 python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo os-prober")
     if efi:
         os.system("pacstrap /mnt efibootmgr")
-    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
+    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"): #REZA maybe add /tmp as well?
         os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
 
 #   Update fstab
-    os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{udistro},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
+    os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
     for mntdir in mntdirs:
-        os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}{udistro},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
+        os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}{distro_suffix},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
     if efi:
         os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | tee -a /mnt/etc/fstab")
@@ -170,9 +175,9 @@ def main(args, distro):
     os.system(f"chroot /mnt ln -sf {tz} /etc/localtime")
     os.system("chroot /mnt hwclock --systohc")
 
-    os.system(f"sudo sed -i '0,/@{udistro}/ s,@,@{udistro}.snapshots/rootfs/snapshot-tmp,' /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@boot{udistro}/ s,@boot{udistro},@.snapshots{udistro}/boot/boot-tmp,' /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@etc{udistro}/ s,@etc{udistro},@.snapshots{udistro}/etc/etc-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@{distro_suffix}/ s,@,@{distro_suffix}.snapshots/rootfs/snapshot-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@etc{distro_suffix}/ s,@etc{distro_suffix},@.snapshots{distro_suffix}/etc/etc-tmp,' /mnt/etc/fstab")
 
     os.system("mkdir -p /mnt/.snapshots/ast/snapshots")
     os.system("chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
@@ -203,10 +208,13 @@ def main(args, distro):
         print("rename ashos grub")
         astpk.rename_ashos_grub(args[3], pdistro)
     os.system(f"chroot /mnt sed -i s,Arch,AshOS,g /etc/default/grub")
-    os.system(f"chroot /mnt grub-install {args[2]}")
+    os.system(f"chroot /mnt grub-install {args[2]}") #REZA --recheck --no-nvram --removable
 ###    # MAYBE do some extra operations here if multiboot?!
     os.system(f"chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
-    os.system(f"sudo sed -i '0,/subvol=@{udistro}/s,subvol=@{udistro},subvol=@.snapshots{udistro}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
+    os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
+#   Backup GRUB and EFI
+    os.system(f"chroot /mnt cp -a /boot/efi/EFI/ashos /boot/efi/EFI/ashos{distro_suffix}.BAK")
+    os.system(f"chroot /mnt cp -a /boot/grub /boot/grub{distro_suffix}.BAK")
 
 #   Copy astpk
     os.system(f"cp ./src/distros/{distro}/astpk.py /mnt/usr/bin/ast")
@@ -217,7 +225,7 @@ def main(args, distro):
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")
     os.system("btrfs sub create /mnt/.snapshots/etc/etc-tmp")
-### probably unnecessary    os.system("btrfs sub create /mnt/.snapshots/var/var-tmp")
+    os.system("btrfs sub create /mnt/.snapshots/var/var-tmp")
 
     for i in ("pacman", "systemd"):
         os.system(f"mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")
@@ -227,7 +235,7 @@ def main(args, distro):
     os.system("cp --reflink=auto -r /mnt/etc/* /mnt/.snapshots/etc/etc-tmp")
     os.system("btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-0")
     os.system("btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-0")
-### probably unnecessary    os.system("btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-0")
+    os.system("btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-0")
 
     os.system(f"echo '{astpart}' | tee /mnt/.snapshots/ast/part")
 
@@ -240,7 +248,7 @@ def main(args, distro):
     os.system("rm -rf /mnt/tmp/*")
 
 ###    # Copy GOOD grub.cfg (the reference one) and maybe grubx64.efi from sda2 to sda1
-### os.system(f"sed -i 's/UUID/{to_uuid(args[1])}/' -i 's/BOOT/boot{udistro}/' /mnt/boot/efi/EFI/ashos/grub.cfg") #MAKE SURE THIS IS THE ONE IN /dev/sda1 not sda2
+### os.system(f"sed -i 's/UUID/{to_uuid(args[1])}/' -i 's/BOOT/boot{distro_suffix}/' /mnt/boot/efi/EFI/ashos/grub.cfg") #MAKE SURE THIS IS THE ONE IN /dev/sda1 not sda2
 ### os.system("cp /mnt/boot/e /mnt/boot/efi/EFI/ashos/ "
 ###
 
@@ -248,10 +256,10 @@ def main(args, distro):
     if efi:
         os.system("umount /mnt/boot/efi")
     os.system("umount /mnt/boot")
-    os.system(f"mount {args[1]} -o subvol=@boot{udistro},compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp")
+    os.system(f"mount {args[1]} -o subvol=@boot{distro_suffix},compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp")
     os.system("cp --reflink=auto -r /mnt/.snapshots/boot/boot-tmp/* /mnt/boot")
     os.system("umount /mnt/etc")
-    os.system(f"mount {args[1]} -o subvol=@etc{udistro},compress=zstd,noatime /mnt/.snapshots/etc/etc-tmp")
+    os.system(f"mount {args[1]} -o subvol=@etc{distro_suffix},compress=zstd,noatime /mnt/.snapshots/etc/etc-tmp")
     os.system("cp --reflink=auto -r /mnt/.snapshots/etc/etc-tmp/* /mnt/etc")
 
     os.system("cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/* /mnt/.snapshots/rootfs/snapshot-tmp/boot")
@@ -260,11 +268,11 @@ def main(args, distro):
 
 #   Unmount everything
     os.system("sudo umount -R /mnt")
-    os.system(f"sudo mount {args[1]} -o subvolid=0 /mnt") # subvolid=5 for any cases?
-    os.system(f"sudo btrfs sub del /mnt/@{udistro}")
+    os.system(f"sudo mount {args[1]} -o subvolid=0 /mnt") # subvolid=5 needed for any cases?
+    os.system(f"sudo btrfs sub del /mnt/@{distro_suffix}")
     os.system("sudo umount -R /mnt")
 
-#    clear()
-#    print("Installation complete")
-#    print("You can reboot now :)")
+    clear()
+    print("Installation complete")
+    print("You can reboot now :)")
 

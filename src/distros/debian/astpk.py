@@ -1,16 +1,16 @@
 #!/usr/bin/python3
 
-import sys
 import ast
-import subprocess
-#from anytree.importer import DictImporter
-#from anytree.exporter import DictExporter
-#import anytree
 import os
 import re
+import subprocess
+import sys
+#MOVEDDOWN from anytree.importer import DictImporter
+#MOVEDDOWN from anytree.exporter import DictExporter
+#MOVEDDOWN import anytree
 
-args = list(sys.argv)
-distro = subprocess.check_output(['sh', '/usr/local/sbin/detect-os.sh']).decode('utf-8').replace('"',"").strip()
+#MOVEDDOWN args = list(sys.argv)
+#MOVEDDOWN distro = subprocess.check_output(['sh', 'detect_os.sh']).decode('utf-8').replace('"',"").strip()
 
 # TODO ------------
 # General code cleanup
@@ -21,7 +21,7 @@ distro = subprocess.check_output(['sh', '/usr/local/sbin/detect-os.sh']).decode(
 
 # Directories
 # All snapshots share one /var
-# global boot is always at @boot
+# global boot is always at @boot{distro_suffix}
 # *-tmp - temporary directories used to boot deployed snapshot
 # *-chr - temporary directories used to chroot into snapshot or copy snapshots around
 # /.snapshots/var/var-* == individual /var for each snapshot
@@ -907,5 +907,7 @@ if __name__ == "__main__":
     from anytree.importer import DictImporter
     from anytree.exporter import DictExporter
     import anytree
+    args = list(sys.argv)
+    distro = subprocess.check_output(['sh', 'detect_os.sh']).decode('utf-8').replace('"',"").strip()
     main(args)
 

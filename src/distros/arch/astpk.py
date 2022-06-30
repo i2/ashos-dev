@@ -1,16 +1,16 @@
 #!/usr/bin/python3
 
-import sys
 import ast
-import subprocess
-#from anytree.importer import DictImporter
-#from anytree.exporter import DictExporter
-#import anytree
 import os
 import re
+import subprocess
+import sys
+#MOVEDDOWN from anytree.importer import DictImporter
+#MOVEDDOWN from anytree.exporter import DictExporter
+#MOVEDDOWN import anytree
 
-args = list(sys.argv)
-distro = subprocess.check_output(['sh', '/usr/local/sbin/detect_os.sh']).decode('utf-8').replace('"',"").strip()
+#MOVEDDOWN args = list(sys.argv)
+#MOVEDDOWN distro = subprocess.check_output(['sh', 'detect_os.sh']).decode('utf-8').replace('"',"").strip()
 
 # TODO ------------
 # General code cleanup
@@ -21,7 +21,7 @@ distro = subprocess.check_output(['sh', '/usr/local/sbin/detect_os.sh']).decode(
 
 # Directories
 # All snapshots share one /var
-# global boot is always at @boot
+# global boot is always at @boot{distro_suffix}
 # *-tmp - temporary directories used to boot deployed snapshot
 # *-chr - temporary directories used to chroot into snapshot or copy snapshots around
 # /.snapshots/var/var-* == individual /var for each snapshot
@@ -34,11 +34,25 @@ distro = subprocess.check_output(['sh', '/usr/local/sbin/detect_os.sh']).decode(
 # /var/lib/ast(/fstree) == ast files, stores fstree, symlink to /.snapshots/ast
 
 #   This function returns either empty string or underscore plus name of distro if it was appended to sub-volume names to distinguish
-def get_distro():
+def get_distro_suffix():
     if "ashos" in distro:
         return f'_{distro.replace("_ashos","")}'
     else:
         return ""
+        
+def switch_distro(p, next_distro):
+    # Move grub and efi
+    tmp_efi= subprocess.check_output("cat /dev/urandom | od -x | tr -d ' ' | head -n 1", shell=True).decode('utf-8').strip()
+    os.system(f"mkdir /tmp/{tmp_efi}")
+    os.system(f"mount /dev/{p} /tmp/{tmp_efi}")
+    os.system(f"mv /tmp/{tmp_efi}/boot/efi/EFI/ashos /tmp/{tmp_efi}/boot/efi/EFI/ashos{distro}")
+    os.system(f"mv /tmp/{tmp_efi}/boot/efi/EFI/ashos_{next_distro} /tmp/{tmp_efi}/boot/efi/EFI/ashos")
+    os.system(f"umount /tmp/{tmp_efi}")
+    tmp_efi= subprocess.check_output("cat /dev/urandom | od -x | tr -d ' ' | head -n 1", shell=True).decode('utf-8').strip()
+    os.system(f"mkdir /tmp/{tmp_efi}")
+    os.system(f"mount /dev/{p} /tmp/{tmp_efi}")
+    os.system(f"mv /mnt/boot/grub /mnt/boot/grub{distro}")
+    os.system(f"mv /mnt/boot/grub_{next_distro} /mnt/boot/grub")
 
 #   Rename grub in sda1 from default ashos to pdistro_ashos
 def rename_ashos_grub(p, pd):
@@ -708,29 +722,29 @@ def rollback():
 
 #   Switch between /tmp deployments
 def switchtmp():
-    DISTRO = get_distro()
+    distro_suffix = get_distro_suffix()
     mount = get_tmp()
     part = get_part()
     os.system(f"mkdir -p /etc/mnt/boot >/dev/null 2>&1")
-    os.system(f"mount {part} -o subvol=@boot{udistro} /etc/mnt/boot") # Mount boot partition for writing
+    os.system(f"mount {part} -o subvol=@boot{distro_suffix} /etc/mnt/boot") # Mount boot partition for writing
     if "tmp0" in mount:
         os.system("cp --reflink=auto -r /.snapshots/rootfs/snapshot-tmp/boot/* /etc/mnt/boot")  ######REZA WHATABOUTTHIS?
-        os.system(f"sed -i 's,@.snapshots{udistro}/rootfs/snapshot-tmp0,@.snapshots{udistro}/rootfs/snapshot-tmp,g' /etc/mnt/boot/grub/grub.cfg") # Overwrite grub config boot subvolume
-        os.system(f"sed -i 's,@.snapshots{udistro}/rootfs/snapshot-tmp0,@.snapshots{udistro}/rootfs/snapshot-tmp,g' /.snapshots/rootfs/snapshot-tmp/boot/grub/grub.cfg")
-        os.system(f"sed -i 's,@.snapshots{udistro}/rootfs/snapshot-tmp0,@.snapshots{udistro}/rootfs/snapshot-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab") # Write fstab for new deployment
-        os.system(f"sed -i 's,@.snapshots{udistro}/etc/etc-tmp0,@.snapshots{udistro}/etc/etc-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
-        os.system(f"sed -i 's,@.snapshots{udistro}/boot/boot-tmp0,@.snapshots{udistro}/boot/boot-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
+        os.system(f"sed -i 's,@.snapshots{distro_suffix}/rootfs/snapshot-tmp0,@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /etc/mnt/boot/grub/grub.cfg") # Overwrite grub config boot subvolume
+        os.system(f"sed -i 's,@.snapshots{distro_suffix}/rootfs/snapshot-tmp0,@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /.snapshots/rootfs/snapshot-tmp/boot/grub/grub.cfg")
+        os.system(f"sed -i 's,@.snapshots{distro_suffix}/rootfs/snapshot-tmp0,@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab") # Write fstab for new deployment
+        os.system(f"sed -i 's,@.snapshots{distro_suffix}/etc/etc-tmp0,@.snapshots{distro_suffix}/etc/etc-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
+        os.system(f"sed -i 's,@.snapshots{distro_suffix}/boot/boot-tmp0,@.snapshots{distro_suffix}/boot/boot-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
         sfile = open("/.snapshots/rootfs/snapshot-tmp0/usr/share/ast/snap","r")
         snap = sfile.readline()
         snap = snap.replace(" ", "")
         sfile.close()
     else:
         os.system("cp --reflink=auto -r /.snapshots/rootfs/snapshot-tmp0/boot/* /etc/mnt/boot")
-        os.system(f"sed -i 's,@.snapshots{udistro}/rootfs/snapshot-tmp,@.snapshots{udistro}/rootfs/snapshot-tmp0,g' /etc/mnt/boot/grub/grub.cfg")
-        os.system(f"sed -i 's,@.snapshots{udistro}/rootfs/snapshot-tmp,@.snapshots{udistro}/rootfs/snapshot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg")
-        os.system(f"sed -i 's,@.snapshots{udistro}/rootfs/snapshot-tmp,@.snapshots{udistro}/rootfs/snapshot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
-        os.system(f"sed -i 's,@.snapshots{udistro}/etc/etc-tmp,@.snapshots{udistro}/etc/etc-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
-        os.system(f"sed -i 's,@.snapshots{udistro}/boot/boot-tmp,@.snapshots{udistro}/boot/boot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
+        os.system(f"sed -i 's,@.snapshots{distro_suffix}/rootfs/snapshot-tmp,@.snapshots{distro_suffix}/rootfs/snapshot-tmp0,g' /etc/mnt/boot/grub/grub.cfg")
+        os.system(f"sed -i 's,@.snapshots{distro_suffix}/rootfs/snapshot-tmp,@.snapshots{distro_suffix}/rootfs/snapshot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg")
+        os.system(f"sed -i 's,@.snapshots{distro_suffix}/rootfs/snapshot-tmp,@.snapshots{distro_suffix}/rootfs/snapshot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
+        os.system(f"sed -i 's,@.snapshots{distro_suffix}/etc/etc-tmp,@.snapshots{distro_suffix}/etc/etc-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
+        os.system(f"sed -i 's,@.snapshots{distro_suffix}/boot/boot-tmp,@.snapshots{distro_suffix}/boot/boot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
         sfile = open("/.snapshots/rootfs/snapshot-tmp/usr/share/ast/snap", "r")
         snap = sfile.readline()
         snap = snap.replace(" ","")
@@ -815,7 +829,7 @@ def findnew():
 
 #   Main function
 def main(args):
-    udistro = get_distro()
+    distro_suffix = get_distro_suffix()
     snapshot = get_snapshot() # Get current snapshot
     etc = snapshot
     importer = DictImporter() # Dict importer
@@ -972,6 +986,7 @@ if __name__ == "__main__":
     from anytree.importer import DictImporter
     from anytree.exporter import DictExporter
     import anytree
-
+    args = list(sys.argv)
+    distro = subprocess.check_output(['sh', 'detect_os.sh']).decode('utf-8').replace('"',"").strip()
     main(args)
 
