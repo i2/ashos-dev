@@ -1,0 +1,2 @@
+sudo dnf makecache --refresh
+sudo dnf -y install supermin
