@@ -212,7 +212,7 @@ def main(args, distro):
         #pdistro = subprocess.check_output(['sh', './src/detect_os.sh']).decode('utf-8').replace('"',"").strip()
         print("rename ashos grub")
         astpk.rename_ashos_grub(args[3], pdistro)
-    os.system(f"chroot /mnt sed -i s,Arch,AshOS,g /etc/default/grub")
+    #os.system(f"chroot /mnt sed -i s,Arch,AshOS,g /etc/default/grub")
     os.system(f"chroot /mnt grub-install {args[2]}") #REZA --recheck --no-nvram --removable
 ###    # MAYBE do some extra operations here if multiboot?!
     os.system(f"chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
