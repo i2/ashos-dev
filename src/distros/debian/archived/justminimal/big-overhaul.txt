@@ -1,0 +1,6 @@
+On June 30, 2022, I finalized astos being just for Arch Linux to being for any Linux (maybe other OSes)
+Today is the day that I moved all temporary files that I kept in certain folders for muscle memory and
+was afraid to lose my 'file structural memory' in case my new way turned out to be totally flawed.
+Now that I have tested and it works great, I am moving those temp files to an archived folder. I'll keep
+them just for a little bit longer until I merge it to "AshOS" project.
+

@@ -1,0 +1,31 @@
+
+----------------
+class Bob:
+  def useful_func(self, arg):
+      pass
+
+if __name__ == '__main__':
+  import UnavailableModule
+  
+  
+  --------------
+from foo import Bob
+
+b = Bob()
+b.useful_func('something useful i believe')
+
+
+
+
+
+
+
+----------------------------
+import UnavailableModule
+
+class Bob:
+    def useful_func(self, arg):
+        # Do useful stuff (doesn't use UnavailableModule)
+----        
+from foo.Bob import useful_func
+---- this gives error. Solution is above!
