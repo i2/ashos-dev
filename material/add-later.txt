@@ -1,3 +1,6 @@
+For debian even as back as this commit, ddint' work:
+1479dd1
+
 setfont Lat38-Terminux32x16.psf.gz
 
 https://gist.github.com/superboum/1c7adcd967d3e15dfbd30d04b9ae6144

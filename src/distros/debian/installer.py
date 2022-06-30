@@ -172,7 +172,7 @@ def main(args, distro):
     os.system("sudo chroot /mnt apt-get update -y -oAcquire::AllowInsecureRepositories=true")
     os.system("sudo chroot /mnt apt-get install -y deb-multimedia-keyring --allow-unauthenticated")
     #os.system("sudo chroot /mnt apt-get install -y python3-anytree network-manager btrfs-progs dhcpcd5 locales sudo os-prober")
-    os.system("sudo chroot /mnt chown -R 1777 /tmp")
+    #os.system("sudo chroot /mnt chown -R 1777 /tmp") NOT NEEDED
     os.system("sudo chroot /mnt apt-get install -y python3-anytree btrfs-progs locales sudo")
     if efi:
         os.system("sudo chroot /mnt apt-get install -y grub-efi")
@@ -207,7 +207,12 @@ def main(args, distro):
     os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
     os.system("sudo chroot /mnt hwclock --systohc")
 
-    os.system(f"sudo sed -i '0,/@{distro_suffix}/ s,@,@{distro_suffix}.snapshots/rootfs/snapshot-tmp,' /mnt/etc/fstab")
+    # THESE 3 lines were not right, I don't know why archashos was still working!!!!!??????
+    #os.system(f"sudo sed -i '0,/@{distro_suffix}/ s,@,@{distro_suffix}.snapshots/rootfs/snapshot-tmp,' /mnt/etc/fstab")
+    #os.system(f"sudo sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
+    #os.system(f"sudo sed -i '0,/@etc{distro_suffix}/ s,@etc{distro_suffix},@.snapshots{distro_suffix}/etc/etc-tmp,' /mnt/etc/fstab")
+    
+    os.system(f"sudo sed -i '0,/@{distro_suffix}/ s,@{distro_suffix},@.snapshots{distro_suffix}/rootfs/snapshot-tmp,' /mnt/etc/fstab")
     os.system(f"sudo sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
     os.system(f"sudo sed -i '0,/@etc{distro_suffix}/ s,@etc{distro_suffix},@.snapshots{distro_suffix}/etc/etc-tmp,' /mnt/etc/fstab")
 
@@ -220,7 +225,7 @@ def main(args, distro):
     create_user(username)
     set_password(username)
 
-    os.system("sudo chroot /mnt systemctl enable NetworkManager")
+    #os.system("sudo chroot /mnt systemctl enable NetworkManager")
 
 #   Initialize fstree
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
@@ -243,16 +248,15 @@ def main(args, distro):
     os.system(f"sudo chroot /mnt grub-install {args[2]}") #REZA --recheck --no-nvram --removable
 ###    # MAYBE do some extra operations here if multiboot?!
     os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
-    os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
+    os.system(f"sudo sed -i '0,/subvol=@{distro_suffix} /s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
 #   Backup GRUB and EFI
-    os.system(f"chroot /mnt cp -a /boot/efi/EFI/ashos /boot/efi/EFI/ashos{distro_suffix}.BAK")
-    os.system(f"chroot /mnt cp -a /boot/grub /boot/grub{distro_suffix}.BAK")
+    os.system(f"sudo chroot /mnt cp -a /boot/efi/EFI/ashos /boot/efi/EFI/ashos{distro_suffix}.BAK")
+    os.system(f"sudo chroot /mnt cp -a /boot/grub /boot/grub{distro_suffix}.BAK")
 
 #   Copy astpk
-    os.system(f"cp ./src/distros/{distro}/astpk.py /mnt/usr/bin/ast")
-    os.system("chroot /mnt chmod +x /usr/sbin/ast")
-    os.system(f"cp ./src/detect_os.sh /mnt/usr/bin/detect_os.sh")
-    os.system("chroot /mnt chmod +x /usr/bin/detect_os.sh")
+    os.system(f"sudo cp ./src/distros/{distro}/astpk.py /mnt/usr/bin/ast")
+    os.system("sudo cp ./src/detect_os.sh /mnt/usr/bin/detect_os.sh")
+    os.system("sudo chroot /mnt chmod +x /usr/bin/ast /usr/bin/detect_os.sh")
 
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")
@@ -292,7 +296,7 @@ def main(args, distro):
     if efi:
         os.system("sudo umount /mnt/boot/efi")
     os.system("sudo umount /mnt/boot")
-    os.system(f"sudo mount {args[1]} -o subvol=@boot{distro_suffix},compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp")
+    os.system(f"sudo mount {args[1]} -o subvol=@boot{distro_suffix},compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp") #IS this mnt point empty?
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-tmp/* /mnt/boot")
     os.system("sudo umount /mnt/etc")
     os.system(f"sudo mount {args[1]} -o subvol=@etc{distro_suffix},compress=zstd,noatime /mnt/.snapshots/etc/etc-tmp")
