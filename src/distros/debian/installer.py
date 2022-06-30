@@ -144,9 +144,9 @@ def main(args, distro):
         os.system(f"mkdir -p /mnt/{i}")
     for i in ("ast", "boot", "etc", "root", "rootfs", "tmp", "var"):
         os.system(f"mkdir -p /mnt/.snapshots/{i}")
-#MOVEDAFTERDEBOOTSTRAP    if efi:
-#MOVEDAFTERDEBOOTSTRAP        os.system("sudo mkdir /mnt/boot/efi")
-#MOVEDAFTERDEBOOTSTRAP        os.system(f"sudo mount {args[3]} /mnt/boot/efi")
+    if efi:
+        os.system("sudo mkdir /mnt/boot/efi")
+        os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
 #   Modify shell profile for debug purposes in live iso (optional temporary)
     #os.system('echo "alias paste='"'"'curl -F "'"'"'"sprunge=<-"'"'"'" http://sprunge.us'"'"' " | tee -a $HOME/.*shrc')
@@ -162,9 +162,9 @@ def main(args, distro):
         os.system(f"sudo mount -B {i} /mnt{i}") # Mount-points needed for chrooting
     os.system(f"sudo chroot /mnt apt-get install -y linux-image-{ARCH}")
 
-    if efi: ###REZA #MOVED FROM ABOVE See if there are still files in sda1 unnecessarily heavy (ONLY FOR DEBOOSTRAP BASED OS, NOT FOR ARCH)
-        os.system("sudo mkdir /mnt/boot/efi")
-        os.system(f"sudo mount {args[3]} /mnt/boot/efi")
+#MOVEDUPBEFOREDEBOOTSTRAP    if efi: ###REZA #MOVED FROM ABOVE See if there are still files in sda1 unnecessarily heavy (ONLY FOR DEBOOSTRAP BASED OS, NOT FOR ARCH)
+#MOVEDUPBEFOREDEBOOTSTRAP        os.system("sudo mkdir /mnt/boot/efi")
+#MOVEDUPBEFOREDEBOOTSTRAP        os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
 #   Install anytree and necessary packages in chroot
     os.system("sudo systemctl enable --now ntp && sleep 30s && ntpq -p") # Sync time in the live iso
