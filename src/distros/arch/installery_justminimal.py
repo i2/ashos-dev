@@ -11,8 +11,8 @@ def to_uuid(part):
     return subprocess.check_output(f"blkid -s UUID -o value {part}", shell=True).decode('utf-8').strip()
 
 ###def grub_ords(part):
-###    letter = 
-    ###return ord(letter.lower())-ord('a'), 
+###    letter =
+    ###return ord(letter.lower())-ord('a'),
 
 #   This function returns a tuple: (1. choice whether partitioning and formatting should happen
 #   2. Underscore plus name of distro if it should be appended to sub-volume names
@@ -95,6 +95,7 @@ def set_password(u):
 
 def main(args, distro):
     print("Welcome to the astOS installer!\n\n\n\n\n")
+    choice, distro_suffix = get_multiboot(distro)
 
 #   Define variables
     btrdirs = [f"@{distro_suffix}",f"@.snapshots{distro_suffix}",f"@home{distro_suffix}",f"@var{distro_suffix}",f"@etc{distro_suffix}",f"@boot{distro_suffix}"]
@@ -105,7 +106,6 @@ def main(args, distro):
     else:
         efi = False
 
-    choice, distro_suffix = get_multiboot(distro)
     tz = get_timezone()
     hostname = get_hostname()
 

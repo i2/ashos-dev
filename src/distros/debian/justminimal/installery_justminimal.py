@@ -16,8 +16,8 @@ def to_uuid(part):
     return subprocess.check_output(f"sudo blkid -s UUID -o value {part}", shell=True).decode('utf-8').strip()
 
 ###def grub_ords(part):
-###    letter = 
-    ###return ord(letter.lower())-ord('a'), 
+###    letter =
+    ###return ord(letter.lower())-ord('a'),
 
 #   This function returns a tuple: (1. choice whether partitioning and formatting should happen
 #   2. Underscore plus name of distro if it should be appended to sub-volume names
@@ -100,6 +100,7 @@ def set_password(u):
 
 def main(args, distro):
     print("Welcome to the astOS installer!\n\n\n\n\n")
+    choice, distro_suffix = get_multiboot(distro)
 
 #   Define variables
     RELEASE = "bullseye"
@@ -112,10 +113,9 @@ def main(args, distro):
     else:
         efi = False
 
-    choice, distro_suffix = get_multiboot(distro)
     tz = get_timezone()
     hostname = get_hostname()
-    
+
 #   Partition and format
     #os.system("find $HOME -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C LANGUAGE=C LANG=C >> $1' -- {} \;") # Perl complains if not set
     os.system("sudo apt-get remove -y --purge man-db") # make installs faster (because of trigger man-db bug)
