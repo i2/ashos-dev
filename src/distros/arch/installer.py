@@ -143,7 +143,7 @@ def main(args, distro):
 #   Pacstrap then install anytree and necessary packages in chroot
     #os.system("pacstrap /mnt base linux linux-firmware nano python3 python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo os-prober")
     #os.system("pacstrap /mnt base linux neovim btrfs-progs grub sudo os-prober")
-    os.system("pacstrap /mnt base linux nano python3 python-anytree arch-install-scripts btrfs-progs grub sudo os-prober")
+    os.system("pacstrap /mnt base linux nano python3 python-anytree arch-install-scripts btrfs-progs grub sudo os-prober tmux")
     if efi:
         os.system("pacstrap /mnt efibootmgr")
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"): #REZA maybe add /tmp as well?
@@ -181,11 +181,11 @@ def main(args, distro):
     #os.system(f"sed -i '0,/@{distro_suffix}/ s,@,@{distro_suffix}.snapshots/rootfs/snapshot-tmp,' /mnt/etc/fstab")
     #os.system(f"sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
     #os.system(f"sed -i '0,/@etc{distro_suffix}/ s,@etc{distro_suffix},@.snapshots{distro_suffix}/etc/etc-tmp,' /mnt/etc/fstab")
-    
+
     os.system(f"sed -i '0,/@{distro_suffix}/ s,@{distro_suffix},@.snapshots{distro_suffix}/rootfs/snapshot-tmp,' /mnt/etc/fstab")
     os.system(f"sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
     os.system(f"sed -i '0,/@etc{distro_suffix}/ s,@etc{distro_suffix},@.snapshots{distro_suffix}/etc/etc-tmp,' /mnt/etc/fstab")
-    
+
     # Delete fstab created for @{distro_suffix} which is going to be deleted at the end
     os.system(f"sed -i.bak '/\@{distro_suffix}/d' /mnt/etc/fstab")
 
@@ -198,7 +198,7 @@ def main(args, distro):
     create_user(username)
     set_password(username)
 
-    os.system("chroot /mnt systemctl enable NetworkManager")
+    #os.system("chroot /mnt systemctl enable NetworkManager")
 
 #   Initialize fstree
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | tee /mnt/.snapshots/ast/fstree")
@@ -225,16 +225,16 @@ def main(args, distro):
 ###        #pdistro = subprocess.check_output(['sh', './src/detect_os.sh']).decode('utf-8').replace('"',"").strip()
 ###        print("rename ashos grub")
 ###        astpk.rename_ashos_grub(args[3], pdistro)
-    #os.system(f"chroot /mnt sed -i s,Arch,AshOS,g /etc/default/grub")
+    #os.system(f"chroot /mnt sed -i s,Arch,AshOS,g /etc/default/grub")  ##### REZA IS THIS WHY GRUB FILES ARE NOT CREATED IN /dev/sda1 ? It doesn't make an issue for Arch!
     os.system(f"chroot /mnt grub-install {args[2]}") #REZA --recheck --no-nvram --removable
 ###    # MAYBE do some extra operations here if multiboot?!
     os.system(f"chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system(f"sed -i '0,/subvol=@{distro_suffix}/s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
 #   GRUB and EFI - Backup and create default entry txt
-    
+
     # Create a map.txt file "distro" => "EFI entry"
     os.system(f"chroot /mnt echo {distro} === $(efibootmgr -v | grep '{distro}') | tee -a /mnt/boot/efi/EFI/map.txt")
-    
+
     try:
         now_os_grub = subprocess.check_output("find /mnt/boot/efi/EFI/ -mindepth 1 -maxdepth 1 -type \
         d -name '*ashos*' -o -name '*default*' -prune -o -exec basename {} \; | \
