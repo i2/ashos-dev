@@ -726,6 +726,7 @@ def switchtmp():
     mount = get_tmp()
     part = get_part()
     os.system(f"mkdir -p /etc/mnt/boot >/dev/null 2>&1")
+###    os.system(f"mount {part} -o subvol=@boot /etc/mnt/boot") # Mount boot partition for writing
     os.system(f"mount {part} -o subvol=@boot{distro_suffix} /etc/mnt/boot") # Mount boot partition for writing
     if "tmp0" in mount:
         os.system("cp --reflink=auto -r /.snapshots/rootfs/snapshot-tmp/boot/* /etc/mnt/boot")  ######REZA WHATABOUTTHIS?

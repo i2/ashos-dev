@@ -205,20 +205,33 @@ def main(args, distro):
 #######        prev_distro = subprocess.check_output(['sh', '/usr/local/sbin/detect_os.sh /tmp/s']).decode('utf-8').replace('"',"").strip()
 
 #######        os.system(f"mv /mnt/boot/efi/ashos /mnt/boot/efi/ashos_BAK") #TODO: Get name of previous installed distro from user or use detect_os.sh
-    if choice == "3":   # COULD BE BETTER TO CHECK FOR EXISTENCE OF 'ashos' in /dev/sda1
-        print("#detect name of previous distro that's mounted at default subvolume")
-        pdistro = astpk.detect_previous_distro(args[1])
-        print(f"name of previous default distro is: {pdistro}")
-        #pdistro = subprocess.check_output(['sh', './src/detect_os.sh']).decode('utf-8').replace('"',"").strip()
-        print("rename ashos grub")
-        astpk.rename_ashos_grub(args[3], pdistro)
+###    if choice == "3":   # COULD BE BETTER TO CHECK FOR EXISTENCE OF 'ashos' in /dev/sda1
+    if choice == "3":   # COULD BE BETTER TO CHECK FOR EXISTENCE OF 'default.txt' content in /dev/sda1
+        try:
+            prev_os_grub = subprocess.check_output("cat /mnt/boot/efi/EFI/default.txt", shell=True).decode('utf-8').strip()
+        except:
+            print("No previous OS grub found!")
+        else:
+            os.system(f"mv /mnt/boot/efi/EFI/{prev_os_grub} /mnt/boot/efi/EFI/{prev_os_grub}_ashos")
+#        if previous_os:
+###        print("#detect name of previous distro that's mounted at default subvolume")
+###        pdistro = astpk.detect_previous_distro(args[1])
+###        print(f"name of previous default distro is: {pdistro}")
+###        #pdistro = subprocess.check_output(['sh', './src/detect_os.sh']).decode('utf-8').replace('"',"").strip()
+###        print("rename ashos grub")
+###        astpk.rename_ashos_grub(args[3], pdistro)
     #os.system(f"chroot /mnt sed -i s,Arch,AshOS,g /etc/default/grub")
     os.system(f"chroot /mnt grub-install {args[2]}") #REZA --recheck --no-nvram --removable
 ###    # MAYBE do some extra operations here if multiboot?!
     os.system(f"chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system(f"sed -i '0,/subvol=@{distro_suffix}/s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
-#   Backup GRUB and EFI
-    os.system(f"chroot /mnt cp -a /boot/efi/EFI/ashos /boot/efi/EFI/ashos{distro_suffix}.BAK")
+#   GRUB and EFI - Backup and create default entry txt
+    now_os_grub = subprocess.check_output("find /mnt/boot/efi/EFI/ -mindepth 1 -maxdepth 1 -type \
+        d -name '*ashos*' -o -name '*default*' -prune -o -exec basename {} \; | \
+        sudo tee /mnt/boot/efi/EFI/default.txt", shell=True).decode('utf-8').strip()
+###    os.system(f"chroot /mnt cp -a /boot/efi/EFI/ashos /boot/efi/EFI/ashos{distro_suffix}.BAK")
+###    os.system(f"chroot /mnt cp -a /boot/grub /boot/grub{distro_suffix}.BAK")
+    os.system(f"chroot /mnt cp -a /boot/efi/EFI/{now_os_grub} /boot/efi/EFI/{now_os_grub_folder}.BAK")
     os.system(f"chroot /mnt cp -a /boot/grub /boot/grub{distro_suffix}.BAK")
 
 #   Copy astpk
