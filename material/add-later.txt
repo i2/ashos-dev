@@ -1,5 +1,10 @@
+This can be set and I don't think there is any problem!
+sudo chroot /mnt grub-install --bootloader-id=ashos{distro_suffix} {args[2]}
+grub-install --locales=XYZ ((((--target=x86_64-efi))))))
+
+
 1. tmp -> deploy     &   tmp0 > deploy-secondary
-OR
+or
 2. tmp0 -> deploy     &   tmp > deploy-secondary
 
 For switching between distros, maybe it's just better to modify /etc/fstab and create grub again? try this on debian and arch.
