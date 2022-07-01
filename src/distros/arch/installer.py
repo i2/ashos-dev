@@ -231,7 +231,7 @@ def main(args, distro):
         sudo tee /mnt/boot/efi/EFI/default.txt", shell=True).decode('utf-8').strip()
 ###    os.system(f"chroot /mnt cp -a /boot/efi/EFI/ashos /boot/efi/EFI/ashos{distro_suffix}.BAK")
 ###    os.system(f"chroot /mnt cp -a /boot/grub /boot/grub{distro_suffix}.BAK")
-    os.system(f"chroot /mnt cp -a /boot/efi/EFI/{now_os_grub} /boot/efi/EFI/{now_os_grub_folder}.BAK")
+    os.system(f"chroot /mnt cp -a /boot/efi/EFI/{now_os_grub} /boot/efi/EFI/{now_os_grub}.BAK")
     os.system(f"chroot /mnt cp -a /boot/grub /boot/grub{distro_suffix}.BAK")
 
 #   Copy astpk
