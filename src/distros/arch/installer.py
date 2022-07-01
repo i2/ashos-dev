@@ -221,18 +221,24 @@ def main(args, distro):
 ###        print("rename ashos grub")
 ###        astpk.rename_ashos_grub(args[3], pdistro)
     #os.system(f"chroot /mnt sed -i s,Arch,AshOS,g /etc/default/grub")
-    os.system(f"chroot /mnt grub-install {args[2]}") #REZA --recheck --no-nvram --removable
+    os.system(f"chroot /mnt grub-install {args[2]} --recheck --no-nvram --removable") #REZA --recheck --no-nvram --removable
 ###    # MAYBE do some extra operations here if multiboot?!
     os.system(f"chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system(f"sed -i '0,/subvol=@{distro_suffix}/s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
 #   GRUB and EFI - Backup and create default entry txt
-    now_os_grub = subprocess.check_output("find /mnt/boot/efi/EFI/ -mindepth 1 -maxdepth 1 -type \
+    try:
+        now_os_grub = subprocess.check_output("find /mnt/boot/efi/EFI/ -mindepth 1 -maxdepth 1 -type \
         d -name '*ashos*' -o -name '*default*' -prune -o -exec basename {} \; | \
         sudo tee /mnt/boot/efi/EFI/default.txt", shell=True).decode('utf-8').strip()
+    except:
+        print("An exception occurred!")
 ###    os.system(f"chroot /mnt cp -a /boot/efi/EFI/ashos /boot/efi/EFI/ashos{distro_suffix}.BAK")
 ###    os.system(f"chroot /mnt cp -a /boot/grub /boot/grub{distro_suffix}.BAK")
-    os.system(f"chroot /mnt cp -a /boot/efi/EFI/{now_os_grub} /boot/efi/EFI/{now_os_grub}.BAK")
-    os.system(f"chroot /mnt cp -a /boot/grub /boot/grub{distro_suffix}.BAK")
+    else:
+        os.system(f"chroot /mnt cp -a /boot/efi/EFI/{now_os_grub} /boot/efi/EFI/{now_os_grub}.BAK")
+        #os.system(f"chroot /mnt cp -a /boot/grub /boot/grub{distro_suffix}.BAK")
+        os.system(f"chroot /mnt cp -a /boot/grub /boot/grub{distro_suffix}_ashos.BAK")
+        #.BAK file and folders are strictly for user's 'manual intervention' if things go wrong. They won't be used in the algorithm.
 
 #   Copy astpk
     os.system(f"cp ./src/distros/{distro}/astpk.py /mnt/usr/bin/ast")

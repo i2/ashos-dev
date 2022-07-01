@@ -40,11 +40,43 @@ def get_distro_suffix():
     else:
         return ""
         
-def switch_distro(p, next_distro):
+def switch_distro_OLD(p, next_distro):
     # Move grub and efi
     tmp_efi= subprocess.check_output("cat /dev/urandom | od -x | tr -d ' ' | head -n 1", shell=True).decode('utf-8').strip()
     os.system(f"mkdir /tmp/{tmp_efi}")
     os.system(f"mount /dev/{p} /tmp/{tmp_efi}")
+    os.system(f"mv /tmp/{tmp_efi}/boot/efi/EFI/ashos /tmp/{tmp_efi}/boot/efi/EFI/ashos{distro}")
+    os.system(f"mv /tmp/{tmp_efi}/boot/efi/EFI/ashos_{next_distro} /tmp/{tmp_efi}/boot/efi/EFI/ashos")
+    os.system(f"umount /tmp/{tmp_efi}")
+    tmp_efi= subprocess.check_output("cat /dev/urandom | od -x | tr -d ' ' | head -n 1", shell=True).decode('utf-8').strip()
+    os.system(f"mkdir /tmp/{tmp_efi}")
+    os.system(f"mount /dev/{p} /tmp/{tmp_efi}")
+    os.system(f"mv /mnt/boot/grub /mnt/boot/grub{distro}")
+    os.system(f"mv /mnt/boot/grub_{next_distro} /mnt/boot/grub")
+
+def switch_distro(p):
+    # Move grub and efi
+    # Look in /mnt/boot/efi/EFI/ for folders with 'ashos' in their name, present them as options to user
+###    next_distro_options = subprocess.check_output("find /mnt/boot/efi/EFI/ -mindepth 1 -maxdepth 1 -type \
+###        d -name '*ashos*' -o -exec basename {} \;", shell=True).decode('utf-8').strip()
+    while True:
+        print("Type the name of a distro to switch to: (type 'list' to list them)")
+        next_distro = input("> ")
+        if next_distro == "q":
+            break
+        elif next_distro == "list":
+            os.system("ls /boot/efi/EFI/ | grep -i 'ashos' | sed 's/_ashos//' | less")
+        elif os.path.exists(f"/boot/efi/EFI/{next_distro}_ashos"):
+            os.system(f"mv /boot/grub /boot/grub{distro}_ashos")
+            os.system(f"mv /boot/grub{next_distro}_ashos /boot/grub")
+            os.system(f"mv /boot/efi/EFI/{distro} /boot/efi/EFI/{distro}_ashos")
+            os.system(f"mv /boot/efi/EFI/{next_distro}_ashos /boot/efi/EFI/{next_distro}")
+            os.system(f"echo {next_distro} >> /boot/efi/EFI/default.txt")
+            break
+        else:
+            print("Invalid distro!")
+            continue
+
     os.system(f"mv /tmp/{tmp_efi}/boot/efi/EFI/ashos /tmp/{tmp_efi}/boot/efi/EFI/ashos{distro}")
     os.system(f"mv /tmp/{tmp_efi}/boot/efi/EFI/ashos_{next_distro} /tmp/{tmp_efi}/boot/efi/EFI/ashos")
     os.system(f"umount /tmp/{tmp_efi}")
