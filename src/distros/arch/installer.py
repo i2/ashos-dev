@@ -226,14 +226,14 @@ def main(args, distro):
 ###        print("rename ashos grub")
 ###        astpk.rename_ashos_grub(args[3], pdistro)
     #os.system(f"chroot /mnt sed -i s,Arch,AshOS,g /etc/default/grub")  ##### REZA IS THIS WHY GRUB FILES ARE NOT CREATED IN /dev/sda1 ? It doesn't make an issue for Arch!
-    os.system(f"chroot /mnt grub-install {args[2]}") #REZA --recheck --no-nvram --removable
+    os.system(f"chroot /mnt grub-install  --bootloader-id=ashos {args[2]}") #REZA --recheck --no-nvram --removable
 ###    # MAYBE do some extra operations here if multiboot?!
     os.system(f"chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system(f"sed -i '0,/subvol=@{distro_suffix}/s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
 #   GRUB and EFI - Backup and create default entry txt
 
     # Create a map.txt file "distro" => "EFI entry"
-    os.system(f"chroot /mnt echo {distro} === $(efibootmgr -v | grep '{distro}') | tee -a /mnt/boot/efi/EFI/map.txt")
+    os.system(f"chroot /mnt echo {distro} === $(efibootmgr -v | grep '{distro}') | tee -a /mnt/boot/efi/EFI/map.txt") # will throw error: efibootmgr not found (it does get installed already by packages above) and even if installed (check when booted in snapshot?), when you are inside a chroot of next_distro it would give error that efi variable not supported on this system!
 
     try:
         now_os_grub = subprocess.check_output("find /mnt/boot/efi/EFI/ -mindepth 1 -maxdepth 1 -type \
@@ -250,9 +250,9 @@ def main(args, distro):
         #.BAK file and folders are strictly for user's 'manual intervention' if things go wrong. They won't be used in the algorithm.
 
 #   Copy astpk
-    os.system(f"cp ./src/distros/{distro}/astpk.py /mnt/usr/bin/ast")
-    os.system("cp ./src/detect_os.sh /mnt/usr/bin/detect_os.sh")
-    os.system("chroot /mnt chmod +x /usr/sbin/ast /usr/bin/detect_os.sh")
+    os.system(f"cp -a ./src/distros/{distro}/astpk.py /mnt/usr/bin/ast")
+    os.system("cp -a ./src/detect_os.sh /mnt/usr/bin/detect_os.sh")
+###    os.system("chroot /mnt chmod a+x /usr/sbin/ast /usr/bin/detect_os.sh") # Might not be necessary by 'cp -a'
 
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")

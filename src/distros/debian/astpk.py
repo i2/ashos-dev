@@ -21,17 +21,17 @@ import sys
 
 # Directories
 # All snapshots share one /var
-# global boot is always at @boot{distro_suffix}
-# *-tmp - temporary directories used to boot deployed snapshot
-# *-chr - temporary directories used to chroot into snapshot or copy snapshots around
-# /.snapshots/var/var-* == individual /var for each snapshot
-# /.snapshots/etc/etc-* == individual /etc for each snapshot
-# /.snapshots/boot/boot-* == individual /boot for each snapshot
-# /.snapshots/rootfs/snapshot-* == snapshots
-# /root/snapshots/*-desc == descriptions
-# /usr/share/ast == files that store current snapshot info
-# /usr/share/ast/db == package database
-# /var/lib/ast(/fstree) == ast files, stores fstree, symlink to /.snapshots/ast
+# global boot is always at @boot
+# *-deploy and *-deploy-secondary : temporary directories used to boot deployed snapshot
+# *-chr                           : temporary directories used to chroot into snapshot or copy snapshots around
+# /.snapshots/var/var-*           : individual /var for each snapshot
+# /.snapshots/etc/etc-*           : individual /etc for each snapshot
+# /.snapshots/boot/boot-*         : individual /boot for each snapshot
+# /.snapshots/rootfs/snapshot-*   : snapshots
+# /root/snapshots/*-desc          : descriptions
+# /usr/share/ast                  : files that store current snapshot info
+# /usr/share/ast/db               : package database
+# /var/lib/ast(/fstree)           : ast files, stores fstree, symlink to /.snapshots/ast
 
 #   This function returns either empty string or underscore plus name of distro if it was appended to sub-volume names to distinguish
 def get_distro_suffix():
