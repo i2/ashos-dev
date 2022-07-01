@@ -119,7 +119,7 @@ def main(args, distro):
 #   Partition and format
     #os.system("find $HOME -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C LANGUAGE=C LANG=C >> $1' -- {} \;") # Perl complains if not set
     os.system("sudo apt-get remove -y --purge man-db") # make installs faster (because of trigger man-db bug)
-    os.system("sudo apt-get update -y")
+    os.system("sudo apt-get clean && app-get update -y && apt-get check -y")
     os.system("sudo apt-get install -y --fix-broken parted dosfstools") #REZA ###DELETE THIS LINE WHEN PRODUCTION READY
     os.system("sudo apt-get install -y --fix-broken btrfs-progs ntp") # Add this to the first apt-get install to fix any broken package
     #os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
