@@ -1,3 +1,12 @@
+For switching between distros, maybe it's just better to modify /etc/fstab and create grub again? try this on debian and arch.
+mount /dev/sda2 /tmp/sda2
+sub btrfs list /tmp/sda2
+modity /tmp/sda2/etc/fstab (or /etc/fstab?!!!!) replace distro1 with distro2
+sudo grub-install /dev/sda
+sudo grub-mkconfig
+
+Including --no-nvram makes install non-bootable in virtualbox, would it work on bare-metal? If so, maybe include it when production-ready?
+
 For debian even as back as this commit, ddint' work:
 1479dd1
 

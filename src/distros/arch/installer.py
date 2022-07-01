@@ -142,7 +142,8 @@ def main(args, distro):
 
 #   Pacstrap then install anytree and necessary packages in chroot
     #os.system("pacstrap /mnt base linux linux-firmware nano python3 python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo os-prober")
-    os.system("pacstrap /mnt base linux neovim btrfs-progs grub sudo os-prober")
+    #os.system("pacstrap /mnt base linux neovim btrfs-progs grub sudo os-prober")
+    os.system("pacstrap /mnt base linux nano python3 python-anytree arch-install-scripts btrfs-progs grub sudo os-prober")
     if efi:
         os.system("pacstrap /mnt efibootmgr")
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"): #REZA maybe add /tmp as well?
@@ -225,14 +226,14 @@ def main(args, distro):
 ###        print("rename ashos grub")
 ###        astpk.rename_ashos_grub(args[3], pdistro)
     #os.system(f"chroot /mnt sed -i s,Arch,AshOS,g /etc/default/grub")
-    os.system(f"chroot /mnt grub-install {args[2]} --recheck --no-nvram") #REZA --recheck --no-nvram --removable
+    os.system(f"chroot /mnt grub-install {args[2]}") #REZA --recheck --no-nvram --removable
 ###    # MAYBE do some extra operations here if multiboot?!
     os.system(f"chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system(f"sed -i '0,/subvol=@{distro_suffix}/s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
 #   GRUB and EFI - Backup and create default entry txt
     
     # Create a map.txt file "distro" => "EFI entry"
-    os.system(f"chroot /mnt echo {distro} === $(efibootmgr -v | grep '{distro}') | tee -a /boot/efi/EFI/map.txt")
+    os.system(f"chroot /mnt echo {distro} === $(efibootmgr -v | grep '{distro}') | tee -a /mnt/boot/efi/EFI/map.txt")
     
     try:
         now_os_grub = subprocess.check_output("find /mnt/boot/efi/EFI/ -mindepth 1 -maxdepth 1 -type \
