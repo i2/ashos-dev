@@ -225,8 +225,9 @@ def main(args, distro):
 ###        #pdistro = subprocess.check_output(['sh', './src/detect_os.sh']).decode('utf-8').replace('"',"").strip()
 ###        print("rename ashos grub")
 ###        astpk.rename_ashos_grub(args[3], pdistro)
-    #os.system(f"chroot /mnt sed -i s,Arch,AshOS,g /etc/default/grub")  ##### REZA IS THIS WHY GRUB FILES ARE NOT CREATED IN /dev/sda1 ? It doesn't make an issue for Arch!
-    os.system(f"chroot /mnt grub-install  --bootloader-id=ashos {args[2]}") #REZA --recheck --no-nvram --removable
+    os.system(f"chroot /mnt sed -i s,Arch,AshOS Arch,g /etc/default/grub")  ##### REZA IS THIS WHY GRUB FILES ARE NOT CREATED IN /dev/sda1 ? It doesn't make an issue for Arch!
+###    os.system(f"chroot /mnt grub-install --bootloader-id=ashos {args[2]}") #REZA --recheck --no-nvram --removable
+    os.system(f"chroot /mnt grub-install {args[2]}") #REZA --recheck --no-nvram --removable
 ###    # MAYBE do some extra operations here if multiboot?!
     os.system(f"chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system(f"sed -i '0,/subvol=@{distro_suffix}/s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")

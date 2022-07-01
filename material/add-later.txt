@@ -1,3 +1,7 @@
+1. tmp -> deploy     &   tmp0 > deploy-secondary
+OR
+2. tmp0 -> deploy     &   tmp > deploy-secondary
+
 For switching between distros, maybe it's just better to modify /etc/fstab and create grub again? try this on debian and arch.
 mount /dev/sda2 /tmp/sda2
 sub btrfs list /tmp/sda2
