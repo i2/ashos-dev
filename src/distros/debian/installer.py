@@ -160,7 +160,7 @@ def main(args, distro):
     os.system(f"sudo debootstrap --arch {ARCH} --exclude={excl} {RELEASE} /mnt http://ftp.debian.org/debian")
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"): #REZA maybe add /tmp as well?
         os.system(f"sudo mount -B {i} /mnt{i}") # Mount-points needed for chrooting
-    os.system(f"sudo chroot /mnt apt-get install -y linux-image-{ARCH}")
+    os.system(f"sudo chroot /mnt apt-get install --fix-broken -y linux-image-{ARCH}")
 
 #MOVEDUPBEFOREDEBOOTSTRAP    if efi: ###REZA #MOVED FROM ABOVE See if there are still files in sda1 unnecessarily heavy (ONLY FOR DEBOOSTRAP BASED OS, NOT FOR ARCH)
 #MOVEDUPBEFOREDEBOOTSTRAP        os.system("sudo mkdir /mnt/boot/efi")
