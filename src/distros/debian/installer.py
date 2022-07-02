@@ -255,8 +255,9 @@ def main(args, distro):
 ###        #pdistro = subprocess.check_output(['sh', './src/detect_os.sh']).decode('utf-8').replace('"',"").strip()
 ###        print("rename ashos grub")
 ###        astpk.rename_ashos_grub(args[3], pdistro)
-    os.system(f"sudo chroot /mnt sed -i s,Debian,ashos,g /etc/default/grub")  ##### REZA IS THIS WHY GRUB FILES ARE NOT CREATED IN /dev/sda1 ? It doesn't make an issue for Arch!
-    os.system(f"sudo chroot /mnt grub-install --bootloader-id=ashos {args[2]}") #REZA --recheck --no-nvram --removable
+    #os.system(f"sudo chroot /mnt sed -i s,Debian,ashos,g /etc/default/grub")  ##### REZA IS THIS WHY GRUB FILES ARE NOT CREATED IN /dev/sda1 ? It doesn't make an issue for Arch!
+###    os.system(f"sudo chroot /mnt grub-install --bootloader-id=ashos {args[2]}") #REZA --recheck --no-nvram --removable
+    os.system(f"sudo chroot /mnt grub-install {args[2]}") #REZA --recheck --no-nvram --removable
 ###    # MAYBE do some extra operations here if multiboot?!
     os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system(f"sudo sed -i '0,/subvol=@{distro_suffix} /s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
@@ -264,7 +265,9 @@ def main(args, distro):
 
     # Create a map.txt file "distro" => "EFI entry"
     #os.system(f"sudo chroot /mnt echo {distro} === $(efibootmgr -v | grep '{distro}') | tee -a /mnt/boot/efi/EFI/map.txt") # will throw error: efibootmgr not found (it does get installed already by packages above) and even if installed (check when booted in snapshot?), when you are inside a chroot of next_distro it would give error that efi variable not supported on this system!
-    os.system(f"echo '{distro} === ' $(efibootmgr -v | grep {distro}) | tee -a /mnt/boot/efi/EFI/map.txt") #astpk.py will read from this file to switch between distros
+    #os.system(f"echo '{distro} ===1=== ' X ' ===2=== ' $(efibootmgr -v | grep {distro} | awk '{print $1}' |XXX) | tee -a /mnt/boot/efi/EFI/map.txt") #astpk.py will read from this file to switch between distros
+#    os.system(f"echo '{distro} = ' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt") #astpk.py will read from this file to switch between distros
+    os.system(f"echo DISTRO = BootOrder\n'{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt") #astpk.py will read from this file to switch between distros
 
 ### NOT NEEDED AS I'M GOINGTO USE efibootmgr inside astpk.py
 ###    try:

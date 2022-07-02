@@ -1,0 +1,64 @@
+
+
+
+
+def choose_distro_to_switch():
+    while True:
+        print("Type the name of a distro to switch to: (type 'list' to list them)")
+        next_distro = input("> ")
+        if next_distro == "q":
+            break
+        elif next_distro == "list":
+            os.system("cat /home/me/Downloads/meeeeeeeeeeeee/awk-test.txt | awk 'BEGIN { FS = "'"'" === "'"'" } ; { print $1 }' | less")
+        elif next_distro in subprocess.check_output("cat /home/me/Downloads/meeeeeeeeeeeee/awk-test.txt | awk 'BEGIN { FS = "'"'" === "'"'" } ; { print $1 }'", shell=True).decode('utf-8').strip():
+            return subprocess.check_output(f"cat /home/me/Downloads/meeeeeeeeeeeee/awk-test.txt | grep {next_distro} | awk '{{print $(NF)}}'")
+            break
+        else:
+            print("Invalid distro!")
+            continue
+
+
+def choose_distro_to_switch():
+    while True:
+        print("Type the name of a distro to switch to: (type 'list' to list them)")
+        next_distro = input("> ")
+        if next_distro == "q":
+            break
+        elif next_distro == "list":
+            os.system("cat /home/me/Downloads/meeeeeeeeeeeee/awk-test.txt | awk 'BEGIN { FS = "'"'" === "'"'" } ; { print $1 }' | less")
+        elif next_distro in subprocess.check_output("cat /home/me/Downloads/meeeeeeeeeeeee/awk-test.txt | awk 'BEGIN { FS = "'"'" === "'"'" } ; { print $1 }'", shell=True).decode('utf-8').strip():
+            return subprocess.check_output(f"cat //home//me//Downloads//meeeeeeeeeeeee//awk-test.txt | grep {next_distro} | print {{'$(NF)'}}", shell=True)
+            break
+        else:
+            print("Invalid distro!")
+            continue
+
+
+
+
+
+
+
+os.system(f"echo '{distro} === ' $(efibootmgr -v | grep {distro} | awk '{print $1}' | sed 's/[^0-9]*//g') | tee -a /mnt/boot/efi/EFI/map.txt")
+
+
+
+os.system("cat ~/Downloads/meeeeeeeeeeeee/awk-test.txt | awk 'BEGIN { FS = "'"'" Boot"'"'" } ; { print $2 }' > ~/Downloads/meeeeeeeeeeeee/awwww3.txt")
+
+
+
+def choose_distro_to_switch():
+    while True:
+        print("Type the name of a distro to switch to: (type 'list' to list them)")
+        next_distro = input("> ")
+        if next_distro == "q":
+            break
+        elif next_distro == "list":
+            os.system("cat ~/Downloads/meeeeeeeeeeeee/awk-test.txt | awk 'BEGIN { FS = "'"'" === "'"'" } ; { print $1 }' | less")
+        elif next_distro in subprocess.check_output("cat ~/Downloads/meeeeeeeeeeeee/awk-test.txt | awk 'BEGIN { FS = "'"'" === "'"'" } ; { print $1 }'", shell=True).decode('utf-8').strip():
+            
+            return next_distro
+            break
+        else:
+            print("Invalid distro!")
+            continue

@@ -1,0 +1,49 @@
+aa_props = {arr[1]: [arr[0]] + arr[2:] for arr in map(lambda x: x.split("\t"), aa_info)}
+
+
+import csv
+
+with open(r"/home/me/Downloads/meeeeeeeeeeeee/awk-test.txt", "r") as csv_file:
+    writer = csv.writer(csv_file, delimiter =",",quoting=csv.QUOTE_MINIMAL)
+    writer.writerow(["a","b"])
+    
+f=open("/home/me/Downloads/meeeeeeeeeeeee/awk-test.txt",'rb') # opens file for reading
+reader = csv.reader(f, delimiter ="=")
+for line in reader:
+    print line
+    
+f=open("/home/me/Downloads/meeeeeeeeeeeee/awk-test.txt",'r') # opens file for reading
+reader = csv.DictReader(f.read(), delimeter="=", quoting=csv.QUOTE_NONE)
+dictobj = next(reader)
+
+
+def test(next_distro):
+    import csv
+    input_file = csv.DictReader(open('/home/me/Downloads/meeeeeeeeeeeee/awk-test.txt', 'r'), delimiter=',', quoting=csv.QUOTE_NONE)
+    for row in input_file:
+        if row["DISTRO"] == next_distro:
+            return row["BootOrder"]
+
+def testme_WORKS(next_distro):
+    import csv
+    with open('/home/me/Downloads/meeeeeeeeeeeee/awk-test.txt', 'r') as f:
+        input_file = csv.DictReader(f, delimiter=',', quoting=csv.QUOTE_NONE)
+        for row in input_file:
+            if row["DISTRO"] == next_distro:
+                return row["BootOrder"]
+
+
+with open('/home/me/Downloads/meeeeeeeeeeeee/awk-test.txt', 'r') as f:
+    data = csv.DictReader(f, delimiter=',', quoting=csv.QUOTE_NONE)
+    columns = {fieldname: [row.get(fieldname) for row in data] for fieldname in data.fieldnames}
+    columns = {fieldname: [row.get(fieldname) for row in data] for fieldname in data.fieldnames}
+
+import csv
+with open('/home/me/Downloads/meeeeeeeeeeeee/awk-test.txt') as f:
+    reader = csv.reader(f)
+    headers = next(reader)
+    # transpose the data
+    # --> columns become rows and rows become columns
+    data = zip(*reader)
+    # create a dictionary by combining the headers with the data
+    d = dict(zip(headers, data))
