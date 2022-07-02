@@ -1,0 +1,714 @@
+
+t@archiso ~ #
+root@archiso ~ # git clone http://github.com/i2/ashos-dev
+Cloning into 'ashos-dev'...
+warning: redirecting to https://github.com/i2/ashos-dev/
+remote: Enumerating objects: 1447, done.
+remote: Counting objects: 100% (407/407), done.
+remote: Compressing objects: 100% (299/299), done.
+remote: Total 1447 (delta 276), reused 232 (delta 104), pack-reused 1040
+Receiving objects: 100% (1447/1447), 1.11 MiB | 5.49 MiB/s, done.
+Resolving deltas: 100% (941/941), done.
+root@archiso ~ # cd ashos-dev
+root@archiso ~/ashos-dev (git)-[main] # git pull
+warning: redirecting to https://github.com/i2/ashos-dev/
+remote: Enumerating objects: 25, done.
+remote: Counting objects: 100% (25/25), done.
+remote: Compressing objects: 100% (5/5), done.
+remote: Total 16 (delta 10), reused 16 (delta 10), pack-reused 0
+Unpacking objects: 100% (16/16), 12.65 KiB | 392.00 KiB/s, done.
+From http://github.com/i2/ashos-dev
+   c374f4f..84fa60e  debian     -> origin/debian
+Already up to date.
+root@archiso ~/ashos-dev (git)-[main] # git status
+On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean
+root@archiso ~/ashos-dev (git)-[main] # git checkout debian
+branch 'debian' set up to track 'origin/debian'.
+Switched to a new branch 'debian'
+root@archiso ~/ashos-dev (git)-[debian] # python3 init.py /dev/sda2 /dev/sda /dev/sda1
+Welcome to the astOS installer!
+
+
+
+
+
+Please choose one of the following:
+1. Single OS installation
+2. Initiate a multi-boot ashos setup
+3. Adding to an already installed ashos
+Please be aware choosing option 1 and 2 will wipe {args[1]}
+> 3
+Select a timezone (type list to list):
+> UTC
+Enter hostname:
+> archjul1
+Happy with your hostname (y/n)?
+> y
+:: Synchronizing package databases...
+ core                                            156.4 KiB   352 KiB/s 00:00 [############################################] 100%
+ extra                                          1720.6 KiB  7.31 MiB/s 00:00 [############################################] 100%
+ community                                         6.7 MiB  10.1 MiB/s 00:01 [############################################] 100%
+warning: archlinux-keyring-20220424-1 is up to date -- reinstalling
+resolving dependencies...
+looking for conflicting packages...
+
+Packages (1) archlinux-keyring-20220424-1
+
+Total Installed Size:  1.46 MiB
+Net Upgrade Size:      0.00 MiB
+
+:: Proceed with installation? [Y/n]
+(1/1) checking keys in keyring                                               [############################################] 100%
+(1/1) checking package integrity                                             [############################################] 100%
+(1/1) loading package files                                                  [############################################] 100%
+(1/1) checking for file conflicts                                            [############################################] 100%
+(1/1) checking available disk space                                          [############################################] 100%
+:: Processing package changes...
+(1/1) reinstalling archlinux-keyring                                         [############################################] 100%
+==> Appending keys from archlinux.gpg...
+==> Updating trust database...
+gpg: next trustdb check due at 2022-07-10
+==> Updating trust database...
+gpg: next trustdb check due at 2022-07-10
+:: Running post-transaction hooks...
+(1/1) Arming ConditionNeedsUpdate...
+Create subvolume '/mnt/@_arch'
+Create subvolume '/mnt/@.snapshots_arch'
+Create subvolume '/mnt/@home_arch'
+Create subvolume '/mnt/@var_arch'
+Create subvolume '/mnt/@etc_arch'
+Create subvolume '/mnt/@boot_arch'
+==> Creating install root at /mnt
+==> Installing packages to /mnt
+:: Synchronizing package databases...
+ core                                            156.4 KiB   586 KiB/s 00:00 [############################################] 100%
+ extra                                          1720.6 KiB  7.89 MiB/s 00:00 [############################################] 100%
+ community                                         6.7 MiB  10.0 MiB/s 00:01 [############################################] 100%
+resolving dependencies...
+:: There are 3 providers available for initramfs:
+:: Repository core
+   1) mkinitcpio
+:: Repository extra
+   2) booster  3) dracut
+
+Enter a number (default=1):
+looking for conflicting packages...
+
+Packages (132) acl-2.3.1-2  archlinux-keyring-20220424-1  argon2-20190702-4  attr-2.5.1-2  audit-3.0.8-1  bash-5.1.016-1
+               binutils-2.38-5  brotli-1.0.9-8  bzip2-1.0.8-4  ca-certificates-20210603-1  ca-certificates-mozilla-3.80-1
+               ca-certificates-utils-20210603-1  coreutils-9.1-1  cryptsetup-2.4.3-2  curl-7.84.0-1  dbus-1.14.0-1
+               device-mapper-2.03.16-1  diffutils-3.8-1  e2fsprogs-1.46.5-4  expat-2.4.8-1  file-5.42-1
+               filesystem-2021.12.07-1  findutils-4.9.0-1  gawk-5.1.1-1  gcc-libs-12.1.0-2  gdbm-1.23-1  gettext-0.21-2
+               glib2-2.72.2-1  glibc-2.35-6  gmp-6.2.1-2  gnupg-2.2.35-2  gnutls-3.7.6-1  gpgme-1.17.1-1  grep-3.7-1
+               gzip-1.12-1  hwdata-0.360-1  iana-etc-20220603-1  icu-71.1-1  iproute2-5.18.0-1  iptables-1:1.8.8-1
+               iputils-20211215-1  json-c-0.16-1  kbd-2.5.1-1  keyutils-1.6.3-1  kmod-29-3  krb5-1.19.3-3  less-1:590-1
+               libarchive-3.6.1-1  libassuan-2.5.5-1  libbpf-0.8.0-1  libcap-2.64-1  libcap-ng-0.8.3-1  libelf-0.187-1
+               libevent-2.1.12-1  libffi-3.4.2-5  libgcrypt-1.10.1-1  libgpg-error-1.45-2  libidn2-2.3.2-1  libksba-1.6.0-1
+               libldap-2.6.2-2  libmnl-1.0.5-1  libnetfilter_conntrack-1.0.9-1  libnfnetlink-1.0.2-1  libnftnl-1.2.2-1
+               libnghttp2-1.48.0-1  libnl-3.6.0-3  libnsl-2.0.0-2  libp11-kit-0.24.1-1  libpcap-1.10.1-2  libpsl-0.21.1-1
+               libsasl-2.1.28-1  libseccomp-2.5.4-1  libsecret-0.20.5-2  libssh2-1.10.0-1  libsysprof-capture-3.44.0-1
+               libtasn1-4.18.0-1  libtirpc-1.3.2-1  libunistring-1.0-1  libutempter-1.2.1-3  libverto-0.3.2-4
+               libxcrypt-4.4.28-2  libxml2-2.9.14-1  licenses-20220125-1  linux-api-headers-5.17.5-2  lz4-1:1.9.3-2  lzo-2.10-3
+               mkinitcpio-31-2  mkinitcpio-busybox-1.35.0-1  mpfr-4.1.0.p13-2  ncurses-6.3-3  nettle-3.8-1  npth-1.6-3
+               openssl-1.1.1.p-1  p11-kit-0.24.1-1  pacman-6.0.1-5  pacman-mirrorlist-20220605-1  pam-1.5.2-1
+               pambase-20211210-1  pciutils-3.8.0-2  pcre-8.45-1  pcre2-10.40-1  pinentry-1.2.0-1  popt-1.18-3
+               procps-ng-3.3.17-1  psmisc-23.5-1  python-six-1.16.0-5  readline-8.1.002-1  sed-4.8-1  shadow-4.11.1-1
+               sqlite-3.39.0-2  systemd-251.2-1  systemd-libs-251.2-1  systemd-sysvcompat-251.2-1  tar-1.34-1  tpm2-tss-3.2.0-1
+               tzdata-2022a-1  util-linux-2.38-1  util-linux-libs-2.38-1  xz-5.2.5-3  zlib-1:1.2.12-2  zstd-1.5.2-7
+               arch-install-scripts-24-2  base-2-2  btrfs-progs-5.18.1-1  grub-2:2.06.r261.g2f4430cc0-1  linux-5.18.7.arch1-1
+               nano-6.3-1  os-prober-1.80-1  python-3.10.5-1  python-anytree-2.8.0-5  sudo-1.9.11.p3-1  tmux-3.3_a-2
+
+Total Download Size:   316.28 MiB
+Total Installed Size:  757.62 MiB
+
+:: Proceed with installation? [Y/n]
+:: Retrieving packages...
+ linux-5.18.7.arch1-1-x86_64                     174.1 MiB  10.8 MiB/s 00:16 [############################################] 100%
+ gcc-libs-12.1.0-2-x86_64                         28.0 MiB  11.0 MiB/s 00:03 [############################################] 100%
+ python-3.10.5-1-x86_64                           11.7 MiB  10.6 MiB/s 00:01 [############################################] 100%
+ icu-71.1-1-x86_64                                10.8 MiB  10.5 MiB/s 00:01 [############################################] 100%
+ glibc-2.35-6-x86_64                               9.9 MiB  10.5 MiB/s 00:01 [############################################] 100%
+ systemd-251.2-1-x86_64                            7.2 MiB  10.2 MiB/s 00:01 [############################################] 100%
+ grub-2:2.06.r261.g2f4430cc0-1-x86_64              6.8 MiB  10.1 MiB/s 00:01 [############################################] 100%
+ binutils-2.38-5-x86_64                            5.9 MiB  9.88 MiB/s 00:01 [############################################] 100%
+ openssl-1.1.1.p-1-x86_64                          3.6 MiB  8.62 MiB/s 00:00 [############################################] 100%
+ glib2-2.72.2-1-x86_64                             2.8 MiB  8.64 MiB/s 00:00 [############################################] 100%
+ gnutls-3.7.6-1-x86_64                             2.8 MiB  8.93 MiB/s 00:00 [############################################] 100%
+ coreutils-9.1-1-x86_64                            2.6 MiB  8.57 MiB/s 00:00 [############################################] 100%
+ util-linux-2.38-1-x86_64                          2.4 MiB  8.75 MiB/s 00:00 [############################################] 100%
+ gnupg-2.2.35-2-x86_64                             2.3 MiB  8.46 MiB/s 00:00 [############################################] 100%
+ gettext-0.21-2-x86_64                          1829.5 KiB  7.57 MiB/s 00:00 [############################################] 100%
+ sudo-1.9.11.p3-1-x86_64                        1732.4 KiB  7.91 MiB/s 00:00 [############################################] 100%
+ bash-5.1.016-1-x86_64                          1667.7 KiB  7.76 MiB/s 00:00 [############################################] 100%
+ sqlite-3.39.0-2-x86_64                         1585.8 KiB  7.74 MiB/s 00:00 [############################################] 100%
+ libxml2-2.9.14-1-x86_64                        1362.6 KiB  7.00 MiB/s 00:00 [############################################] 100%
+ krb5-1.19.3-3-x86_64                           1272.0 KiB  6.64 MiB/s 00:00 [############################################] 100%
+ kbd-2.5.1-1-x86_64                             1241.0 KiB  7.01 MiB/s 00:00 [############################################] 100%
+ e2fsprogs-1.46.5-4-x86_64                      1199.3 KiB  6.73 MiB/s 00:00 [############################################] 100%
+ shadow-4.11.1-1-x86_64                         1191.6 KiB  6.61 MiB/s 00:00 [############################################] 100%
+ linux-api-headers-5.17.5-2-any                 1187.5 KiB  6.44 MiB/s 00:00 [############################################] 100%
+ gawk-5.1.1-1-x86_64                            1175.1 KiB  6.34 MiB/s 00:00 [############################################] 100%
+ ncurses-6.3-3-x86_64                           1169.7 KiB  5.83 MiB/s 00:00 [############################################] 100%
+ curl-7.84.0-1-x86_64                           1156.5 KiB  5.54 MiB/s 00:00 [############################################] 100%
+ pcre2-10.40-1-x86_64                           1139.5 KiB  6.96 MiB/s 00:00 [############################################] 100%
+ iproute2-5.18.0-1-x86_64                       1081.6 KiB  5.47 MiB/s 00:00 [############################################] 100%
+ archlinux-keyring-20220424-1-any               1051.1 KiB  5.90 MiB/s 00:00 [############################################] 100%
+ pcre-8.45-1-x86_64                              983.0 KiB  6.40 MiB/s 00:00 [############################################] 100%
+ btrfs-progs-5.18.1-1-x86_64                     942.0 KiB  5.03 MiB/s 00:00 [############################################] 100%
+ pacman-6.0.1-5-x86_64                           910.4 KiB  6.84 MiB/s 00:00 [############################################] 100%
+ tpm2-tss-3.2.0-1-x86_64                         838.3 KiB  6.11 MiB/s 00:00 [############################################] 100%
+ tar-1.34-1-x86_64                               817.2 KiB  6.33 MiB/s 00:00 [############################################] 100%
+ libunistring-1.0-1-x86_64                       662.0 KiB  5.09 MiB/s 00:00 [############################################] 100%
+ systemd-libs-251.2-1-x86_64                     631.0 KiB  4.97 MiB/s 00:00 [############################################] 100%
+ libgcrypt-1.10.1-1-x86_64                       588.1 KiB  4.32 MiB/s 00:00 [############################################] 100%
+ nano-6.3-1-x86_64                               586.5 KiB  5.07 MiB/s 00:00 [############################################] 100%
+ cryptsetup-2.4.3-2-x86_64                       585.5 KiB  4.40 MiB/s 00:00 [############################################] 100%
+ pam-1.5.2-1-x86_64                              572.6 KiB  4.66 MiB/s 00:00 [############################################] 100%
+ libelf-0.187-1-x86_64                           536.1 KiB  5.03 MiB/s 00:00 [############################################] 100%
+ procps-ng-3.3.17-1-x86_64                       516.6 KiB  4.31 MiB/s 00:00 [############################################] 100%
+ libarchive-3.6.1-1-x86_64                       511.4 KiB  4.54 MiB/s 00:00 [############################################] 100%
+ hwdata-0.360-1-any                              474.6 KiB  4.21 MiB/s 00:00 [############################################] 100%
+ libp11-kit-0.24.1-1-x86_64                      466.7 KiB  4.75 MiB/s 00:00 [############################################] 100%
+ brotli-1.0.9-8-x86_64                           462.8 KiB  4.22 MiB/s 00:00 [############################################] 100%
+ findutils-4.9.0-1-x86_64                        449.8 KiB  3.89 MiB/s 00:00 [############################################] 100%
+ nettle-3.8-1-x86_64                             443.1 KiB  4.04 MiB/s 00:00 [############################################] 100%
+ gpgme-1.17.1-1-x86_64                           441.1 KiB  4.03 MiB/s 00:00 [############################################] 100%
+ tmux-3.3_a-2-x86_64                             438.1 KiB  4.41 MiB/s 00:00 [############################################] 100%
+ gmp-6.2.1-2-x86_64                              437.3 KiB  3.78 MiB/s 00:00 [############################################] 100%
+ iptables-1:1.8.8-1-x86_64                       428.4 KiB  4.06 MiB/s 00:00 [############################################] 100%
+ libnl-3.6.0-3-x86_64                            406.6 KiB  4.22 MiB/s 00:00 [############################################] 100%
+ mpfr-4.1.0.p13-2-x86_64                         404.9 KiB  4.08 MiB/s 00:00 [############################################] 100%
+ zstd-1.5.2-7-x86_64                             394.4 KiB  3.74 MiB/s 00:00 [############################################] 100%
+ tzdata-2022a-1-x86_64                           394.0 KiB  3.97 MiB/s 00:00 [############################################] 100%
+ iana-etc-20220603-1-any                         394.0 KiB  4.01 MiB/s 00:00 [############################################] 100%
+ audit-3.0.8-1-x86_64                            383.4 KiB  3.86 MiB/s 00:00 [############################################] 100%
+ file-5.42-1-x86_64                              364.3 KiB  3.56 MiB/s 00:00 [############################################] 100%
+ diffutils-3.8-1-x86_64                          363.1 KiB  3.44 MiB/s 00:00 [############################################] 100%
+ util-linux-libs-2.38-1-x86_64                   360.4 KiB  3.48 MiB/s 00:00 [############################################] 100%
+ ca-certificates-mozilla-3.80-1-x86_64           358.8 KiB  3.77 MiB/s 00:00 [############################################] 100%
+ readline-8.1.002-1-x86_64                       315.7 KiB  3.31 MiB/s 00:00 [############################################] 100%
+ dbus-1.14.0-1-x86_64                            305.3 KiB  3.47 MiB/s 00:00 [############################################] 100%
+ xz-5.2.5-3-x86_64                               301.1 KiB  3.82 MiB/s 00:00 [############################################] 100%
+ device-mapper-2.03.16-1-x86_64                  297.0 KiB  3.33 MiB/s 00:00 [############################################] 100%
+ libldap-2.6.2-2-x86_64                          280.8 KiB  2.95 MiB/s 00:00 [############################################] 100%
+ libpcap-1.10.1-2-x86_64                         276.7 KiB  3.26 MiB/s 00:00 [############################################] 100%
+ mkinitcpio-busybox-1.35.0-1-x86_64              275.0 KiB  2.95 MiB/s 00:00 [############################################] 100%
+ libevent-2.1.12-1-x86_64                        270.2 KiB  3.18 MiB/s 00:00 [############################################] 100%
+ gdbm-1.23-1-x86_64                              265.8 KiB  2.79 MiB/s 00:00 [############################################] 100%
+ grep-3.7-1-x86_64                               248.1 KiB  2.78 MiB/s 00:00 [############################################] 100%
+ libbpf-0.8.0-1-x86_64                           241.7 KiB  3.37 MiB/s 00:00 [############################################] 100%
+ libgpg-error-1.45-2-x86_64                      241.6 KiB  2.54 MiB/s 00:00 [############################################] 100%
+ sed-4.8-1-x86_64                                237.9 KiB  2.47 MiB/s 00:00 [############################################] 100%
+ libssh2-1.10.0-1-x86_64                         213.4 KiB  2.98 MiB/s 00:00 [############################################] 100%
+ libsecret-0.20.5-2-x86_64                       191.9 KiB  2.43 MiB/s 00:00 [############################################] 100%
+ psmisc-23.5-1-x86_64                            190.9 KiB  2.45 MiB/s 00:00 [############################################] 100%
+ libtirpc-1.3.2-1-x86_64                         176.8 KiB  2.33 MiB/s 00:00 [############################################] 100%
+ libsasl-2.1.28-1-x86_64                         145.5 KiB  1819 KiB/s 00:00 [############################################] 100%
+ p11-kit-0.24.1-1-x86_64                         140.5 KiB  1924 KiB/s 00:00 [############################################] 100%
+ libidn2-2.3.2-1-x86_64                          140.2 KiB  1612 KiB/s 00:00 [############################################] 100%
+ libksba-1.6.0-1-x86_64                          137.9 KiB  1661 KiB/s 00:00 [############################################] 100%
+ acl-2.3.1-2-x86_64                              135.7 KiB  1696 KiB/s 00:00 [############################################] 100%
+ iputils-20211215-1-x86_64                       134.3 KiB  1679 KiB/s 00:00 [############################################] 100%
+ libtasn1-4.18.0-1-x86_64                        126.6 KiB  1217 KiB/s 00:00 [############################################] 100%
+ pinentry-1.2.0-1-x86_64                         126.1 KiB  1467 KiB/s 00:00 [############################################] 100%
+ lz4-1:1.9.3-2-x86_64                            120.2 KiB  1382 KiB/s 00:00 [############################################] 100%
+ expat-2.4.8-1-x86_64                            118.3 KiB  1536 KiB/s 00:00 [############################################] 100%
+ kmod-29-3-x86_64                                116.8 KiB  1947 KiB/s 00:00 [############################################] 100%
+ less-1:590-1-x86_64                             115.1 KiB  1919 KiB/s 00:00 [############################################] 100%
+ libassuan-2.5.5-1-x86_64                        106.6 KiB  1524 KiB/s 00:00 [############################################] 100%
+ pciutils-3.8.0-2-x86_64                         103.1 KiB  1413 KiB/s 00:00 [############################################] 100%
+ keyutils-1.6.3-1-x86_64                         102.1 KiB  1595 KiB/s 00:00 [############################################] 100%
+ libnghttp2-1.48.0-1-x86_64                       95.1 KiB  1441 KiB/s 00:00 [############################################] 100%
+ zlib-1:1.2.12-2-x86_64                           90.4 KiB  1587 KiB/s 00:00 [############################################] 100%
+ libseccomp-2.5.4-1-x86_64                        88.1 KiB  1546 KiB/s 00:00 [############################################] 100%
+ libxcrypt-4.4.28-2-x86_64                        84.0 KiB  1273 KiB/s 00:00 [############################################] 100%
+ libcap-2.64-1-x86_64                             82.9 KiB  1382 KiB/s 00:00 [############################################] 100%
+ lzo-2.10-3-x86_64                                82.5 KiB  1232 KiB/s 00:00 [############################################] 100%
+ gzip-1.12-1-x86_64                               79.6 KiB  1327 KiB/s 00:00 [############################################] 100%
+ libpsl-0.21.1-1-x86_64                           79.6 KiB  1326 KiB/s 00:00 [############################################] 100%
+ popt-1.18-3-x86_64                               70.6 KiB   967 KiB/s 00:00 [############################################] 100%
+ licenses-20220125-1-any                          69.0 KiB  1210 KiB/s 00:00 [############################################] 100%
+ libnftnl-1.2.2-1-x86_64                          68.8 KiB  1146 KiB/s 00:00 [############################################] 100%
+ attr-2.5.1-2-x86_64                              67.5 KiB  1185 KiB/s 00:00 [############################################] 100%
+ bzip2-1.0.8-4-x86_64                             57.2 KiB   908 KiB/s 00:00 [############################################] 100%
+ json-c-0.16-1-x86_64                             54.6 KiB   958 KiB/s 00:00 [############################################] 100%
+ libnetfilter_conntrack-1.0.9-1-x86_64            49.0 KiB   924 KiB/s 00:00 [############################################] 100%
+ libsysprof-capture-3.44.0-1-x86_64               45.2 KiB   753 KiB/s 00:00 [############################################] 100%
+ python-anytree-2.8.0-5-any                       45.1 KiB   752 KiB/s 00:00 [############################################] 100%
+ libffi-3.4.2-5-x86_64                            45.1 KiB   751 KiB/s 00:00 [############################################] 100%
+ mkinitcpio-31-2-any                              44.5 KiB   824 KiB/s 00:00 [############################################] 100%
+ libcap-ng-0.8.3-1-x86_64                         41.6 KiB   694 KiB/s 00:00 [############################################] 100%
+ argon2-20190702-4-x86_64                         32.4 KiB   579 KiB/s 00:00 [############################################] 100%
+ npth-1.6-3-x86_64                                24.5 KiB   430 KiB/s 00:00 [############################################] 100%
+ python-six-1.16.0-5-any                          23.2 KiB   387 KiB/s 00:00 [############################################] 100%
+ libnsl-2.0.0-2-x86_64                            21.8 KiB   436 KiB/s 00:00 [############################################] 100%
+ libverto-0.3.2-4-x86_64                          18.4 KiB   341 KiB/s 00:00 [############################################] 100%
+ os-prober-1.80-1-x86_64                          17.4 KiB   348 KiB/s 00:00 [############################################] 100%
+ libnfnetlink-1.0.2-1-x86_64                      17.1 KiB   306 KiB/s 00:00 [############################################] 100%
+ filesystem-2021.12.07-1-x86_64                   14.5 KiB   268 KiB/s 00:00 [############################################] 100%
+ arch-install-scripts-24-2-any                    14.1 KiB   193 KiB/s 00:00 [############################################] 100%
+ libmnl-1.0.5-1-x86_64                            11.2 KiB   212 KiB/s 00:00 [############################################] 100%
+ libutempter-1.2.1-3-x86_64                        9.4 KiB   174 KiB/s 00:00 [############################################] 100%
+ ca-certificates-utils-20210603-1-any              8.2 KiB   137 KiB/s 00:00 [############################################] 100%
+ pacman-mirrorlist-20220605-1-any                  7.6 KiB   176 KiB/s 00:00 [############################################] 100%
+ systemd-sysvcompat-251.2-1-x86_64                 5.6 KiB   104 KiB/s 00:00 [############################################] 100%
+ pambase-20211210-1-any                            3.1 KiB  54.7 KiB/s 00:00 [############################################] 100%
+ base-2-2-any                                      2.1 KiB  42.8 KiB/s 00:00 [############################################] 100%
+ ca-certificates-20210603-1-any                 2028.0   B  39.6 KiB/s 00:00 [############################################] 100%
+ Total (132/132)                                 316.3 MiB  8.52 MiB/s 00:37 [############################################] 100%
+(132/132) checking keys in keyring                                           [############################################] 100%
+(132/132) checking package integrity                                         [############################################] 100%
+(132/132) loading package files                                              [############################################] 100%
+(132/132) checking for file conflicts                                        [############################################] 100%
+(132/132) checking available disk space                                      [############################################] 100%
+:: Processing package changes...
+(  1/132) installing iana-etc                                                [############################################] 100%
+(  2/132) installing filesystem                                              [############################################] 100%
+warning: directory permissions differ on /mnt/root/
+filesystem: 755  package: 750
+(  3/132) installing linux-api-headers                                       [############################################] 100%
+(  4/132) installing tzdata                                                  [############################################] 100%
+(  5/132) installing glibc                                                   [############################################] 100%
+Optional dependencies for glibc
+    gd: for memusagestat
+    perl: for mtrace
+(  6/132) installing gcc-libs                                                [############################################] 100%
+(  7/132) installing ncurses                                                 [############################################] 100%
+Optional dependencies for ncurses
+    bash: for ncursesw6-config [pending]
+(  8/132) installing readline                                                [############################################] 100%
+(  9/132) installing bash                                                    [############################################] 100%
+Optional dependencies for bash
+    bash-completion: for tab completion
+( 10/132) installing attr                                                    [############################################] 100%
+( 11/132) installing acl                                                     [############################################] 100%
+( 12/132) installing gmp                                                     [############################################] 100%
+( 13/132) installing util-linux-libs                                         [############################################] 100%
+( 14/132) installing e2fsprogs                                               [############################################] 100%
+Optional dependencies for e2fsprogs
+    lvm2: for e2scrub
+    util-linux: for e2scrub [pending]
+    smtp-forwarder: for e2scrub_fail script
+( 15/132) installing gdbm                                                    [############################################] 100%
+( 16/132) installing openssl                                                 [############################################] 100%
+Optional dependencies for openssl
+    ca-certificates [pending]
+    perl
+( 17/132) installing libsasl                                                 [############################################] 100%
+( 18/132) installing libldap                                                 [############################################] 100%
+( 19/132) installing keyutils                                                [############################################] 100%
+( 20/132) installing libevent                                                [############################################] 100%
+Optional dependencies for libevent
+    python: to use event_rpcgen.py [pending]
+( 21/132) installing libverto                                                [############################################] 100%
+( 22/132) installing krb5                                                    [############################################] 100%
+( 23/132) installing libtirpc                                                [############################################] 100%
+( 24/132) installing pambase                                                 [############################################] 100%
+( 25/132) installing libcap-ng                                               [############################################] 100%
+( 26/132) installing audit                                                   [############################################] 100%
+( 27/132) installing libxcrypt                                               [############################################] 100%
+( 28/132) installing pam                                                     [############################################] 100%
+( 29/132) installing libcap                                                  [############################################] 100%
+( 30/132) installing coreutils                                               [############################################] 100%
+( 31/132) installing zlib                                                    [############################################] 100%
+( 32/132) installing xz                                                      [############################################] 100%
+( 33/132) installing bzip2                                                   [############################################] 100%
+( 34/132) installing libseccomp                                              [############################################] 100%
+( 35/132) installing file                                                    [############################################] 100%
+( 36/132) installing findutils                                               [############################################] 100%
+( 37/132) installing mpfr                                                    [############################################] 100%
+( 38/132) installing gawk                                                    [############################################] 100%
+( 39/132) installing pcre                                                    [############################################] 100%
+( 40/132) installing grep                                                    [############################################] 100%
+( 41/132) installing libgpg-error                                            [############################################] 100%
+( 42/132) installing libgcrypt                                               [############################################] 100%
+( 43/132) installing libtasn1                                                [############################################] 100%
+( 44/132) installing libffi                                                  [############################################] 100%
+( 45/132) installing libp11-kit                                              [############################################] 100%
+( 46/132) installing lz4                                                     [############################################] 100%
+( 47/132) installing zstd                                                    [############################################] 100%
+( 48/132) installing systemd-libs                                            [############################################] 100%
+( 49/132) installing procps-ng                                               [############################################] 100%
+( 50/132) installing sed                                                     [############################################] 100%
+( 51/132) installing tar                                                     [############################################] 100%
+( 52/132) installing libunistring                                            [############################################] 100%
+( 53/132) installing icu                                                     [############################################] 100%
+( 54/132) installing libxml2                                                 [############################################] 100%
+Optional dependencies for libxml2
+    python: Python bindings [pending]
+( 55/132) installing gettext                                                 [############################################] 100%
+Optional dependencies for gettext
+    git: for autopoint infrastructure updates
+( 56/132) installing hwdata                                                  [############################################] 100%
+( 57/132) installing kmod                                                    [############################################] 100%
+( 58/132) installing pciutils                                                [############################################] 100%
+( 59/132) installing psmisc                                                  [############################################] 100%
+( 60/132) installing shadow                                                  [############################################] 100%
+( 61/132) installing util-linux                                              [############################################] 100%
+Optional dependencies for util-linux
+    python: python bindings to libmount [pending]
+    words: default dictionary for look
+( 62/132) installing pcre2                                                   [############################################] 100%
+( 63/132) installing less                                                    [############################################] 100%
+( 64/132) installing gzip                                                    [############################################] 100%
+( 65/132) installing licenses                                                [############################################] 100%
+( 66/132) installing expat                                                   [############################################] 100%
+( 67/132) installing libarchive                                              [############################################] 100%
+( 68/132) installing p11-kit                                                 [############################################] 100%
+( 69/132) installing ca-certificates-utils                                   [############################################] 100%
+( 70/132) installing ca-certificates-mozilla                                 [############################################] 100%
+( 71/132) installing ca-certificates                                         [############################################] 100%
+( 72/132) installing brotli                                                  [############################################] 100%
+( 73/132) installing libidn2                                                 [############################################] 100%
+( 74/132) installing libnghttp2                                              [############################################] 100%
+( 75/132) installing libpsl                                                  [############################################] 100%
+( 76/132) installing libssh2                                                 [############################################] 100%
+( 77/132) installing curl                                                    [############################################] 100%
+( 78/132) installing npth                                                    [############################################] 100%
+( 79/132) installing libksba                                                 [############################################] 100%
+( 80/132) installing libassuan                                               [############################################] 100%
+( 81/132) installing libsysprof-capture                                      [############################################] 100%
+( 82/132) installing glib2                                                   [############################################] 100%
+Optional dependencies for glib2
+    python: gdbus-codegen, glib-genmarshal, glib-mkenums, gtester-report [pending]
+    libelf: gresource inspection tool [pending]
+    gvfs: most gio functionality
+( 83/132) installing json-c                                                  [############################################] 100%
+( 84/132) installing tpm2-tss                                                [############################################] 100%
+( 85/132) installing libsecret                                               [############################################] 100%
+Optional dependencies for libsecret
+    org.freedesktop.secrets: secret storage backend
+( 86/132) installing pinentry                                                [############################################] 100%
+Optional dependencies for pinentry
+    gtk2: gtk2 backend
+    qt5-base: qt backend
+    gcr: gnome3 backend
+( 87/132) installing nettle                                                  [############################################] 100%
+( 88/132) installing gnutls                                                  [############################################] 100%
+Optional dependencies for gnutls
+    guile: for use with Guile bindings
+    tpm2-tss: support for TPM2 wrapped keys [installed]
+    zstd: for compression support [installed]
+( 89/132) installing sqlite                                                  [############################################] 100%
+( 90/132) installing gnupg                                                   [############################################] 100%
+Optional dependencies for gnupg
+    libldap: gpg2keys_ldap [installed]
+    libusb-compat: scdaemon
+    pcsclite: scdaemon
+( 91/132) installing gpgme                                                   [############################################] 100%
+( 92/132) installing pacman-mirrorlist                                       [############################################] 100%
+( 93/132) installing archlinux-keyring                                       [############################################] 100%
+( 94/132) installing pacman                                                  [############################################] 100%
+Optional dependencies for pacman
+    perl-locale-gettext: translation support in makepkg-template
+( 95/132) installing device-mapper                                           [############################################] 100%
+( 96/132) installing popt                                                    [############################################] 100%
+( 97/132) installing argon2                                                  [############################################] 100%
+( 98/132) installing cryptsetup                                              [############################################] 100%
+( 99/132) installing dbus                                                    [############################################] 100%
+(100/132) installing libmnl                                                  [############################################] 100%
+(101/132) installing libnftnl                                                [############################################] 100%
+(102/132) installing libnl                                                   [############################################] 100%
+(103/132) installing libpcap                                                 [############################################] 100%
+(104/132) installing libnfnetlink                                            [############################################] 100%
+(105/132) installing libnetfilter_conntrack                                  [############################################] 100%
+(106/132) installing iptables                                                [############################################] 100%
+(107/132) installing kbd                                                     [############################################] 100%
+(108/132) installing libelf                                                  [############################################] 100%
+(109/132) installing systemd                                                 [############################################] 100%
+Initializing machine ID from random generator.
+Creating group 'sys' with GID 3.
+Creating group 'mem' with GID 8.
+Creating group 'ftp' with GID 11.
+Creating group 'mail' with GID 12.
+Creating group 'log' with GID 19.
+Creating group 'smmsp' with GID 25.
+Creating group 'proc' with GID 26.
+Creating group 'games' with GID 50.
+Creating group 'lock' with GID 54.
+Creating group 'network' with GID 90.
+Creating group 'floppy' with GID 94.
+Creating group 'scanner' with GID 96.
+Creating group 'power' with GID 98.
+Creating group 'nobody' with GID 65534.
+Creating group 'adm' with GID 999.
+Creating group 'wheel' with GID 998.
+Creating group 'utmp' with GID 997.
+Creating group 'audio' with GID 996.
+Creating group 'disk' with GID 995.
+Creating group 'input' with GID 994.
+Creating group 'kmem' with GID 993.
+Creating group 'kvm' with GID 992.
+Creating group 'lp' with GID 991.
+Creating group 'optical' with GID 990.
+Creating group 'render' with GID 989.
+Creating group 'sgx' with GID 988.
+Creating group 'storage' with GID 987.
+Creating group 'tty' with GID 5.
+Creating group 'uucp' with GID 986.
+Creating group 'video' with GID 985.
+Creating group 'users' with GID 984.
+Creating group 'systemd-journal' with GID 983.
+Creating group 'rfkill' with GID 982.
+Creating group 'bin' with GID 1.
+Creating user 'bin' (n/a) with UID 1 and GID 1.
+Creating group 'daemon' with GID 2.
+Creating user 'daemon' (n/a) with UID 2 and GID 2.
+Creating user 'mail' (n/a) with UID 8 and GID 12.
+Creating user 'ftp' (n/a) with UID 14 and GID 11.
+Creating group 'http' with GID 33.
+Creating user 'http' (n/a) with UID 33 and GID 33.
+Creating user 'nobody' (Nobody) with UID 65534 and GID 65534.
+Creating group 'dbus' with GID 81.
+Creating user 'dbus' (System Message Bus) with UID 81 and GID 81.
+Creating group 'systemd-coredump' with GID 981.
+Creating user 'systemd-coredump' (systemd Core Dumper) with UID 981 and GID 981.
+Creating group 'systemd-network' with GID 980.
+Creating user 'systemd-network' (systemd Network Management) with UID 980 and GID 980.
+Creating group 'systemd-oom' with GID 979.
+Creating user 'systemd-oom' (systemd Userspace OOM Killer) with UID 979 and GID 979.
+Creating group 'systemd-journal-remote' with GID 978.
+Creating user 'systemd-journal-remote' (systemd Journal Remote) with UID 978 and GID 978.
+Creating group 'systemd-resolve' with GID 977.
+Creating user 'systemd-resolve' (systemd Resolver) with UID 977 and GID 977.
+Creating group 'systemd-timesync' with GID 976.
+Creating user 'systemd-timesync' (systemd Time Synchronization) with UID 976 and GID 976.
+Creating group 'tss' with GID 975.
+Creating user 'tss' (tss user for tpm2) with UID 975 and GID 975.
+Creating group 'uuidd' with GID 68.
+Creating user 'uuidd' (n/a) with UID 68 and GID 68.
+Created symlink /etc/systemd/system/getty.target.wants/getty@tty1.service → /usr/lib/systemd/system/getty@.service.
+Created symlink /etc/systemd/system/multi-user.target.wants/remote-fs.target → /usr/lib/systemd/system/remote-fs.target.
+Optional dependencies for systemd
+    libmicrohttpd: remote journald capabilities
+    quota-tools: kernel-level quota management
+    systemd-sysvcompat: symlink package to provide sysvinit binaries [pending]
+    polkit: allow administration as unprivileged user
+    curl: machinectl pull-tar and pull-raw [installed]
+    libfido2: unlocking LUKS2 volumes with FIDO2 token
+    tpm2-tss: unlocking LUKS2 volumes with TPM2 [installed]
+(110/132) installing systemd-sysvcompat                                      [############################################] 100%
+(111/132) installing iputils                                                 [############################################] 100%
+(112/132) installing libbpf                                                  [############################################] 100%
+(113/132) installing iproute2                                                [############################################] 100%
+Optional dependencies for iproute2
+    db: userspace arp daemon
+    libcap: tipc [installed]
+    linux-atm: ATM support
+(114/132) installing base                                                    [############################################] 100%
+Optional dependencies for base
+    linux: bare metal support [pending]
+(115/132) installing mkinitcpio-busybox                                      [############################################] 100%
+(116/132) installing binutils                                                [############################################] 100%
+Optional dependencies for binutils
+    debuginfod: for debuginfod server/client functionality
+(117/132) installing diffutils                                               [############################################] 100%
+(118/132) installing mkinitcpio                                              [############################################] 100%
+Optional dependencies for mkinitcpio
+    gzip: Use gzip compression for the initramfs image [installed]
+    xz: Use lzma or xz compression for the initramfs image [installed]
+    bzip2: Use bzip2 compression for the initramfs image [installed]
+    lzop: Use lzo compression for the initramfs image
+    lz4: Use lz4 compression for the initramfs image [installed]
+    mkinitcpio-nfs-utils: Support for root filesystem on NFS
+(119/132) installing linux                                                   [############################################] 100%
+Optional dependencies for linux
+    wireless-regdb: to set the correct wireless channels of your country
+    linux-firmware: firmware images needed for some devices
+(120/132) installing nano                                                    [############################################] 100%
+(121/132) installing libnsl                                                  [############################################] 100%
+(122/132) installing python                                                  [############################################] 100%
+Optional dependencies for python
+    python-setuptools
+    python-pip
+    sqlite [installed]
+    mpdecimal: for decimal
+    xz: for lzma [installed]
+    tk: for tkinter
+(123/132) installing python-six                                              [############################################] 100%
+(124/132) installing python-anytree                                          [############################################] 100%
+(125/132) installing arch-install-scripts                                    [############################################] 100%
+(126/132) installing lzo                                                     [############################################] 100%
+(127/132) installing btrfs-progs                                             [############################################] 100%
+Optional dependencies for btrfs-progs
+    python: libbtrfsutil python bindings [installed]
+    e2fsprogs: btrfs-convert [installed]
+    reiserfsprogs: btrfs-convert
+(128/132) installing grub                                                    [############################################] 100%
+:: Generate your bootloader configuration with:
+     grub-mkconfig -o /boot/grub/grub.cfg
+Optional dependencies for grub
+    freetype2: For grub-mkfont usage
+    fuse2: For grub-mount usage
+    dosfstools: For grub-mkrescue FAT FS and EFI support
+    lzop: For grub-mkrescue LZO support
+    efibootmgr: For grub-install EFI support
+    libisoburn: Provides xorriso for generating grub rescue iso using grub-mkrescue
+    os-prober: To detect other OSes when generating grub.cfg in BIOS systems [pending]
+    mtools: For grub-mkrescue FAT FS support
+(129/132) installing sudo                                                    [############################################] 100%
+(130/132) installing os-prober                                               [############################################] 100%
+(131/132) installing libutempter                                             [############################################] 100%
+(132/132) installing tmux                                                    [############################################] 100%
+:: Running post-transaction hooks...
+( 1/12) Creating system user accounts...
+( 2/12) Updating journal message catalog...
+( 3/12) Reloading system manager configuration...
+  Skipped: Running in chroot.
+( 4/12) Updating udev hardware database...
+( 5/12) Applying kernel sysctl settings...
+  Skipped: Running in chroot.
+( 6/12) Creating temporary files...
+( 7/12) Reloading device manager configuration...
+  Skipped: Running in chroot.
+( 8/12) Arming ConditionNeedsUpdate...
+( 9/12) Rebuilding certificate stores...
+(10/12) Updating module dependencies...
+(11/12) Updating linux initcpios...
+==> Building image from preset: /etc/mkinitcpio.d/linux.preset: 'default'
+  -> -k /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img
+==> Starting build: 5.18.7-arch1-1
+  -> Running build hook: [base]
+  -> Running build hook: [udev]
+  -> Running build hook: [autodetect]
+  -> Running build hook: [modconf]
+  -> Running build hook: [block]
+  -> Running build hook: [filesystems]
+  -> Running build hook: [keyboard]
+  -> Running build hook: [fsck]
+==> Generating module dependencies
+==> Creating zstd-compressed initcpio image: /boot/initramfs-linux.img
+==> Image generation successful
+==> Building image from preset: /etc/mkinitcpio.d/linux.preset: 'fallback'
+  -> -k /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux-fallback.img -S autodetect
+==> Starting build: 5.18.7-arch1-1
+  -> Running build hook: [base]
+  -> Running build hook: [udev]
+  -> Running build hook: [modconf]
+  -> Running build hook: [block]
+==> WARNING: Possibly missing firmware for module: advansys
+==> WARNING: Possibly missing firmware for module: aic94xx
+==> WARNING: Possibly missing firmware for module: bfa
+==> WARNING: Possibly missing firmware for module: cxgb4
+==> WARNING: Possibly missing firmware for module: csiostor
+==> WARNING: Possibly missing firmware for module: cxgb3
+==> WARNING: Possibly missing firmware for module: isci
+==> WARNING: Possibly missing firmware for module: qed
+==> WARNING: Possibly missing firmware for module: qla1280
+==> WARNING: Possibly missing firmware for module: qla2xxx
+==> WARNING: Possibly missing firmware for module: wd719x
+==> WARNING: Possibly missing firmware for module: xhci_pci
+==> WARNING: Possibly missing firmware for module: ums_eneub6250
+  -> Running build hook: [filesystems]
+  -> Running build hook: [keyboard]
+  -> Running build hook: [fsck]
+==> Generating module dependencies
+==> Creating zstd-compressed initcpio image: /boot/initramfs-linux-fallback.img
+==> Image generation successful
+(12/12) Reloading system bus configuration...
+  Skipped: Running in chroot.
+==> Creating install root at /mnt
+==> Installing packages to /mnt
+:: Synchronizing package databases...
+ core is up to date
+ extra is up to date
+ community                                         6.7 MiB  3.94 MiB/s 00:02 [############################################] 100%
+resolving dependencies...
+looking for conflicting packages...
+
+Packages (2) efivar-38-2  efibootmgr-17-2
+
+Total Download Size:   0.17 MiB
+Total Installed Size:  0.63 MiB
+
+:: Proceed with installation? [Y/n]
+:: Retrieving packages...
+ efivar-38-2-x86_64                              145.5 KiB   927 KiB/s 00:00 [############################################] 100%
+ efibootmgr-17-2-x86_64                           27.4 KiB   435 KiB/s 00:00 [############################################] 100%
+ Total (2/2)                                     172.9 KiB   786 KiB/s 00:00 [############################################] 100%
+(2/2) checking keys in keyring                                               [############################################] 100%
+(2/2) checking package integrity                                             [############################################] 100%
+(2/2) loading package files                                                  [############################################] 100%
+(2/2) checking for file conflicts                                            [############################################] 100%
+(2/2) checking available disk space                                          [############################################] 100%
+:: Processing package changes...
+(1/2) installing efivar                                                      [############################################] 100%
+(2/2) installing efibootmgr                                                  [############################################] 100%
+:: Running post-transaction hooks...
+(1/1) Arming ConditionNeedsUpdate...
+UUID="a0638131-0a62-441a-8622-8ec4a73b1df5" / btrfs subvol=@_arch,compress=zstd,noatime,ro 0 0
+UUID="a0638131-0a62-441a-8622-8ec4a73b1df5" / btrfs subvol=@_arch,compress=zstd,noatime 0 0
+UUID="a0638131-0a62-441a-8622-8ec4a73b1df5" /.snapshots btrfs subvol=@.snapshots_arch,compress=zstd,noatime 0 0
+UUID="a0638131-0a62-441a-8622-8ec4a73b1df5" /home btrfs subvol=@home_arch,compress=zstd,noatime 0 0
+UUID="a0638131-0a62-441a-8622-8ec4a73b1df5" /var btrfs subvol=@var_arch,compress=zstd,noatime 0 0
+UUID="a0638131-0a62-441a-8622-8ec4a73b1df5" /etc btrfs subvol=@etc_arch,compress=zstd,noatime 0 0
+UUID="a0638131-0a62-441a-8622-8ec4a73b1df5" /boot btrfs subvol=@boot_arch,compress=zstd,noatime 0 0
+UUID="8867-8C55" /boot/efi vfat umask=0077 0 2
+/.snapshots/ast/root /root none bind 0 0
+/.snapshots/ast/tmp /tmp none bind 0 0
+0
+archjul1
+Generating locales...
+Generation complete.
+LANG=en_US.UTF-8
+Setting a password for 'root':
+New password:
+Retype new password:
+passwd: password updated successfully
+Was your password set properly (y/n)?
+> y
+Enter username (all lowercase, max 8 letters)
+> me2
+Happy with your username (y/n)?
+> y
+%wheel ALL=(ALL:ALL) ALL
+export XDG_RUNTIME_DIR="/run/user/1000"
+Setting a password for 'me2':
+New password:
+Retype new password:
+passwd: password updated successfully
+Was your password set properly (y/n)?
+> y
+{'name': 'root', 'children': [{'name': '0'}]}
+sed: -e expression #1, char 12: unterminated `s' command
+Installing for x86_64-efi platform.
+Installation finished. No error reported.
+Generating grub configuration file ...
+Found linux image: /boot/vmlinuz-linux
+Found initrd image: /boot/initramfs-linux.img
+Found fallback initrd image(s) in /boot:  initramfs-linux-fallback.img
+Warning: os-prober will not be executed to detect other bootable partitions.
+Systems on them will not be added to the GRUB boot configuration.
+Check GRUB_DISABLE_OS_PROBER documentation entry.
+Adding boot menu entry for UEFI Firmware Settings ...
+done
+arch === Boot0007* arch HD(1,GPT,588a0fb3-d20c-472a-8816-38c624b660bf,0x22,0x7ffde)/File(\EFI\arch\grubx64.efi)
+cp: missing destination file operand after '/boot/efi/EFI/map.txt_ashos'
+Try 'cp --help' for more information.
+sh: line 2: arch: command not found
+sh: line 3: map.txt.BAK: command not found
+sh: line 4: debian: command not found
+sh: line 5: map.txt: command not found
+sh: line 6: arch: command not found
+sh: line 7: map.txt.BAK: command not found
+sh: line 8: debian: command not found
+sh: line 9: map.txt.BAK: command not found
+Create a readonly snapshot of '/mnt' in '/mnt/.snapshots/rootfs/snapshot-0'
+Create subvolume '/mnt/.snapshots/boot/boot-tmp'
+Create subvolume '/mnt/.snapshots/etc/etc-tmp'
+Create subvolume '/mnt/.snapshots/var/var-tmp'
+Create a readonly snapshot of '/mnt/.snapshots/boot/boot-tmp' in '/mnt/.snapshots/boot/boot-0'
+Create a readonly snapshot of '/mnt/.snapshots/etc/etc-tmp' in '/mnt/.snapshots/etc/etc-0'
+Create a readonly snapshot of '/mnt/.snapshots/var/var-tmp' in '/mnt/.snapshots/var/var-0'
+a0638131-0a62-441a-8622-8ec4a73b1df5
+Create a snapshot of '/mnt/.snapshots/rootfs/snapshot-0' in '/mnt/.snapshots/rootfs/snapshot-tmp'
+Delete subvolume (no-commit): '/mnt/@_arch'
+Installation complete
+You can reboot now :)
+python3 init.py /dev/sda2 /dev/sda /dev/sda1  29.59s user 26.14s system 24% cpu 3:49.10 total
+root@archiso ~/ashos-dev (git)-[debian] #
+
+

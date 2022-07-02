@@ -5,6 +5,19 @@ import os
 import re
 import subprocess
 import sys
+#MOVEDDOWN from anytree.importer import DictImporter
+#MOVEDDOWN from anytree.exporter import DictExporter
+#MOVEDDOWN import anytree
+
+#MOVEDDOWN args = list(sys.argv)
+#distro = subprocess.check_output(['sh', 'detect_os.sh']).decode('utf-8').replace('"',"").strip()
+
+# TODO ------------
+# General code cleanup
+# Maybe port for other distros?
+# A clean way to completely unistall ast
+# Implement AUR package maintenance between snapshots
+# -----------------
 
 # Directories
 # All snapshots share one /var
@@ -50,6 +63,35 @@ def switch_distro():
         else:
             print("Invalid distro!")
             continue
+
+def detect_previous_distro(p):
+    tmp_sda2 = subprocess.check_output("cat /dev/urandom | od -x | tr -d ' ' | head -n 1", shell=True).decode('utf-8').strip()
+    os.system(f"mkdir /tmp/{tmp_sda2}")
+    os.system(f"mount /dev/{p} /tmp/{tmp_sda2}")
+    pd = subprocess.check_output(['sh', f'detect_os.sh /tmp/{tmp_sda2}/']).decode('utf-8').replace('"',"").strip()
+    os.system(f"umount /tmp/{tmp_sda2}")
+    return pd
+    #os.system(f"rm -rf /tmp/{tmp_sda2}") ##if successful umount ( check result of 'echo $?' )
+
+def rename_distro_subvolumes(p):  ### Maybe can reuse ast functions from cuberjan3? #potentially receive 3 arguments: partition, string1 (suffix right now) and string2 (desired suffix)
+    tmp_sda2 = subprocess.check_output("cat /dev/urandom | od -x | tr -d ' ' | head -n 1", shell=True).decode('utf-8').strip()
+###     os.system(f"mkdir /tmp/{tmp_sda2}")
+###     os.system(f"mount -o subvolid=5 /dev/{p} /tmp/{tmp_sda2}")
+    for i in ["@.snapshots", "@boot", "@etc", "@home", "var"]:
+        os.system(f'mv "/tmp/{tmp_sda2}/{i}" "/tmp/{tmp_sda2}/{i}_{d}"')
+###     pd = subprocess.check_output(['sh', f'detect_os.sh /tmp/{tmp_sda2}/']).decode('utf-8').replace('"',"").strip()
+###     os.system(f"umount /tmp/{tmp_sda2}")
+###     return pd
+    #os.system(f"rm -rf /tmp/{tmp_sda2}") ##if successful umount ( check result of 'echo $?' )
+
+def rename_distro_bare_grub(p, currd): # In case someone is installing on a system that was previously chosen option 1 but changed opinion
+    tmp_efi= subprocess.check_output("cat /dev/urandom | od -x | tr -d ' ' | head -n 1", shell=True).decode('utf-8').strip()
+    os.system(f"mkdir /tmp/{tmp_efi}")
+    os.system(f"mount /dev/{p} /tmp/{tmp_efi}")
+    os.system(f"sed -i 's/@boot\/grub/@boot_arch\/grub/' /tmp/{tmp_efi}/EFI/ashos/grub.cfg")
+    # IS THIS A GOOD PLACE TO COPY GRUBX64.EFI AND GRUB.CFG TO /tmp/{tmp_efi} ?
+    os.system(f"umount /tmp/{tmp_efi}")
+    #os.system(f"rm -rf /tmp/{tmp_efi}") ##if successful umount ( check result of 'echo $?' )
 
 #   Import filesystem tree file in this function
 def import_tree_file(treename):
