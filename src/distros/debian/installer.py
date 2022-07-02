@@ -1,10 +1,5 @@
 #!/usr/bin/python3
 
-# Steps: partition, format, mount root partition, debootstrap, chroot, mount-bind etc.
-# modify fstab, network (/etc/{network/interfaces,resolv.conf,hostname,hosts}), cp sources.list to chroot
-# apt-get update, apt-get --no-install-recommends install stuff, set locales tz,
-# os.system(f"sudo debootstrap --arch {ARCH} --exclude={excl} {RELEASE} /mnt http://archive.ubuntu.com/ubuntu")
-
 import os
 import subprocess
 from src.distros.arch import astpk
@@ -200,8 +195,9 @@ def main(args, distro):
     os.system(f"sed -i '/^ID/ s/debian/debian_ashos/' /mnt/etc/os-release")
     #os.system("echo 'HOME_URL=\"https://github.com/astos/astos\"' | tee -a /mnt/etc/os-release")
 
-#   Update hostname, locales and timezone
+#   Update hostname, hosts, locales and timezone, hosts
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
+    os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
     os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen")
     os.system("sudo chroot /mnt locale-gen")
     os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")

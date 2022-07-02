@@ -163,8 +163,9 @@ def main(args, distro):
     os.system(f"sed -i '/^ID/ s/arch/arch_ashos/' /mnt/etc/os-release")
     #os.system("echo 'HOME_URL=\"https://github.com/astos/astos\"' | tee -a /mnt/etc/os-release")
 
-#   Update hostname, locales and timezone
+#   Update hostname, hosts, locales and timezone, hosts
     os.system(f"echo {hostname} | tee /mnt/etc/hostname")
+    os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
     os.system("sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen")
     os.system("chroot /mnt locale-gen")
     os.system("echo 'LANG=en_US.UTF-8' | tee /mnt/etc/locale.conf")
