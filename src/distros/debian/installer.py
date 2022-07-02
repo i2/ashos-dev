@@ -263,21 +263,23 @@ def main(args, distro):
 #   GRUB and EFI - Backup and create default entry txt
 
     # Create a map.txt file "distro" => "EFI entry"
-    os.system(f"chroot /mnt echo {distro} === $(efibootmgr -v | grep '{distro}') | tee -a /mnt/boot/efi/EFI/map.txt") # will throw error: efibootmgr not found (it does get installed already by packages above) and even if installed (check when booted in snapshot?), when you are inside a chroot of next_distro it would give error that efi variable not supported on this system!
+    #os.system(f"sudo chroot /mnt echo {distro} === $(efibootmgr -v | grep '{distro}') | tee -a /mnt/boot/efi/EFI/map.txt") # will throw error: efibootmgr not found (it does get installed already by packages above) and even if installed (check when booted in snapshot?), when you are inside a chroot of next_distro it would give error that efi variable not supported on this system!
+    os.system(f"echo '{distro} === ' $(efibootmgr -v | grep {distro}) | tee -a /mnt/boot/efi/EFI/map.txt") #astpk.py will read from this file to switch between distros
 
-    try:
-        now_os_grub = subprocess.check_output("find /mnt/boot/efi/EFI/ -mindepth 1 -maxdepth 1 -type \
-        d -name '*ashos*' -o -name '*default*' -prune -o -exec basename {} \; | \
-        sudo tee /mnt/boot/efi/EFI/default.txt", shell=True).decode('utf-8').strip()
-    except:
-        print("An exception occurred!")
+### NOT NEEDED AS I'M GOINGTO USE efibootmgr inside astpk.py
+###    try:
+###        now_os_grub = subprocess.check_output("find /mnt/boot/efi/EFI/ -mindepth 1 -maxdepth 1 -type \
+###        d -name '*ashos*' -o -name '*default*' -prune -o -exec basename {} \; | \
+###        sudo tee /mnt/boot/efi/EFI/default.txt", shell=True).decode('utf-8').strip()
+###    except:
+###        print("An exception occurred!")
 ###    os.system(f"sudo chroot /mnt cp -a /boot/efi/EFI/ashos /boot/efi/EFI/ashos{distro_suffix}.BAK")
 ###    os.system(f"sudo chroot /mnt cp -a /boot/grub /boot/grub{distro_suffix}.BAK")
-    else:
-        os.system(f"sudo chroot /mnt cp -a /boot/efi/EFI/{now_os_grub} /boot/efi/EFI/{now_os_grub}.BAK")
-        #os.system(f"sudo chroot /mnt cp -a /boot/grub /boot/grub{distro_suffix}.BAK")
-        os.system(f"sudo chroot /mnt cp -a /boot/grub /boot/grub{distro_suffix}_ashos.BAK")
-        #.BAK file and folders are strictly for user's 'manual intervention' if things go wrong. They won't be used in the algorithm.
+###    else:
+###        os.system(f"sudo chroot /mnt cp -a /boot/efi/EFI/{now_os_grub} /boot/efi/EFI/{now_os_grub}.BAK")
+###        #os.system(f"sudo chroot /mnt cp -a /boot/grub /boot/grub{distro_suffix}.BAK")
+###        os.system(f"sudo chroot /mnt cp -a /boot/grub /boot/grub{distro_suffix}_ashos.BAK")
+###        #.BAK file and folders are strictly for user's 'manual intervention' if things go wrong. They won't be used in the algorithm.
 
 #   Copy astpk
     os.system(f"sudo cp -a ./src/distros/{distro}/astpk.py /mnt/usr/bin/ast")
