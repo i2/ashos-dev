@@ -55,7 +55,7 @@ def switch_distro():
                 for row in input_file:
                     if row["DISTRO"] == next_distro:
                         #os.system(f'efibootmgr --bootnext {row["BootOrder"]}')
-                        boot_order = subprocess.check_output("efibootmgr | grep BootOrder | awk '{print $1}'", shell=True).decode('utf-8').strip()
+                        boot_order = subprocess.check_output("efibootmgr | grep BootOrder | awk '{print $2}'", shell=True).decode('utf-8').strip()
                         temp = boot_order.replace(f'{row["BootOrder"]},', "")
                         new_boot_order = f"{row['BootOrder']},{temp}"
                         os.system(f'efibootmgr --bootorder {new_boot_order}')
