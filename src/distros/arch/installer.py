@@ -94,9 +94,9 @@ def main(args, distro):
     choice, distro_suffix = get_multiboot(distro)
 
 #   Define variables
+    #astpart = to_uuid(args[1])
     btrdirs = [f"@{distro_suffix}",f"@.snapshots{distro_suffix}",f"@home{distro_suffix}",f"@var{distro_suffix}",f"@etc{distro_suffix}",f"@boot{distro_suffix}"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]
-    astpart = to_uuid(args[1])
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
@@ -107,9 +107,11 @@ def main(args, distro):
 
 #   Partition and format
     if choice != "3":
-        os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}") ###DELETE THIS LINE WHEN PRODUCTION READY
+        os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}") ### DELETE THIS LINE WHEN PRODUCTION READY
         os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
     os.system("pacman -Syy --noconfirm archlinux-keyring")
+
+    astpart = to_uuid(args[1]) ### DELETE THIS LINE WHEN PRODUCTION READY
 
 #   Mount and create necessary sub-volumes and directories
     if choice != "3":
@@ -140,7 +142,7 @@ def main(args, distro):
     os.system("pacstrap /mnt base linux linux-firmware neovim python3 python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo os-prober tmux")
     if efi:
         os.system("pacstrap /mnt efibootmgr")
-    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"): #REZA maybe add /tmp as well?
+    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars /tmp"):
         os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
 
 #   Update fstab

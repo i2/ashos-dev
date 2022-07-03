@@ -10,10 +10,6 @@ def clear():
 def to_uuid(part):
     return subprocess.check_output(f"sudo blkid -s UUID -o value {part}", shell=True).decode('utf-8').strip()
 
-###def grub_ords(part):
-###    letter =
-    ###return ord(letter.lower())-ord('a'),
-
 #   This function returns a tuple: (1. choice whether partitioning and formatting should happen
 #   2. Underscore plus name of distro if it should be appended to sub-volume names
 def get_multiboot(dist):
@@ -100,9 +96,9 @@ def main(args, distro):
 #   Define variables
     RELEASE = "bullseye"
     ARCH = "amd64"
+    #astpart = to_uuid(args[1])
     btrdirs = [f"@{distro_suffix}",f"@.snapshots{distro_suffix}",f"@home{distro_suffix}",f"@var{distro_suffix}",f"@etc{distro_suffix}",f"@boot{distro_suffix}"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]
-    #astpart = to_uuid(args[1])
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
@@ -115,14 +111,13 @@ def main(args, distro):
     #os.system("find $HOME -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C LANGUAGE=C LANG=C >> $1' -- {} \;") # Perl complains if not set
     os.system("sudo apt-get remove -y --purge man-db") # make installs faster (because of trigger man-db bug)
     os.system("sudo apt-get clean && app-get update -y && apt-get check -y")
-    os.system("sudo apt-get install -y --fix-broken parted dosfstools") #REZA ###DELETE THIS LINE WHEN PRODUCTION READY
-    os.system("sudo apt-get install -y --fix-broken btrfs-progs ntp") # Add this to the first apt-get install to fix any broken package
-    #os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")
+    os.system("sudo apt-get install -y --fix-broken parted dosfstools") ### DELETE THIS LINE WHEN PRODUCTION READY
+    os.system("sudo apt-get install -y --fix-broken btrfs-progs ntp efibootmgr") # Add this to the first apt-get install to fix any broken package
     if choice != "3":
-        os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}") ###DELETE THIS LINE WHEN PRODUCTION READY
+        os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}") ### DELETE THIS LINE WHEN PRODUCTION READY
         os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
 
-    astpart = to_uuid(args[1]) #REZA ###DELETE THIS LINE WHEN PRODUCTION READY
+    astpart = to_uuid(args[1]) ### DELETE THIS LINE WHEN PRODUCTION READY
 
 #   Mount and create necessary sub-volumes and directories
     if choice != "3":
@@ -153,7 +148,7 @@ def main(args, distro):
     os.system("sudo apt-get install -y debootstrap")
     excl = subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | awk '{print $1}'", shell=True).decode('utf-8').strip().replace("\n",",")
     os.system(f"sudo debootstrap --arch {ARCH} --exclude={excl} {RELEASE} /mnt http://ftp.debian.org/debian")
-    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"): #REZA maybe add /tmp as well?
+    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars /tmp"):
         os.system(f"sudo mount -B {i} /mnt{i}") # Mount-points needed for chrooting
     os.system(f"sudo chroot /mnt apt-get install --fix-broken -y linux-image-{ARCH}")
 

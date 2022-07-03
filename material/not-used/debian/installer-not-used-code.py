@@ -7,3 +7,6 @@
 ###    letter =
     ###return ord(letter.lower())-ord('a'),
 
+    #astpart = to_uuid(args[1])
+    
+    #os.system("sudo parted --align minimal --script /dev/sda mklabel gpt unit MiB mkpart ESP fat32 0% 256 set 1 boot on mkpart primary ext4 256 100%")

@@ -1,3 +1,5 @@
+Combine options 2 and 3 into one.
+
 This can be set and I don't think there is any problem!
 sudo chroot /mnt grub-install --bootloader-id=ashos{distro_suffix} {args[2]}
 grub-install --locales=XYZ ((((--target=x86_64-efi))))))
