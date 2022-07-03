@@ -1,2 +1,0 @@
-distro pppn
-distro pppnline2
