@@ -111,7 +111,7 @@ def main(args, distro):
     #os.system("find $HOME -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C LANGUAGE=C LANG=C >> $1' -- {} \;") # Perl complains if not set
     os.system("sudo apt-get remove -y --purge man-db") # make installs faster (because of trigger man-db bug)
     os.system("sudo apt-get clean && sudo apt-get update -y && sudo apt-get check -y")
-    os.system("sudo apt-get install -y --fix-broken parted dosfstools tmux") ### DELETE THIS LINE WHEN PRODUCTION READY
+    os.system("sudo apt-get install -y --fix-broken parted dosfstools") ### DELETE THIS LINE WHEN PRODUCTION READY
     os.system("sudo apt-get install -y --fix-broken btrfs-progs ntp efibootmgr") # Add this to the first apt-get install to fix any broken package
     if choice != "3":
         os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}") ### DELETE THIS LINE WHEN PRODUCTION READY
@@ -164,7 +164,7 @@ def main(args, distro):
     os.system(f"echo 'deb [trusted=yes] http://www.deb-multimedia.org {RELEASE} main' | sudo tee -a /mnt/etc/apt/sources.list.d/multimedia.list >/dev/null")
     os.system("sudo chroot /mnt apt-get update -y -oAcquire::AllowInsecureRepositories=true")
     os.system("sudo chroot /mnt apt-get install -y deb-multimedia-keyring --allow-unauthenticated")
-    #os.system("sudo chroot /mnt apt-get install -y python3-anytree network-manager btrfs-progs dhcpcd5 locales sudo os-prober")
+    #os.system("sudo chroot /mnt apt-get install -y python3-anytree network-manager btrfs-progs dhcpcd5 locales sudo os-prober tmux")
     os.system("sudo chroot /mnt apt-get install -y python3-anytree btrfs-progs locales sudo")
     #os.system("sudo chroot /mnt apt-get install -y btrfs-progs locales")
     if efi:
