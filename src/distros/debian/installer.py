@@ -150,9 +150,9 @@ def main(args, distro):
     os.system(f"sudo debootstrap --arch {ARCH} --exclude={excl} {RELEASE} /mnt http://ftp.debian.org/debian")
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
         os.system(f"sudo mount -B {i} /mnt{i}") # Mount-points needed for chrooting
-    print("XXXXXXXXXXXXXXXXXXXXXXXXXX hhhhhhhhhhhhhhhhhhhhhhhhhh HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH NOW creating tmp mount point")
-    os.system("sudo mount -B /tmp /mnt/tmp")
-    print("XXXXXXXXXXXXXXXXXXXXXXXXXX ************************** 888888888888888888888888888888888888888 DONE NOW creating tmp mount point")
+###    print("XXXXXXXXXXXXXXXXXXXXXXXXXX hhhhhhhhhhhhhhhhhhhhhhhhhh HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH NOW creating tmp mount point")
+###    os.system("sudo mount -B /tmp /mnt/tmp")
+###    print("XXXXXXXXXXXXXXXXXXXXXXXXXX ************************** 888888888888888888888888888888888888888 DONE NOW creating tmp mount point")
     os.system(f"sudo chroot /mnt apt-get install --fix-broken -y linux-image-{ARCH}")
 
 #MOVEDUPBEFOREDEBOOTSTRAP    if efi: ###REZA #MOVED FROM ABOVE See if there are still files in sda1 unnecessarily heavy (ONLY FOR DEBOOSTRAP BASED OS, NOT FOR ARCH)
@@ -238,7 +238,8 @@ def main(args, distro):
 ###MOVEDTOUP    os.system(f"sudo cp -a ./src/distros/{distro}/astpk.py /mnt/usr/bin/ast")
 ###MOVEDTOUP    os.system("sudo cp -a ./src/detect_os.sh /mnt/usr/bin/detect_os.sh")
 
-    os.system("sudo chroot /mnt ln -s /.snapshots/ast/ast /usr/local/sbin/ast")             ####PR32 Can I moved it somewhere better?
+    os.system("sudo chroot /mnt ln -s /.snapshots/ast/ast /usr/bin/ast")             ####PR32 Can I moved it somewhere better?
+    os.system("sudo chroot /mnt ln -s /.snapshots/ast/detect_os.sh /usr/bin/detect_os.sh")
 
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")

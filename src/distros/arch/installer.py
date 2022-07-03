@@ -143,7 +143,6 @@ def main(args, distro):
     os.system("pacstrap /mnt base linux neovim python3 python-anytree arch-install-scripts btrfs-progs grub sudo os-prober tmux")
     if efi:
         os.system("pacstrap /mnt efibootmgr")
-####DOES THIS CAUSE EFIVAR NOT SUPPORTED ISSUE?    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars /tmp"):
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
         os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
 
@@ -210,7 +209,8 @@ def main(args, distro):
 ###MOVEDTOUP    os.system(f"cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
 ###MOVEDTOUP    os.system("cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
 
-    os.system("chroot /mnt ln -s /.snapshots/ast/ast /usr/local/sbin/ast")             ####PR32 Can I moved it somewhere better?
+    os.system("chroot /mnt ln -s /.snapshots/ast/ast /usr/bin/ast")             ####PR32 Can I moved it somewhere better?
+    os.system("chroot /mnt ln -s /.snapshots/ast/detect_os.sh /usr/bin/detect_os.sh")
 
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")

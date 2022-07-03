@@ -70,3 +70,8 @@
 #   Copy astpk
 ###    os.system("chroot /mnt chmod a+x /usr/sbin/ast /usr/bin/detect_os.sh") # Might not be necessary by 'cp -a'
 
+
+
+
+#DO NOT mount /tmp to /mnt/tmp!!! THIS CAUSE EFIVAR NOT SUPPORTED ISSUE and system not bootable.
+### for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars /tmp"):
