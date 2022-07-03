@@ -184,9 +184,9 @@ def main(args, distro):
     #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf")
 
 #   Modify OS release information (optional)
-    os.system(f"sed -i '/^NAME/ s/Debian/Debian (ashos)/' /mnt/etc/os-release")
-    os.system(f"sed -i '/PRETTY_NAME/ s/Debian/Debian (ashos)/' /mnt/etc/os-release")
-    os.system(f"sed -i '/^ID/ s/debian/debian_ashos/' /mnt/etc/os-release")
+    os.system(f"sudo sed -i '/^NAME/ s/Debian/Debian (ashos)/' /mnt/etc/os-release")
+    os.system(f"sudo sed -i '/PRETTY_NAME/ s/Debian/Debian (ashos)/' /mnt/etc/os-release")
+    os.system(f"sudo sed -i '/^ID/ s/debian/debian_ashos/' /mnt/etc/os-release")
     #os.system("echo 'HOME_URL=\"https://github.com/astos/astos\"' | tee -a /mnt/etc/os-release")
 
 #   Update hostname, hosts, locales and timezone, hosts

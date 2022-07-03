@@ -107,17 +107,17 @@ def main(args, distro):
 
 #   Partition and format
     if choice != "3":
-        os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}") ### DELETE THIS LINE WHEN PRODUCTION READY
-        os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
+        os.system(f"/usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}") ### DELETE THIS LINE WHEN PRODUCTION READY
+        os.system(f"/usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
     os.system("pacman -Syy --noconfirm archlinux-keyring")
 
     astpart = to_uuid(args[1]) ### DELETE THIS LINE WHEN PRODUCTION READY
 
 #   Mount and create necessary sub-volumes and directories
     if choice != "3":
-        os.system(f"sudo mount {args[1]} /mnt")
+        os.system(f"mount {args[1]} /mnt")
     else:
-        os.system(f"sudo mount -o subvolid=5 {args[1]} /mnt")
+        os.system(f"mount -o subvolid=5 {args[1]} /mnt")
     for btrdir in btrdirs:
         os.system(f"btrfs sub create /mnt/{btrdir}")
     os.system("umount /mnt")
@@ -247,10 +247,10 @@ def main(args, distro):
     os.system("cp --reflink=auto -r /mnt/.snapshots/var/var-0/* /mnt/.snapshots/rootfs/snapshot-tmp/var")
 
 #   Unmount everything
-    os.system("sudo umount -R /mnt")
-    os.system(f"sudo mount {args[1]} -o subvolid=0 /mnt") # subvolid=5 needed for any cases?
-    os.system(f"sudo btrfs sub del /mnt/@{distro_suffix}")
-    os.system("sudo umount -R /mnt")
+    os.system("umount -R /mnt")
+    os.system(f"mount {args[1]} -o subvolid=0 /mnt") # subvolid=5 needed for any cases?
+    os.system(f"btrfs sub del /mnt/@{distro_suffix}")
+    os.system("umount -R /mnt")
 
     clear()
     print("Installation complete")
