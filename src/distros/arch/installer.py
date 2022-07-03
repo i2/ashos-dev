@@ -202,6 +202,7 @@ def main(args, distro):
 
 #   GRUB and EFI
     os.system(f"chroot /mnt grub-install {args[2]}") #REZA --recheck --no-nvram --removable
+    os.system("mkdir -p /mnt/boot/grub/BAK/") # Folder for backing up grub configs created by astpk
     os.system(f"chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system(f"sed -i '0,/subvol=@{distro_suffix}/s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
     if efi: # Create a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros

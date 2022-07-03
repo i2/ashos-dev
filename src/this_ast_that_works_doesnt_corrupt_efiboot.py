@@ -1,55 +1,97 @@
 #!/usr/bin/python3
 
+import sys
 import ast
+import subprocess
+#from anytree.importer import DictImporter
+#from anytree.exporter import DictExporter
+#import anytree
 import os
 import re
-import subprocess
-import sys
+
+args = list(sys.argv)
+#distro = subprocess.check_output(['sh', '/usr/local/sbin/detect_os.sh']).decode('utf-8').replace('"',"").strip()
+distro = subprocess.check_output(['sh', 'detect_os.sh']).decode('utf-8').replace('"',"").strip()
+
+# TODO ------------
+# General code cleanup
+# Maybe port for other distros?
+# A clean way to completely unistall ast
+# Implement AUR package maintenance between snapshots
+# -----------------
 
 # Directories
 # All snapshots share one /var
 # global boot is always at @boot
-# *-deploy and *-deploy-secondary : temporary directories used to boot deployed snapshot
-# *-chr                           : temporary directories used to chroot into snapshot or copy snapshots around
-# /.snapshots/var/var-*           : individual /var for each snapshot
-# /.snapshots/etc/etc-*           : individual /etc for each snapshot
-# /.snapshots/boot/boot-*         : individual /boot for each snapshot
-# /.snapshots/rootfs/snapshot-*   : snapshots
-# /root/snapshots/*-desc          : descriptions
-# /usr/share/ast                  : files that store current snapshot info
-# /usr/share/ast/db               : package database
-# /var/lib/ast(/fstree)           : ast files, stores fstree, symlink to /.snapshots/ast
+# *-tmp - temporary directories used to boot deployed snapshot
+# *-chr - temporary directories used to chroot into snapshot or copy snapshots around
+# /.snapshots/var/var-* == individual /var for each snapshot
+# /.snapshots/etc/etc-* == individual /etc for each snapshot
+# /.snapshots/boot/boot-* == individual /boot for each snapshot
+# /.snapshots/rootfs/snapshot-* == snapshots
+# /root/snapshots/*-desc == descriptions
+# /usr/share/ast == files that store current snapshot info
+# /usr/share/ast/db == package database
+# /var/lib/ast(/fstree) == ast files, stores fstree, symlink to /.snapshots/ast
 
 #   This function returns either empty string or underscore plus name of distro if it was appended to sub-volume names to distinguish
-def get_distro_suffix():
+def get_distro():
     if "ashos" in distro:
         return f'_{distro.replace("_ashos","")}'
     else:
         return ""
 
-def switch_distro():
-    while True:
-        map_tmp = subprocess.check_output("cat /boot/efi/EFI/map.txt | awk 'BEGIN { FS = "'"'" === "'"'" } ; { print $1 }'", shell=True).decode('utf-8').strip()
-        print("Type the name of a distro to switch to: (type 'list' to list them, 'q' to quit)")
-        next_distro = input("> ")
-        if next_distro == "q":
-            break
-        elif next_distro == "list":
-            print(map_tmp)
-        elif next_distro in map_tmp:
-            import csv
-            with open('/boot/efi/EFI/map.txt', 'r') as f:
-                input_file = csv.DictReader(f, delimiter=',', quoting=csv.QUOTE_NONE)
-                for row in input_file:
-                    if row["DISTRO"] == next_distro:
-                        boot_order = subprocess.check_output("efibootmgr | grep BootOrder | awk '{print $2}'", shell=True).decode('utf-8').strip()
-                        temp = boot_order.replace(f'{row["BootOrder"]},', "")
-                        new_boot_order = f"{row['BootOrder']},{temp}"
-                        os.system(f'efibootmgr --bootorder {new_boot_order}')
-            break
-        else:
-            print("Invalid distro!")
-            continue
+#   Rename grub in sda1 from default ashos to pdistro_ashos
+def rename_ashos_grub(p, pd):
+    tmp_efi= subprocess.check_output("cat /dev/urandom | od -x | tr -d ' ' | head -n 1", shell=True).decode('utf-8').strip()
+    os.system(f"mkdir /tmp/{tmp_efi}")
+    os.system(f"mount /dev/{p} /tmp/{tmp_efi}")
+    #os.system(f"mkdir /tmp/{tmp_efi}/ashos")
+    #os.system(f"cp -r /tmp/{tmp_efi}/EFI/${d}_ashos/")
+
+    #os.system(f"mkdir /tmp/{tmp_efi}/ashos_{pd}") #THIS IS REDUNDANT as cp -a creates the dest folder even if doesn't exist
+    #os.system(f"cp -a /tmp/{tmp_efi}/EFI/ashos/. /tmp/{tmp_efi}/EFI/ashos_{pd}/")
+    os.system(f"cp -a /tmp/{tmp_efi}/EFI/ashos /tmp/{tmp_efi}/EFI/ashos_{pd}")
+    os.system(f"umount /tmp/{tmp_efi}")
+    #os.system(f"rm -rf /tmp/{tmp_efi}") ##if successful umount ( check result of 'echo $?' )
+
+############# BOTH WHEN INSTALLING ASHOS / UPDATING AKA DEPLOYING FROM AST, CREATE A BACKUP OF FILES
+############# sudo mv /tmp/{tmp_efi}/EFI/ashos/grub.cfg /tmp/{tmp_efi}/EFI/ashos/grub.cfg{DISTRO}
+############# sudo mv /tmp/{tmp_efi}/EFI/ashos/grubx64.efi /tmp/{tmp_efi}/EFI/ashos/grubx64.efi{DISTRO}
+############# sudo mv /tmp/{tmp_efi}/EFI/ashos/grub{NEXTDISTRO}.cfg /tmp/{tmp_efi}/EFI/ashos/grub.cfg
+############# sudo mv /tmp/{tmp_efi}/EFI/ashos/grubx64.efi{NEXTDISTRO} /tmp/{tmp_efi}/EFI/ashos/grubx64.efi
+
+#IF THE GRUB IN INSTALLER OF A DISTRO DIDN'T CREATE {THAT "REFERENCE" grub.cfg} in /dev/sda1 (for example arch doesn't -- maybe it creates it in /dev/sda2 ???? double check!)
+# CREATE IT FROM MY CACHE (either store in astpk.py or installer.py as a paragraph) and copy it over to /tmp/{tmp_efi}/EFI/ashos/ as grub.cfg
+
+def detect_previous_distro(p):
+    tmp_sda2 = subprocess.check_output("cat /dev/urandom | od -x | tr -d ' ' | head -n 1", shell=True).decode('utf-8').strip()
+    os.system(f"mkdir /tmp/{tmp_sda2}")
+    os.system(f"mount /dev/{p} /tmp/{tmp_sda2}")
+    pd = subprocess.check_output(['sh', f'detect_os.sh /tmp/{tmp_sda2}/']).decode('utf-8').replace('"',"").strip()
+    os.system(f"umount /tmp/{tmp_sda2}")
+    return pd
+    #os.system(f"rm -rf /tmp/{tmp_sda2}") ##if successful umount ( check result of 'echo $?' )
+
+def rename_distro_subvolumes(p):  ### Maybe can reuse ast functions from cuberjan3? #potentially receive 3 arguments: partition, string1 (suffix right now) and string2 (desired suffix)
+    tmp_sda2 = subprocess.check_output("cat /dev/urandom | od -x | tr -d ' ' | head -n 1", shell=True).decode('utf-8').strip()
+###     os.system(f"mkdir /tmp/{tmp_sda2}")
+###     os.system(f"mount -o subvolid=5 /dev/{p} /tmp/{tmp_sda2}")
+    for i in ["@.snapshots", "@boot", "@etc", "@home", "var"]:
+        os.system(f'mv "/tmp/{tmp_sda2}/{i}" "/tmp/{tmp_sda2}/{i}_{d}"')
+###     pd = subprocess.check_output(['sh', f'detect_os.sh /tmp/{tmp_sda2}/']).decode('utf-8').replace('"',"").strip()
+###     os.system(f"umount /tmp/{tmp_sda2}")
+###     return pd
+    #os.system(f"rm -rf /tmp/{tmp_sda2}") ##if successful umount ( check result of 'echo $?' )
+
+def rename_distro_bare_grub(p, currd): # In case someone is installing on a system that was previously chosen option 1 but changed opinion
+    tmp_efi= subprocess.check_output("cat /dev/urandom | od -x | tr -d ' ' | head -n 1", shell=True).decode('utf-8').strip()
+    os.system(f"mkdir /tmp/{tmp_efi}")
+    os.system(f"mount /dev/{p} /tmp/{tmp_efi}")
+    os.system(f"sed -i 's/@boot\/grub/@boot_arch\/grub/' /tmp/{tmp_efi}/EFI/ashos/grub.cfg")
+    # IS THIS A GOOD PLACE TO COPY GRUBX64.EFI AND GRUB.CFG TO /tmp/{tmp_efi} ?
+    os.system(f"umount /tmp/{tmp_efi}")
+    #os.system(f"rm -rf /tmp/{tmp_efi}") ##if successful umount ( check result of 'echo $?' )
 
 #   Import filesystem tree file in this function
 def import_tree_file(treename):
@@ -343,7 +385,6 @@ def sync_tree(tree,treename,forceOffline):
             os.system(f"cp --reflink=auto -r /.snapshots/var/var-{arg}/lib/systemd/* /.snapshots/var/var-chr{sarg}/lib/systemd/ >/dev/null 2>&1")
             os.system(f"cp --reflink=auto -r /.snapshots/var/var-{arg}/lib/systemd/* /.snapshots/rootfs/snapshot-chr{sarg}/var/lib/systemd/ >/dev/null 2>&1")
             os.system(f"cp --reflink=auto -n -r /.snapshots/rootfs/snapshot-{arg}/* /.snapshots/rootfs/snapshot-chr{sarg}/ >/dev/null 2>&1")
-            os.system(f"cp --reflink=auto -r /.snapshots/rootfs/snapshot-{arg}/etc/* /.snapshots/rootfs/snapshot-chr{sarg}/etc/ >/dev/null 2>&1")
             posttrans(sarg)
         print(f"Tree {treename} synced.")
 
@@ -394,11 +435,9 @@ def update_boot(snapshot):
         tmp = get_tmp()
         part = get_part()
         prepare(snapshot)
-        ### TODO: DELETE grub.cfg.DATE.BAK older than 90 days
-        os.system("cp /boot/grub/grub.cfg /boot/grub/BAK/grub.cfg.`date '+%Y%m%d-%H%M%S'`")
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} grub-mkconfig {part} -o /boot/grub/grub.cfg")
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i s,snapshot-chr{snapshot},snapshot-{tmp},g /boot/grub/grub.cfg")
-        os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i '0,/Arch\ Linux/ s##Arch\ Linux\ snapshot\ {snapshot}#' /boot/grub/grub.cfg")
+        os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i '0,/AshOS\ Linux/s//AshOS\ Linux\ snapshot\ {snapshot}/' /boot/grub/grub.cfg")
         posttrans(snapshot)
 
 #   Chroot into snapshot
@@ -670,30 +709,29 @@ def rollback():
 
 #   Switch between /tmp deployments
 def switchtmp():
-    distro_suffix = get_distro_suffix()
+    udistro = get_distro()
     mount = get_tmp()
     part = get_part()
     os.system(f"mkdir -p /etc/mnt/boot >/dev/null 2>&1")
-###    os.system(f"mount {part} -o subvol=@boot /etc/mnt/boot") # Mount boot partition for writing
-    os.system(f"mount {part} -o subvol=@boot{distro_suffix} /etc/mnt/boot") # Mount boot partition for writing
+    os.system(f"mount {part} -o subvol=@boot{udistro} /etc/mnt/boot") # Mount boot partition for writing
     if "tmp0" in mount:
         os.system("cp --reflink=auto -r /.snapshots/rootfs/snapshot-tmp/boot/* /etc/mnt/boot")  ######REZA WHATABOUTTHIS?
-        os.system(f"sed -i 's,@.snapshots{distro_suffix}/rootfs/snapshot-tmp0,@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /etc/mnt/boot/grub/grub.cfg") # Overwrite grub config boot subvolume
-        os.system(f"sed -i 's,@.snapshots{distro_suffix}/rootfs/snapshot-tmp0,@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /.snapshots/rootfs/snapshot-tmp/boot/grub/grub.cfg")
-        os.system(f"sed -i 's,@.snapshots{distro_suffix}/rootfs/snapshot-tmp0,@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab") # Write fstab for new deployment
-        os.system(f"sed -i 's,@.snapshots{distro_suffix}/etc/etc-tmp0,@.snapshots{distro_suffix}/etc/etc-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
-        os.system(f"sed -i 's,@.snapshots{distro_suffix}/boot/boot-tmp0,@.snapshots{distro_suffix}/boot/boot-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
+        os.system(f"sed -i 's,@.snapshots{udistro}/rootfs/snapshot-tmp0,@.snapshots{udistro}/rootfs/snapshot-tmp,g' /etc/mnt/boot/grub/grub.cfg") # Overwrite grub config boot subvolume
+        os.system(f"sed -i 's,@.snapshots{udistro}/rootfs/snapshot-tmp0,@.snapshots{udistro}/rootfs/snapshot-tmp,g' /.snapshots/rootfs/snapshot-tmp/boot/grub/grub.cfg")
+        os.system(f"sed -i 's,@.snapshots{udistro}/rootfs/snapshot-tmp0,@.snapshots{udistro}/rootfs/snapshot-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab") # Write fstab for new deployment
+        os.system(f"sed -i 's,@.snapshots{udistro}/etc/etc-tmp0,@.snapshots{udistro}/etc/etc-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
+        os.system(f"sed -i 's,@.snapshots{udistro}/boot/boot-tmp0,@.snapshots{udistro}/boot/boot-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
         sfile = open("/.snapshots/rootfs/snapshot-tmp0/usr/share/ast/snap","r")
         snap = sfile.readline()
         snap = snap.replace(" ", "")
         sfile.close()
     else:
         os.system("cp --reflink=auto -r /.snapshots/rootfs/snapshot-tmp0/boot/* /etc/mnt/boot")
-        os.system(f"sed -i 's,@.snapshots{distro_suffix}/rootfs/snapshot-tmp,@.snapshots{distro_suffix}/rootfs/snapshot-tmp0,g' /etc/mnt/boot/grub/grub.cfg")
-        os.system(f"sed -i 's,@.snapshots{distro_suffix}/rootfs/snapshot-tmp,@.snapshots{distro_suffix}/rootfs/snapshot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg")
-        os.system(f"sed -i 's,@.snapshots{distro_suffix}/rootfs/snapshot-tmp,@.snapshots{distro_suffix}/rootfs/snapshot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
-        os.system(f"sed -i 's,@.snapshots{distro_suffix}/etc/etc-tmp,@.snapshots{distro_suffix}/etc/etc-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
-        os.system(f"sed -i 's,@.snapshots{distro_suffix}/boot/boot-tmp,@.snapshots{distro_suffix}/boot/boot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
+        os.system(f"sed -i 's,@.snapshots{udistro}/rootfs/snapshot-tmp,@.snapshots{udistro}/rootfs/snapshot-tmp0,g' /etc/mnt/boot/grub/grub.cfg")
+        os.system(f"sed -i 's,@.snapshots{udistro}/rootfs/snapshot-tmp,@.snapshots{udistro}/rootfs/snapshot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg")
+        os.system(f"sed -i 's,@.snapshots{udistro}/rootfs/snapshot-tmp,@.snapshots{udistro}/rootfs/snapshot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
+        os.system(f"sed -i 's,@.snapshots{udistro}/etc/etc-tmp,@.snapshots{udistro}/etc/etc-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
+        os.system(f"sed -i 's,@.snapshots{udistro}/boot/boot-tmp,@.snapshots{udistro}/boot/boot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
         sfile = open("/.snapshots/rootfs/snapshot-tmp/usr/share/ast/snap", "r")
         snap = sfile.readline()
         snap = snap.replace(" ","")
@@ -713,9 +751,9 @@ def switchtmp():
         gconf = gconf.replace("snapshot-tmp0","snapshot-tmp")
     else:
         gconf = gconf.replace("snapshot-tmp", "snapshot-tmp0")
-    if "Arch Linux" in gconf:
+    if "AshOS Linux" in gconf:
         gconf = re.sub('\d', '', gconf)
-        gconf = gconf.replace(f"Arch Linux snapshot", f"Arch Linux last booted deployment (snapshot {snap})")
+        gconf = gconf.replace(f"AshOS Linux snapshot",f"AshOS last booted deployment (snapshot {snap})")
     grubconf.close()
     os.system("sed -i '$ d' /etc/mnt/boot/grub/grub.cfg")
     grubconf = open("/etc/mnt/boot/grub/grub.cfg", "a")
@@ -737,9 +775,9 @@ def switchtmp():
         gconf = gconf.replace("snapshot-tmp0","snapshot-tmp")
     else:
         gconf = gconf.replace("snapshot-tmp", "snapshot-tmp0")
-    if "Arch Linux" in gconf:
+    if "AshOS Linux" in gconf:
         gconf = re.sub('\d', '', gconf)
-        gconf = gconf.replace(f"Arch Linux snapshot", f"Arch Linux last booted deployment (snapshot {snap})")
+        gconf = gconf.replace(f"AshOS Linux snapshot", f"AshOS last booted deployment (snapshot {snap})")
     grubconf.close()
     os.system("sed -i '$ d' /.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg")
     grubconf = open("/.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg", "a")
@@ -748,49 +786,6 @@ def switchtmp():
     grubconf.write("### END /etc/grub.d/41_custom ###")
     grubconf.close()
     os.system("umount /etc/mnt/boot >/dev/null 2>&1")
-
-#   Show some basic ast commands
-def ast_help():
-    print("all ast commands, aside from 'ast tree' must be used with root permissions!")
-    print("\n\ntree manipulation commands:")
-    print("\ttree - show the snapshot tree")
-    print("\tcurrent - return current snapshot number")
-    print("\tdesc <snapshot> <description> - set a description for snapshot by number")
-    print("\tdel <tree> - delete a tree and all it's branches recursively")
-    print("\tchroot <snapshot> - open a root shell inside specified snapshot")
-    print("\tlive-chroot - open a read-write shell inside currently booted snapshot (changes are discarded on new deployment)")
-    print("\trun <snapshot> <command> - execute command inside another snapshot")
-    print("\ttree-run <tree> <command> - execute command inside another snapshot and all snapshots below it")
-    print("\tclone <snapshot> - create a copy of snapshot")
-    print("\tbranch <snapshot> - create a new branch from snapshot")
-    print("\tcbranch <snapshot> - copy snapshot under same parent branch")
-    print("\tubranch <parent> <snapshot> - copy snapshot under specified parent")
-    print("\tnew - create a new base snapshot")
-    print("\tdeploy <snapshot> - deploy a snapshot for next boot")
-    print("\tbase-update - update the base image")
-    print("\n\npackage management commands:")
-    print("\tinstall <snapshot> <package> - install a package inside specified snapshot")
-    print("\tsync <tree> - sync package and configuration changes recursively, requires an internet connection")
-    print("\tforce-sync <tree> - same thing as sync but doesn't update snapshots, potentially riskier")
-    print("\tremove <snapshot> <package(s)> - remove package(s) from snapshot")
-    print("\ttree-rmpkg <tree> <package(s)> - remove package(s) from tree recursively")
-    print("\tupgrade <snapshot> - update all packages in snapshot")
-    print("\ttree-upgrade <tree> - update all packages in snapshot recursively")
-    print("\trollback - rollback the deployment to the last booted snapshot")
-    print("\n\nto update ast itself use 'ast ast-sync'")
-
-#   Update ast itself
-def ast_sync():
-    cdir = os.getcwd()
-    os.chdir("/tmp")
-    excode = str(os.system("curl -O 'https://raw.githubusercontent.com/astos/astos/main/astpk.py'"))
-    if int(excode) == 0:
-        os.system("cp ./astpk.py /.snapshots/ast/ast")
-        os.system("chmod +x /.snapshots/ast/ast")
-        print("ast updated succesfully.")
-    else:
-        print("error: failed to download ast")
-    os.chdir(cdir)
 
 # Clear all temporary snapshots
 def tmpclear():
@@ -802,7 +797,7 @@ def tmpclear():
     os.system(f"btrfs sub del /.snapshots/rootfs/snapshot-chr* >/dev/null 2>&1")
 
 def list_subvolumes():
-    os.system(f"btrfs sub list / | grep -i {get_distro_suffix()}")
+    os.system(f"btrfs sub list / | grep -i {distro}")
 
 # Find new unused snapshot dir
 def findnew():
@@ -821,7 +816,7 @@ def findnew():
 
 #   Main function
 def main(args):
-    distro_suffix = get_distro_suffix()
+    udistro = get_distro()
     snapshot = get_snapshot() # Get current snapshot
     etc = snapshot
     importer = DictImporter() # Dict importer
@@ -833,11 +828,7 @@ def main(args):
     fstreepath = str("/.snapshots/ast/fstree") # Path to fstree file
     fstree = importer.import_(import_tree_file("/.snapshots/ast/fstree")) # Import fstree file
     # Recognize argument and call appropriate function
-    if len(args) > 1:
-        arg = args[1]
-    else:
-        print("You need to specify an operation, see 'ast help' for help.")
-        sys.exit()
+    arg = args[1]
     if isChroot == True and ("--chroot" not in args):
         print("Please don't use ast inside a chroot!")
     elif lock == True:
@@ -932,12 +923,6 @@ def main(args):
         ast_lock()
         update_base()
         ast_unlock()
-    elif arg == "help":
-        ast_help()
-    elif arg == "ast-sync" and (lock != True): ###REVIEW_LATER Currently this lock is ignored
-        ast_lock()
-        ast_sync()
-        ast_unlock()
     elif arg == "sync" or arg == "tree-sync" and (lock != True):
         ast_lock()
         sync_tree(fstree,args[args.index(arg)+1],False)
@@ -978,10 +963,8 @@ def main(args):
         ast_unlock()
     elif arg == "tree":
         show_fstree()
-    elif arg == "subs":
+    elif arg == "list":
         list_subvolumes()
-    elif arg == "dist" or arg == "distro" or arg == "distros":
-        switch_distro()
     else:
         print("Operation not found.")
 
@@ -990,7 +973,7 @@ if __name__ == "__main__":
     from anytree.importer import DictImporter
     from anytree.exporter import DictExporter
     import anytree
-    args = list(sys.argv)
-    distro = subprocess.check_output(['sh', '/usr/bin/detect_os.sh']).decode('utf-8').replace('"',"").strip()
+
     main(args)
+
 

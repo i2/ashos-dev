@@ -1,3 +1,10 @@
+$ sudo dmesg | nc termbin.com 9999 # then paste the link
+
+
+Downfall of PR32 from cuberjan3: ast tree in chroot deosn't see ast excutable?!!!
+
+IMPORTANT: In a multibooted system, what happens if btrfs of another OS say arch updates and becomes incompatible with btrfs from debian?
+
 Combine options 2 and 3 into one.
 
 This can be set and I don't think there is any problem!
