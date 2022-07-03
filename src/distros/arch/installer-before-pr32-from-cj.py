@@ -182,9 +182,6 @@ def main(args, distro):
 
     os.system("mkdir -p /mnt/.snapshots/ast/snapshots")
     os.system("chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
-#   Copy astpk                                                                                    ###MOVEDTOHERE
-    os.system(f"cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")                     ###MOVEDTOHERE
-    os.system("cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")                          ###MOVEDTOHERE
 
 #   Create user and set password
     set_password("root")
@@ -192,7 +189,7 @@ def main(args, distro):
     create_user(username)
     set_password(username)
 
-    #os.system("chroot /mnt systemctl enable NetworkManager")
+    os.system("chroot /mnt systemctl enable NetworkManager")
 
 #   Initialize fstree
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | tee /mnt/.snapshots/ast/fstree")
@@ -204,11 +201,9 @@ def main(args, distro):
     if efi: # Create a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
         os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
 
-###MOVEDTOUP#   Copy astpk
-###MOVEDTOUP    os.system(f"cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
-###MOVEDTOUP    os.system("cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
-
-    os.system("chroot /mnt ln -s /.snapshots/ast/ast /usr/local/sbin/ast")             ####PR32 Can I moved it somewhere better?
+#   Copy astpk
+    os.system(f"cp -a ./src/distros/{distro}/astpk.py /mnt/usr/bin/ast")
+    os.system("cp -a ./src/detect_os.sh /mnt/usr/bin/detect_os.sh")
 
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")

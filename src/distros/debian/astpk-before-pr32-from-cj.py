@@ -239,7 +239,6 @@ def clone_under(snapshot, branch):
         print(f"Branch {i} added under snapshot {snapshot}.")
 
 #   Lock ast
-#   Currently this lock is ignored (### NEEDS_REVIEW_LATER ###)
 def ast_lock():
     os.system("touch /.snapshots/ast/lock-disable")
 
@@ -396,7 +395,7 @@ def update_boot(snapshot):
         prepare(snapshot)
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} grub-mkconfig {part} -o /boot/grub/grub.cfg")
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i s,snapshot-chr{snapshot},snapshot-{tmp},g /boot/grub/grub.cfg")
-        os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i '0,/Arch\ Linux/s//Arch\ Linux\ snapshot\ {snapshot}/' /boot/grub/grub.cfg")
+        os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i '0,/Debian\ Linux/s//Debian\ Linux\ snapshot\ {snapshot}/' /boot/grub/grub.cfg")
         posttrans(snapshot)
 
 #   Chroot into snapshot
@@ -452,7 +451,7 @@ def live_install(pkg):
     os.system(f"mount --bind /var /.snapshots/rootfs/snapshot-{tmp}/var >/dev/null 2>&1")
     os.system(f"mount --bind /etc /.snapshots/rootfs/snapshot-{tmp}/etc >/dev/null 2>&1")
     os.system(f"mount --bind /tmp /.snapshots/rootfs/snapshot-{tmp}/tmp >/dev/null 2>&1")
-    os.system(f"chroot /.snapshots/rootfs/snapshot-{tmp} pacman -S --overwrite \\* --noconfirm {pkg}")
+    os.system(f"chroot /.snapshots/rootfs/snapshot-{tmp} apt-get install -y {pkg}")
     os.system(f"umount /.snapshots/rootfs/snapshot-{tmp}/* >/dev/null 2>&1")
     os.system(f"umount /.snapshots/rootfs/snapshot-{tmp} >/dev/null 2>&1")
 
@@ -477,7 +476,8 @@ def install(snapshot,pkg):
         print("F: changing base snapshot is not allowed.")
     else:
         prepare(snapshot)
-        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} pacman -S {pkg} --overwrite '/var/*'"))
+        #excode = str(os.system(f'chroot /.snapshots/rootfs/snapshot-chr{snapshot} apt-get -o Dpkg::Options::="--force-overwrite" install -y {pkg}'))
+        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} apt install -f -y {pkg}"))
         if int(excode) == 0:
             posttrans(snapshot)
             print(f"Package {pkg} installed in snapshot {snapshot} successfully.")
@@ -496,7 +496,7 @@ def remove(snapshot,pkg):
         print("F: changing base snapshot is not allowed.")
     else:
         prepare(snapshot)
-        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} pacman --noconfirm -Rns {pkg}"))
+        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} apt-get remove {pkg}"))
         if int(excode) == 0:
             posttrans(snapshot)
             print(f"Package {pkg} removed from snapshot {snapshot} successfully.")
@@ -533,7 +533,7 @@ def delete(snapshot):
 #   Update base
 def update_base():
     prepare("0")
-    os.system(f"chroot /.snapshots/rootfs/snapshot-chr0 pacman -Syyu")
+    os.system(f"chroot /.snapshots/rootfs/snapshot-chr0 apt-get update")
     posttrans("0")
 
 #   Prepare snapshot to chroot dir to install or chroot into
@@ -544,7 +544,7 @@ def prepare(snapshot):
     os.system(f"btrfs sub snap /.snapshots/rootfs/snapshot-{snapshot} /.snapshots/rootfs/snapshot-chr{snapshot} >/dev/null 2>&1")
     os.system(f"btrfs sub snap /.snapshots/etc/etc-{snapshot} /.snapshots/etc/etc-chr{snapshot} >/dev/null 2>&1")
     os.system(f"mkdir -p /.snapshots/var/var-chr{snapshot} >/dev/null 2>&1")
-    # pacman gets weird when chroot directory is not a mountpoint, so the following mount is necessary
+    # IS line immediate after this comment needed for Debian's apt-get/dpkg? pacman gets weird when chroot directory is not a mountpoint, so the following mount is necessary
     os.system(f"mount --bind /.snapshots/rootfs/snapshot-chr{snapshot} /.snapshots/rootfs/snapshot-chr{snapshot} >/dev/null 2>&1")
     os.system(f"mount --bind /var /.snapshots/rootfs/snapshot-chr{snapshot}/var >/dev/null 2>&1")
     os.system(f"mount --rbind /dev /.snapshots/rootfs/snapshot-chr{snapshot}/dev >/dev/null 2>&1")
@@ -581,7 +581,7 @@ def posttrans(snapshot):
     os.system(f"rm -rf /.snapshots/var/var-chr{snapshot}/* >/dev/null 2>&1")
     os.system(f"mkdir -p /.snapshots/var/var-chr{snapshot}/lib/systemd >/dev/null 2>&1")
     os.system(f"cp -r --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/var/lib/systemd/* /.snapshots/var/var-chr{snapshot}/lib/systemd >/dev/null 2>&1")
-    os.system(f"cp -r -n --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/var/cache/pacman/pkg/* /var/cache/pacman/pkg/ >/dev/null 2>&1")
+    os.system(f"cp -r -n --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/var/cache/apt/* /var/cache/apt/ >/dev/null 2>&1")
     os.system(f"rm -rf /.snapshots/boot/boot-chr{snapshot}/* >/dev/null 2>&1")
     os.system(f"cp -r --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/boot/* /.snapshots/boot/boot-chr{snapshot} >/dev/null 2>&1")
     os.system(f"btrfs sub del /.snapshots/etc/etc-{etc} >/dev/null 2>&1")
@@ -605,7 +605,7 @@ def upgrade(snapshot):
         print("F: changing base snapshot is not allowed.")
     else:
         prepare(snapshot)
-        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} pacman -Syyu")) # Default upgrade behaviour is now "safe" update, meaning failed updates get fully discarded
+        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} apt-get update")) # Default upgrade behaviour is now "safe" update, meaning failed updates get fully discarded
         if int(excode) == 0:
             posttrans(snapshot)
             print(f"Snapshot {snapshot} upgraded successfully.")
@@ -630,7 +630,7 @@ def refresh(snapshot):
 #   Noninteractive update
 def autoupgrade(snapshot):
     prepare(snapshot)
-    excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} pacman --noconfirm -Syyu"))
+    excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} apt-get update -y"))
     if int(excode) == 0:
         posttrans(snapshot)
         os.system("echo 0 > /.snapshots/ast/upstate")
@@ -711,9 +711,9 @@ def switchtmp():
         gconf = gconf.replace("snapshot-tmp0","snapshot-tmp")
     else:
         gconf = gconf.replace("snapshot-tmp", "snapshot-tmp0")
-    if "Arch Linux" in gconf:
+    if "Debian Linux" in gconf:
         gconf = re.sub('\d', '', gconf)
-        gconf = gconf.replace(f"Arch Linux snapshot", f"Arch Linux last booted deployment (snapshot {snap})")
+        gconf = gconf.replace(f"Debian Linux snapshot", f"Debian Linux last booted deployment (snapshot {snap})")
     grubconf.close()
     os.system("sed -i '$ d' /etc/mnt/boot/grub/grub.cfg")
     grubconf = open("/etc/mnt/boot/grub/grub.cfg", "a")
@@ -735,9 +735,9 @@ def switchtmp():
         gconf = gconf.replace("snapshot-tmp0","snapshot-tmp")
     else:
         gconf = gconf.replace("snapshot-tmp", "snapshot-tmp0")
-    if "Arch Linux" in gconf:
+    if "Debian Linux" in gconf:
         gconf = re.sub('\d', '', gconf)
-        gconf = gconf.replace(f"Arch Linux snapshot", f"Arch Linux last booted deployment (snapshot {snap})")
+        gconf = gconf.replace(f"Debian Linux snapshot", f"Debian Linux last booted deployment (snapshot {snap})")
     grubconf.close()
     os.system("sed -i '$ d' /.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg")
     grubconf = open("/.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg", "a")
@@ -746,49 +746,6 @@ def switchtmp():
     grubconf.write("### END /etc/grub.d/41_custom ###")
     grubconf.close()
     os.system("umount /etc/mnt/boot >/dev/null 2>&1")
-
-#   Show some basic ast commands
-def ast_help():
-    print("all ast commands, aside from 'ast tree' must be used with root permissions!")
-    print("\n\ntree manipulation commands:")
-    print("\ttree - show the snapshot tree")
-    print("\tcurrent - return current snapshot number")
-    print("\tdesc <snapshot> <description> - set a description for snapshot by number")
-    print("\tdel <tree> - delete a tree and all it's branches recursively")
-    print("\tchroot <snapshot> - open a root shell inside specified snapshot")
-    print("\tlive-chroot - open a read-write shell inside currently booted snapshot (changes are discarded on new deployment)")
-    print("\trun <snapshot> <command> - execute command inside another snapshot")
-    print("\ttree-run <tree> <command> - execute command inside another snapshot and all snapshots below it")
-    print("\tclone <snapshot> - create a copy of snapshot")
-    print("\tbranch <snapshot> - create a new branch from snapshot")
-    print("\tcbranch <snapshot> - copy snapshot under same parent branch")
-    print("\tubranch <parent> <snapshot> - copy snapshot under specified parent")
-    print("\tnew - create a new base snapshot")
-    print("\tdeploy <snapshot> - deploy a snapshot for next boot")
-    print("\tbase-update - update the base image")
-    print("\n\npackage management commands:")
-    print("\tinstall <snapshot> <package> - install a package inside specified snapshot")
-    print("\tsync <tree> - sync package and configuration changes recursively, requires an internet connection")
-    print("\tforce-sync <tree> - same thing as sync but doesn't update snapshots, potentially riskier")
-    print("\tremove <snapshot> <package(s)> - remove package(s) from snapshot")
-    print("\ttree-rmpkg <tree> <package(s)> - remove package(s) from tree recursively")
-    print("\tupgrade <snapshot> - update all packages in snapshot")
-    print("\ttree-upgrade <tree> - update all packages in snapshot recursively")
-    print("\trollback - rollback the deployment to the last booted snapshot")
-    print("\n\nto update ast itself use 'ast ast-sync'")
-
-#   Update ast itself
-def ast_sync():
-    cdir = os.getcwd()
-    os.chdir("/tmp")
-    excode = str(os.system("curl -O 'https://raw.githubusercontent.com/astos/astos/main/astpk.py'"))
-    if int(excode) == 0:
-        os.system("cp ./astpk.py /.snapshots/ast/ast")
-        os.system("chmod +x /.snapshots/ast/ast")
-        print("ast updated succesfully.")
-    else:
-        print("error: failed to download ast")
-    os.chdir(cdir)
 
 # Clear all temporary snapshots
 def tmpclear():
@@ -831,11 +788,7 @@ def main(args):
     fstreepath = str("/.snapshots/ast/fstree") # Path to fstree file
     fstree = importer.import_(import_tree_file("/.snapshots/ast/fstree")) # Import fstree file
     # Recognize argument and call appropriate function
-    if len(args) > 1:
-        arg = args[1]
-    else:
-        print("You need to specify an operation, see 'ast help' for help.")
-        sys.exit()
+    arg = args[1]
     if isChroot == True and ("--chroot" not in args):
         print("Please don't use ast inside a chroot!")
     elif lock == True:
@@ -929,12 +882,6 @@ def main(args):
     elif arg == "base-update" or arg == "bu" and (lock != True):
         ast_lock()
         update_base()
-        ast_unlock()
-    elif arg == "help":
-        ast_help()
-    elif arg == "ast-sync" and (lock != True):
-        ast_lock()
-        ast_sync()
         ast_unlock()
     elif arg == "sync" or arg == "tree-sync" and (lock != True):
         ast_lock()
