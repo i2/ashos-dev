@@ -240,7 +240,6 @@ def clone_under(snapshot, branch):
         print(f"Branch {i} added under snapshot {snapshot}.")
 
 #   Lock ast
-#   Currently this lock is ignored (### NEEDS_REVIEW_LATER ###)
 def ast_lock():
     os.system("touch /.snapshots/ast/lock-disable")
 
@@ -933,7 +932,7 @@ def main(args):
         ast_unlock()
     elif arg == "help":
         ast_help()
-    elif arg == "ast-sync" and (lock != True):
+    elif arg == "ast-sync" and (lock != True): ###REVIEW_LATER Currently this lock is ignored
         ast_lock()
         ast_sync()
         ast_unlock()
