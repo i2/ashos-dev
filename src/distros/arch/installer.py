@@ -139,8 +139,8 @@ def main(args, distro):
     #os.system("echo -e 'setw -g mode-keys vi\nset -g history-limit 999999' >> $HOME/.tmux.conf")
 
 #   Pacstrap then install anytree and necessary packages in chroot
-    #os.system("pacstrap /mnt base linux linux-firmware neovim python3 python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo os-prober tmux")
-    os.system("pacstrap /mnt base linux neovim python3 python-anytree arch-install-scripts btrfs-progs grub sudo os-prober tmux")
+    #os.system("pacstrap /mnt base linux linux-firmware neovim python3 python-anytree dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo tmux") # os-prober 
+    os.system("pacstrap /mnt base linux neovim python3 python-anytree arch-install-scripts btrfs-progs grub sudo tmux")
     if efi:
         os.system("pacstrap /mnt efibootmgr")
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):

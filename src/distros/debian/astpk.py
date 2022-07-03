@@ -29,14 +29,15 @@ def get_distro_suffix():
 
 def switch_distro():
     while True:
-        gg = subprocess.check_output("cat /boot/efi/EFI/map.txt | awk 'BEGIN { FS = "'"'" === "'"'" } ; { print $1 }'", shell=True).decode('utf-8').strip()
-        print("Type the name of a distro to switch to: (type 'list' to list them)")
+        map_tmp = subprocess.check_output("cat /boot/efi/EFI/map.txt | awk 'BEGIN { FS = "'"'" === "'"'" } ; { print $1 }'", shell=True).decode('utf-8').strip()
+        print("Type the name of a distro to switch to: (type 'list' to list them, 'q' to quit)")
         next_distro = input("> ")
         if next_distro == "q":
             break
         elif next_distro == "list":
-            print(gg)
-        elif next_distro in gg:
+            print(map_tmp)
+        elif next_distro in map_tmp:
+            import csv
             with open('/boot/efi/EFI/map.txt', 'r') as f:
                 input_file = csv.DictReader(f, delimiter=',', quoting=csv.QUOTE_NONE)
                 for row in input_file:
@@ -801,7 +802,7 @@ def tmpclear():
     os.system(f"btrfs sub del /.snapshots/rootfs/snapshot-chr* >/dev/null 2>&1")
 
 def list_subvolumes():
-    os.system(f"btrfs sub list / | grep -i {distro}")
+    os.system(f"btrfs sub list / | grep -i {get_distro_suffix()}")
 
 # Find new unused snapshot dir
 def findnew():
