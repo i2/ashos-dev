@@ -1,3 +1,17 @@
+this test resulted in nonbootable efi:
+sudo ast clone 0
+sudo ast clone 0
+sudo ast branch 2
+sudo chroot 4
+... mkdir /etc/node4-arch
+... mkdir ~/node4-arch
+... exit
+sudo ast deploy 4
+-------------- efi non bootable!
+
+
+Right now, /root among snapshots is different but #HOME is same. Should /root be same too?
+
 $ sudo dmesg | nc termbin.com 9999 # then paste the link
 
 
