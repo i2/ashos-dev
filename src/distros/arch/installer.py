@@ -195,12 +195,11 @@ def main(args, distro):
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | tee /mnt/.snapshots/ast/fstree")
 
 #   GRUB and EFI
-    os.system(f"chroot /mnt sed -i s,Arch,AshOS Arch,g /etc/default/grub")
     os.system(f"chroot /mnt grub-install {args[2]}") #REZA --recheck --no-nvram --removable
     os.system(f"chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system(f"sed -i '0,/subvol=@{distro_suffix}/s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
-    if efi: # Create a map.txt file "distro" <=> "BootOrder number"
-        os.system(f"chroot /mnt echo {distro} === $(efibootmgr -v | grep '{distro}') | tee -a /mnt/boot/efi/EFI/map.txt")
+    if efi: # Create a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
+        os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
 
 #   Copy astpk
     os.system(f"cp -a ./src/distros/{distro}/astpk.py /mnt/usr/bin/ast")

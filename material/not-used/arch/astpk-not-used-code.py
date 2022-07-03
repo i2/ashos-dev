@@ -138,3 +138,9 @@ def rename_distro_bare_grub(p, currd): # In case someone is installing on a syst
     os.system(f"umount /tmp/{tmp_efi}")
     #os.system(f"rm -rf /tmp/{tmp_efi}") ##if successful umount ( check result of 'echo $?' )
 
+
+
+
+
+
+                        #os.system(f'efibootmgr --bootnext {row["BootOrder"]}')

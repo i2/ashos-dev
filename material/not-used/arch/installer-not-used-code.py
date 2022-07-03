@@ -40,6 +40,7 @@
 .
 .
 #   GRUB and EFI - Backup and create default entry txt
+    os.system(f"chroot /mnt sed -i s,Arch,AshOS Arch,g /etc/default/grub")
 .
 .
 .

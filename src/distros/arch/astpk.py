@@ -26,7 +26,7 @@ def get_distro_suffix():
         return f'_{distro.replace("_ashos","")}'
     else:
         return ""
-        
+
 def switch_distro():
     while True:
         gg = subprocess.check_output("cat /boot/efi/EFI/map.txt | awk 'BEGIN { FS = "'"'" === "'"'" } ; { print $1 }'", shell=True).decode('utf-8').strip()
@@ -41,7 +41,6 @@ def switch_distro():
                 input_file = csv.DictReader(f, delimiter=',', quoting=csv.QUOTE_NONE)
                 for row in input_file:
                     if row["DISTRO"] == next_distro:
-                        #os.system(f'efibootmgr --bootnext {row["BootOrder"]}')
                         boot_order = subprocess.check_output("efibootmgr | grep BootOrder | awk '{print $2}'", shell=True).decode('utf-8').strip()
                         temp = boot_order.replace(f'{row["BootOrder"]},', "")
                         new_boot_order = f"{row['BootOrder']},{temp}"
@@ -396,7 +395,7 @@ def update_boot(snapshot):
         prepare(snapshot)
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} grub-mkconfig {part} -o /boot/grub/grub.cfg")
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i s,snapshot-chr{snapshot},snapshot-{tmp},g /boot/grub/grub.cfg")
-        os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i '0,/AshOS\ Linux/s//AshOS\ Linux\ snapshot\ {snapshot}/' /boot/grub/grub.cfg")
+        os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i '0,/Arch\ Linux/s//Arch\ Linux\ snapshot\ {snapshot}/' /boot/grub/grub.cfg")
         posttrans(snapshot)
 
 #   Chroot into snapshot
@@ -711,9 +710,9 @@ def switchtmp():
         gconf = gconf.replace("snapshot-tmp0","snapshot-tmp")
     else:
         gconf = gconf.replace("snapshot-tmp", "snapshot-tmp0")
-    if "AshOS Linux" in gconf:
+    if "Arch Linux" in gconf:
         gconf = re.sub('\d', '', gconf)
-        gconf = gconf.replace(f"AshOS Linux snapshot",f"AshOS last booted deployment (snapshot {snap})")
+        gconf = gconf.replace(f"Arch Linux snapshot", f"Arch Linux last booted deployment (snapshot {snap})")
     grubconf.close()
     os.system("sed -i '$ d' /etc/mnt/boot/grub/grub.cfg")
     grubconf = open("/etc/mnt/boot/grub/grub.cfg", "a")
@@ -735,9 +734,9 @@ def switchtmp():
         gconf = gconf.replace("snapshot-tmp0","snapshot-tmp")
     else:
         gconf = gconf.replace("snapshot-tmp", "snapshot-tmp0")
-    if "AshOS Linux" in gconf:
+    if "Arch Linux" in gconf:
         gconf = re.sub('\d', '', gconf)
-        gconf = gconf.replace(f"AshOS Linux snapshot", f"AshOS last booted deployment (snapshot {snap})")
+        gconf = gconf.replace(f"Arch Linux snapshot", f"Arch Linux last booted deployment (snapshot {snap})")
     grubconf.close()
     os.system("sed -i '$ d' /.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg")
     grubconf = open("/.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg", "a")
@@ -936,6 +935,6 @@ if __name__ == "__main__":
     from anytree.exporter import DictExporter
     import anytree
     args = list(sys.argv)
-    distro = subprocess.check_output(['sh', 'detect_os.sh']).decode('utf-8').replace('"',"").strip()
+    distro = subprocess.check_output(['sh', '/usr/bin/detect_os.sh']).decode('utf-8').replace('"',"").strip()
     main(args)
 
