@@ -396,7 +396,7 @@ def update_boot(snapshot):
         prepare(snapshot)
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} grub-mkconfig {part} -o /boot/grub/grub.cfg")
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i s,snapshot-chr{snapshot},snapshot-{tmp},g /boot/grub/grub.cfg")
-        os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i '0,/Debian\ GNU\/Linux/s//Debian\ GNU\/Linux\ snapshot\ {snapshot}/' /boot/grub/grub.cfg")
+        os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i '0,/Debian\ GNU\/Linux/ s##Debian\ GNU\/Linux\ snapshot\ {snapshot}#' /boot/grub/grub.cfg")
         posttrans(snapshot)
 
 #   Chroot into snapshot
@@ -977,7 +977,7 @@ def main(args):
         ast_unlock()
     elif arg == "tree":
         show_fstree()
-    elif arg == "list":
+    elif arg == "subs":
         list_subvolumes()
     elif arg == "dist" or arg == "distro" or arg == "distros":
         switch_distro()

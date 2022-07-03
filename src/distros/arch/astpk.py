@@ -396,7 +396,7 @@ def update_boot(snapshot):
         prepare(snapshot)
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} grub-mkconfig {part} -o /boot/grub/grub.cfg")
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i s,snapshot-chr{snapshot},snapshot-{tmp},g /boot/grub/grub.cfg")
-        os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i '0,/Arch\ Linux/s//Arch\ Linux\ snapshot\ {snapshot}/' /boot/grub/grub.cfg")
+        os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i '0,/Arch\ Linux/ s##Arch\ Linux\ snapshot\ {snapshot}#' /boot/grub/grub.cfg")
         posttrans(snapshot)
 
 #   Chroot into snapshot
