@@ -95,3 +95,9 @@
 # move this functionality from installer.py aka main.py to astpk.py:
 #    for i in packages:
 #        os.system(f"sudo chroot /mnt apt-get install -y {i}")
+
+
+# Donot do this mount-point, it causes efi var not available and as a result system not bootable.
+###    print("XXXXXXXXXXXXXXXXXXXXXXXXXX hhhhhhhhhhhhhhhhhhhhhhhhhh HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH NOW creating tmp mount point")
+###    os.system("sudo mount -B /tmp /mnt/tmp")
+###    print("XXXXXXXXXXXXXXXXXXXXXXXXXX ************************** 888888888888888888888888888888888888888 DONE NOW creating tmp mount point")

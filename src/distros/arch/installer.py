@@ -181,11 +181,13 @@ def main(args, distro):
     # Delete fstab created for @{distro_suffix} which is going to be deleted at the end
     os.system(f"sed -i.bak '/\@{distro_suffix}/d' /mnt/etc/fstab")
 
+#   Copy and symlink astpk and detect_os.sh                                                              ###MOVEDTOHERE
     os.system("mkdir -p /mnt/.snapshots/ast/snapshots")
+    os.system(f"cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
+    os.system("cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
+    os.system("chroot /mnt ln -s /.snapshots/ast/ast /usr/bin/ast")             ####PR32 Can I moved it somewhere better?
+    os.system("chroot /mnt ln -s /.snapshots/ast/detect_os.sh /usr/bin/detect_os.sh")
     os.system("chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
-#   Copy astpk                                                                                    ###MOVEDTOHERE
-    os.system(f"cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")                     ###MOVEDTOHERE
-    os.system("cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")                          ###MOVEDTOHERE
 
 #   Create user and set password
     set_password("root")
@@ -204,13 +206,6 @@ def main(args, distro):
     os.system(f"sed -i '0,/subvol=@{distro_suffix}/s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
     if efi: # Create a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
         os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
-
-###MOVEDTOUP#   Copy astpk
-###MOVEDTOUP    os.system(f"cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
-###MOVEDTOUP    os.system("cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
-
-    os.system("chroot /mnt ln -s /.snapshots/ast/ast /usr/bin/ast")             ####PR32 Can I moved it somewhere better?
-    os.system("chroot /mnt ln -s /.snapshots/ast/detect_os.sh /usr/bin/detect_os.sh")
 
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")

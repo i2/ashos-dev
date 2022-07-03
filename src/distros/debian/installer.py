@@ -150,9 +150,6 @@ def main(args, distro):
     os.system(f"sudo debootstrap --arch {ARCH} --exclude={excl} {RELEASE} /mnt http://ftp.debian.org/debian")
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
         os.system(f"sudo mount -B {i} /mnt{i}") # Mount-points needed for chrooting
-###    print("XXXXXXXXXXXXXXXXXXXXXXXXXX hhhhhhhhhhhhhhhhhhhhhhhhhh HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH NOW creating tmp mount point")
-###    os.system("sudo mount -B /tmp /mnt/tmp")
-###    print("XXXXXXXXXXXXXXXXXXXXXXXXXX ************************** 888888888888888888888888888888888888888 DONE NOW creating tmp mount point")
     os.system(f"sudo chroot /mnt apt-get install --fix-broken -y linux-image-{ARCH}")
 
 #MOVEDUPBEFOREDEBOOTSTRAP    if efi: ###REZA #MOVED FROM ABOVE See if there are still files in sda1 unnecessarily heavy (ONLY FOR DEBOOSTRAP BASED OS, NOT FOR ARCH)
@@ -207,11 +204,13 @@ def main(args, distro):
     # Delete fstab created for @{distro_suffix} which is going to be deleted at the end
     os.system(f"sed -i.bak '/\@{distro_suffix}/d' /mnt/etc/fstab")
 
+#   Copy and symlink astpk and detect_os.sh                                                              ###MOVEDTOHERE
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
+    os.system(f"sudo cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
+    os.system("sudo cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
+    os.system("sudo chroot /mnt ln -s /.snapshots/ast/ast /usr/bin/ast")             ####PR32 Can I moved it somewhere better?
+    os.system("sudo chroot /mnt ln -s /.snapshots/ast/detect_os.sh /usr/bin/detect_os.sh")
     os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
-#   Copy astpk                                                                                    ###MOVEDTOHERE
-    os.system(f"sudo cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")                     ###MOVEDTOHERE
-    os.system("sudo cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")                          ###MOVEDTOHERE
 
 #   Create user and set password
     set_password("root")
@@ -228,18 +227,8 @@ def main(args, distro):
     os.system(f"sudo chroot /mnt grub-install {args[2]}") #REZA --recheck --no-nvram --removable
     os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system(f"sudo sed -i '0,/subvol=@{distro_suffix} /s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
-    print("XXXXXXXXXXXXXXXXXXXXXXXXXXXX#########################             %%%%%%%%%%%%%%%%%% creating map.txt")
-    print("XXXXXXXXXXXXXXXXXXXXXXXXXXXX#########################             %%%%%%%%%%%%%%%%%% creating map.txt")
     if efi: # Create a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
         os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | sudo tee -a /mnt/boot/efi/EFI/map.txt")
-    print("XXXXXXXXXXXXXXXXXXXXXXXXXXXX#########################             %%%%%%%%%%%%%%%%%% DONE creating map.txt")
-
-###MOVEDTOUP#   Copy astpk
-###MOVEDTOUP    os.system(f"sudo cp -a ./src/distros/{distro}/astpk.py /mnt/usr/bin/ast")
-###MOVEDTOUP    os.system("sudo cp -a ./src/detect_os.sh /mnt/usr/bin/detect_os.sh")
-
-    os.system("sudo chroot /mnt ln -s /.snapshots/ast/ast /usr/bin/ast")             ####PR32 Can I moved it somewhere better?
-    os.system("sudo chroot /mnt ln -s /.snapshots/ast/detect_os.sh /usr/bin/detect_os.sh")
 
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")

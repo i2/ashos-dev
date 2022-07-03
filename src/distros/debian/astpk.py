@@ -396,7 +396,7 @@ def update_boot(snapshot):
         prepare(snapshot)
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} grub-mkconfig {part} -o /boot/grub/grub.cfg")
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i s,snapshot-chr{snapshot},snapshot-{tmp},g /boot/grub/grub.cfg")
-        os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i '0,/Debian\ Linux/s//Debian\ Linux\ snapshot\ {snapshot}/' /boot/grub/grub.cfg")
+        os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i '0,/Debian\ GNU\/Linux/s//Debian\ GNU\/Linux\ snapshot\ {snapshot}/' /boot/grub/grub.cfg")
         posttrans(snapshot)
 
 #   Chroot into snapshot
@@ -712,9 +712,9 @@ def switchtmp():
         gconf = gconf.replace("snapshot-tmp0","snapshot-tmp")
     else:
         gconf = gconf.replace("snapshot-tmp", "snapshot-tmp0")
-    if "Debian Linux" in gconf:
+    if "Debian GNU/Linux" in gconf:
         gconf = re.sub('\d', '', gconf)
-        gconf = gconf.replace(f"Debian Linux snapshot", f"Debian Linux last booted deployment (snapshot {snap})")
+        gconf = gconf.replace(f"Debian GNU/Linux snapshot", f"Debian GNU/Linux last booted deployment (snapshot {snap})")
     grubconf.close()
     os.system("sed -i '$ d' /etc/mnt/boot/grub/grub.cfg")
     grubconf = open("/etc/mnt/boot/grub/grub.cfg", "a")
@@ -736,9 +736,9 @@ def switchtmp():
         gconf = gconf.replace("snapshot-tmp0","snapshot-tmp")
     else:
         gconf = gconf.replace("snapshot-tmp", "snapshot-tmp0")
-    if "Debian Linux" in gconf:
+    if "Debian GNU/Linux" in gconf:
         gconf = re.sub('\d', '', gconf)
-        gconf = gconf.replace(f"Debian Linux snapshot", f"Debian Linux last booted deployment (snapshot {snap})")
+        gconf = gconf.replace(f"Debian GNU/Linux snapshot", f"Debian GNU/Linux last booted deployment (snapshot {snap})")
     grubconf.close()
     os.system("sed -i '$ d' /.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg")
     grubconf = open("/.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg", "a")
