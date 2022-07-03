@@ -1,3 +1,6 @@
+GREAT IDEA:
+Within the forest/tree of ashos, can I set a spot that makes a node and its children no longer immutable? A mix of immutable and non-immutable nodes.
+
 this test resulted in nonbootable efi:
 sudo ast clone 0
 sudo ast clone 0
