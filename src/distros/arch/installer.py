@@ -143,7 +143,8 @@ def main(args, distro):
     os.system("pacstrap /mnt base linux neovim python3 python-anytree arch-install-scripts btrfs-progs grub sudo os-prober tmux")
     if efi:
         os.system("pacstrap /mnt efibootmgr")
-    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars /tmp"):
+####DOES THIS CAUSE EFIVAR NOT SUPPORTED ISSUE?    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars /tmp"):
+    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
         os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
 
 #   Update fstab
