@@ -228,8 +228,11 @@ def main(args, distro):
     os.system(f"sudo mkdir -p /mnt/boot/grub/BAK/") # Folder for backing up grub configs created by astpk
     os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system(f"sudo sed -i '0,/subvol=@{distro_suffix} /s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
-    if efi: # Create a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
-        os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | sudo tee -a /mnt/boot/efi/EFI/map.txt")
+    if os.path.exists("/mnt/boot/efi/EFI/map.txt"):
+        if efi: # Create a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
+            os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | sudo tee -a /mnt/boot/efi/EFI/map.txt")
+    else:
+        os.system("echo DISTRO,BootOrder | sudo tee -a /mnt/boot/efi/EFI/map.txt")
 
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")

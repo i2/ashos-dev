@@ -395,7 +395,7 @@ def update_boot(snapshot):
         part = get_part()
         prepare(snapshot)
         ### TODO: DELETE grub.cfg.DATE.BAK older than 90 days
-        os.system("cp /boot/grub/grub.cfg /boot/grub/BAK/grub.cfg.`date '+%Y%m%d-%H%M%S'`")
+        subprocess.check_output("cp /boot/grub/grub.cfg /boot/grub/BAK/grub.cfg.`date '+%Y%m%d-%H%M%S'`", shell=True)
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} grub-mkconfig {part} -o /boot/grub/grub.cfg")
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i s,snapshot-chr{snapshot},snapshot-{tmp},g /boot/grub/grub.cfg")
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i '0,/Arch\ Linux/ s##Arch\ Linux\ snapshot\ {snapshot}#' /boot/grub/grub.cfg")

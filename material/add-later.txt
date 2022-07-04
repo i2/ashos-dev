@@ -1,3 +1,5 @@
+Convert installer.py to POSIX shell ideally with no bashism
+
 GREAT IDEA:
 Within the forest/tree of ashos, can I set a spot that makes a node and its children no longer immutable? A mix of immutable and non-immutable nodes.
 
