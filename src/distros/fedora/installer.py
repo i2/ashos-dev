@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+# might need to append /bin/sh or /bin/bash to chroot commands, as arch iso live cd use zsh and choroot environment is bash
+
 import os
 import subprocess
 #from src.distros.arch import astpk
@@ -182,11 +184,13 @@ def main(args, distro):
 #   Update hostname, hosts, locales and timezone, hosts
     os.system(f"echo {hostname} | tee /mnt/etc/hostname")
     os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
-    os.system("sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen")
-    os.system("chroot /mnt locale-gen")
+    #os.system("sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen")
+    #os.system("chroot /mnt locale-gen")
     os.system("echo 'LANG=en_US.UTF-8' | tee /mnt/etc/locale.conf")
     os.system(f"chroot /mnt ln -sf {tz} /etc/localtime")
-    os.system("chroot /mnt hwclock --systohc")
+    os.system("chroot /mnt hwclock --systohc")    #REZA hwclock and locale-gen commands not found!
+
+############### step 7 begins here
 
     os.system(f"sed -i '0,/@{distro_suffix}/ s,@{distro_suffix},@.snapshots{distro_suffix}/rootfs/snapshot-tmp,' /mnt/etc/fstab")
     os.system(f"sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
