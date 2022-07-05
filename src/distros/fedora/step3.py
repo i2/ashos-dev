@@ -107,18 +107,6 @@ def main(args, distro):
 
     astpart = to_uuid(args[1]) ### DELETE THIS LINE WHEN PRODUCTION READY
 
-####### STEP 2 BEGINS HERE
-
-    #os.system(f"dnf makecache --refresh --releasever={RELEASE} -c ./src/distros/fedora/base.repo")
-    
-    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):  ### REZA In debian, these mount-points operations go 'after' debootstrapping and there is no complaint! In fedora, if so, dnf would complain /dev is not mounted!
-        #os.system(f"mkdir -p /mnt{i}")
-        os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
-    
-    os.system(f"dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install dnf -y --releasever={RELEASE}")  #### removed basearch as it was giving unrecognized arguments error!
-    if efi:
-        os.system("chroot /mnt dnf install -y efibootmgr grub2-efi-x64 grub2-common")
-
 ####### STEP 3 BEGINS HERE
 
     #os.system("chroot /mnt dnf install -y passwd which grub2-efi-x64-modules os-prober shim-x64")
@@ -142,7 +130,6 @@ def main(args, distro):
     os.system(f"sed -i '/PRETTY_NAME/ s/Fedora Linux/Fedora Linux (ashos)/' /mnt/etc/os-release")
     os.system(f"sed -i '/^ID/ s/fedora/fedora_ashos/' /mnt/etc/os-release")
     #os.system("echo 'HOME_URL=\"https://github.com/astos/astos\"' | tee -a /mnt/etc/os-release")
-
 
 args = list(sys.argv)
 distro="fedora"

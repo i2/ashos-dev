@@ -107,34 +107,26 @@ def main(args, distro):
 
     astpart = to_uuid(args[1]) ### DELETE THIS LINE WHEN PRODUCTION READY
 
+    tz= get_timezone()
+    hostname  = get_hostname()
 
-
-####### STEP 2 BEGINS HERE
-
-#os.system("dnf makecache --refresh")
-
-#   Update fstab
-    os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
-    for mntdir in mntdirs:
-        os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}{distro_suffix},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
-    if efi:
-        os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | tee -a /mnt/etc/fstab")
-    os.system("echo '/.snapshots/ast/root /root none bind 0 0' | tee -a /mnt/etc/fstab")
-    os.system("echo '/.snapshots/ast/tmp /tmp none bind 0 0' | tee -a /mnt/etc/fstab")
-
-    os.system("mkdir -p /mnt/usr/share/ast/db")
-    os.system("echo '0' | tee /mnt/usr/share/ast/snap")
-    #os.system(f"cp -r /mnt/var/lib/pacman/* /mnt/usr/share/ast/db")
-    #os.system(f"sed -i s,\"#DBPath      = /var/lib/pacman/\",\"DBPath      = /usr/share/ast/db/\",g /mnt/etc/pacman.conf")
-
-#   Modify OS release information (optional)
-    os.system(f"sed -i '/^NAME/ s/Fedora Linux/Fedora Linux (ashos)/' /mnt/etc/os-release")
-    os.system(f"sed -i '/PRETTY_NAME/ s/Fedora Linux/Fedora Linux (ashos)/' /mnt/etc/os-release")
-    os.system(f"sed -i '/^ID/ s/fedora/fedora_ashos/' /mnt/etc/os-release")
-    #os.system("echo 'HOME_URL=\"https://github.com/astos/astos\"' | tee -a /mnt/etc/os-release")
+####### STEP 4 BEGINS HERE
 
     os.system(f"echo 'releasever={RELEASE}' | tee /mnt/etc/yum.conf") ########NEW FOR FEDORA
     
+    ### glibc-locale-source is already installed
+    os.system(f"chroot /mnt dnf install -y systemd ncurses bash-completion kernel glibc-langpack-en --releasever={RELEASE}") ########NEW FOR FEDORA package 'systemd' already installed using whatever above packages came
+
+#   Update hostname, hosts, locales and timezone, hosts
+    os.system(f"echo {hostname} | tee /mnt/etc/hostname")
+    os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
+#    os.system("sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen")
+    ### os.system("yum -y install glibc-langpack-en") ######### glibc-locale-source is already installed
+    os.system("chroot /mnt localedef -v -c -i en_US -f UTF-8 en_US.UTF-8") #######REZA got error (
+    os.system("echo 'LANG=en_US.UTF-8' | tee /mnt/etc/locale.conf")
+    os.system(f"chroot /mnt ln -sf {tz} /etc/localtime")
+    os.system("chroot /mnt /usr/sbin/hwclock --systohc")    #REZA hwclock and locale-gen commands not found!
+
 args = list(sys.argv)
 distro="fedora"
 main(args, distro)

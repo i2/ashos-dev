@@ -177,22 +177,26 @@ def main(args, distro):
     os.system(f"sed -i '/^ID/ s/fedora/fedora_ashos/' /mnt/etc/os-release")
     #os.system("echo 'HOME_URL=\"https://github.com/astos/astos\"' | tee -a /mnt/etc/os-release")
 
+####### STEP 4 BEGINS HERE
+
     os.system(f"echo 'releasever={RELEASE}' | tee /mnt/etc/yum.conf") ########NEW FOR FEDORA
     
-    ########## Step 6 begins here
-    
-    os.system(f"chroot /mnt dnf install -y ncurses bash-completion kernel --releasever={RELEASE}") ########NEW FOR FEDORA package 'systemd' already installed using whatever above packages came
+    ### glibc-locale-source is already installed
+    os.system(f"chroot /mnt dnf install -y systemd ncurses bash-completion kernel glibc-langpack-en --releasever={RELEASE}") ########NEW FOR FEDORA package 'systemd' already installed using whatever above packages came
 
 #   Update hostname, hosts, locales and timezone, hosts
     os.system(f"echo {hostname} | tee /mnt/etc/hostname")
     os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
-    #os.system("sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen")
-    #os.system("chroot /mnt locale-gen")
+#    os.system("sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen")
+    ### os.system("yum -y install glibc-langpack-en") ######### glibc-locale-source is already installed
+    os.system("chroot /mnt localedef -v -c -i en_US -f UTF-8 en_US.UTF-8") #######REZA got error (
     os.system("echo 'LANG=en_US.UTF-8' | tee /mnt/etc/locale.conf")
     os.system(f"chroot /mnt ln -sf {tz} /etc/localtime")
-    os.system("chroot /mnt hwclock --systohc")    #REZA hwclock and locale-gen commands not found!
+    os.system("chroot /mnt /usr/sbin/hwclock --systohc")    #REZA hwclock and locale-gen commands not found!
 
-############### step 7 begins here
+
+
+############### step 5 begins here
 
     os.system(f"sed -i '0,/@{distro_suffix}/ s,@{distro_suffix},@.snapshots{distro_suffix}/rootfs/snapshot-tmp,' /mnt/etc/fstab")
     os.system(f"sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
