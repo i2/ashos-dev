@@ -182,7 +182,7 @@ def main(args, distro):
     os.system(f"echo 'releasever={RELEASE}' | tee /mnt/etc/yum.conf") ########NEW FOR FEDORA
     
     ### glibc-locale-source is already installed
-    os.system(f"chroot /mnt dnf install -y systemd ncurses bash-completion kernel glibc-langpack-en --releasever={RELEASE}") ########NEW FOR FEDORA package 'systemd' already installed using whatever above packages came
+    os.system(f"chroot /mnt dnf install -y systemd ncurses bash-completion kernel glibc-locale-source glibc-langpack-en --releasever={RELEASE}") ########NEW FOR FEDORA package 'systemd' already installed using whatever above packages came
 
 #   Update hostname, hosts, locales and timezone, hosts
     os.system(f"echo {hostname} | tee /mnt/etc/hostname")
@@ -193,8 +193,6 @@ def main(args, distro):
     os.system("echo 'LANG=en_US.UTF-8' | tee /mnt/etc/locale.conf")
     os.system(f"chroot /mnt ln -sf {tz} /etc/localtime")
     os.system("chroot /mnt /usr/sbin/hwclock --systohc")    #REZA hwclock and locale-gen commands not found!
-
-
 
 ############### step 5 begins here
 

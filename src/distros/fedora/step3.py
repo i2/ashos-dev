@@ -109,7 +109,7 @@ def main(args, distro):
 
 ####### STEP 3 BEGINS HERE
 
-    #os.system("chroot /mnt dnf install -y passwd which grub2-efi-x64-modules os-prober shim-x64")
+    os.system("chroot /mnt dnf install -y passwd which grub2-efi-x64-modules os-prober shim-x64")
     
     #   Update fstab
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
