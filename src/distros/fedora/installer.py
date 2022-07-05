@@ -210,7 +210,7 @@ def main(args, distro):
     os.system("chroot /mnt ln -s /.snapshots/ast/detect_os.sh /usr/bin/detect_os.sh")
     os.system("chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
 
-############### step 8 begins here
+############### step NEW6 begins here
 
 
 #   Create user and set password

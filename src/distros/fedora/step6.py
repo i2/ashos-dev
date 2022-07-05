@@ -32,6 +32,33 @@ def get_multiboot(dist):
             print("Invalid choice!")
             continue
 
+def get_hostname():
+    clear()
+    while True:
+        print("Enter hostname:")
+        hostname = input("> ")
+        if hostname:
+            print("Happy with your hostname (y/n)?")
+            reply = input("> ")
+            if reply.casefold() == "y":
+                break
+            else:
+                continue
+    return hostname
+
+def get_timezone():
+    clear()
+    while True:
+        print("Select a timezone (type list to list):")
+        zone = input("> ")
+        if zone == "list":
+            os.system("ls /usr/share/zoneinfo | less")
+        elif os.path.isfile(f"/usr/share/zoneinfo/{zone}"):
+            return str(f"/usr/share/zoneinfo/{zone}")
+        else:
+            print("Invalid Timezone!")
+            continue
+
 def get_username():
     clear()
     while True:
@@ -64,7 +91,6 @@ def set_password(u):
             continue
 
 def main(args, distro):
-
     print("Welcome to the astOS installer!\n\n\n\n\n")
     choice, distro_suffix = get_multiboot("fedora")
 
@@ -81,24 +107,21 @@ def main(args, distro):
 
     astpart = to_uuid(args[1]) ### DELETE THIS LINE WHEN PRODUCTION READY
 
-####### STEP 7 BEGINS HERE
+    tz= get_timezone()
+    hostname  = get_hostname()
 
-    print("STEP 7 BEGINS HERE")
-    os.system(f"sed -i '0,/@{distro_suffix}/ s,@{distro_suffix},@.snapshots{distro_suffix}/rootfs/snapshot-tmp,' /mnt/etc/fstab")
-    os.system(f"sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
-    os.system(f"sed -i '0,/@etc{distro_suffix}/ s,@etc{distro_suffix},@.snapshots{distro_suffix}/etc/etc-tmp,' /mnt/etc/fstab")
-    # Delete fstab created for @{distro_suffix} which is going to be deleted at the end
-    os.system(f"sed -i.bak '/\@{distro_suffix}/d' /mnt/etc/fstab")
+####### STEP 6 BEGINS HERE
 
-#   Copy and symlink astpk and detect_os.sh                                                              ###MOVEDTOHERE
-    os.system("mkdir -p /mnt/.snapshots/ast/snapshots")
-    os.system(f"cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
-    os.system("cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
-    os.system("chroot /mnt ln -s /.snapshots/ast/ast /usr/bin/ast")             ####PR32 Can I moved it somewhere better?
-    os.system("chroot /mnt ln -s /.snapshots/ast/detect_os.sh /usr/bin/detect_os.sh")
-    os.system("chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
+#   Create user and set password
+    set_password("root")
+    username = get_username()
+    create_user(username)
+    set_password(username)
 
-    print("STEP 7 ENDS HERE")    
+    #os.system("chroot /mnt systemctl enable NetworkManager")
+
+#   Initialize fstree
+    os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | tee /mnt/.snapshots/ast/fstree")
 
 args = list(sys.argv)
 distro="fedora"
