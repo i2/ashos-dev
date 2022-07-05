@@ -75,7 +75,7 @@ def get_username():
     return username
 
 def create_user(u):
-    os.system(f"chroot /mnt useradd -m -G wheel -s /bin/bash {u}")
+    os.system(f"chroot /mnt /usr/sbin/useradd -m -G wheel -s /bin/bash {u}")
     os.system("echo '%wheel ALL=(ALL:ALL) ALL' | tee -a /mnt/etc/sudoers")
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | tee -a /mnt/home/{u}/.bashrc")
 
