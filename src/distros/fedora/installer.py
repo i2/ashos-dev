@@ -153,7 +153,7 @@ def main(args, distro):
     if efi:
         os.system("chroot /mnt dnf install -y efibootmgr grub2-efi") #addeed grub2-efi as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?
 
-    os.system("chroot /mnt dnf install -y passwd which grub2-efi-x64-modules")
+    os.system("chroot /mnt dnf install -y passwd which grub2-efi-x64-modules os-prober")
     os.system("cp /etc/resolv.conf /mnt/etc/")  ###########NEW FOR FEDORA, it says already cped this file!
 
 #   Update fstab
@@ -226,12 +226,11 @@ def main(args, distro):
     os.system("mkdir -p /mnt/boot/grub2/BAK/") # Folder for backing up grub configs created by astpk
     os.system(f"chroot /mnt /usr/sbin/grub2-mkconfig {args[2]} -o /boot/grub2/grub.cfg")
     os.system(f"sed -i '0,/subvol=@{distro_suffix}/s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub2/grub.cfg")
-    if os.path.exists("/mnt/boot/efi/EFI/map.txt"):
-        if efi: # Create a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
-            os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
-    else:
-        os.system("echo DISTRO,BootOrder | tee -a /mnt/boot/efi/EFI/map.txt")
-
+    if efi: # Create a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
+        if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
+            os.system("echo DISTRO,BootOrder | tee /mnt/boot/efi/EFI/map.txt")
+        os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
+    
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")
     os.system("btrfs sub create /mnt/.snapshots/etc/etc-tmp")
@@ -239,7 +238,7 @@ def main(args, distro):
 
 ############Step 10 begins here
 
-    for i in ("pacman", "systemd"):
+    for i in ("dnf", "systemd"):
         os.system(f"mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")
     os.system("cp --reflink=auto -r /mnt/var/lib/pacman/* /mnt/.snapshots/var/var-tmp/lib/pacman/")
     os.system("cp --reflink=auto -r /mnt/var/lib/systemd/* /mnt/.snapshots/var/var-tmp/lib/systemd/")
