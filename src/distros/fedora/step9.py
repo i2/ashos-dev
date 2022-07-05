@@ -9,7 +9,7 @@ def clear():
     os.system("#clear")
 
 def to_uuid(part):
-    return subprocess.check_output(f"blkid -s UUID -o value {part}", shell=True).decode('utf-8').strip()
+    return subprocess.check_output(f"/usr/sbin/blkid -s UUID -o value {part}", shell=True).decode('utf-8').strip()
 
 #   This function returns a tuple: (1. choice whether partitioning and formatting should happen
 #   2. Underscore plus name of distro if it should be appended to sub-volume names
