@@ -149,9 +149,9 @@ def main(args, distro):
         os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
     os.system(f"dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install dnf -y --releasever={RELEASE} --basearch={ARCH}")  #### removed basearch as it was giving unrecognized arguments error!
     if efi:
-        os.system("pacstrap /mnt efibootmgr") ########## FIX THIS
+        os.system("chroot /mnt dnf install -y efibootmgr")
 
-    os.system("cp /etc/resolv.conf /mnt/etc/")  ###########NEW FOR FEDORA
+    os.system("cp /etc/resolv.conf /mnt/etc/")  ###########NEW FOR FEDORA, it says already cped this file!
 
 #   Update fstab
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
