@@ -11,12 +11,14 @@ if args[3]:
 else:
     distro = subprocess.check_output(['sh', './src/detect_os.sh']).decode('utf-8').replace('"',"").strip()
 
-if 'debian' in distro:
-    from src.distros.debian import installer
-elif 'arch' in distro:
+if 'arch' in distro:
     from src.distros.arch import installer
+elif 'debian' in distro:
+    from src.distros.debian import installer
 elif 'fedora' in distro:
     from src.distros.fedora import step1
+elif 'ubuntu' in distro:
+    from src.distros.ubuntu import installer
 
-step1.main(args, distro)
+installer.main(args, distro)
 
