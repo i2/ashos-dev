@@ -65,10 +65,6 @@ def set_password(u):
 
 def main(args, distro):
 
-    args = list(sys.argv)
-    distro="fedora"
-    main(args, distro)
-
     print("Welcome to the astOS installer!\n\n\n\n\n")
     choice, distro_suffix = get_multiboot("fedora")
 
@@ -87,8 +83,7 @@ def main(args, distro):
 
 ####### STEP 7 BEGINS HERE
 
-
-
+    print("STEP 7 BEGINS HERE")
     os.system(f"sed -i '0,/@{distro_suffix}/ s,@{distro_suffix},@.snapshots{distro_suffix}/rootfs/snapshot-tmp,' /mnt/etc/fstab")
     os.system(f"sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
     os.system(f"sed -i '0,/@etc{distro_suffix}/ s,@etc{distro_suffix},@.snapshots{distro_suffix}/etc/etc-tmp,' /mnt/etc/fstab")
@@ -102,5 +97,9 @@ def main(args, distro):
     os.system("chroot /mnt ln -s /.snapshots/ast/ast /usr/bin/ast")             ####PR32 Can I moved it somewhere better?
     os.system("chroot /mnt ln -s /.snapshots/ast/detect_os.sh /usr/bin/detect_os.sh")
     os.system("chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
-    
 
+    print("STEP 7 ENDS HERE")    
+
+args = list(sys.argv)
+distro="fedora"
+main(args, distro)

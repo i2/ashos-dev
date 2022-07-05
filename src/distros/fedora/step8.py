@@ -65,9 +65,7 @@ def set_password(u):
 
 def main(args, distro):
 
-    args = list(sys.argv)
-    distro="fedora"
-    main(args, distro)
+    
 
     print("Welcome to the astOS installer!\n\n\n\n\n")
     choice, distro_suffix = get_multiboot("fedora")
@@ -116,3 +114,8 @@ def main(args, distro):
     os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")
     os.system("btrfs sub create /mnt/.snapshots/etc/etc-tmp")
     os.system("btrfs sub create /mnt/.snapshots/var/var-tmp")
+
+
+args = list(sys.argv)
+distro="fedora"
+main(args, distro)
