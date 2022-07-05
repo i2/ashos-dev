@@ -148,6 +148,7 @@ def main(args, distro):
     ########## mkdir testroot
     #os.system("pacstrap /mnt base linux neovim python3 python-anytree arch-install-scripts btrfs-progs grub sudo tmux")
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):  ### REZA In debian, these mount-points operations go 'after' debootstrapping and there is no complaint! In fedora, if so, dnf would complain /dev is not mounted!
+        os.system(f"mkdir -p /mnt{i}")
         os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
     os.system(f"dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install dnf -y --releasever={RELEASE} --basearch={ARCH}")  #### removed basearch as it was giving unrecognized arguments error!
     if efi:
