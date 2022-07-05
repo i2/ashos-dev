@@ -5,3 +5,8 @@ sudo dnf -y install supermin
 install dhcp-client dnf fedora-release glibc glibc-langpack-en glibc-langpack-de iputils less ncurses passwd systemd systemd-networkd systemd-resolved vim-default-editor
 F34 installs 165 packages (247M) and allocates 557M in the file system. F35 installs 174 packages (270M) and allocates 527M in the file system.
 
+
+
+
+
+/etc/hostname was hostrez in fedora tha I doubt I set. Did it spill ober from oyerh disreos?
