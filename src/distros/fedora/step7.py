@@ -65,9 +65,9 @@ def set_password(u):
 
 def main(args, distro):
 
-args = list(sys.argv)
-distro="fedora"
-main(args, distro)
+    args = list(sys.argv)
+    distro="fedora"
+    main(args, distro)
 
     print("Welcome to the astOS installer!\n\n\n\n\n")
     choice, distro_suffix = get_multiboot("fedora")
