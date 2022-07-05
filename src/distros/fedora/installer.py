@@ -151,9 +151,9 @@ def main(args, distro):
         os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
     os.system(f"dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install dnf -y --releasever={RELEASE} --basearch={ARCH}")  #### removed basearch as it was giving unrecognized arguments error!
     if efi:
-        os.system("chroot /mnt dnf install -y efibootmgr grub2-efi") #addeed grub2-efi as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?
+        os.system("chroot /mnt dnf install -y efibootmgr grub2-efi-x64") #addeed grub2-efi as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?
 
-    os.system("chroot /mnt dnf install -y passwd which grub2-efi-x64-modules os-prober")
+    os.system("chroot /mnt dnf install -y passwd which grub2-efi-x64-modules os-prober shim-x64")
     os.system("cp /etc/resolv.conf /mnt/etc/")  ###########NEW FOR FEDORA, it says already cped this file!
 
 #   Update fstab
@@ -230,7 +230,14 @@ def main(args, distro):
         if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
             os.system("echo DISTRO,BootOrder | tee /mnt/boot/efi/EFI/map.txt")
         os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
-    
+#    if os.path.exists("/mnt/boot/efi/EFI/map.txt"):
+#        if efi: # Create a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
+#            os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
+#    else:
+#        os.system("echo DISTRO,BootOrder | tee -a /mnt/boot/efi/EFI/map.txt")
+
+
+
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")
     os.system("btrfs sub create /mnt/.snapshots/etc/etc-tmp")
@@ -238,7 +245,7 @@ def main(args, distro):
 
 ############Step 10 begins here
 
-    for i in ("dnf", "systemd"):
+    for i in ("dnf", "rpm", "systemd"):
         os.system(f"mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")
     os.system("cp --reflink=auto -r /mnt/var/lib/pacman/* /mnt/.snapshots/var/var-tmp/lib/pacman/")
     os.system("cp --reflink=auto -r /mnt/var/lib/systemd/* /mnt/.snapshots/var/var-tmp/lib/systemd/")
