@@ -107,9 +107,6 @@ def main(args, distro):
 
     astpart = to_uuid(args[1]) ### DELETE THIS LINE WHEN PRODUCTION READY
 
-    tz= get_timezone()
-    hostname  = get_hostname()
-
 ####### STEP 6 BEGINS HERE
 
 #   Create user and set password
