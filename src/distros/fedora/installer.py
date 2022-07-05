@@ -174,7 +174,10 @@ def main(args, distro):
     #os.system("echo 'HOME_URL=\"https://github.com/astos/astos\"' | tee -a /mnt/etc/os-release")
 
     os.system(f"echo 'releasever={RELEASE}' | tee /mnt/etc/yum.conf") ########NEW FOR FEDORA
-    os.system(f"chroot /mnt dnf install -y ncurses bash-completion systemd kernel 'releasever={RELEASE}'") ########NEW FOR FEDORA
+    
+    ########## Step 6 begins here
+    
+    os.system(f"chroot /mnt dnf install -y ncurses bash-completion kernel --releasever={RELEASE}") ########NEW FOR FEDORA package 'systemd' already installed using whatever above packages came
 
 #   Update hostname, hosts, locales and timezone, hosts
     os.system(f"echo {hostname} | tee /mnt/etc/hostname")
