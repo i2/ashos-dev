@@ -1,3 +1,17 @@
+Have the installer structured as follows:
+- Pre-bootstrap()
+- Bootstrap()
+- Post-bootstrap()
+
+Fedora: http://blog.parahard.com/2011/06/five-steps-to-create-fedora-chroot-jail.html
+https://docs.fedoraproject.org/en-US/Fedora/25/html/Installation_Guide/sect-boot-options-kickstart.html
+https://pbraun.nethence.com/unix/sysutils_linux/windows_happy.html
+https://pbraun.nethence.com/unix/sysutils_linux/slackware_slackinst.html
+
+BSD:
+https://docs.freebsd.org/en/books/arch-handbook/boot/
+
+
 Convert installer.py to POSIX shell ideally with no bashism
 
 GREAT IDEA:
