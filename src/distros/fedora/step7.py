@@ -107,18 +107,63 @@ def main(args, distro):
 
     astpart = to_uuid(args[1]) ### DELETE THIS LINE WHEN PRODUCTION READY
 
-####### STEP 6 BEGINS HERE
+    distro="fedora"
+####### STEP 7 BEGINS HERE
 
-#   Create user and set password
-    set_password("root")
-    username = get_username()
-    create_user(username)
-    set_password(username)
+    os.system(f"sed -i '0,/subvol=@{distro_suffix}/s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub2/grub.cfg")
+    if efi: # Create a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
+        if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
+            os.system("echo DISTRO,BootOrder | tee /mnt/boot/efi/EFI/map.txt")
+        os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
 
-    #os.system("chroot /mnt systemctl enable NetworkManager")
+    os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
+    os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")
+    os.system("btrfs sub create /mnt/.snapshots/etc/etc-tmp")
+    os.system("btrfs sub create /mnt/.snapshots/var/var-tmp")
 
-#   Initialize fstree
-    os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | tee /mnt/.snapshots/ast/fstree")
+    for i in ("dnf", "rpm", "systemd"):
+        os.system(f"mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")
+    os.system("cp --reflink=auto -r /mnt/var/lib/pacman/* /mnt/.snapshots/var/var-tmp/lib/pacman/")
+    os.system("cp --reflink=auto -r /mnt/var/lib/systemd/* /mnt/.snapshots/var/var-tmp/lib/systemd/")
+    os.system("cp --reflink=auto -r /mnt/boot/* /mnt/.snapshots/boot/boot-tmp")
+    os.system("cp --reflink=auto -r /mnt/etc/* /mnt/.snapshots/etc/etc-tmp")
+    os.system("btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-0")
+    os.system("btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-0")
+    os.system("btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-0")
+
+    os.system(f"echo '{astpart}' | tee /mnt/.snapshots/ast/part")
+
+    os.system("btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
+    os.system("chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
+
+    os.system("cp -r /mnt/root/. /mnt/.snapshots/root/")
+    os.system("cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")
+    os.system("rm -rf /mnt/root/*")
+    os.system("rm -rf /mnt/tmp/*")
+
+#   Copy boot and etc from snapshot's tmp to common
+    if efi:
+        os.system("umount /mnt/boot/efi")
+    os.system("umount /mnt/boot")
+    os.system(f"mount {args[1]} -o subvol=@boot{distro_suffix},compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp")
+    os.system("cp --reflink=auto -r /mnt/.snapshots/boot/boot-tmp/* /mnt/boot")
+    os.system("umount /mnt/etc")
+    os.system(f"mount {args[1]} -o subvol=@etc{distro_suffix},compress=zstd,noatime /mnt/.snapshots/etc/etc-tmp")
+    os.system("cp --reflink=auto -r /mnt/.snapshots/etc/etc-tmp/* /mnt/etc")
+
+    os.system("cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/* /mnt/.snapshots/rootfs/snapshot-tmp/boot")
+    os.system("cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/* /mnt/.snapshots/rootfs/snapshot-tmp/etc")
+    os.system("cp --reflink=auto -r /mnt/.snapshots/var/var-0/* /mnt/.snapshots/rootfs/snapshot-tmp/var")
+
+#   Unmount everything
+    os.system("umount -R /mnt")
+    os.system(f"mount {args[1]} -o subvolid=0 /mnt") # subvolid=5 needed for any cases?
+    os.system(f"btrfs sub del /mnt/@{distro_suffix}")
+    os.system("umount -R /mnt")
+
+    clear()
+    print("Installation complete")
+    print("You can reboot now :)")
 
 args = list(sys.argv)
 distro="fedora"
