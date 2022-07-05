@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+import sys ### temporary just for testing steps
 #from src.distros.arch import astpk
 
 def clear():
