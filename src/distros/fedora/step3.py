@@ -107,22 +107,8 @@ def main(args, distro):
     tz = get_timezone()
     hostname = get_hostname()
 
-#   Partition and format
-    if choice != "3":
-        os.system(f"/usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}") ### DELETE THIS LINE WHEN PRODUCTION READY
-        os.system(f"/usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
-    os.system("pacman -Syy --noconfirm archlinux-keyring dnf")
-
     astpart = to_uuid(args[1]) ### DELETE THIS LINE WHEN PRODUCTION READY
 
-#   Mount and create necessary sub-volumes and directories
-    if choice != "3":
-        os.system(f"mount {args[1]} /mnt")
-    else:
-        os.system(f"mount -o subvolid=5 {args[1]} /mnt")
-    for btrdir in btrdirs:
-        os.system(f"btrfs sub create /mnt/{btrdir}")
-    os.system("umount /mnt")
     for mntdir in mntdirs:
         os.system(f"mkdir -p /mnt/{mntdir}") # -p to ignore /mnt exists complaint
         os.system(f"mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
@@ -136,7 +122,10 @@ def main(args, distro):
 
 ####### STEP 2 BEGINS HERE
 
+#os.system("dnf makecache --refresh")
 
+for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):  ### REZA In debian, these mount-points operations go 'after' debootstrapping and there is no complaint! In fedora, if so, dnf would complain /dev is not mounted!
+        os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
 
 args = list(sys.argv)
 distro="fedora"

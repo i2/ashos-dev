@@ -142,14 +142,14 @@ def main(args, distro):
 
 #   Pacstrap then install anytree and necessary packages in chroot
     #os.system("pacstrap /mnt base linux linux-firmware neovim python3 python-anytree bash dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo tmux") # os-prober
-    os.system("dnf makecache --refresh")
+    os.system(f"dnf makecache --refresh --releasever={RELEASE} -c ./src/distros/fedora/base.repo")
     ########## mkdir testroot
     #os.system("pacstrap /mnt base linux neovim python3 python-anytree arch-install-scripts btrfs-progs grub sudo tmux")
-    os.system(f"dnf -c base.repo --installroot=/mnt install dnf -y --releasever={RELEASE} --basearch={ARCH}")
-    if efi:
-        os.system("pacstrap /mnt efibootmgr")
-    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
+    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):  ### REZA In debian, these mount-points operations go 'after' debootstrapping and there is no complaint! In fedora, if so, dnf would complain /dev is not mounted!
         os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
+    os.system(f"dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install dnf -y --releasever={RELEASE} --basearch={ARCH}")  #### removed basearch as it was giving unrecognized arguments error!
+    if efi:
+        os.system("pacstrap /mnt efibootmgr") ########## FIX THIS
 
     os.system("cp /etc/resolv.conf /mnt/etc/")  ###########NEW FOR FEDORA
 
