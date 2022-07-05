@@ -237,6 +237,8 @@ def main(args, distro):
     os.system("btrfs sub create /mnt/.snapshots/etc/etc-tmp")
     os.system("btrfs sub create /mnt/.snapshots/var/var-tmp")
 
+############Step 10 begins here
+
     for i in ("pacman", "systemd"):
         os.system(f"mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")
     os.system("cp --reflink=auto -r /mnt/var/lib/pacman/* /mnt/.snapshots/var/var-tmp/lib/pacman/")

@@ -81,23 +81,25 @@ def main(args, distro):
     else:
         efi = False
 
-    astpart = to_uuid(args[1]) ### DELETE THIS LINE WHEN PRODUCTION READY
 
-####### STEP 8 BEGINS HERE
+#   GRUB and EFI
+    os.system(f"chroot /mnt /usr/sbin/grub2-install {args[2]}") #REZA --recheck --no-nvram --removable
+    os.system("mkdir -p /mnt/boot/grub2/BAK/") # Folder for backing up grub configs created by astpk
+    os.system(f"chroot /mnt /usr/sbin/grub2-mkconfig {args[2]} -o /boot/grub2/grub.cfg")
+    os.system(f"sed -i '0,/subvol=@{distro_suffix}/s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub2/grub.cfg")
+    if os.path.exists("/mnt/boot/efi/EFI/map.txt"):
+        if efi: # Create a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
+            os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
+    else:
+        os.system("echo DISTRO,BootOrder | tee -a /mnt/boot/efi/EFI/map.txt")
 
+    os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
+    os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")
+    os.system("btrfs sub create /mnt/.snapshots/etc/etc-tmp")
+    os.system("btrfs sub create /mnt/.snapshots/var/var-tmp")
 
+####### STEP 9 BEGINS HERE
 
-
-#   Create user and set password
-    #set_password("root")
-    username = get_username()
-    create_user(username)
-    set_password(username)
-
-    #os.system("chroot /mnt systemctl enable NetworkManager")
-
-#   Initialize fstree
-    #os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | tee /mnt/.snapshots/ast/fstree")
 
 
 
