@@ -94,6 +94,8 @@ def main(args, distro):
     choice, distro_suffix = get_multiboot(distro)
 
 #   Define variables
+    ARCH="x86_64"
+    RELEASE="rawhide"
     #astpart = to_uuid(args[1])
     btrdirs = [f"@{distro_suffix}",f"@.snapshots{distro_suffix}",f"@home{distro_suffix}",f"@var{distro_suffix}",f"@etc{distro_suffix}",f"@boot{distro_suffix}"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]
@@ -109,7 +111,7 @@ def main(args, distro):
     if choice != "3":
         os.system(f"/usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}") ### DELETE THIS LINE WHEN PRODUCTION READY
         os.system(f"/usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
-    os.system("pacman -Syy --noconfirm archlinux-keyring")
+    os.system("pacman -Syy --noconfirm archlinux-keyring dnf")
 
     astpart = to_uuid(args[1]) ### DELETE THIS LINE WHEN PRODUCTION READY
 
@@ -139,12 +141,17 @@ def main(args, distro):
     #os.system("echo -e 'setw -g mode-keys vi\nset -g history-limit 999999' >> $HOME/.tmux.conf")
 
 #   Pacstrap then install anytree and necessary packages in chroot
-    #os.system("pacstrap /mnt base linux linux-firmware neovim python3 python-anytree bash dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo tmux") # os-prober 
-    os.system("pacstrap /mnt base linux neovim python3 python-anytree arch-install-scripts btrfs-progs grub sudo tmux")
+    #os.system("pacstrap /mnt base linux linux-firmware neovim python3 python-anytree bash dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo tmux") # os-prober
+    os.system("dnf makecache --refresh")
+    ########## mkdir testroot
+    #os.system("pacstrap /mnt base linux neovim python3 python-anytree arch-install-scripts btrfs-progs grub sudo tmux")
+    os.system(f"dnf -c base.repo --installroot=/mnt install dnf -y --releasever={RELEASE} --basearch={ARCH}")
     if efi:
         os.system("pacstrap /mnt efibootmgr")
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
         os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
+
+    os.system("cp /etc/resolv.conf /mnt/etc/")  ###########NEW FOR FEDORA
 
 #   Update fstab
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
@@ -157,14 +164,17 @@ def main(args, distro):
 
     os.system("mkdir -p /mnt/usr/share/ast/db")
     os.system("echo '0' | tee /mnt/usr/share/ast/snap")
-    os.system(f"cp -r /mnt/var/lib/pacman/* /mnt/usr/share/ast/db")
-    os.system(f"sed -i s,\"#DBPath      = /var/lib/pacman/\",\"DBPath      = /usr/share/ast/db/\",g /mnt/etc/pacman.conf")
+    #os.system(f"cp -r /mnt/var/lib/pacman/* /mnt/usr/share/ast/db")
+    #os.system(f"sed -i s,\"#DBPath      = /var/lib/pacman/\",\"DBPath      = /usr/share/ast/db/\",g /mnt/etc/pacman.conf")
 
 #   Modify OS release information (optional)
-    os.system(f"sed -i '/^NAME/ s/Arch Linux/Arch Linux (ashos)/' /mnt/etc/os-release")
-    os.system(f"sed -i '/PRETTY_NAME/ s/Arch Linux/Arch Linux (ashos)/' /mnt/etc/os-release")
-    os.system(f"sed -i '/^ID/ s/arch/arch_ashos/' /mnt/etc/os-release")
+    os.system(f"sed -i '/^NAME/ s/Fedora Linux/Fedora Linux (ashos)/' /mnt/etc/os-release")
+    os.system(f"sed -i '/PRETTY_NAME/ s/Fedora Linux/Fedora Linux (ashos)/' /mnt/etc/os-release")
+    os.system(f"sed -i '/^ID/ s/fedora/fedora_ashos/' /mnt/etc/os-release")
     #os.system("echo 'HOME_URL=\"https://github.com/astos/astos\"' | tee -a /mnt/etc/os-release")
+
+    os.system(f"echo 'releasever={RELEASE}' | tee /mnt/etc/yum.conf") ########NEW FOR FEDORA
+    os.system(f"chroot /mnt dnf install -y ncurses bash-completion systemd kernel 'releasever={RELEASE}'") ########NEW FOR FEDORA
 
 #   Update hostname, hosts, locales and timezone, hosts
     os.system(f"echo {hostname} | tee /mnt/etc/hostname")

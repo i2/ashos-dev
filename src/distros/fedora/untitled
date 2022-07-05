@@ -1,2 +1,7 @@
 sudo dnf makecache --refresh
 sudo dnf -y install supermin
+
+ […]# dnf --releasever=35 --best --setopt=install_weak_deps=False --installroot=/var/lib/machines/{CTNAME}/ \
+install dhcp-client dnf fedora-release glibc glibc-langpack-en glibc-langpack-de iputils less ncurses passwd systemd systemd-networkd systemd-resolved vim-default-editor
+F34 installs 165 packages (247M) and allocates 557M in the file system. F35 installs 174 packages (270M) and allocates 527M in the file system.
+
