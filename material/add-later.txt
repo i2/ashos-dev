@@ -1,3 +1,5 @@
+dnf repoquery -l crontabs
+
 Have the installer structured as follows:
 - Pre-bootstrap()
 - Bootstrap()

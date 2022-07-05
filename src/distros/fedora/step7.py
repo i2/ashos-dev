@@ -32,6 +32,33 @@ def get_multiboot(dist):
             print("Invalid choice!")
             continue
 
+def get_hostname():
+    clear()
+    while True:
+        print("Enter hostname:")
+        hostname = input("> ")
+        if hostname:
+            print("Happy with your hostname (y/n)?")
+            reply = input("> ")
+            if reply.casefold() == "y":
+                break
+            else:
+                continue
+    return hostname
+
+def get_timezone():
+    clear()
+    while True:
+        print("Select a timezone (type list to list):")
+        zone = input("> ")
+        if zone == "list":
+            os.system("ls /usr/share/zoneinfo | less")
+        elif os.path.isfile(f"/usr/share/zoneinfo/{zone}"):
+            return str(f"/usr/share/zoneinfo/{zone}")
+        else:
+            print("Invalid Timezone!")
+            continue
+
 def get_username():
     clear()
     while True:
@@ -64,9 +91,6 @@ def set_password(u):
             continue
 
 def main(args, distro):
-
-    
-
     print("Welcome to the astOS installer!\n\n\n\n\n")
     choice, distro_suffix = get_multiboot("fedora")
 
@@ -83,13 +107,10 @@ def main(args, distro):
 
     astpart = to_uuid(args[1]) ### DELETE THIS LINE WHEN PRODUCTION READY
 
-####### STEP 8 BEGINS HERE
-
-
-
+####### STEP 6 BEGINS HERE
 
 #   Create user and set password
-    #set_password("root")
+    set_password("root")
     username = get_username()
     create_user(username)
     set_password(username)
@@ -97,9 +118,7 @@ def main(args, distro):
     #os.system("chroot /mnt systemctl enable NetworkManager")
 
 #   Initialize fstree
-    #os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | tee /mnt/.snapshots/ast/fstree")
-
-
+    os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | tee /mnt/.snapshots/ast/fstree")
 
 args = list(sys.argv)
 distro="fedora"

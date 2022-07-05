@@ -154,7 +154,7 @@ def main(args, distro):
     if efi:
         os.system("chroot /mnt dnf install -y efibootmgr grub2-efi-x64 grub2-common") #addeed grub2-efi as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?
 
-    os.system("chroot /mnt dnf install -y passwd which grub2-efi-x64-modules os-prober shim-x64")
+    os.system("chroot /mnt dnf install -y passwd which grub2-efi-x64-modules os-prober shim-x64 btrfs-progs")
     ### NOT NEEDED AT ALL os.system("cp /etc/resolv.conf /mnt/etc/")  ###########NEW FOR FEDORA, it says already cped this file!
 
 #   Update fstab
@@ -223,6 +223,12 @@ def main(args, distro):
 
 #   Initialize fstree
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | tee /mnt/.snapshots/ast/fstree")
+
+#### STEP 7 Begins here
+
+#################### IMPORTANT: Installation continue to go into  /usr/sbin which is not in PATH and binaries are not found automatically. I should find a way to add /usr/sbin to PATH
+################### cp /usr/sbin/btrfs* /usr/bin/
+################### cp /usr/sbin/blkid /usr/bin/
 
 #   GRUB and EFI
 #   REALLY ANNOYING BUG: https://bugzilla.redhat.com/show_bug.cgi?id=1917213
