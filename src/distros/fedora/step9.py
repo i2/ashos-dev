@@ -93,10 +93,11 @@ def main(args, distro):
     else:
         os.system("echo DISTRO,BootOrder | tee -a /mnt/boot/efi/EFI/map.txt")
 
-    os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
-    os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")
-    os.system("btrfs sub create /mnt/.snapshots/etc/etc-tmp")
-    os.system("btrfs sub create /mnt/.snapshots/var/var-tmp")
+##done
+    #os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
+    #os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")
+    #os.system("btrfs sub create /mnt/.snapshots/etc/etc-tmp")
+    #os.system("btrfs sub create /mnt/.snapshots/var/var-tmp")
 
 ####### STEP 9 BEGINS HERE
 
