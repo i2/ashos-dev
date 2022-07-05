@@ -105,28 +105,44 @@ def main(args, distro):
     else:
         efi = False
 
-    tz = get_timezone()
-    hostname = get_hostname()
-
     astpart = to_uuid(args[1]) ### DELETE THIS LINE WHEN PRODUCTION READY
-
-    for mntdir in mntdirs:
-        os.system(f"mkdir -p /mnt/{mntdir}") # -p to ignore /mnt exists complaint
-        os.system(f"mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
-    for i in ("tmp", "root"):
-        os.system(f"mkdir -p /mnt/{i}")
-    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp", "var"):
-        os.system(f"mkdir -p /mnt/.snapshots/{i}")
-    if efi:
-        os.system("mkdir /mnt/boot/efi")
-        os.system(f"mount {args[3]} /mnt/boot/efi")
 
 ####### STEP 2 BEGINS HERE
 
-#os.system("dnf makecache --refresh")
-
-for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):  ### REZA In debian, these mount-points operations go 'after' debootstrapping and there is no complaint! In fedora, if so, dnf would complain /dev is not mounted!
+    #os.system(f"dnf makecache --refresh --releasever={RELEASE} -c ./src/distros/fedora/base.repo")
+    
+    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):  ### REZA In debian, these mount-points operations go 'after' debootstrapping and there is no complaint! In fedora, if so, dnf would complain /dev is not mounted!
+        #os.system(f"mkdir -p /mnt{i}")
         os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
+    
+    os.system(f"dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install dnf -y --releasever={RELEASE}")  #### removed basearch as it was giving unrecognized arguments error!
+    if efi:
+        os.system("chroot /mnt dnf install -y efibootmgr grub2-efi-x64 grub2-common")
+
+####### STEP 3 BEGINS HERE
+
+    #os.system("chroot /mnt dnf install -y passwd which grub2-efi-x64-modules os-prober shim-x64")
+    
+    #   Update fstab
+    os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
+    for mntdir in mntdirs:
+        os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}{distro_suffix},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
+    if efi:
+        os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | tee -a /mnt/etc/fstab")
+    os.system("echo '/.snapshots/ast/root /root none bind 0 0' | tee -a /mnt/etc/fstab")
+    os.system("echo '/.snapshots/ast/tmp /tmp none bind 0 0' | tee -a /mnt/etc/fstab")
+
+    os.system("mkdir -p /mnt/usr/share/ast/db")
+    os.system("echo '0' | tee /mnt/usr/share/ast/snap")
+    #os.system(f"cp -r /mnt/var/lib/pacman/* /mnt/usr/share/ast/db")
+    #os.system(f"sed -i s,\"#DBPath      = /var/lib/pacman/\",\"DBPath      = /usr/share/ast/db/\",g /mnt/etc/pacman.conf")
+
+#   Modify OS release information (optional)
+    os.system(f"sed -i '/^NAME/ s/Fedora Linux/Fedora Linux (ashos)/' /mnt/etc/os-release")
+    os.system(f"sed -i '/PRETTY_NAME/ s/Fedora Linux/Fedora Linux (ashos)/' /mnt/etc/os-release")
+    os.system(f"sed -i '/^ID/ s/fedora/fedora_ashos/' /mnt/etc/os-release")
+    #os.system("echo 'HOME_URL=\"https://github.com/astos/astos\"' | tee -a /mnt/etc/os-release")
+
 
 args = list(sys.argv)
 distro="fedora"
