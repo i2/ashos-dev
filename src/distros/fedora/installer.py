@@ -151,7 +151,7 @@ def main(args, distro):
         os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
     os.system(f"dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install dnf -y --releasever={RELEASE} --basearch={ARCH}")  #### removed basearch as it was giving unrecognized arguments error!
     if efi:
-        os.system("chroot /mnt dnf install -y efibootmgr grub2-efi-x64") #addeed grub2-efi as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?
+        os.system("chroot /mnt dnf install -y efibootmgr grub2-efi-x64 grub2-common") #addeed grub2-efi as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?
 
     os.system("chroot /mnt dnf install -y passwd which grub2-efi-x64-modules os-prober shim-x64")
     os.system("cp /etc/resolv.conf /mnt/etc/")  ###########NEW FOR FEDORA, it says already cped this file!
@@ -222,7 +222,10 @@ def main(args, distro):
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | tee /mnt/.snapshots/ast/fstree")
 
 #   GRUB and EFI
-    os.system(f"chroot /mnt /usr/sbin/grub2-install {args[2]}") #REZA --recheck --no-nvram --removable
+#   REALLY ANNOYING BUG: https://bugzilla.redhat.com/show_bug.cgi?id=1917213
+#   https://fedoraproject.org/wiki/GRUB_2#Instructions_for_UEFI-based_systems
+    #os.system(f"chroot /mnt /usr/sbin/grub2-install {args[2]}") #REZA --recheck --no-nvram --removable (not needed for Fedora on EFI)
+    # if dnf reinstall shim-* grub2-efi-* grub2-common return an exitcode of error (excode != 0), run dnf install shim-x64 grub2-efi-x64 grub2-common
     os.system("mkdir -p /mnt/boot/grub2/BAK/") # Folder for backing up grub configs created by astpk
     os.system(f"chroot /mnt /usr/sbin/grub2-mkconfig {args[2]} -o /boot/grub2/grub.cfg")
     os.system(f"sed -i '0,/subvol=@{distro_suffix}/s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub2/grub.cfg")

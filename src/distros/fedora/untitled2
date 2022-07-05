@@ -1,6 +1,33 @@
 $ sudo usermod -aG wheel username
 
 
+----------------------------
+
+Do not use the grub2-install command on UEFI systems. On those systems, bootloaders are in the shim and grub-efi RPM packages. By reinstalling those packages, the bootloaders are reinstalled to their proper location in /boot/efi/ on the EFI System volume.
+
+----------------------------
+
+
+FYI, you don't need grub2-install for EFI systems, it makes no sense.  
+
+1. Generate the grub.cfg file in the correct place (e.g. /boot/efi/EFI/<DISTRO NAME>)
+2. Tell the efi where it is, e.g.
+
+efibootmgr -c -d  /dev/<part>  -p 1 -L <OS name, e.g. centos> -l '\EFI\BOOT/BOOTX64.efi'.
+
+Pb
+
+----------------
+
+The problem to solve is: on UEFI, grub2-install results in the Fedora signed grub$arch.efi file being silently replaced with a non-signed version (that also has rather different behaviors than the signed one) resulting in user confusion and boot failure when Secure Boot is enabled
+
+In order to properly install the bootloader on UEFI:
+a. An RPM -V verified copy of grub$arch.efi needs to be in /usr/lib/grub
+b. Copy /usr/lib/grub/grub$arch.efi and /usr/lib/grub/$arch modules (if present) to the user specified destination; or to /boot/efi/EFI/fedora if not specified
+
+@rharwood any opinion on doing this instead of --force? And then also reverting the "grub2-install: error: this utility cannot be used for EFI platforms because it does not support UEFI Secure Boot" patch?
+
+---------------
 
 Eugene, grub2-install shouldn't be used on any (U)EFI computers. The correct procedure for reinstalling the bootloaders on Macs and other (U)EFI computers is:
 
