@@ -7,6 +7,7 @@ args = list(sys.argv)
 
 if args[3]:
     distro = args[3]
+    del args[-1]
 else:
     distro = subprocess.check_output(['sh', './src/detect_os.sh']).decode('utf-8').replace('"',"").strip()
 
@@ -17,5 +18,5 @@ elif 'arch' in distro:
 elif 'fedora' in distro:
     from src.distros.fedora import step1
 
-installer.main(args, distro)
+step1.main(args, distro)
 
