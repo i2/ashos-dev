@@ -135,4 +135,6 @@ def main(args, distro):
         os.system(f"mount {args[3]} /mnt/boot/efi")
 
 ####### STEP 2 BEGINS HERE
-
+args = list(sys.argv)
+distro="fedora"
+main(args, distro)
