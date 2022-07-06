@@ -146,8 +146,9 @@ def main(args, distro):
 
 #   Bootstrap (minimal)
     os.system("sudo apt-get install -y debootstrap")
-    excl = subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | awk '{print $1}'", shell=True).decode('utf-8').strip().replace("\n",",")
-    os.system(f"sudo debootstrap --arch {ARCH} --exclude={excl} {RELEASE} /mnt http://archive.ubuntu.com/ubuntu")
+    #excl = subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | awk '{print $1}'", shell=True).decode('utf-8').strip().replace("\n",",")
+    #os.system(f"sudo debootstrap --arch {ARCH} --exclude={excl} {RELEASE} /mnt http://archive.ubuntu.com/ubuntu")
+    os.system(f"sudo debootstrap --arch {ARCH} {RELEASE} /mnt http://archive.ubuntu.com/ubuntu")
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"): ### REZA should this go before debootstrapping line above? If fedora, if not before dnfing it would complain that /dev is not mounted!
         os.system(f"sudo mkdir /mnt{i}")
         os.system(f"sudo mount -B {i} /mnt{i}") # Mount-points needed for chrooting
