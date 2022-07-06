@@ -110,11 +110,11 @@ def main(args, distro):
     distro="fedora"
 ####### STEP 7 BEGINS HERE
 
-    os.system(f"sed -i '0,/subvol=@{distro_suffix}/s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub2/grub.cfg")
-    if efi: # Create a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
-        if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
-            os.system("echo DISTRO,BootOrder | tee /mnt/boot/efi/EFI/map.txt")
-        os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
+###DONE-BY-HAND    os.system(f"sed -i '0,/subvol=@{distro_suffix}/s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub2/grub.cfg")
+###DONE-BY-HAND    if efi: # Create a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
+###DONE-BY-HAND        if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
+###DONE-BY-HAND            os.system("echo DISTRO,BootOrder | tee /mnt/boot/efi/EFI/map.txt")
+###DONE-BY-HAND        os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
 
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")
