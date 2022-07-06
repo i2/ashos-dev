@@ -105,6 +105,7 @@ def main(args, distro):
         efi = True
     else:
         efi = False
+    packages = "passwd which grub2-efi-x64-modules shim-x64 btrfs-progs python-anytree sudo tmux neovim NetworkManager dhcpcd"
 
     tz = get_timezone()
     hostname = get_hostname()
@@ -153,7 +154,7 @@ def main(args, distro):
     if efi:
         os.system("chroot /mnt dnf install -y efibootmgr grub2-efi-x64 grub2-common") #addeed grub2-efi as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?
 
-    os.system("chroot /mnt dnf install -y passwd which grub2-efi-x64-modules shim-x64 btrfs-progs python-anytree sudo tmux")
+    os.system(f"chroot /mnt dnf install -y {packages}")
     ### NOT NEEDED AT ALL os.system("cp /etc/resolv.conf /mnt/etc/")  ###########NEW FOR FEDORA, it says already cped this file!
 
 #   Update fstab

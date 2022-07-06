@@ -94,6 +94,7 @@ def main(args, distro):
     choice, distro_suffix = get_multiboot(distro)
 
 #   Define variables
+    packages = "firmware-linux-nonfree python3 python3-anytree btrfs-progs network-manager locales sudo nano"
     RELEASE = "bullseye"
     ARCH = "amd64"
     #astpart = to_uuid(args[1])
@@ -162,7 +163,7 @@ def main(args, distro):
     os.system("sudo chroot /mnt apt-get update -y -oAcquire::AllowInsecureRepositories=true")
     os.system("sudo chroot /mnt apt-get install -y deb-multimedia-keyring --allow-unauthenticated")
     #os.system("sudo chroot /mnt apt-get install -y python3-anytree network-manager btrfs-progs dhcpcd5 locales sudo tmux") # os-prober
-    excode = int(os.system("sudo chroot /mnt apt-get install -y firmware-linux-nonfree python3 python3-anytree btrfs-progs network-manager locales sudo nano"))
+    excode = int(os.system(f"sudo chroot /mnt apt-get install -y {packages}"))
     if excode != 0:
         print("Failed to download packages!")
         sys.exit()

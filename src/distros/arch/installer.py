@@ -94,6 +94,7 @@ def main(args, distro):
     choice, distro_suffix = get_multiboot(distro)
 
 #   Define variables
+    packages = "base linux linux-firmware nano python3 python-anytree bash dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo tmux"
     #astpart = to_uuid(args[1])
     btrdirs = [f"@{distro_suffix}",f"@.snapshots{distro_suffix}",f"@home{distro_suffix}",f"@var{distro_suffix}",f"@etc{distro_suffix}",f"@boot{distro_suffix}"]
     mntdirs = ["",".snapshots","home","var","etc","boot"]
@@ -140,7 +141,7 @@ def main(args, distro):
 
 #   Pacstrap then install anytree and necessary packages in chroot
     #os.system("pacstrap /mnt base linux linux-firmware neovim python3 python-anytree bash dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo tmux") # os-prober 
-    excode = int(os.system("pacstrap /mnt base linux linux-firmware nano python3 python-anytree bash dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo tmux"))
+    excode = int(os.system(f"pacstrap /mnt {packages}"))
     if excode != 0:
         print("Failed to download packages!")
         sys.exit()
