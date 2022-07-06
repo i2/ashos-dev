@@ -300,3 +300,6 @@ def main(args, distro):
     print("Installation complete")
     print("You can reboot now :)")
 
+
+
+#### grubby shim-x64 grub2-efi-x64 grub2-tools-minimal os-prober grub2-tools grub2-common
