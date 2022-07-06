@@ -140,9 +140,15 @@ def main(args, distro):
 
 #   Pacstrap then install anytree and necessary packages in chroot
     #os.system("pacstrap /mnt base linux linux-firmware neovim python3 python-anytree bash dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo tmux") # os-prober 
-    os.system("pacstrap /mnt base linux neovim python3 python-anytree arch-install-scripts btrfs-progs grub sudo tmux")
+    excode = int(os.system("pacstrap /mnt base linux linux-firmware nano python3 python-anytree bash dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo tmux"))
+    if excode != 0:
+        print("Failed to download packages!")
+        sys.exit()
     if efi:
-        os.system("pacstrap /mnt efibootmgr")
+        excode = int(os.system("pacstrap /mnt efibootmgr"))
+        if excode != 0:
+            print("Failed to download packages!")
+            sys.exit()
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
         os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
 

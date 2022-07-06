@@ -162,12 +162,21 @@ def main(args, distro):
     os.system("sudo chroot /mnt apt-get update -y -oAcquire::AllowInsecureRepositories=true")
     os.system("sudo chroot /mnt apt-get install -y deb-multimedia-keyring --allow-unauthenticated")
     #os.system("sudo chroot /mnt apt-get install -y python3-anytree network-manager btrfs-progs dhcpcd5 locales sudo tmux") # os-prober
-    os.system("sudo chroot /mnt apt-get install -y python3-anytree btrfs-progs locales sudo")
+    excode = int(os.system("sudo chroot /mnt apt-get install -y firmware-linux-nonfree python3 python3-anytree btrfs-progs network-manager locales sudo nano"))
+    if excode != 0:
+        print("Failed to download packages!")
+        sys.exit()
     #os.system("sudo chroot /mnt apt-get install -y btrfs-progs locales")
     if efi:
-        os.system("sudo chroot /mnt apt-get install -y grub-efi")
+        excode = int(os.system("sudo chroot /mnt apt-get install -y grub-efi"))
+        if excode != 0:
+            print("Failed to download packages!")
+            sys.exit()
     else:
-        os.system("sudo chroot /mnt apt-get install -y grub-pc")
+        excode = int(os.system("sudo chroot /mnt apt-get install -y grub-pc"))
+        if excode != 0:
+            print("Failed to download packages!")
+            sys.exit()
 
 #   Update fstab
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")

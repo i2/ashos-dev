@@ -15,6 +15,7 @@
   * [Package management](https://github.com/astos/astos#package-management)
 * [Additional documentation](https://github.com/astos/astos#additional-documentation)
   * [Updating the pacman keys](https://github.com/astos/astos#fixing-pacman-corrupt-packages--key-issues)
+  * [Saving configuration changes made in /etc persistent](https://github.com/astos/astos#saving-configuration-changes-made-in-etc-persistent)
   * [Configuring dual boot](https://github.com/astos/astos#dual-boot)
   * [Updating ast itself](https://github.com/astos/astos#updating-ast-itself)
   * [Debugging ast](https://github.com/astos/astos#debuggin-ast)
@@ -317,6 +318,15 @@ ast rollback
 ast install <snapshots> archlinux-keyring
 ```
 
+#### Saving configuration changes made in ``/etc`` persistent
+* Normally configuration should be done with ``ast chroot``, but sometimes you may want to apply changes you've made to the booted system persistently
+* To do this use the following command
+
+```
+ast etc-update
+```
+
+* This allows you to configure your system by modifying ``/etc`` as usual, and then saving these changes.
 
 #### Dual boot
 * astOS supports dual boot using the GRUB bootloader
