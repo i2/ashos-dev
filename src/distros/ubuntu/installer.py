@@ -94,7 +94,7 @@ def main(args, distro):
     choice, distro_suffix = get_multiboot(distro)
 
 #   Define variables
-    RELEASE = "jammy"
+    RELEASE = "bionic"
     ARCH = "amd64"
     #astpart = to_uuid(args[1])
     btrdirs = [f"@{distro_suffix}",f"@.snapshots{distro_suffix}",f"@home{distro_suffix}",f"@var{distro_suffix}",f"@etc{distro_suffix}",f"@boot{distro_suffix}"]
@@ -149,6 +149,7 @@ def main(args, distro):
     excl = subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | awk '{print $1}'", shell=True).decode('utf-8').strip().replace("\n",",")
     os.system(f"sudo debootstrap --arch {ARCH} --exclude={excl} {RELEASE} /mnt http://archive.ubuntu.com/ubuntu")
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"): ### REZA should this go before debootstrapping line above? If fedora, if not before dnfing it would complain that /dev is not mounted!
+        os.system(f"sudo mkdir /mnt{i}")
         os.system(f"sudo mount -B {i} /mnt{i}") # Mount-points needed for chrooting
     os.system(f"sudo chroot /mnt apt-get install --fix-broken -y linux-image-{ARCH}")
 
