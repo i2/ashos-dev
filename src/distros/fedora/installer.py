@@ -145,7 +145,6 @@ def main(args, distro):
 #   Pacstrap then install anytree and necessary packages in chroot
     #os.system("pacstrap /mnt base linux linux-firmware neovim python3 python-anytree bash dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo tmux") # os-prober
     os.system(f"dnf makecache --refresh --releasever={RELEASE} -c ./src/distros/fedora/base.repo")
-    ########## mkdir testroot
     #os.system("pacstrap /mnt base linux neovim python3 python-anytree arch-install-scripts btrfs-progs grub sudo tmux")
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):  ### REZA In debian, these mount-points operations go 'after' debootstrapping and there is no complaint! In fedora, if so, dnf would complain /dev is not mounted!
         os.system(f"mkdir -p /mnt{i}")

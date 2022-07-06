@@ -17,7 +17,7 @@ if 'arch' in distro:
 elif 'debian' in distro:
     from src.distros.debian import installer
 elif 'fedora' in distro:
-    from src.distros.fedora import step1
+    from src.distros.fedora import installer
 elif 'ubuntu' in distro:
     from src.distros.ubuntu import installer
 
