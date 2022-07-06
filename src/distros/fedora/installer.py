@@ -153,7 +153,7 @@ def main(args, distro):
     if efi:
         os.system("chroot /mnt dnf install -y efibootmgr grub2-efi-x64 grub2-common") #addeed grub2-efi as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?
 
-    os.system("chroot /mnt dnf install -y passwd which grub2-efi-x64-modules os-prober shim-x64 btrfs-progs")
+    os.system("chroot /mnt dnf install -y passwd which grub2-efi-x64-modules shim-x64 btrfs-progs python-anytree sudo tmux")
     ### NOT NEEDED AT ALL os.system("cp /etc/resolv.conf /mnt/etc/")  ###########NEW FOR FEDORA, it says already cped this file!
 
 #   Update fstab
@@ -179,7 +179,7 @@ def main(args, distro):
 ####### STEP 4 BEGINS HERE
 
     os.system(f"echo 'releasever={RELEASE}' | tee /mnt/etc/yum.conf") ########NEW FOR FEDORA
-    
+
     ### glibc-locale-source is already installed
     os.system(f"chroot /mnt dnf install -y systemd ncurses bash-completion kernel glibc-locale-source glibc-langpack-en --releasever={RELEASE}") ########NEW FOR FEDORA package 'systemd' already installed using whatever above packages came
 
@@ -211,7 +211,6 @@ def main(args, distro):
 
 ############### step NEW6 begins here
 
-
 #   Create user and set password
     set_password("root")
     username = get_username()
@@ -225,7 +224,7 @@ def main(args, distro):
 
 #### STEP 7 Begins here
 
-#################### IMPORTANT: Installation continue to go into  /usr/sbin which is not in PATH and binaries are not found automatically. I should find a way to add /usr/sbin to PATH
+#################### IMPORTANT: Installations continue to go into  /usr/sbin which is not in PATH and binaries are not found automatically. I should find a way to add /usr/sbin to PATH
 ################### cp /usr/sbin/btrfs* /usr/bin/
 ################### cp /usr/sbin/blkid /usr/bin/
 
@@ -241,13 +240,6 @@ def main(args, distro):
         if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
             os.system("echo DISTRO,BootOrder | tee /mnt/boot/efi/EFI/map.txt")
         os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
-#    if os.path.exists("/mnt/boot/efi/EFI/map.txt"):
-#        if efi: # Create a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
-#            os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
-#    else:
-#        os.system("echo DISTRO,BootOrder | tee -a /mnt/boot/efi/EFI/map.txt")
-
-
 
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")
@@ -301,9 +293,8 @@ def main(args, distro):
     print("Installation complete")
     print("You can reboot now :)")
 
-
-
-#### grubby shim-x64 
+#### grubby shim-x64
 #grub2-common grub2-tools-minimal grub2-tools-efi os-prober grub2-tools grub2-efi-x64
 
-#  efibootmgr -c -d  /dev/sda -p 1 -L "Fedora" -l '\EFI\fedora\BOOTX64.efi'
+#  efibootmgr -c -d  /dev/sda -p 1 -L "Fedora" -l '\EFI\fedora\grubx64.efi'
+
