@@ -2,7 +2,7 @@ Fedora needs nomodeset in init parameters to boot
 
 btrfs property set -ts /path/to/snapshot ro false
 
-Just after debootstrapping update: make a backup of /etc/login.defs and modify PATH to be universal among all ashos installation for the duration of
+Just after debootstrapping update: make a backup of /etc/login.defs and modify ENV_PATH and ENV_SUPATH to be universal among all ashos installation for the duration of
 installation. Make sure /usr/bin and /usr/local/sbin /sbin /bin are all in PATH
 cp -a /etc/login.defs /etc/login.defs.BAK
 
