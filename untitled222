@@ -1,0 +1,11 @@
+Developed AshOS, a novel immutable meta-distribution (Linux). With AshOS, as it utilizes BTRFS snapshot, one can create a theoretically infinite permutations of operating system snapshots that are immutable, i.e. can not deliberately be compromised. Also, one can switch from one Linux distributions to another distributin within seconds!
+
+
+For instance, one can jump from say snapshot 5 of Arch Linux which rocks Gnome and is finetuned to play video games to snapshot 8 of Debian
+which rocks sway and is riced for wayland development to snapshot 2 of Fedora Linux which is .... Your imagination is key
+
+I developed AshOS, a novel immutable meta-distribution (Linux). With AshOS, one can theoretically create an infinite number of snapshots from totally different operating systems that are immutable, i.e. can not deliberately be compromised. Also, one can jump from one OS to another within seconds!
+AshOS is right now for Linux family of operating systems, but it is planned to be extended to BSDs (FreeBSD, OpenBSD, NetBSD, etc.)
+
+    • Developed AshOS, an innovative immutable meta-distribution (Linux)
+    • Theoretically infinite number of very secure operating systems for different tasks, different softwares and stacks

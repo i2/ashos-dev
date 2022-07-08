@@ -2,7 +2,6 @@
 
 import os
 import subprocess
-#from src.distros.arch import astpk
 
 def clear():
     os.system("#clear")
@@ -90,14 +89,14 @@ def set_password(u):
             continue
 
 def main(args, distro):
-    print("Welcome to the astOS installer!\n\n\n\n\n")
+    print("Welcome to the AshOS installer!\n\n\n\n\n")
     choice, distro_suffix = get_multiboot(distro)
 
 #   Define variables
     packages = "base linux linux-firmware nano python3 python-anytree bash dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo tmux"
     #astpart = to_uuid(args[1])
-    btrdirs = [f"@{distro_suffix}",f"@.snapshots{distro_suffix}",f"@home{distro_suffix}",f"@var{distro_suffix}",f"@etc{distro_suffix}",f"@boot{distro_suffix}"]
-    mntdirs = ["",".snapshots","home","var","etc","boot"]
+    btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
+    mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
