@@ -1,10 +1,21 @@
 Fedora needs nomodeset in init parameters to boot
 
+How to fix 'character map file `UTF-8' not found' when issuing: localedef -f UTF-8 -i en_US en_US.UTF-8
+dnf -y install glibc-locale-source glibc-langpack-en
+
+fedora: /usr/lib/sysimage/rpm/rpmdb.sqlite
+/var/lib/rpm --> /usr/lib/sysimage/rpm
+https://docs.fedoraproject.org/en-US/quick-docs/bootloading-with-grub2/
+
 btrfs property set -ts /path/to/snapshot ro false
 
 Just after debootstrapping update: make a backup of /etc/login.defs and modify ENV_PATH and ENV_SUPATH to be universal among all ashos installation for the duration of
 installation. Make sure /usr/bin and /usr/local/sbin /sbin /bin are all in PATH
 cp -a /etc/login.defs /etc/login.defs.BAK
+ENV_SUPATH	PATH=/usr/local/sbin:/usr/local/bin:/usr/bin
+ENV_PATH	PATH=/usr/local/sbin:/usr/local/bin:/usr/bin
+
+
 
 dnf repoquery -l crontabs
 

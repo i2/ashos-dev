@@ -297,5 +297,5 @@ def main(args, distro):
 #### grubby shim-x64
 #grub2-common grub2-tools-minimal grub2-tools-efi os-prober grub2-tools grub2-efi-x64
 
-#  efibootmgr -c -d  /dev/sda -p 1 -L "Fedora" -l '\EFI\fedora\grubx64.efi'
+#  efibootmgr -c -d /dev/sda -p 1 -L "Fedora" -l '\EFI\fedora\grubx64.efi'
 

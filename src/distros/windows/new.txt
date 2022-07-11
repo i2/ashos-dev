@@ -1,0 +1,4 @@
+sudo btrfs subvol list /dev/sdXY_aka_BTRFS_PARTITION
+- convert ID to hex
+efibootmgr -c -d /dev/sdb -p 1 -L "Windows" -l '\EFI\quibble\quibble.efi'
+
