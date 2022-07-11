@@ -18,6 +18,8 @@ elif 'debian' in distro:
     from src.distros.debian import installer
 elif 'fedora' in distro:
     from src.distros.fedora import installer
+elif 'gentoo' in distro:
+    from src.distros.gentoo import installer
 elif 'ubuntu' in distro:
     from src.distros.ubuntu import installer
 

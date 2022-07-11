@@ -93,7 +93,7 @@ def main(args, distro):
     choice, distro_suffix = get_multiboot(distro)
 
 #   Define variables
-    packages = "base linux linux-firmware nano python3 python-anytree bash dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo tmux"
+    packages = "base linux linux-firmware nano python3 python-anytree bash dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo tmux os-prober"
     #astpart = to_uuid(args[1])
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
@@ -126,7 +126,7 @@ def main(args, distro):
         os.system(f"mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
     for i in ("tmp", "root"):
         os.system(f"mkdir -p /mnt/{i}")
-    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp", "var"):
+    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp"):
         os.system(f"mkdir -p /mnt/.snapshots/{i}")
     if efi:
         os.system("mkdir /mnt/boot/efi")
@@ -139,7 +139,6 @@ def main(args, distro):
     #os.system("echo -e 'setw -g mode-keys vi\nset -g history-limit 999999' >> $HOME/.tmux.conf")
 
 #   Pacstrap then install anytree and necessary packages in chroot
-    #os.system("pacstrap /mnt base linux linux-firmware neovim python3 python-anytree bash dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo tmux") # os-prober 
     excode = int(os.system(f"pacstrap /mnt {packages}"))
     if excode != 0:
         print("Failed to download packages!")
@@ -155,7 +154,7 @@ def main(args, distro):
 #   Update fstab
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
     for mntdir in mntdirs:
-        os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}{distro_suffix},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
+        os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}{distro_suffix},compress=zstd,noatime 0 0' | tee -a /mnt/etc/fstab")
     if efi:
         os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | tee -a /mnt/etc/fstab")
@@ -184,10 +183,10 @@ def main(args, distro):
     os.system(f"sed -i '0,/@{distro_suffix}/ s,@{distro_suffix},@.snapshots{distro_suffix}/rootfs/snapshot-tmp,' /mnt/etc/fstab")
     os.system(f"sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
     os.system(f"sed -i '0,/@etc{distro_suffix}/ s,@etc{distro_suffix},@.snapshots{distro_suffix}/etc/etc-tmp,' /mnt/etc/fstab")
-    # Delete fstab created for @{distro_suffix} which is going to be deleted at the end
+    # Delete fstab created for @{distro_suffix} which is going to be deleted (at the end of installer)
     os.system(f"sed -i.bak '/\@{distro_suffix}/d' /mnt/etc/fstab")
 
-#   Copy and symlink astpk and detect_os.sh                                                              ###MOVEDTOHERE
+#   Copy and symlink astpk and detect_os.sh                                     ###MOVEDTOHERE
     os.system("mkdir -p /mnt/.snapshots/ast/snapshots")
     os.system(f"cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
     os.system("cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
@@ -207,30 +206,25 @@ def main(args, distro):
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | tee /mnt/.snapshots/ast/fstree")
 
 #   GRUB and EFI
+###    os.system(f"arch-chroot /mnt sed -i s,Arch,astOS,g /etc/default/grub") ###NOT_PLANNING_TO_USE_THIS_APPROACH_AT_ALL
     os.system(f"chroot /mnt grub-install {args[2]}") #REZA --recheck --no-nvram --removable
-    os.system("mkdir -p /mnt/boot/grub/BAK/") # Folder for backing up grub configs created by astpk
     os.system(f"chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
-    os.system(f"sed -i '0,/subvol=@{distro_suffix}/s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
+    os.system("mkdir -p /mnt/boot/grub/BAK/") # Folder for backing up grub configs created by astpk
+    os.system(f"sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
+    # Create a mapping of "distro" <=> "BootOrder number". Ash reads from this file to switch between distros.
     if os.path.exists("/mnt/boot/efi/EFI/map.txt"):
-        if efi: # Create a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
-            os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
+        os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
     else:
         os.system("echo DISTRO,BootOrder | tee -a /mnt/boot/efi/EFI/map.txt")
 
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")
     os.system("btrfs sub create /mnt/.snapshots/etc/etc-tmp")
-    os.system("btrfs sub create /mnt/.snapshots/var/var-tmp")
 
-    for i in ("pacman", "systemd"):
-        os.system(f"mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")
-    os.system("cp --reflink=auto -r /mnt/var/lib/pacman/* /mnt/.snapshots/var/var-tmp/lib/pacman/")
-    os.system("cp --reflink=auto -r /mnt/var/lib/systemd/* /mnt/.snapshots/var/var-tmp/lib/systemd/")
     os.system("cp --reflink=auto -r /mnt/boot/* /mnt/.snapshots/boot/boot-tmp")
     os.system("cp --reflink=auto -r /mnt/etc/* /mnt/.snapshots/etc/etc-tmp")
     os.system("btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-0")
     os.system("btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-0")
-    os.system("btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-0")
 
     os.system(f"echo '{astpart}' | tee /mnt/.snapshots/ast/part")
 
@@ -254,7 +248,6 @@ def main(args, distro):
 
     os.system("cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/* /mnt/.snapshots/rootfs/snapshot-tmp/boot")
     os.system("cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/* /mnt/.snapshots/rootfs/snapshot-tmp/etc")
-    os.system("cp --reflink=auto -r /mnt/.snapshots/var/var-0/* /mnt/.snapshots/rootfs/snapshot-tmp/var")
 
 #   Unmount everything
     os.system("umount -R /mnt")
