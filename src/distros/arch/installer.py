@@ -126,7 +126,7 @@ def main(args, distro):
         os.system(f"mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
     for i in ("tmp", "root"):
         os.system(f"mkdir -p /mnt/{i}")
-    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp"):
+    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp"): ###JULY11,2022 var removed as it's not needed!
         os.system(f"mkdir -p /mnt/.snapshots/{i}")
     if efi:
         os.system("mkdir /mnt/boot/efi")
@@ -212,10 +212,10 @@ def main(args, distro):
     os.system("mkdir -p /mnt/boot/grub/BAK/") # Folder for backing up grub configs created by astpk
     os.system(f"sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
     # Create a mapping of "distro" <=> "BootOrder number". Ash reads from this file to switch between distros.
-    if os.path.exists("/mnt/boot/efi/EFI/map.txt"):
+    if efi:
+        if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
+            os.system("echo DISTRO,BootOrder | tee -a /mnt/boot/efi/EFI/map.txt")
         os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
-    else:
-        os.system("echo DISTRO,BootOrder | tee -a /mnt/boot/efi/EFI/map.txt")
 
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")

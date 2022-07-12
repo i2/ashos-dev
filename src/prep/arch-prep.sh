@@ -8,6 +8,6 @@ echo "setw -g mode-keys vi" | tee -a $HOME/.tmux.conf
 git clone http://github.com/i2/ashos-dev
 cd ashos-dev
 git checkout debian
-/bin/sh ./src/part-efi-example.sh /dev/sda
+/bin/sh ./src/prep/part-efi-example.sh /dev/sda
 #python3 init.py /dev/sda2 /dev/sda /dev/sda1
 
