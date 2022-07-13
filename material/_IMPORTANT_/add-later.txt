@@ -3,6 +3,19 @@ Fedora needs nomodeset in init parameters to boot
 How to fix 'character map file `UTF-8' not found' when issuing: localedef -f UTF-8 -i en_US en_US.UTF-8
 dnf -y install glibc-locale-source glibc-langpack-en
 
+----
+#!/bin/sh
+exec tail -n +3 $0
+# This file provides an easy way to add custom menu entries.  Simply type the
+# menu entries you want to add after this comment.  Be careful not to change
+# the 'exec tail' line above.
+
+menuentry 'NixOS' --class gnu-linux --class gnu --class os $menuentry_id_option 'nixos-0aca58bc-8fdb-4a07-aa2f-56406bcf19b7' {
+        set root='hd0,msdos4'
+        configfile /nixos/root/boot/grub/grub.cfg
+}
+-----
+
 fedora: /usr/lib/sysimage/rpm/rpmdb.sqlite
 /var/lib/rpm --> /usr/lib/sysimage/rpm
 https://docs.fedoraproject.org/en-US/quick-docs/bootloading-with-grub2/

@@ -4,7 +4,6 @@
 
 import os
 import subprocess
-#from src.distros.arch import astpk
 
 def clear():
     os.system("#clear")
