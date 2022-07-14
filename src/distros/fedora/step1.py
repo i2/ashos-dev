@@ -152,3 +152,7 @@ def main(args, distro):
         os.system(f"mkdir -p /mnt{i}")
         os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
     os.system(f"dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install dnf -y --releasever={RELEASE} --basearch={ARCH}")  #### removed basearch as it was giving unrecognized arguments error!
+
+args = list(sys.argv)
+distro="fedora"
+main(args, distro)
