@@ -4,6 +4,7 @@
 
 import os
 import subprocess
+import sys
 
 def clear():
     os.system("#clear")
@@ -234,3 +235,6 @@ def main(args, distro):
 
 #  efibootmgr -c -d /dev/sda -p 1 -L "Fedora" -l '\EFI\fedora\grubx64.efi'
 
+args = list(sys.argv)
+distro="fedora"
+main(args, distro)
