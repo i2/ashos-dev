@@ -1,3 +1,5 @@
+Remove UEFI entry B00E: sudo efibootmgr -b E -B
+
 Fedora needs nomodeset in init parameters to boot
 
 How to fix 'character map file `UTF-8' not found' when issuing: localedef -f UTF-8 -i en_US en_US.UTF-8
@@ -658,3 +660,27 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 In my multiboot (arch installed first and then debian), here is what I have in /boot (without mounting /dev/sda1 to /boot/efi):
 
 ================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ramin:
+شیره افرا
+taffee
