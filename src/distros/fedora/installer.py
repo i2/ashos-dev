@@ -104,7 +104,7 @@ def main(args, distro):
         efi = True
     else:
         efi = False
-    packages = "passwd which grub2-efi-x64-modules shim-x64 btrfs-progs python-anytree sudo tmux neovim NetworkManager dhcpcd"
+    packages = "passwd which grub2-efi-x64-modules shim-x64 btrfs-progs python-anytree sudo tmux neovim NetworkManager dhcpcd efibootmgr"
 
     tz = get_timezone()
     hostname = get_hostname()
@@ -150,8 +150,11 @@ def main(args, distro):
         os.system(f"mkdir -p /mnt{i}")
         os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
     os.system(f"dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install dnf -y --releasever={RELEASE} --forcearch={ARCH}")
+
+############ STEP2 NEW STAARTS HERE july 15 2022
+
     if efi:
-        os.system("chroot /mnt dnf install -y efibootmgr grub2-efi-x64 grub2-common") #addeed grub2-efi as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?
+        os.system("chroot /mnt dnf install -y efibootmgr grub2-efi-x64") #addeed grub2-efi as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?  # grub2-common already installed at this point
 
     os.system(f"chroot /mnt dnf install -y {packages}")
     ### NOT NEEDED AT ALL os.system("cp /etc/resolv.conf /mnt/etc/")  ###########NEW FOR FEDORA, it says already cped this file!
