@@ -4,6 +4,10 @@ to
 cp --reflink=auto -r /mnt/boot/.
 # as * would not copy hidden files
 
+fedora shows a lot of audit messages. Add audit=0 as kernel parameter
+
+- add a function for version upgrade for fedora: dnf system-upgrade
+- add a function to autoclean and autoremove in fedora
 
 The logic for updating grub.cfg where it says:
 while "BEGIN /etc/grub.d/10_linux" not in line:

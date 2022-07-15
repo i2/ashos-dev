@@ -453,7 +453,7 @@ def live_install(pkg):
     os.system(f"mount --bind /var /.snapshots/rootfs/snapshot-{tmp}/var >/dev/null 2>&1")
     os.system(f"mount --bind /etc /.snapshots/rootfs/snapshot-{tmp}/etc >/dev/null 2>&1")
     os.system(f"mount --bind /tmp /.snapshots/rootfs/snapshot-{tmp}/tmp >/dev/null 2>&1")
-    os.system(f"chroot /.snapshots/rootfs/snapshot-{tmp} pacman -S --overwrite \\* --noconfirm {pkg}")
+    os.system(f"chroot /.snapshots/rootfs/snapshot-{tmp} sudo dnf -y install {pkg}") ### REVIEW_LATER how to do 'overwrite'
     os.system(f"umount /.snapshots/rootfs/snapshot-{tmp}/* >/dev/null 2>&1")
     os.system(f"umount /.snapshots/rootfs/snapshot-{tmp} >/dev/null 2>&1")
 
@@ -480,7 +480,7 @@ def install(snapshot,pkg):
         print(f"F: snapshot {snapshot} appears to be in use. If you're certain it's not in use clear lock with 'ast unlock {snapshot}'.")
     else:
         prepare(snapshot)
-        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} pacman -S {pkg} --overwrite '/var/*'"))
+        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sudo dnf install {pkg}")) ### REVIEW_LATER how to do 'overwrite /var/*'
         if int(excode) == 0:
             posttrans(snapshot)
             print(f"Package {pkg} installed in snapshot {snapshot} successfully.")
@@ -502,7 +502,8 @@ def remove(snapshot,pkg):
         print(f"F: snapshot {snapshot} appears to be in use. If you're certain it's not in use clear lock with 'ast unlock {snapshot}'.")
     else:
         prepare(snapshot)
-        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} pacman --noconfirm -Rns {pkg}"))
+        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sudo dnf -y remove {pkg}")) ### REVIEW_LATER how to do -Rns
+        os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sudo dnf -y autoremove") ### REVIEW_LATER 
         if int(excode) == 0:
             posttrans(snapshot)
             print(f"Package {pkg} removed from snapshot {snapshot} successfully.")
@@ -542,7 +543,7 @@ def update_base():
         print(f"F: snapshot {snapshot} appears to be in use. If you're certain it's not in use clear lock with 'ast unlock {snapshot}'.")
     else:
         prepare(snapshot)
-        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} pacman -Syyu"))
+        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sudo dnf upgrade"))
         if int(excode) == 0:
             posttrans(snapshot)
             print(f"Snapshot {snapshot} upgraded successfully.")
@@ -590,7 +591,7 @@ def posttrans(snapshot):
     os.system(f"btrfs sub del /.snapshots/rootfs/snapshot-{snapshot} >/dev/null 2>&1")
     os.system(f"rm -rf /.snapshots/etc/etc-chr{snapshot}/* >/dev/null 2>&1")
     os.system(f"cp -r --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/etc/* /.snapshots/etc/etc-chr{snapshot} >/dev/null 2>&1")
-    os.system(f"cp -r -n --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/var/cache/pacman/pkg/* /var/cache/pacman/pkg/ >/dev/null 2>&1")
+    os.system(f"cp -r -n --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/var/cache/dnf/* /var/cache/dnf/ >/dev/null 2>&1") ### REVIEW_LATER
     os.system(f"rm -rf /.snapshots/boot/boot-chr{snapshot}/* >/dev/null 2>&1")
     os.system(f"cp -r --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/boot/* /.snapshots/boot/boot-chr{snapshot} >/dev/null 2>&1")
     os.system(f"btrfs sub del /.snapshots/etc/etc-{etc} >/dev/null 2>&1")
@@ -612,7 +613,7 @@ def upgrade(snapshot):
         print(f"F: snapshot {snapshot} appears to be in use. If you're certain it's not in use clear lock with 'ast unlock {snapshot}'.")
     else:
         prepare(snapshot)
-        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} pacman -Syyu")) # Default upgrade behaviour is now "safe" update, meaning failed updates get fully discarded
+        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sudo dnf upgrade")) # Default upgrade behaviour is now "safe" update, meaning failed updates get fully discarded
         if int(excode) == 0:
             posttrans(snapshot)
             print(f"Snapshot {snapshot} upgraded successfully.")
@@ -630,7 +631,7 @@ def refresh(snapshot):
         print(f"F: snapshot {snapshot} appears to be in use. If you're certain it's not in use clear lock with 'ast unlock {snapshot}'.")
     else:
         prepare(snapshot)
-        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} pacman -Syy"))
+        excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sudo dnf upgrade --refresh")) ### REVIEW_LATER
         if int(excode) == 0:
             posttrans(snapshot)
             print(f"Snapshot {snapshot} refreshed successfully.")
@@ -641,7 +642,7 @@ def refresh(snapshot):
 #   Noninteractive update
 def autoupgrade(snapshot):
     prepare(snapshot)
-    excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} pacman --noconfirm -Syyu"))
+    excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sudo dnf -y upgrade")) ### REVIEW_LATER
     if int(excode) == 0:
         posttrans(snapshot)
         os.system("echo 0 > /.snapshots/ast/upstate")
