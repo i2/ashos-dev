@@ -149,10 +149,12 @@ def main(args, distro):
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):  ### REZA In debian, these mount-points operations go 'after' debootstrapping and there is no complaint! In fedora, if so, dnf would complain /dev is not mounted!
         os.system(f"mkdir -p /mnt{i}")
         os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
+    print("Im here")
     os.system(f"dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install dnf -y --releasever={RELEASE} --forcearch={ARCH}")
 
 ############ STEP2 NEW STAARTS HERE july 15 2022
 
+    print("Im here as well")
     if efi:
         os.system("chroot /mnt dnf install -y efibootmgr grub2-efi-x64") #addeed grub2-efi as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?  # grub2-common already installed at this point
 
