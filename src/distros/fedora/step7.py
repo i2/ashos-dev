@@ -122,6 +122,8 @@ def main(args, distro):
 ################### cp /usr/sbin/btrfs* /usr/bin/
 ################### cp /usr/sbin/blkid /usr/bin/
 
+    distro="fedora"
+
 #   GRUB and EFI
 #   REALLY ANNOYING BUG: https://bugzilla.redhat.com/show_bug.cgi?id=1917213
 #   https://fedoraproject.org/wiki/GRUB_2#Instructions_for_UEFI-based_systems
