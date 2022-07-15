@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+### incorporated changes up to and including commit 5a93f8d018773f01512a71ff1560077ea974ceb7 from AstOS
+
 import os
 import subprocess
 

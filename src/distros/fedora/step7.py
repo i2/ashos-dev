@@ -1,15 +1,16 @@
 #!/usr/bin/python3
 
+# might need to append /bin/sh or /bin/bash to chroot commands, as arch iso live cd use zsh and choroot environment is bash
+
 import os
 import subprocess
-import sys ### temporary just for testing steps
-#from src.distros.arch import astpk
+import sys
 
 def clear():
     os.system("#clear")
 
 def to_uuid(part):
-    return subprocess.check_output(f"blkid -s UUID -o value {part}", shell=True).decode('utf-8').strip()
+    return subprocess.check_output(f"/usr/sbin/blkid -s UUID -o value {part}", shell=True).decode('utf-8').strip()
 
 #   This function returns a tuple: (1. choice whether partitioning and formatting should happen
 #   2. Underscore plus name of distro if it should be appended to sub-volume names
@@ -74,7 +75,7 @@ def get_username():
     return username
 
 def create_user(u):
-    os.system(f"chroot /mnt useradd -m -G wheel -s /bin/bash {u}")
+    os.system(f"chroot /mnt /usr/sbin/useradd -m -G wheel -s /bin/bash {u}")
     os.system("echo '%wheel ALL=(ALL:ALL) ALL' | tee -a /mnt/etc/sudoers")
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | tee -a /mnt/home/{u}/.bashrc")
 
@@ -92,7 +93,7 @@ def set_password(u):
 
 def main(args, distro):
     print("Welcome to the astOS installer!\n\n\n\n\n")
-    choice, distro_suffix = get_multiboot("fedora")
+    choice, distro_suffix = get_multiboot(distro)
 
 #   Define variables
     ARCH="x86_64"
@@ -104,28 +105,43 @@ def main(args, distro):
         efi = True
     else:
         efi = False
+    #packages = "passwd which grub2-efi-x64-modules shim-x64 btrfs-progs python-anytree sudo tmux neovim NetworkManager dhcpcd"
+    packages = "passwd which grub2-efi-x64-modules shim-x64 btrfs-progs python-anytree sudo neovim efibootmgr"
+
+#   Partition and format
+#    if choice != "3":
+#        os.system(f"/usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}") ### DELETE THIS LINE WHEN PRODUCTION READY
+#        os.system(f"/usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
+#    os.system("pacman -Syy --noconfirm archlinux-keyring dnf")
 
     astpart = to_uuid(args[1]) ### DELETE THIS LINE WHEN PRODUCTION READY
 
-    tz= get_timezone()
-    hostname  = get_hostname()
+#### STEP 7 Begins here
 
-####### STEP 4 BEGINS HERE
+#################### IMPORTANT: Installations continue to go into  /usr/sbin which is not in PATH and binaries are not found automatically. I should find a way to add /usr/sbin to PATH
+################### cp /usr/sbin/btrfs* /usr/bin/
+################### cp /usr/sbin/blkid /usr/bin/
 
-    os.system(f"echo 'releasever={RELEASE}' | tee /mnt/etc/yum.conf") ########NEW FOR FEDORA
-    
-    ### glibc-locale-source is already installed
-    os.system(f"chroot /mnt dnf install -y systemd ncurses bash-completion kernel glibc-locale-source glibc-langpack-en --releasever={RELEASE}") ########NEW FOR FEDORA package 'systemd' already installed using whatever above packages came
+#   GRUB and EFI
+#   REALLY ANNOYING BUG: https://bugzilla.redhat.com/show_bug.cgi?id=1917213
+#   https://fedoraproject.org/wiki/GRUB_2#Instructions_for_UEFI-based_systems
+    #os.system(f"chroot /mnt /usr/sbin/grub2-install {args[2]}") #REZA --recheck --no-nvram --removable (not needed for Fedora on EFI)
+    # if dnf reinstall shim-* grub2-efi-* grub2-common return an exitcode of error (excode != 0), run dnf install shim-x64 grub2-efi-x64 grub2-common
+    os.system("mkdir -p /mnt/boot/grub2/BAK") # Folder for backing up grub configs created by astpk
+    os.system(f"chroot /mnt sudo /usr/sbin/grub2-mkconfig {args[2]} -o /boot/grub2/grub.cfg")
+#### In Fedora files are under /boot/loader/entries/
+    os.system(f"sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/loader/entries/*")
+    if efi: # Create a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
+        if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
+            os.system("echo DISTRO,BootOrder | tee /mnt/boot/efi/EFI/map.txt")
+        os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
 
-#   Update hostname, hosts, locales and timezone, hosts
-    os.system(f"echo {hostname} | tee /mnt/etc/hostname")
-    os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
-#    os.system("sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen")
-    ### os.system("yum -y install glibc-langpack-en") ######### glibc-locale-source is already installed
-    os.system("chroot /mnt localedef -v -c -i en_US -f UTF-8 en_US.UTF-8") #######REZA got error (
-    os.system("echo 'LANG=en_US.UTF-8' | tee /mnt/etc/locale.conf")
-    os.system(f"chroot /mnt ln -sf {tz} /etc/localtime")
-    os.system("chroot /mnt /usr/sbin/hwclock --systohc")    #REZA hwclock and locale-gen commands not found!
+
+
+#### grubby shim-x64
+#grub2-common grub2-tools-minimal grub2-tools-efi os-prober grub2-tools grub2-efi-x64
+
+#  efibootmgr -c -d /dev/sda -p 1 -L "Fedora" -l '\EFI\fedora\grubx64.efi'
 
 args = list(sys.argv)
 distro="fedora"

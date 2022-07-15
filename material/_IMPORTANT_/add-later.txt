@@ -1,3 +1,7 @@
+AshOS is:
+- A wrapper-installer for any Linux distribution that can be debootstrapped, and that is pretty much any major distribution
+- A meta-distribution that brings immutability even to distros that do not have a dedicated project i.e. Arch Linux, Gentoo, etc.
+
 Remove UEFI entry B00E: sudo efibootmgr -b E -B
 
 Fedora needs nomodeset in init parameters to boot

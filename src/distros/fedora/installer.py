@@ -236,20 +236,21 @@ def main(args, distro):
 #   https://fedoraproject.org/wiki/GRUB_2#Instructions_for_UEFI-based_systems
     #os.system(f"chroot /mnt /usr/sbin/grub2-install {args[2]}") #REZA --recheck --no-nvram --removable (not needed for Fedora on EFI)
     # if dnf reinstall shim-* grub2-efi-* grub2-common return an exitcode of error (excode != 0), run dnf install shim-x64 grub2-efi-x64 grub2-common
-    os.system("mkdir -p /mnt/boot/grub2/BAK/") # Folder for backing up grub configs created by astpk
-    os.system(f"chroot /mnt /usr/sbin/grub2-mkconfig {args[2]} -o /boot/grub2/grub.cfg")
-    os.system(f"sed -i '0,/subvol=@{distro_suffix}/s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub2/grub.cfg")
+    os.system("mkdir -p /mnt/boot/grub2/BAK") # Folder for backing up grub configs created by astpk
+    os.system(f"chroot /mnt sudo /usr/sbin/grub2-mkconfig {args[2]} -o /boot/grub2/grub.cfg")
+#### In Fedora files are under /boot/loader/entries/
+    os.system(f"sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/loader/entries/*")
     if efi: # Create a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
         if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
             os.system("echo DISTRO,BootOrder | tee /mnt/boot/efi/EFI/map.txt")
         os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
 
+#### STEP 8 Begins here
+
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")
     os.system("btrfs sub create /mnt/.snapshots/etc/etc-tmp")
     os.system("btrfs sub create /mnt/.snapshots/var/var-tmp")
-
-############Step 10 begins here
 
     for i in ("dnf", "rpm", "systemd"):
         os.system(f"mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")
