@@ -220,7 +220,7 @@ def main(args, distro):
     create_user(username)
     set_password(username)
 
-    #os.system("chroot /mnt systemctl enable NetworkManager")
+    os.system("chroot /mnt systemctl enable NetworkManager")
 
 #   Initialize fstree
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | tee /mnt/.snapshots/ast/fstree")
@@ -240,8 +240,8 @@ def main(args, distro):
     os.system(f"chroot /mnt sudo /usr/sbin/grub2-mkconfig {args[2]} -o /boot/grub2/grub.cfg") ### THIS MIGHT BE TOTALLY REDUNDANT
 #### In Fedora files are under /boot/loader/entries/
     os.system(f"sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/loader/entries/*")
+    # Create a symlink to the newest systemd-boot entry
     os.system(f"ln -s /mnt/boot/loader/entries/`ls -rt /mnt/boot/loader/entries | tail -n1` current.cfg")
-    
     if efi: # Create EFI entry and a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
         if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
             os.system("echo DISTRO,BootOrder | tee /mnt/boot/efi/EFI/map.txt")
@@ -307,3 +307,6 @@ def main(args, distro):
 
 #  efibootmgr -c -d /dev/sda -p 1 -L "Fedora" -l '\EFI\fedora\grubx64.efi'
 
+#args = list(sys.argv)
+#distro="fedora"
+#main(args, distro)
