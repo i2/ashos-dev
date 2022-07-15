@@ -503,6 +503,7 @@ def remove(snapshot,pkg):
     else:
         prepare(snapshot)
         excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sudo dnf -y remove {pkg}")) ### REVIEW_LATER how to do -Rns
+        #excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sudo dnf -y remove {pkg} && sudo dnf -y autoremove"))
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sudo dnf -y autoremove") ### REVIEW_LATER 
         if int(excode) == 0:
             posttrans(snapshot)
