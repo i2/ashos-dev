@@ -124,22 +124,33 @@ def main(args, distro):
 
     distro="fedora"
 
-#   GRUB and EFI
-#   REALLY ANNOYING BUG: https://bugzilla.redhat.com/show_bug.cgi?id=1917213
-#   https://fedoraproject.org/wiki/GRUB_2#Instructions_for_UEFI-based_systems
-    #os.system(f"chroot /mnt /usr/sbin/grub2-install {args[2]}") #REZA --recheck --no-nvram --removable (not needed for Fedora on EFI)
-    # if dnf reinstall shim-* grub2-efi-* grub2-common return an exitcode of error (excode != 0), run dnf install shim-x64 grub2-efi-x64 grub2-common
-    os.system("mkdir -p /mnt/boot/grub2/BAK") # Folder for backing up grub configs created by astpk
-    os.system(f"chroot /mnt sudo /usr/sbin/grub2-mkconfig {args[2]} -o /boot/grub2/grub.cfg")
-#### In Fedora files are under /boot/loader/entries/
-    os.system(f"sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/loader/entries/*")
-    if efi: # Create a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
-        if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
-            os.system("echo DISTRO,BootOrder | tee /mnt/boot/efi/EFI/map.txt")
-        os.system(f"efibootmgr -c -d {args[2]} -p 1 -L 'Fedora' -l '\EFI\fedora\grubx64.efi'")
-        os.system(f"echo '{distro},' $(efibootmgr -v | grep -i {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
+#### STEP 8 Begins here
 
+    os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
+    os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")
+    os.system("btrfs sub create /mnt/.snapshots/etc/etc-tmp")
+    os.system("btrfs sub create /mnt/.snapshots/var/var-tmp")
 
+    for i in ("dnf", "rpm", "systemd"):
+        os.system(f"mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")
+    os.system("cp --reflink=auto -r /mnt/var/lib/dnf/* /mnt/.snapshots/var/var-tmp/lib/dnf/")
+    os.system("cp --reflink=auto -r /mnt/var/lib/rpm/* /mnt/.snapshots/var/var-tmp/lib/rpm/")
+    os.system("cp --reflink=auto -r /mnt/var/lib/systemd/* /mnt/.snapshots/var/var-tmp/lib/systemd/")
+    os.system("cp --reflink=auto -r /mnt/boot/* /mnt/.snapshots/boot/boot-tmp")
+    os.system("cp --reflink=auto -r /mnt/etc/* /mnt/.snapshots/etc/etc-tmp")
+    os.system("btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-0")
+    os.system("btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-0")
+    os.system("btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-0")
+
+    os.system(f"echo '{astpart}' | tee /mnt/.snapshots/ast/part")
+
+    os.system("btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
+    os.system("chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
+
+    os.system("cp -r /mnt/root/. /mnt/.snapshots/root/")
+    os.system("cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")
+    os.system("rm -rf /mnt/root/*")
+    os.system("rm -rf /mnt/tmp/*")
 
 #### grubby shim-x64
 #grub2-common grub2-tools-minimal grub2-tools-efi os-prober grub2-tools grub2-efi-x64

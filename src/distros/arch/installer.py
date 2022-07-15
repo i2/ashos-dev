@@ -218,7 +218,7 @@ def main(args, distro):
     if efi:
         if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
             os.system("echo DISTRO,BootOrder | tee -a /mnt/boot/efi/EFI/map.txt")
-        os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
+        os.system(f"echo '{distro},' $(efibootmgr -v | grep -i {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
 
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")

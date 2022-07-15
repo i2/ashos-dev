@@ -240,11 +240,11 @@ def main(args, distro):
     os.system(f"chroot /mnt sudo /usr/sbin/grub2-mkconfig {args[2]} -o /boot/grub2/grub.cfg")
 #### In Fedora files are under /boot/loader/entries/
     os.system(f"sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/loader/entries/*")
-    if efi: # Create a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
+    if efi: # Create EFI entry and a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
         if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
             os.system("echo DISTRO,BootOrder | tee /mnt/boot/efi/EFI/map.txt")
         os.system(f"efibootmgr -c -d {args[2]} -p 1 -L 'Fedora' -l '\EFI\fedora\grubx64.efi'")
-        os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
+        os.system(f"echo '{distro},' $(efibootmgr -v | grep -i {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
 
 #### STEP 8 Begins here
 
@@ -273,6 +273,8 @@ def main(args, distro):
     os.system("cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")
     os.system("rm -rf /mnt/root/*")
     os.system("rm -rf /mnt/tmp/*")
+
+#### STEP 9 Begins here
 
 #   Copy boot and etc from snapshot's tmp to common
     if efi:
