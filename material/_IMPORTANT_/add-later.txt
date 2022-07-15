@@ -1,3 +1,14 @@
+Change all:
+cp --reflink=auto -r /mnt/boot/*
+to
+cp --reflink=auto -r /mnt/boot/.
+# as * would not copy hidden files
+
+
+The logic for updating grub.cfg where it says:
+while "BEGIN /etc/grub.d/10_linux" not in line:
+should be changed. It's not comprehensive!
+
 AshOS is:
 - A wrapper-installer for any Linux distribution that can be debootstrapped, and that is pretty much any major distribution
 - A meta-distribution that brings immutability even to distros that do not have a dedicated project i.e. Arch Linux, Gentoo, etc.

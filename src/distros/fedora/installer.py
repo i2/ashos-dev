@@ -237,9 +237,11 @@ def main(args, distro):
     #os.system(f"chroot /mnt /usr/sbin/grub2-install {args[2]}") #REZA --recheck --no-nvram --removable (not needed for Fedora on EFI)
     # if dnf reinstall shim-* grub2-efi-* grub2-common return an exitcode of error (excode != 0), run dnf install shim-x64 grub2-efi-x64 grub2-common
     os.system("mkdir -p /mnt/boot/grub2/BAK") # Folder for backing up grub configs created by astpk
-    os.system(f"chroot /mnt sudo /usr/sbin/grub2-mkconfig {args[2]} -o /boot/grub2/grub.cfg")
+    os.system(f"chroot /mnt sudo /usr/sbin/grub2-mkconfig {args[2]} -o /boot/grub2/grub.cfg") ### THIS MIGHT BE TOTALLY REDUNDANT
 #### In Fedora files are under /boot/loader/entries/
     os.system(f"sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/loader/entries/*")
+    os.system(f"ln -s /mnt/boot/loader/entries/`ls -rt /mnt/boot/loader/entries | tail -n1` current.cfg")
+    
     if efi: # Create EFI entry and a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
         if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
             os.system("echo DISTRO,BootOrder | tee /mnt/boot/efi/EFI/map.txt")
