@@ -1,0 +1,37 @@
+
+t@archiso ~ # grubby --info=ALL
+zsh: command not found: grubby
+127 root@archiso ~ # chroot /mnt /bin/bash
+bash-5.1# sudo grubby --info=ALL
+index=0
+kernel="/boot/@boot_fedora/vmlinuz-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64"
+args="ro rootflags=subvol=@_fedora"
+root="UUID=5c7f0167-3735-4a85-9a10-ed6585fa7dee"
+initrd="/boot/@boot_fedora/initramfs-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64.img"
+title="Fedora Linux (ashos) (5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64) 37 (Rawhide Prerelease)"
+id="5c2e0517574f42e5be46cc2a32207db3-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64"
+bash-5.1# sudo grubby --info=ALL
+index=0
+kernel="/boot/@boot_fedora/vmlinuz-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64"
+args="ro rootflags=subvol=@_fedora"
+root="UUID=5c7f0167-3735-4a85-9a10-ed6585fa7dee"
+initrd="/boot/@boot_fedora/initramfs-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64.img"
+title="Fedora Linux (ashos) (5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64) 37 (Rawhide Prerelease)"
+id="5c2e0517574f42e5be46cc2a32207db3-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64"
+bash-5.1# exit
+exit
+root@archiso ~ # chroot /mnt /bin/bash
+bash-5.1# sudo grubby --info=ALL
+index=0
+kernel="/boot/@boot_fedora/vmlinuz-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64"
+args="ro rootflags=subvol=@_fedora"
+root="UUID=5c7f0167-3735-4a85-9a10-ed6585fa7dee"
+initrd="/boot/@boot_fedora/initramfs-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64.img"
+title="Fedora Linux (ashos) (5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64) 37 (Rawhide Prerelease)"
+id="5c2e0517574f42e5be46cc2a32207db3-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64"
+bash-5.1# exit
+exit
+root has logged on pts/4 from tmux(1010).
+root@archiso ~ #
+
+

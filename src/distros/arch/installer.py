@@ -244,13 +244,13 @@ def main(args, distro):
         os.system("umount /mnt/boot/efi")
     os.system("umount /mnt/boot")
     os.system(f"mount {args[1]} -o subvol=@boot{distro_suffix},compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp")
-    os.system("cp --reflink=auto -r /mnt/.snapshots/boot/boot-tmp/* /mnt/boot")
+    os.system("cp --reflink=auto -r /mnt/.snapshots/boot/boot-tmp/. /mnt/boot/")
     os.system("umount /mnt/etc")
     os.system(f"mount {args[1]} -o subvol=@etc{distro_suffix},compress=zstd,noatime /mnt/.snapshots/etc/etc-tmp")
-    os.system("cp --reflink=auto -r /mnt/.snapshots/etc/etc-tmp/* /mnt/etc")
+    os.system("cp --reflink=auto -r /mnt/.snapshots/etc/etc-tmp/. /mnt/etc/")
 
-    os.system("cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/* /mnt/.snapshots/rootfs/snapshot-tmp/boot")
-    os.system("cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/* /mnt/.snapshots/rootfs/snapshot-tmp/etc")
+    os.system("cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/. /mnt/.snapshots/rootfs/snapshot-tmp/boot/")
+    os.system("cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/. /mnt/.snapshots/rootfs/snapshot-tmp/etc/")
 
 #   Unmount everything
     os.system("umount -R /mnt")

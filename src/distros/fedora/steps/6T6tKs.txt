@@ -1,0 +1,652 @@
+
+t@archiso ~/ashos-dev (git)-[debian] # lsblk
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
+loop0    7:0    0 689.8M  1 loop /run/archiso/airootfs
+sda      8:0    0     2T  0 disk
+|-sda1   8:1    0   256M  0 part /mnt/boot/efi
+|-sda2   8:2    0 409.3G  0 part /mnt/boot
+|                                /mnt/etc
+|                                /mnt/var
+|                                /mnt/home
+|                                /mnt/.snapshots
+|                                /mnt
+`-sda3   8:3    0 409.6G  0 part
+sr0     11:0    1 795.3M  0 rom  /run/archiso/bootmnt
+root has logged off pts/0 from tmux(1010).
+root@archiso ~/ashos-dev (git)-[debian] # vim /mnt/boot/efi/EFI/fedora/grub.cfg
+root has logged on pts/0 from tmux(1010).
+root@archiso ~/ashos-dev (git)-[debian] # vim /mnt/boot/grub2/grub.cfg
+root@archiso ~/ashos-dev (git)-[debian] # efibootmgr
+BootCurrent: 0001
+Timeout: 0 seconds
+BootOrder: 0000,0001,0003,0002
+Boot0000* UiApp
+Boot0001* UEFI VBOX CD-ROM VB2-01700376
+Boot0002* UEFI VBOX HARDDISK VBd84c6635-8859033f
+Boot0003* EFI Internal Shell
+root@archiso ~/ashos-dev (git)-[debian] # mkdir -p /mnt/boot/grub2/BAK
+root@archiso ~/ashos-dev (git)-[debian] # xxxxchroot /mnt grub2-mkconfig /dev/sda -o /boot/grub2/grub.cfg
+zsh: command not found: xxxxchroot
+127 root@archiso ~/ashos-dev (git)-[debian] # cp /mnt/boot/grub2/grub.cfg /mnt/boot/grub2/BAK/grub.cfg
+root@archiso ~/ashos-dev (git)-[debian] # chroot /mnt grub2-mkconfig /dev/sda -o /boot/grub2/grub.cfg
+chroot: failed to run command 'grub2-mkconfig': No such file or directory
+127 root@archiso ~/ashos-dev (git)-[debian] # chroot /mnt /bin/bash grub2-mkconfig /dev/sda -o /boot/grub2/grub.cfg
+/bin/bash: grub2-mkconfig: No such file or directory
+127 root@archiso ~/ashos-dev (git)-[debian] # chroot /mnt /bin/bash -c "grub2-mkconfig /dev/sda -o /boot/grub2/grub.cfg"
+/bin/bash: line 1: grub2-mkconfig: command not found
+127 root@archiso ~/ashos-dev (git)-[debian] # chroot /mnt /usr/sbin/grub2-mkconfig /dev/sda -o /boot/grub2/grub.cfg
+Generating grub configuration file ...
+/usr/bin/os-prober: line 91: blkid: command not found
+/usr/bin/os-prober: line 172: blkid: command not found
+/usr/bin/os-prober: line 172: blkid: command not found
+/usr/bin/os-prober: line 172: blkid: command not found
+Adding boot menu entry for UEFI Firmware Settings ...
+done
+root@archiso ~/ashos-dev (git)-[debian] # chroot /mnt
+chroot: failed to run command '/usr/bin/zsh': No such file or directory
+127 root@archiso ~/ashos-dev (git)-[debian] # chroot /mnt /bin/bash
+bash-5.1# exit
+exit
+root@archiso ~/ashos-dev (git)-[debian] # vim /mnt/etc/login.defs
+root@archiso ~/ashos-dev (git)-[debian] # vim /mnt/etc/login.defs
+root@archiso ~/ashos-dev (git)-[debian] # chroot /mnt /bin/bash
+bash-5.1# blkid
+bash: blkid: command not found
+bash-5.1# sudo blkid
+/dev/sda2: LABEL="LINUX" UUID="5c7f0167-3735-4a85-9a10-ed6585fa7dee" UUID_SUB="d3470265-d085-4b33-8fd3-150a71b47982" BLOCK_SIZE="4096" TYPE="btrfs" PARTLABEL="primary" PARTUUID="d74fbb80-0ad4-42b8-910e-8bd6dab5cedb"
+/dev/sda1: LABEL_FATBOOT="EFI" LABEL="EFI" UUID="D916-8905" BLOCK_SIZE="512" TYPE="vfat" PARTLABEL="ESP" PARTUUID="7d63ad74-5550-42ca-b786-e7ce0d24b9e6"
+/dev/sr0: BLOCK_SIZE="2048" UUID="2022-07-01-13-20-00-00" LABEL="ARCH_202207" TYPE="iso9660" PTUUID="2a588529" PTTYPE="dos"
+/dev/loop0: TYPE="squashfs"
+/dev/sda3: PARTLABEL="primary" PARTUUID="834ebfab-271d-4878-b607-63cb326ba7b4"
+bash-5.1# su
+su          sudo        sudoedit    sudoreplay  sum         suspend
+bash-5.1# exit
+exit
+root@archiso ~/ashos-dev (git)-[debian] # chroot /mnt sudo /usr/sbin/grub2-mkconfig /dev/sda -o /boot/grub2/grub.cfg
+Generating grub configuration file ...
+Adding boot menu entry for UEFI Firmware Settings ...
+done
+root@archiso ~/ashos-dev (git)-[debian] # vim /mnt/boot/grub2/grub.cfg
+root@archiso ~/ashos-dev (git)-[debian] # chroot /mnt /bin/bash
+bash-5.1# grub2-
+grub2-editenv          grub2-menulst2cfg      grub2-mkpasswd-pbkdf2  grub2-mount
+grub2-file             grub2-mkimage          grub2-mkrelpath        grub2-script-check
+bash-5.1# grubby
+bash: grubby: command not found
+bash-5.1# sudo grubby --help
+Usage: grubby [OPTION...]
+      --add-kernel=kernel-path            add an entry for the specified kernel
+      --args=args                         default arguments for the new kernel or new arguments for kernel being updated)
+      --bad-image-okay                    don't sanity check images in boot entries (for testing only)
+  -c, --config-file=path                  path to grub config file to update ("-" for stdin)
+      --copy-default                      use the default boot entry as a template for the new entry being added; if the default is not a linux image, or if the kernel referenced by the default image does not exist, the
+                                          first linux entry whose kernel does exist is used as the template
+      --default-kernel                    display the path of the default kernel
+      --default-index                     display the index of the default kernel
+      --default-title                     display the title of the default kernel
+      --env=path                          path for environment data
+      --grub2                             configure grub2 bootloader
+      --info=kernel-path                  display boot information for specified kernel
+      --initrd=initrd-path                initrd image for the new kernel
+  -i, --extra-initrd=initrd-path          auxiliary initrd image for things other than the new kernel
+      --make-default                      make the newly added entry the default boot entry
+      --remove-args=STRING                remove kernel arguments
+      --remove-kernel=kernel-path         remove all entries for the specified kernel
+      --set-default=kernel-path           make the first entry referencing the specified kernel the default
+      --set-default-index=entry-index     make the given entry index the default entry
+      --title=entry-title                 title to use for the new kernel entry
+      --update-kernel=kernel-path         updated information for the specified kernel
+      --zipl                              configure zipl bootloader
+  -b, --bls-directory                     path to directory containing the BootLoaderSpec fragment files
+      --no-etc-grub-update                don't update the GRUB_CMDLINE_LINUX variable in /etc/default/grub
+
+Help options:
+  -h, --help                              Show this help message
+
+bash-5.1# exit
+exit
+root@archiso ~/ashos-dev (git)-[debian] # vim /mnt/etc/login.defs
+root@archiso ~/ashos-dev (git)-[debian] # chroot /mnt /bin/bash
+bash-5.1# blkid
+bash: blkid: command not found
+bash-5.1# sudo blkid
+/dev/sda2: LABEL="LINUX" UUID="5c7f0167-3735-4a85-9a10-ed6585fa7dee" UUID_SUB="d3470265-d085-4b33-8fd3-150a71b47982" BLOCK_SIZE="4096" TYPE="btrfs" PARTLABEL="primary" PARTUUID="d74fbb80-0ad4-42b8-910e-8bd6dab5cedb"
+/dev/sda1: LABEL_FATBOOT="EFI" LABEL="EFI" UUID="D916-8905" BLOCK_SIZE="512" TYPE="vfat" PARTLABEL="ESP" PARTUUID="7d63ad74-5550-42ca-b786-e7ce0d24b9e6"
+/dev/sr0: BLOCK_SIZE="2048" UUID="2022-07-01-13-20-00-00" LABEL="ARCH_202207" TYPE="iso9660" PTUUID="2a588529" PTTYPE="dos"
+/dev/loop0: TYPE="squashfs"
+/dev/sda3: PARTLABEL="primary" PARTUUID="834ebfab-271d-4878-b607-63cb326ba7b4"
+bash-5.1# exit
+exit
+root@archiso ~/ashos-dev (git)-[debian] # chroot /mnt /bin/bash
+bash-5.1# users
+root root root root
+bash-5.1# ls -al /boot/
+.vmlinuz-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64.hmac
+System.map-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64
+config-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64
+efi/
+grub2/
+initramfs-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64.img
+loader/
+symvers-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64.gz
+vmlinuz-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64
+bash-5.1# ls -al /boot
+total 36965
+dr-xr-xr-x 1 root root      770 Jul 15 04:11 .
+dr-xr-xr-x 1 root root      158 Jul 15 03:27 ..
+-rw-r--r-- 1 root root      190 Jul 13 14:51 .vmlinuz-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64.hmac
+-rw------- 1 root root  6594807 Jul 13 14:53 System.map-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64
+-rw-r--r-- 1 root root   250286 Jul 13 14:53 config-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64
+drwxr-xr-x 3 root root      512 Jan  1  1970 efi
+drwx------ 1 root root       46 Jul 15 05:25 grub2
+-rw------- 1 root root 17702291 Jul 15 04:11 initramfs-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64.img
+drwxr-xr-x 1 root root       14 Jul 15 04:08 loader
+lrwxrwxrwx 1 root root       75 Jul 15 04:10 symvers-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64.gz -> /lib/modules/5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64/symvers.gz
+-rwxr-xr-x 1 root root 13286416 Jul 13 14:53 vmlinuz-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64
+bash-5.1# ls -al /etc/grub
+grub.d/        grub2-efi.cfg  grub2.cfg
+bash-5.1# ls -al /etc/grub.d/
+00_header              10_linux               14_menu_show_once      30_os-prober           41_custom
+01_users               10_reset_boot_success  20_linux_xen           30_uefi-firmware       README
+08_fallback_counting   12_menu_auto_hide      20_ppc_terminfo        40_custom
+bash-5.1# ls -al /etc/grub.d/
+total 104
+drwx------ 1 root root   358 Jul 15 03:27 .
+drwxr-xr-x 1 root root  2156 Jul 15 05:30 ..
+-rwxr-xr-x 1 root root  9346 Jun  7 17:30 00_header
+-rwxr-xr-x 1 root root   236 Jun  7 17:30 01_users
+-rwxr-xr-x 1 root root   835 Jun  7 17:30 08_fallback_counting
+-rwxr-xr-x 1 root root 18938 Jun  7 17:30 10_linux
+-rwxr-xr-x 1 root root   833 Jun  7 17:30 10_reset_boot_success
+-rwxr-xr-x 1 root root   892 Jun  7 17:30 12_menu_auto_hide
+-rwxr-xr-x 1 root root   410 Jun  7 17:30 14_menu_show_once
+-rwxr-xr-x 1 root root 13613 Jun  7 17:30 20_linux_xen
+-rwxr-xr-x 1 root root  2562 Jun  7 17:30 20_ppc_terminfo
+-rwxr-xr-x 1 root root 10869 Jun  7 17:30 30_os-prober
+-rwxr-xr-x 1 root root  1122 Jun  7 17:30 30_uefi-firmware
+-rwxr-xr-x 1 root root   218 Jun  7 17:30 40_custom
+-rwxr-xr-x 1 root root   219 Jun  7 17:30 41_custom
+-rw-r--r-- 1 root root   483 Jun  7 17:30 README
+bash-5.1# cd /etc/grub.d/
+bash-5.1# nano 10_linux
+bash-5.1# sudo grubby --default-kernel
+/boot/@boot_fedora/vmlinuz-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64
+bash-5.1# sudo grubby --info=ALL
+index=0
+kernel="/boot/@boot_fedora/vmlinuz-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64"
+args="ro rootflags=subvol=@_fedora"
+root="UUID=5c7f0167-3735-4a85-9a10-ed6585fa7dee"
+initrd="/boot/@boot_fedora/initramfs-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64.img"
+title="Fedora Linux (ashos) (5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64) 37 (Rawhide Prerelease)"
+id="5c2e0517574f42e5be46cc2a32207db3-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64"
+bash-5.1# exit
+exit
+root@archiso ~/ashos-dev (git)-[debian] # vim /mnt/etc/grub.d/40_custom
+root@archiso ~/ashos-dev (git)-[debian] # vim /mnt/etc/grub.d/41_custom
+root@archiso ~/ashos-dev (git)-[debian] # vim /mnt/etc/grub.d/10_linux
+root@archiso ~/ashos-dev (git)-[debian] # vim /mnt/etc/grub.d/01_users
+root@archiso ~/ashos-dev (git)-[debian] # vim /mnt/etc/grub.d/30_os-prober
+root@archiso ~/ashos-dev (git)-[debian] # vim /mnt/etc/grub.d/30_uefi-firmware
+root@archiso ~/ashos-dev (git)-[debian] # vim /mnt/etc/grub2-efi.cfg
+root has logged on pts/3 from tmux(1010).
+root@archiso ~/ashos-dev (git)-[debian] # vim /mnt/etc/grub2.cfg
+root@archiso ~/ashos-dev (git)-[debian] # vim /mnt/etc/os-release
+root@archiso ~/ashos-dev (git)-[debian] # vim /mnt/etc/os-release
+root@archiso ~/ashos-dev (git)-[debian] # grep -r "ashos" /mnt/etc/
+/mnt/etc/os-release:NAME="Fedora Linux (ashos)"
+/mnt/etc/os-release:ID=fedora_ashos
+/mnt/etc/os-release:PRETTY_NAME="Fedora Linux (ashos) 37 (Rawhide Prerelease)"
+root@archiso ~/ashos-dev (git)-[debian] # grep -r "ashos" /mnt/
+/mnt/.snapshots/ast/ast:    if "ashos" in distro:
+/mnt/.snapshots/ast/ast:        return f'_{distro.replace("_ashos","")}'
+/mnt/var/log/dnf.log:2022-07-15T03:24:04+0000 DEBUG repo: downloading from remote: ashos
+/mnt/var/log/dnf.log:2022-07-15T03:24:56+0000 DEBUG ashos: using metadata from Thu Jul 14 07:56:51 2022.
+/mnt/var/log/dnf.log: dnf                                       noarch             4.13.0-2.fc37                             ashos             453 k
+/mnt/var/log/dnf.log: alternatives                              x86_64             1.19-2.fc36                               ashos              36 k
+/mnt/var/log/dnf.log: audit-libs                                x86_64             3.0.8-2.fc37                              ashos             116 k
+/mnt/var/log/dnf.log: authselect                                x86_64             1.4.0-1.fc37                              ashos             139 k
+/mnt/var/log/dnf.log: authselect-libs                           x86_64             1.4.0-1.fc37                              ashos             234 k
+/mnt/var/log/dnf.log: basesystem                                noarch             11-13.fc36                                ashos             7.0 k
+/mnt/var/log/dnf.log: bash                                      x86_64             5.1.16-2.fc36                             ashos             1.7 M
+/mnt/var/log/dnf.log: bzip2-libs                                x86_64             1.0.8-11.fc36                             ashos              41 k
+/mnt/var/log/dnf.log: ca-certificates                           noarch             2021.2.52-3.fc36                          ashos             367 k
+/mnt/var/log/dnf.log: coreutils                                 x86_64             9.1-2.fc37                                ashos             1.1 M
+/mnt/var/log/dnf.log: coreutils-common                          x86_64             9.1-2.fc37                                ashos             2.0 M
+/mnt/var/log/dnf.log: cpio                                      x86_64             2.13-12.fc36                              ashos             270 k
+/mnt/var/log/dnf.log: cracklib                                  x86_64             2.9.6-28.fc36                             ashos              81 k
+/mnt/var/log/dnf.log: crypto-policies                           noarch             20220428-2.gitdfb10ea.fc37                ashos              60 k
+/mnt/var/log/dnf.log: curl                                      x86_64             7.84.0-1.fc37                             ashos             313 k
+/mnt/var/log/dnf.log: cyrus-sasl-lib                            x86_64             2.1.28-1.fc37                             ashos             793 k
+/mnt/var/log/dnf.log: dbus                                      x86_64             1:1.14.0-2.fc37                           ashos             7.4 k
+/mnt/var/log/dnf.log: dbus-broker                               x86_64             31-1.fc37                                 ashos             176 k
+/mnt/var/log/dnf.log: dbus-common                               noarch             1:1.14.0-2.fc37                           ashos              14 k
+/mnt/var/log/dnf.log: dbus-libs                                 x86_64             1:1.14.0-2.fc37                           ashos             155 k
+/mnt/var/log/dnf.log: device-mapper                             x86_64             1.02.175-8.fc37                           ashos             138 k
+/mnt/var/log/dnf.log: device-mapper-libs                        x86_64             1.02.175-8.fc37                           ashos             177 k
+/mnt/var/log/dnf.log: dnf-data                                  noarch             4.13.0-2.fc37                             ashos              42 k
+/mnt/var/log/dnf.log: dracut                                    x86_64             056-2.fc37                                ashos             360 k
+/mnt/var/log/dnf.log: elfutils-default-yama-scope               noarch             0.187-5.fc37                              ashos              17 k
+/mnt/var/log/dnf.log: elfutils-libelf                           x86_64             0.187-5.fc37                              ashos             197 k
+/mnt/var/log/dnf.log: elfutils-libs                             x86_64             0.187-5.fc37                              ashos             257 k
+/mnt/var/log/dnf.log: expat                                     x86_64             2.4.8-1.fc37                              ashos             109 k
+/mnt/var/log/dnf.log: fedora-gpg-keys                           noarch             37-0.2                                    ashos             114 k
+/mnt/var/log/dnf.log: fedora-release                            noarch             37-0.7                                    ashos              11 k
+/mnt/var/log/dnf.log: fedora-release-common                     noarch             37-0.7                                    ashos              22 k
+/mnt/var/log/dnf.log: fedora-release-identity-basic             noarch             37-0.7                                    ashos              12 k
+/mnt/var/log/dnf.log: fedora-repos                              noarch             37-0.2                                    ashos              10 k
+/mnt/var/log/dnf.log: fedora-repos-rawhide                      noarch             37-0.2                                    ashos             9.8 k
+/mnt/var/log/dnf.log: file                                      x86_64             5.41-6.fc37                               ashos              48 k
+/mnt/var/log/dnf.log: file-libs                                 x86_64             5.41-6.fc37                               ashos             634 k
+/mnt/var/log/dnf.log: filesystem                                x86_64             3.16-2.fc36                               ashos             1.1 M
+/mnt/var/log/dnf.log: findutils                                 x86_64             1:4.9.0-1.fc36                            ashos             483 k
+/mnt/var/log/dnf.log: fuse-libs                                 x86_64             2.9.9-14.fc36                             ashos              97 k
+/mnt/var/log/dnf.log: gawk                                      x86_64             5.1.1-3.fc37                              ashos             1.0 M
+/mnt/var/log/dnf.log: gdbm-libs                                 x86_64             1:1.23-1.fc37                             ashos              56 k
+/mnt/var/log/dnf.log: gettext                                   x86_64             0.21-15.fc37.0.20220203                   ashos             1.1 M
+/mnt/var/log/dnf.log: gettext-libs                              x86_64             0.21-15.fc37.0.20220203                   ashos             322 k
+/mnt/var/log/dnf.log: glib2                                     x86_64             2.73.1-2.fc37                             ashos             2.7 M
+/mnt/var/log/dnf.log: glibc                                     x86_64             2.35.9000-29.fc37                         ashos             2.1 M
+/mnt/var/log/dnf.log: glibc-common                              x86_64             2.35.9000-29.fc37                         ashos             349 k
+/mnt/var/log/dnf.log: glibc-minimal-langpack                    x86_64             2.35.9000-29.fc37                         ashos              76 k
+/mnt/var/log/dnf.log: gmp                                       x86_64             1:6.2.1-2.fc36                            ashos             315 k
+/mnt/var/log/dnf.log: gnupg2                                    x86_64             2.3.7-1.fc37                              ashos             2.5 M
+/mnt/var/log/dnf.log: gnutls                                    x86_64             3.7.6-4.fc37                              ashos             1.1 M
+/mnt/var/log/dnf.log: gpgme                                     x86_64             1.17.0-3.fc37                             ashos             210 k
+/mnt/var/log/dnf.log: grep                                      x86_64             3.7-2.fc36                                ashos             263 k
+/mnt/var/log/dnf.log: grub2-common                              noarch             1:2.06-42.fc37                            ashos             907 k
+/mnt/var/log/dnf.log: grub2-tools                               x86_64             1:2.06-42.fc37                            ashos             1.8 M
+/mnt/var/log/dnf.log: grub2-tools-minimal                       x86_64             1:2.06-42.fc37                            ashos             606 k
+/mnt/var/log/dnf.log: gzip                                      x86_64             1.12-1.fc37                               ashos             159 k
+/mnt/var/log/dnf.log: ima-evm-utils                             x86_64             1.4-5.fc36                                ashos              63 k
+/mnt/var/log/dnf.log: json-c                                    x86_64             0.16-1.fc37                               ashos              42 k
+/mnt/var/log/dnf.log: kbd                                       x86_64             2.5.1-1.fc37                              ashos             409 k
+/mnt/var/log/dnf.log: kbd-misc                                  noarch             2.5.1-1.fc37                              ashos             1.5 M
+/mnt/var/log/dnf.log: keyutils-libs                             x86_64             1.6.1-4.fc36                              ashos              31 k
+/mnt/var/log/dnf.log: kmod                                      x86_64             30-1.fc37                                 ashos             120 k
+/mnt/var/log/dnf.log: kmod-libs                                 x86_64             30-1.fc37                                 ashos              68 k
+/mnt/var/log/dnf.log: krb5-libs                                 x86_64             1.19.2-11.fc37                            ashos             723 k
+/mnt/var/log/dnf.log: libacl                                    x86_64             2.3.1-3.fc36                              ashos              24 k
+/mnt/var/log/dnf.log: libarchive                                x86_64             3.6.1-1.fc37                              ashos             397 k
+/mnt/var/log/dnf.log: libargon2                                 x86_64             20171227-9.fc37                           ashos              28 k
+/mnt/var/log/dnf.log: libassuan                                 x86_64             2.5.5-4.fc36                              ashos              67 k
+/mnt/var/log/dnf.log: libattr                                   x86_64             2.5.1-4.fc36                              ashos              18 k
+/mnt/var/log/dnf.log: libb2                                     x86_64             0.98.1-6.fc37                             ashos              25 k
+/mnt/var/log/dnf.log: libblkid                                  x86_64             2.38-4.fc37                               ashos             107 k
+/mnt/var/log/dnf.log: libbrotli                                 x86_64             1.0.9-8.fc37                              ashos             315 k
+/mnt/var/log/dnf.log: libcap                                    x86_64             2.48-4.fc36                               ashos              67 k
+/mnt/var/log/dnf.log: libcap-ng                                 x86_64             0.8.3-2.fc37                              ashos              33 k
+/mnt/var/log/dnf.log: libcbor                                   x86_64             0.7.0-5.fc36                              ashos              56 k
+/mnt/var/log/dnf.log: libcom_err                                x86_64             1.46.5-2.fc36                             ashos              25 k
+/mnt/var/log/dnf.log: libcomps                                  x86_64             0.1.18-3.fc37                             ashos              76 k
+/mnt/var/log/dnf.log: libcurl                                   x86_64             7.84.0-1.fc37                             ashos             306 k
+/mnt/var/log/dnf.log: libdb                                     x86_64             5.3.28-52.fc37                            ashos             764 k
+/mnt/var/log/dnf.log: libdnf                                    x86_64             0.67.0-3.fc37                             ashos             662 k
+/mnt/var/log/dnf.log: libeconf                                  x86_64             0.4.0-3.fc36                              ashos              27 k
+/mnt/var/log/dnf.log: libevent                                  x86_64             2.1.12-6.fc36                             ashos             261 k
+/mnt/var/log/dnf.log: libfdisk                                  x86_64             2.38-4.fc37                               ashos             160 k
+/mnt/var/log/dnf.log: libffi                                    x86_64             3.4.2-8.fc36                              ashos              37 k
+/mnt/var/log/dnf.log: libfsverity                               x86_64             1.4-7.fc36                                ashos              19 k
+/mnt/var/log/dnf.log: libgcc                                    x86_64             12.1.1-3.fc37                             ashos             105 k
+/mnt/var/log/dnf.log: libgcrypt                                 x86_64             1.10.1-3.fc37                             ashos             511 k
+/mnt/var/log/dnf.log: libgomp                                   x86_64             12.1.1-3.fc37                             ashos             292 k
+/mnt/var/log/dnf.log: libgpg-error                              x86_64             1.45-1.fc37                               ashos             221 k
+/mnt/var/log/dnf.log: libicu                                    x86_64             69.1-6.fc37                               ashos             9.8 M
+/mnt/var/log/dnf.log: libidn2                                   x86_64             2.3.3-1.fc37                              ashos             107 k
+/mnt/var/log/dnf.log: libkcapi                                  x86_64             1.3.1-4.fc36                              ashos              46 k
+/mnt/var/log/dnf.log: libkcapi-hmaccalc                         x86_64             1.3.1-4.fc36                              ashos              24 k
+/mnt/var/log/dnf.log: libksba                                   x86_64             1.6.0-3.fc36                              ashos             157 k
+/mnt/var/log/dnf.log: libmodulemd                               x86_64             2.14.0-3.fc37                             ashos             234 k
+/mnt/var/log/dnf.log: libmount                                  x86_64             2.38-4.fc37                               ashos             135 k
+/mnt/var/log/dnf.log: libnghttp2                                x86_64             1.48.0-1.fc37                             ashos              75 k
+/mnt/var/log/dnf.log: libnsl2                                   x86_64             2.0.0-3.fc36                              ashos              30 k
+/mnt/var/log/dnf.log: libpsl                                    x86_64             0.21.1-5.fc36                             ashos              64 k
+/mnt/var/log/dnf.log: librepo                                   x86_64             1.14.3-2.fc37                             ashos              94 k
+/mnt/var/log/dnf.log: libreport-filesystem                      noarch             2.17.1-2.fc37                             ashos              13 k
+/mnt/var/log/dnf.log: libseccomp                                x86_64             2.5.3-2.fc36                              ashos              70 k
+/mnt/var/log/dnf.log: libsecret                                 x86_64             0.20.5-1.fc37                             ashos             185 k
+/mnt/var/log/dnf.log: libselinux                                x86_64             3.4-4.fc37                                ashos              86 k
+/mnt/var/log/dnf.log: libsemanage                               x86_64             3.4-3.fc37                                ashos             120 k
+/mnt/var/log/dnf.log: libsepol                                  x86_64             3.4-2.fc37                                ashos             322 k
+/mnt/var/log/dnf.log: libsigsegv                                x86_64             2.14-2.fc36                               ashos              27 k
+/mnt/var/log/dnf.log: libsmartcols                              x86_64             2.38-4.fc37                               ashos              64 k
+/mnt/var/log/dnf.log: libsolv                                   x86_64             0.7.22-2.fc37                             ashos             405 k
+/mnt/var/log/dnf.log: libssh                                    x86_64             0.9.6-4.fc36                              ashos             203 k
+/mnt/var/log/dnf.log: libssh-config                             noarch             0.9.6-4.fc36                              ashos             7.6 k
+/mnt/var/log/dnf.log: libstdc++                                 x86_64             12.1.1-3.fc37                             ashos             798 k
+/mnt/var/log/dnf.log: libtasn1                                  x86_64             4.18.0-2.fc36                             ashos              75 k
+/mnt/var/log/dnf.log: libtirpc                                  x86_64             1.3.2-1.rc1.fc36.1                        ashos              94 k
+/mnt/var/log/dnf.log: libunistring                              x86_64             1.0-1.fc36                                ashos             551 k
+/mnt/var/log/dnf.log: libusb1                                   x86_64             1.0.25-8.fc37                             ashos              74 k
+/mnt/var/log/dnf.log: libutempter                               x86_64             1.2.1-6.fc36                              ashos              26 k
+/mnt/var/log/dnf.log: libuuid                                   x86_64             2.38-4.fc37                               ashos              28 k
+/mnt/var/log/dnf.log: libverto                                  x86_64             0.3.2-3.fc36                              ashos              21 k
+/mnt/var/log/dnf.log: libxcrypt                                 x86_64             4.4.28-1.fc37                             ashos             119 k
+/mnt/var/log/dnf.log: libxml2                                   x86_64             2.9.14-2.fc37                             ashos             753 k
+/mnt/var/log/dnf.log: libyaml                                   x86_64             0.2.5-7.fc36                              ashos              60 k
+/mnt/var/log/dnf.log: libzstd                                   x86_64             1.5.2-2.fc37                              ashos             294 k
+/mnt/var/log/dnf.log: lua-libs                                  x86_64             5.4.4-2.fc37                              ashos             217 k
+/mnt/var/log/dnf.log: lz4-libs                                  x86_64             1.9.3-4.fc36                              ashos              70 k
+/mnt/var/log/dnf.log: mozjs91                                   x86_64             91.11.0-2.fc37                            ashos             4.4 M
+/mnt/var/log/dnf.log: mpdecimal                                 x86_64             2.5.1-3.fc36                              ashos             102 k
+/mnt/var/log/dnf.log: mpfr                                      x86_64             4.1.0-9.fc36                              ashos             333 k
+/mnt/var/log/dnf.log: ncurses-base                              noarch             6.3-2.20220501.fc37                       ashos              61 k
+/mnt/var/log/dnf.log: ncurses-libs                              x86_64             6.3-2.20220501.fc37                       ashos             328 k
+/mnt/var/log/dnf.log: nettle                                    x86_64             3.8-1.fc37                                ashos             414 k
+/mnt/var/log/dnf.log: npth                                      x86_64             1.6-8.fc36                                ashos              24 k
+/mnt/var/log/dnf.log: openldap                                  x86_64             2.6.2-3.fc37                              ashos             254 k
+/mnt/var/log/dnf.log: openssl-libs                              x86_64             1:3.0.5-1.fc37                            ashos             2.1 M
+/mnt/var/log/dnf.log: os-prober                                 x86_64             1.77-9.fc36                               ashos              43 k
+/mnt/var/log/dnf.log: p11-kit                                   x86_64             0.24.1-2.fc36                             ashos             362 k
+/mnt/var/log/dnf.log: p11-kit-trust                             x86_64             0.24.1-2.fc36                             ashos             138 k
+/mnt/var/log/dnf.log: pam                                       x86_64             1.5.2-12.fc37                             ashos             519 k
+/mnt/var/log/dnf.log: pam-libs                                  x86_64             1.5.2-12.fc37                             ashos              59 k
+/mnt/var/log/dnf.log: pcre                                      x86_64             8.45-1.fc36.1                             ashos             203 k
+/mnt/var/log/dnf.log: pcre2                                     x86_64             10.40-1.fc37                              ashos             237 k
+/mnt/var/log/dnf.log: pcre2-syntax                              noarch             10.40-1.fc37                              ashos             143 k
+/mnt/var/log/dnf.log: pcsc-lite                                 x86_64             1.9.8-1.fc37                              ashos              94 k
+/mnt/var/log/dnf.log: pcsc-lite-libs                            x86_64             1.9.8-1.fc37                              ashos              28 k
+/mnt/var/log/dnf.log: polkit                                    x86_64             0.120-5.fc37                              ashos             146 k
+/mnt/var/log/dnf.log: polkit-libs                               x86_64             0.120-5.fc37                              ashos              65 k
+/mnt/var/log/dnf.log: polkit-pkla-compat                        x86_64             0.1-21.fc36                               ashos              44 k
+/mnt/var/log/dnf.log: popt                                      x86_64             1.19~rc1-2.fc37                           ashos              58 k
+/mnt/var/log/dnf.log: procps-ng                                 x86_64             3.3.17-5.fc37                             ashos             330 k
+/mnt/var/log/dnf.log: protobuf-c                                x86_64             1.4.0-5.fc37                              ashos              36 k
+/mnt/var/log/dnf.log: publicsuffix-list-dafsa                   noarch             20210518-4.fc36                           ashos              58 k
+/mnt/var/log/dnf.log: python-pip-wheel                          noarch             22.0.4-4.fc37                             ashos             1.5 M
+/mnt/var/log/dnf.log: python-setuptools-wheel                   noarch             62.6.0-1.fc37                             ashos             712 k
+/mnt/var/log/dnf.log: python3                                   x86_64             3.11.0~b4-1.fc37                          ashos              27 k
+/mnt/var/log/dnf.log: python3-dnf                               noarch             4.13.0-2.fc37                             ashos             570 k
+/mnt/var/log/dnf.log: python3-gpg                               x86_64             1.17.0-3.fc37                             ashos             284 k
+/mnt/var/log/dnf.log: python3-hawkey                            x86_64             0.67.0-3.fc37                             ashos             108 k
+/mnt/var/log/dnf.log: python3-libcomps                          x86_64             0.1.18-3.fc37                             ashos              48 k
+/mnt/var/log/dnf.log: python3-libdnf                            x86_64             0.67.0-3.fc37                             ashos             811 k
+/mnt/var/log/dnf.log: python3-libs                              x86_64             3.11.0~b4-1.fc37                          ashos             9.3 M
+/mnt/var/log/dnf.log: python3-rpm                               x86_64             4.18.0-0.beta1.2.fc37                     ashos              93 k
+/mnt/var/log/dnf.log: readline                                  x86_64             8.1-6.fc36                                ashos             211 k
+/mnt/var/log/dnf.log: rpm                                       x86_64             4.18.0-0.beta1.2.fc37                     ashos             543 k
+/mnt/var/log/dnf.log: rpm-build-libs                            x86_64             4.18.0-0.beta1.2.fc37                     ashos              94 k
+/mnt/var/log/dnf.log: rpm-libs                                  x86_64             4.18.0-0.beta1.2.fc37                     ashos             319 k
+/mnt/var/log/dnf.log: rpm-sign-libs                             x86_64             4.18.0-0.beta1.2.fc37                     ashos              26 k
+/mnt/var/log/dnf.log: sed                                       x86_64             4.8-10.fc36                               ashos             297 k
+/mnt/var/log/dnf.log: setup                                     noarch             2.13.10-1.fc37                            ashos             143 k
+/mnt/var/log/dnf.log: shadow-utils                              x86_64             2:4.11.1-2.fc37                           ashos             1.1 M
+/mnt/var/log/dnf.log: sqlite-libs                               x86_64             3.39.0-1.fc37                             ashos             657 k
+/mnt/var/log/dnf.log: systemd-libs                              x86_64             251.2-1.fc37                              ashos             624 k
+/mnt/var/log/dnf.log: systemd-pam                               x86_64             251.2-1.fc37                              ashos             335 k
+/mnt/var/log/dnf.log: systemd-udev                              x86_64             251.2-1.fc37                              ashos             2.0 M
+/mnt/var/log/dnf.log: tpm2-tss                                  x86_64             3.2.0-1.fc37                              ashos             596 k
+/mnt/var/log/dnf.log: tzdata                                    noarch             2022a-2.fc37                              ashos             435 k
+/mnt/var/log/dnf.log: unbound-libs                              x86_64             1.16.0-6.fc37                             ashos             518 k
+/mnt/var/log/dnf.log: util-linux                                x86_64             2.38-4.fc37                               ashos             2.3 M
+/mnt/var/log/dnf.log: util-linux-core                           x86_64             2.38-4.fc37                               ashos             454 k
+/mnt/var/log/dnf.log: whois-nls                                 noarch             5.5.13-1.fc37                             ashos              35 k
+/mnt/var/log/dnf.log: xkeyboard-config                          noarch             2.36-1.fc37                               ashos             901 k
+/mnt/var/log/dnf.log: xz                                        x86_64             5.2.5-9.fc37                              ashos             214 k
+/mnt/var/log/dnf.log: xz-libs                                   x86_64             5.2.5-9.fc37                              ashos              92 k
+/mnt/var/log/dnf.log: zchunk-libs                               x86_64             1.2.2-1.fc37                              ashos              51 k
+/mnt/var/log/dnf.log: zlib                                      x86_64             1.2.12-3.fc37                             ashos              94 k
+/mnt/var/log/dnf.log: crypto-policies-scripts                   noarch             20220428-2.gitdfb10ea.fc37                ashos              99 k
+/mnt/var/log/dnf.log: cryptsetup-libs                           x86_64             2.4.3-2.fc36                              ashos             432 k
+/mnt/var/log/dnf.log: deltarpm                                  x86_64             3.6.3-3.fc37                              ashos              89 k
+/mnt/var/log/dnf.log: diffutils                                 x86_64             3.8-2.fc36                                ashos             370 k
+/mnt/var/log/dnf.log: elfutils-debuginfod-client                x86_64             0.187-5.fc37                              ashos              39 k
+/mnt/var/log/dnf.log: gawk-all-langpacks                        x86_64             5.1.1-3.fc37                              ashos             232 k
+/mnt/var/log/dnf.log: glibc-gconv-extra                         x86_64             2.35.9000-29.fc37                         ashos             1.6 M
+/mnt/var/log/dnf.log: gnupg2-smime                              x86_64             2.3.7-1.fc37                              ashos             248 k
+/mnt/var/log/dnf.log: grubby                                    x86_64             8.40-61.fc37                              ashos              33 k
+/mnt/var/log/dnf.log: kpartx                                    x86_64             0.9.0-1.fc37                              ashos              49 k
+/mnt/var/log/dnf.log: libbpf                                    x86_64             2:0.8.0-1.fc37                            ashos             172 k
+/mnt/var/log/dnf.log: libfido2                                  x86_64             1.11.0-1.fc37                             ashos              96 k
+/mnt/var/log/dnf.log: libpwquality                              x86_64             1.4.4-10.fc37                             ashos             105 k
+/mnt/var/log/dnf.log: libxcrypt-compat                          x86_64             4.4.28-1.fc37                             ashos              90 k
+/mnt/var/log/dnf.log: libxkbcommon                              x86_64             1.4.1-1.fc37                              ashos             140 k
+/mnt/var/log/dnf.log: memstrack                                 x86_64             0.2.4-2.fc36                              ashos              50 k
+/mnt/var/log/dnf.log: mkpasswd                                  x86_64             5.5.13-1.fc37                             ashos              25 k
+/mnt/var/log/dnf.log: openssl-pkcs11                            x86_64             0.4.11-8.fc36                             ashos              74 k
+/mnt/var/log/dnf.log: pcsc-lite-ccid                            x86_64             1.5.0-1.fc36                              ashos             319 k
+/mnt/var/log/dnf.log: pigz                                      x86_64             2.7-1.fc37                                ashos              82 k
+/mnt/var/log/dnf.log: pinentry                                  x86_64             1.2.0-2.fc36                              ashos              98 k
+/mnt/var/log/dnf.log: python-unversioned-command                noarch             3.11.0~b4-1.fc37                          ashos             9.7 k
+/mnt/var/log/dnf.log: python3-unbound                           x86_64             1.16.0-6.fc37                             ashos             109 k
+/mnt/var/log/dnf.log: qrencode-libs                             x86_64             4.1.1-2.fc36                              ashos              61 k
+/mnt/var/log/dnf.log: rpm-plugin-systemd-inhibit                x86_64             4.18.0-0.beta1.2.fc37                     ashos              20 k
+/mnt/var/log/dnf.log: systemd                                   x86_64             251.2-1.fc37                              ashos             4.2 M
+/mnt/var/log/dnf.log: systemd-networkd                          x86_64             251.2-1.fc37                              ashos             555 k
+/mnt/var/log/dnf.log: systemd-resolved                          x86_64             251.2-1.fc37                              ashos             277 k
+/mnt/var/log/dnf.log: unbound-anchor                            x86_64             1.16.0-6.fc37                             ashos              37 k
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libcurl-7.84.0-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libdb-5.3.28-52.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/util-linux-2.38-4.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/xkeyboard-config-2.36-1.fc37.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/ncurses-libs-6.3-2.20220501.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/grub2-tools-2.06-42.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libgcc-12.1.1-3.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libunistring-1.0-1.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/gzip-1.12-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/tpm2-tss-3.2.0-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/pcre-8.45-1.fc36.1.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/grub2-common-2.06-42.fc37.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libstdc++-12.1.1-3.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libcap-ng-0.8.3-2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/basesystem-11-13.fc36.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libssh-config-0.9.6-4.fc36.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/authselect-1.4.0-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/json-c-0.16-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libkcapi-hmaccalc-1.3.1-4.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/audit-libs-3.0.8-2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libsecret-0.20.5-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/dnf-4.13.0-2.fc37.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libverto-0.3.2-3.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/gnutls-3.7.6-4.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libgomp-12.1.1-3.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libfsverity-1.4-7.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libsmartcols-2.38-4.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/lua-libs-5.4.4-2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/filesystem-3.16-2.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/rpm-4.18.0-0.beta1.2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libffi-3.4.2-8.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libtasn1-4.18.0-2.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/systemd-libs-251.2-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libssh-0.9.6-4.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libxml2-2.9.14-2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/sed-4.8-10.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/crypto-policies-20220428-2.gitdfb10ea.fc37.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/rpm-sign-libs-4.18.0-0.beta1.2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/publicsuffix-list-dafsa-20210518-4.fc36.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/kpartx-0.9.0-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/qrencode-libs-4.1.1-2.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libcom_err-1.46.5-2.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/polkit-pkla-compat-0.1-21.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/fedora-release-common-37-0.7.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/dracut-056-2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/python3-libcomps-0.1.18-3.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/python3-unbound-1.16.0-6.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libcap-2.48-4.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/python3-libdnf-0.67.0-3.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/deltarpm-3.6.3-3.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libnghttp2-1.48.0-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/dbus-1.14.0-2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libutempter-1.2.1-6.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libusb1-1.0.25-8.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/kbd-2.5.1-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/readline-8.1-6.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libxcrypt-4.4.28-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/polkit-0.120-5.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libuuid-2.38-4.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libfdisk-2.38-4.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libxcrypt-compat-4.4.28-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/dbus-libs-1.14.0-2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/keyutils-libs-1.6.1-4.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/systemd-resolved-251.2-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/gpgme-1.17.0-3.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/coreutils-9.1-2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/kmod-30-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libgpg-error-1.45-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/glibc-2.35.9000-29.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libfido2-1.11.0-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/openldap-2.6.2-3.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/systemd-251.2-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/systemd-networkd-251.2-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libpwquality-1.4.4-10.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/cracklib-2.9.6-28.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/openssl-libs-3.0.5-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/lz4-libs-1.9.3-4.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/memstrack-0.2.4-2.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/glibc-gconv-extra-2.35.9000-29.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libzstd-1.5.2-2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libmount-2.38-4.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/p11-kit-0.24.1-2.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/python-setuptools-wheel-62.6.0-1.fc37.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/cryptsetup-libs-2.4.3-2.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/fedora-release-identity-basic-37-0.7.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/expat-2.4.8-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/zlib-1.2.12-3.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/zchunk-libs-1.2.2-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/pinentry-1.2.0-2.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/fedora-repos-rawhide-37-0.2.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/shadow-utils-4.11.1-2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/python3-dnf-4.13.0-2.fc37.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/python3-gpg-1.17.0-3.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/nettle-3.8-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/gettext-libs-0.21-15.fc37.0.20220203.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/glibc-minimal-langpack-2.35.9000-29.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libbrotli-1.0.9-8.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libsigsegv-2.14-2.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/ncurses-base-6.3-2.20220501.fc37.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/cpio-2.13-12.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/file-5.41-6.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/pigz-2.7-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libnsl2-2.0.0-3.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/mpdecimal-2.5.1-3.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/kbd-misc-2.5.1-1.fc37.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/unbound-anchor-1.16.0-6.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/fedora-repos-37-0.2.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/procps-ng-3.3.17-5.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/mpfr-4.1.0-9.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/grubby-8.40-61.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libcbor-0.7.0-5.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/file-libs-5.41-6.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/ca-certificates-2021.2.52-3.fc36.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libevent-2.1.12-6.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/systemd-pam-251.2-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/systemd-udev-251.2-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libxkbcommon-1.4.1-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/python-unversioned-command-3.11.0~b4-1.fc37.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/coreutils-common-9.1-2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/dnf-data-4.13.0-2.fc37.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/xz-libs-5.2.5-9.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/setup-2.13.10-1.fc37.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/pcsc-lite-ccid-1.5.0-1.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libsemanage-3.4-3.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/curl-7.84.0-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/elfutils-libs-0.187-5.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libsolv-0.7.22-2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/pam-libs-1.5.2-12.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/bzip2-libs-1.0.8-11.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:36+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/gettext-0.21-15.fc37.0.20220203.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/python-pip-wheel-22.0.4-4.fc37.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/gawk-5.1.1-3.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libmodulemd-2.14.0-3.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/pcsc-lite-1.9.8-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/whois-nls-5.5.13-1.fc37.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/device-mapper-libs-1.02.175-8.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/gdbm-libs-1.23-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libsepol-3.4-2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libassuan-2.5.5-4.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libidn2-2.3.3-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libbpf-0.8.0-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/npth-1.6-8.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/crypto-policies-scripts-20220428-2.gitdfb10ea.fc37.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/fuse-libs-2.9.9-14.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libb2-0.98.1-6.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/authselect-libs-1.4.0-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/protobuf-c-1.4.0-5.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/gnupg2-smime-2.3.7-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/grep-3.7-2.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/openssl-pkcs11-0.4.11-8.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/python3-3.11.0~b4-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libacl-2.3.1-3.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/ima-evm-utils-1.4-5.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libselinux-3.4-4.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/pcsc-lite-libs-1.9.8-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/elfutils-libelf-0.187-5.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/p11-kit-trust-0.24.1-2.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/gnupg2-2.3.7-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/findutils-4.9.0-1.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libyaml-0.2.5-7.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libkcapi-1.3.1-4.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/gmp-6.2.1-2.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/rpm-plugin-systemd-inhibit-4.18.0-0.beta1.2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libpsl-0.21.1-5.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/python3-libs-3.11.0~b4-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/os-prober-1.77-9.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/rpm-build-libs-4.18.0-0.beta1.2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/dbus-common-1.14.0-2.fc37.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/grub2-tools-minimal-2.06-42.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libicu-69.1-6.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libdnf-0.67.0-3.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/glibc-common-2.35.9000-29.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/mkpasswd-5.5.13-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/popt-1.19~rc1-2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/unbound-libs-1.16.0-6.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/xz-5.2.5-9.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libargon2-20171227-9.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libtirpc-1.3.2-1.rc1.fc36.1.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/device-mapper-1.02.175-8.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/glib2-2.73.1-2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/rpm-libs-4.18.0-0.beta1.2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/gawk-all-langpacks-5.1.1-3.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/bash-5.1.16-2.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/python3-rpm-4.18.0-0.beta1.2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/pcre2-syntax-10.40-1.fc37.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/pcre2-10.40-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/python3-hawkey-0.67.0-3.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libeconf-0.4.0-3.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libcomps-0.1.18-3.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/krb5-libs-1.19.2-11.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/kmod-libs-30-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libseccomp-2.5.3-2.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/dbus-broker-31-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/alternatives-1.19-2.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/cyrus-sasl-lib-2.1.28-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libksba-1.6.0-3.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/pam-1.5.2-12.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/polkit-libs-0.120-5.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/diffutils-3.8-2.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/elfutils-debuginfod-client-0.187-5.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libattr-2.5.1-4.fc36.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libarchive-3.6.1-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/elfutils-default-yama-scope-0.187-5.fc37.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/sqlite-libs-3.39.0-1.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libblkid-2.38-4.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/fedora-release-37-0.7.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/util-linux-core-2.38-4.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/mozjs91-91.11.0-2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libreport-filesystem-2.17.1-2.fc37.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/librepo-1.14.3-2.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/libgcrypt-1.10.1-3.fc37.x86_64.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/fedora-gpg-keys-37-0.2.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T03:28:37+0000 DDEBUG /mnt/var/cache/dnf/ashos-f5220a5af1c49f4f/packages/tzdata-2022a-2.fc37.noarch.rpm removed
+/mnt/var/log/dnf.log:2022-07-15T04:08:51+0000 DEBUG User-Agent: constructed: 'libdnf (Fedora Linux (ashos) 37; generic; Linux.x86_64)'
+grep: /mnt/var/lib/dnf/history.sqlite: binary file matches
+grep: /mnt/var/lib/dnf/history.sqlite-wal: binary file matches
+/mnt/etc/os-release:NAME="Fedora Linux (ashos)"
+/mnt/etc/os-release:ID=fedora_ashos
+/mnt/etc/os-release:PRETTY_NAME="Fedora Linux (ashos) 37 (Rawhide Prerelease)"
+/mnt/boot/loader/entries/5c2e0517574f42e5be46cc2a32207db3-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64.conf:title Fedora Linux (ashos) (5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64) 37 (Rawhide Prerelease)
+/mnt/boot/loader/entries/5c2e0517574f42e5be46cc2a32207db3-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64.conf:grub_class fedora_ashos
+grep: /mnt/proc/sys/net/ipv4/route/flush: Permission denied
+grep: /mnt/proc/sys/net/ipv6/conf/all/stable_secret: Input/output error
+grep: /mnt/proc/sys/net/ipv6/conf/default/stable_secret: Input/output error
+grep: /mnt/proc/sys/net/ipv6/conf/enp0s3/stable_secret: Input/output error
+grep: /mnt/proc/sys/net/ipv6/conf/lo/stable_secret: Input/output error
+grep: /mnt/proc/sys/net/ipv6/route/flush: Permission denied
+grep: /mnt/proc/sys/vm/compact_memory: Permission denied
+grep: /mnt/proc/sys/vm/drop_caches: Permission denied
+grep: /mnt/proc/kmsg: Resource temporarily unavailable
+^C
+grep --color=auto -r "ashos" /mnt/  19.73s user 4.80s system 90% cpu 27.220 total
+130 root@archiso ~/ashos-dev (git)-[debian] # vim /mnt/boot/loader/entries/5c2e0517574f42e5be46cc2a32207db3-5.19.0-0.rc6.20220713gitb047602d579b.48.fc37.x86_64.conf
+root@archiso ~/ashos-dev (git)-[debian] #
+
+

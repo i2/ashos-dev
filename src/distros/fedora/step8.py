@@ -145,7 +145,7 @@ def main(args, distro):
     os.system(f"echo '{astpart}' | tee /mnt/.snapshots/ast/part")
 
     os.system("btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
-    os.system("chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
+    os.system("chroot /mnt sudo btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
 
     os.system("cp -r /mnt/root/. /mnt/.snapshots/root/")
     os.system("cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")
