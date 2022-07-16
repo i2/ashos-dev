@@ -218,6 +218,8 @@ def extend_branch(snapshot, desc=""):
     else:
         if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
             immutability = ""
+        else:
+            immutability = "-r"
         i = findnew()
         os.system(f"btrfs sub snap {immutability} /.snapshots/rootfs/snapshot-{snapshot} /.snapshots/rootfs/snapshot-{i} >/dev/null 2>&1")
         #os.system(f"mkdir -p /.snapshots/rootfs/snapshot-{i}/usr/share/ast") ### REVIEW_LATER MOST PROBABLY NOT NEEDED
@@ -236,6 +238,8 @@ def clone_branch(snapshot):
     else:
         if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
             immutability = ""
+        else:
+            immutability = "-r"
         i = findnew()
         os.system(f"btrfs sub snap {immutability} /.snapshots/rootfs/snapshot-{snapshot} /.snapshots/rootfs/snapshot-{i} >/dev/null 2>&1")
         #os.system(f"mkdir -p /.snapshots/rootfs/snapshot-{i}/usr/share/ast") ### REVIEW_LATER MOST PROBABLY NOT NEEDED
@@ -255,6 +259,8 @@ def clone_under(snapshot, branch):
     else:
         if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
             immutability = ""
+        else:
+            immutability = "-r"
         i = findnew()
         os.system(f"btrfs sub snap {immutability} /.snapshots/rootfs/snapshot-{branch} /.snapshots/rootfs/snapshot-{i} >/dev/null 2>&1")
         #os.system(f"mkdir -p /.snapshots/rootfs/snapshot-{i}/usr/share/ast") ### REVIEW_LATER MOST PROBABLY NOT NEEDED
@@ -390,6 +396,8 @@ def clone_as_tree(snapshot):
     else:
         if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
             immutability = ""
+        else:
+            immutability = "-r"
         i = findnew()
         os.system(f"btrfs sub snap {immutability} /.snapshots/rootfs/snapshot-{snapshot} /.snapshots/rootfs/snapshot-{i} >/dev/null 2>&1")
         #os.system(f"mkdir -p /.snapshots/rootfs/snapshot-{i}/usr/share/ast") ### REVIEW_LATER MOST PROBABLY NOT NEEDED
@@ -424,6 +432,8 @@ def update_etc():
     os.system(f"btrfs sub del /.snapshots/etc/etc-{snapshot} >/dev/null 2>&1")
     if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
         immutability = ""
+    else:
+        immutability = "-r"
     os.system(f"btrfs sub snap {immutability} /.snapshots/etc/etc-{tmp} /.snapshots/etc/etc-{snapshot} >/dev/null 2>&1")
 
 #   Update boot
@@ -638,7 +648,9 @@ def posttrans(snapshot):
     os.system(f"btrfs sub del /.snapshots/etc/etc-{etc} >/dev/null 2>&1")
     os.system(f"btrfs sub del /.snapshots/boot/boot-{etc} >/dev/null 2>&1")
     if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
-            immutability = ""
+        immutability = ""
+    else:
+        immutability = "-r"
     os.system(f"btrfs sub snap {immutability} /.snapshots/etc/etc-chr{snapshot} /.snapshots/etc/etc-{etc} >/dev/null 2>&1")
     os.system(f"rm -rf /var/lib/systemd/* >/dev/null 2>&1")
     os.system(f"cp --reflink=auto -r /.snapshots/rootfs/snapshot-{tmp}/var/lib/systemd/* /var/lib/systemd >/dev/null 2>&1")
@@ -885,7 +897,6 @@ def findnew():
 
 #   Main function
 def main(args):
-    immutability = "-r"
     distro_suffix = get_distro_suffix()
     snapshot = get_snapshot() # Get current snapshot
     etc = snapshot
