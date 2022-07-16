@@ -1,3 +1,6 @@
+failed to remove /var/lib/os-prober/mount device or resource busy
+
+
 Change all:
 cp --reflink=auto -r /mnt/boot/*
 to

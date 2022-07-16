@@ -718,6 +718,7 @@ def switchtmp():
     snap = snap.replace('\n',"")
     grubconf = open("/etc/mnt/boot/loader/entries/current.cfg","r")
     line = grubconf.readline()
+    #NOTGOOD print("XXXX We have reached here but next line has error)
     while "BEGIN /etc/grub.d/10_linux" not in line:
         line = grubconf.readline()
     line = grubconf.readline()
