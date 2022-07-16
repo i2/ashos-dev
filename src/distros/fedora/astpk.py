@@ -686,8 +686,12 @@ def switchtmp():
     distro_suffix = get_distro_suffix()
     mount = get_tmp()
     part = get_part()
+    print("XXXX We are in switchtmp function before making /etc/mnt/boot") ### REZA
     os.system(f"mkdir -p /etc/mnt/boot >/dev/null 2>&1")
+    print("XXXX We are in switchtmp function after making /etc/mnt/boot")
+    print("XXXX We are in switchtmp function before mounting /etc/mnt/boot")
     os.system(f"mount {part} -o subvol=@boot{distro_suffix} /etc/mnt/boot") # Mount boot partition for writing
+    print("XXXX We are in switchtmp function after mounting /etc/mnt/boot")
     if "tmp0" in mount:
         os.system("cp --reflink=auto -r /.snapshots/rootfs/snapshot-tmp/boot/* /etc/mnt/boot")  ######REZA WHATABOUTTHIS?
         os.system(f"sed -i 's,@.snapshots{distro_suffix}/rootfs/snapshot-tmp0,@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /etc/mnt/boot/loader/entries/current.cfg") # Overwrite grub config boot subvolume
