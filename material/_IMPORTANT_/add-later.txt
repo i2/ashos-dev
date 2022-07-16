@@ -1,3 +1,5 @@
+Incorporate https://github.com/Antynea/grub-btrfs
+
 REPLACE excode != 0 with try except else
 
 #################### IMPORTANT: For Fedora, installed binaries continue to go into /usr/sbin which is not in PATH and binaries are not found automatically. I should find a way to add /usr/sbin to PATH

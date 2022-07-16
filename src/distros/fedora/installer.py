@@ -218,6 +218,7 @@ def main(args, distro):
     # if dnf reinstall shim-* grub2-efi-* grub2-common return an exitcode of error (excode != 0), run dnf install shim-x64 grub2-efi-x64 grub2-common
     os.system(f"chroot /mnt sudo /usr/sbin/grub2-mkconfig {args[2]} -o /boot/grub2/grub.cfg") ### THIS MIGHT BE TOTALLY REDUNDANT
     os.system("mkdir -p /mnt/boot/grub2/BAK") # Folder for backing up grub configs created by astpk
+    os.system(f"sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub2/grub.cfg")
     os.system(f"sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/loader/entries/*")
     # Create a symlink to the newest systemd-boot entry
     os.system(f"ln -sf /mnt/boot/loader/entries/`ls -rt /mnt/boot/loader/entries | tail -n1` /mnt/boot/loader/entries/current.cfg") ###REVIEW_LATER I think without sudo can't create

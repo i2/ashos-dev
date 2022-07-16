@@ -20,6 +20,30 @@ import sys
 # /var/lib/ast(/fstree)           : ast files, stores fstree, symlink to /.snapshots/ast
 # Failed prompts start with "F: "
 
+#   Make a node mutable (and hopefully maintain inheritance to its children too)
+def immutability_disable(snapshot):
+    if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
+        print(f"F: Snapshot {snapshot} doesn't exist.")
+    else:
+        if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
+            print(f"F: Snapshot {snapshot} is already mutable.")
+        else:
+            os.system(f"btrfs property set -ts /.snapshots/rootfs/snapshot-{snapshot} ro false")
+            os.system(f"touch /.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable")
+            print(f"F: Snapshot {snapshot} successfully made mutable.")
+
+#   Make a node mutable (and hopefully maintain inheritance to its children too)
+def immutability_enable(snapshot):
+    if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
+        print(f"F: Snapshot {snapshot} doesn't exist.")
+    else:
+        if not os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
+            print(f"F: Snapshot {snapshot} is already immutable.")
+        else:
+            os.system(f"btrfs property set -ts /.snapshots/rootfs/snapshot-{snapshot} ro true")
+            os.system(f"rm /.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable")
+            print(f"F: Snapshot {snapshot} successfully made immutable.")
+
 #   This function returns either empty string or underscore plus name of distro if it was appended to sub-volume names to distinguish
 def get_distro_suffix():
     if "ashos" in distro:
@@ -192,8 +216,12 @@ def extend_branch(snapshot, desc=""):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
         print(f"F: cannot branch as snapshot {snapshot} doesn't exist.")
     else:
+        if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
+            immutability = ""
         i = findnew()
         os.system(f"btrfs sub snap {immutability} /.snapshots/rootfs/snapshot-{snapshot} /.snapshots/rootfs/snapshot-{i} >/dev/null 2>&1")
+        #os.system(f"mkdir -p /.snapshots/rootfs/snapshot-{i}/usr/share/ast") ### REVIEW_LATER MOST PROBABLY NOT NEEDED
+        os.system(f"touch /.snapshots/rootfs/snapshot-{i}/usr/share/ast/mutable")
         os.system(f"btrfs sub snap {immutability} /.snapshots/etc/etc-{snapshot} /.snapshots/etc/etc-{i} >/dev/null 2>&1")
         os.system(f"btrfs sub snap {immutability} /.snapshots/boot/boot-{snapshot} /.snapshots/boot/boot-{i} >/dev/null 2>&1")
         add_node_to_parent(fstree,snapshot,i)
@@ -206,8 +234,12 @@ def clone_branch(snapshot):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
         print(f"F: cannot clone as snapshot {snapshot} doesn't exist.")
     else:
+        if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
+            immutability = ""
         i = findnew()
         os.system(f"btrfs sub snap {immutability} /.snapshots/rootfs/snapshot-{snapshot} /.snapshots/rootfs/snapshot-{i} >/dev/null 2>&1")
+        #os.system(f"mkdir -p /.snapshots/rootfs/snapshot-{i}/usr/share/ast") ### REVIEW_LATER MOST PROBABLY NOT NEEDED
+        os.system(f"touch /.snapshots/rootfs/snapshot-{i}/usr/share/ast/mutable")
         os.system(f"btrfs sub snap {immutability} /.snapshots/etc/etc-{snapshot} /.snapshots/etc/etc-{i} >/dev/null 2>&1")
         os.system(f"btrfs sub snap {immutability} /.snapshots/boot/boot-{snapshot} /.snapshots/boot/boot-{i} >/dev/null 2>&1")
         add_node_to_level(fstree,snapshot,i)
@@ -221,8 +253,12 @@ def clone_under(snapshot, branch):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")) or (not(os.path.exists(f"/.snapshots/rootfs/snapshot-{branch}"))):
         print(f"F: cannot clone as snapshot {snapshot} doesn't exist.")
     else:
+        if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
+            immutability = ""
         i = findnew()
         os.system(f"btrfs sub snap {immutability} /.snapshots/rootfs/snapshot-{branch} /.snapshots/rootfs/snapshot-{i} >/dev/null 2>&1")
+        #os.system(f"mkdir -p /.snapshots/rootfs/snapshot-{i}/usr/share/ast") ### REVIEW_LATER MOST PROBABLY NOT NEEDED
+        os.system(f"touch /.snapshots/rootfs/snapshot-{i}/usr/share/ast/mutable")
         os.system(f"btrfs sub snap {immutability} /.snapshots/etc/etc-{branch} /.snapshots/etc/etc-{i} >/dev/null 2>&1")
         os.system(f"btrfs sub snap {immutability} /.snapshots/boot/boot-{branch} /.snapshots/boot/boot-{i} >/dev/null 2>&1")
         add_node_to_parent(fstree,snapshot,i)
@@ -352,8 +388,12 @@ def clone_as_tree(snapshot):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
         print(f"F: cannot clone as snapshot {snapshot} doesn't exist.")
     else:
+        if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
+            immutability = ""
         i = findnew()
         os.system(f"btrfs sub snap {immutability} /.snapshots/rootfs/snapshot-{snapshot} /.snapshots/rootfs/snapshot-{i} >/dev/null 2>&1")
+        #os.system(f"mkdir -p /.snapshots/rootfs/snapshot-{i}/usr/share/ast") ### REVIEW_LATER MOST PROBABLY NOT NEEDED
+        os.system(f"touch /.snapshots/rootfs/snapshot-{i}/usr/share/ast/mutable")
         os.system(f"btrfs sub snap {immutability} /.snapshots/etc/etc-{snapshot} /.snapshots/etc/etc-{i} >/dev/null 2>&1")
         os.system(f"btrfs sub snap {immutability} /.snapshots/boot/boot-{snapshot} /.snapshots/boot/boot-{i} >/dev/null 2>&1")
         append_base_tree(fstree,i)
@@ -363,11 +403,11 @@ def clone_as_tree(snapshot):
         print(f"Tree {i} cloned from {snapshot}.")
 
 #   Creates new tree from base file
-def new_snapshot(desc=""):
+def new_snapshot(desc=""): # immutability toggle not used as base is always considered to be immutable
     i = findnew()
-    os.system(f"btrfs sub snap {immutability} /.snapshots/rootfs/snapshot-0 /.snapshots/rootfs/snapshot-{i} >/dev/null 2>&1")
-    os.system(f"btrfs sub snap {immutability} /.snapshots/etc/etc-0 /.snapshots/etc/etc-{i} >/dev/null 2>&1")
-    os.system(f"btrfs sub snap {immutability} /.snapshots/boot/boot-0 /.snapshots/boot/boot-{i} >/dev/null 2>&1")
+    os.system(f"btrfs sub snap -r /.snapshots/rootfs/snapshot-0 /.snapshots/rootfs/snapshot-{i} >/dev/null 2>&1")
+    os.system(f"btrfs sub snap -r /.snapshots/etc/etc-0 /.snapshots/etc/etc-{i} >/dev/null 2>&1")
+    os.system(f"btrfs sub snap -r /.snapshots/boot/boot-0 /.snapshots/boot/boot-{i} >/dev/null 2>&1")
     append_base_tree(fstree,i)
     write_tree(fstree)
     if desc: write_desc(i, desc)
@@ -382,6 +422,8 @@ def update_etc():
     tmp = get_tmp()
     snapshot = get_snapshot()
     os.system(f"btrfs sub del /.snapshots/etc/etc-{snapshot} >/dev/null 2>&1")
+    if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
+        immutability = ""
     os.system(f"btrfs sub snap {immutability} /.snapshots/etc/etc-{tmp} /.snapshots/etc/etc-{snapshot} >/dev/null 2>&1")
 
 #   Update boot
@@ -595,10 +637,14 @@ def posttrans(snapshot):
     os.system(f"cp -r --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/boot/* /.snapshots/boot/boot-chr{snapshot} >/dev/null 2>&1")
     os.system(f"btrfs sub del /.snapshots/etc/etc-{etc} >/dev/null 2>&1")
     os.system(f"btrfs sub del /.snapshots/boot/boot-{etc} >/dev/null 2>&1")
+    if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
+            immutability = ""
     os.system(f"btrfs sub snap {immutability} /.snapshots/etc/etc-chr{snapshot} /.snapshots/etc/etc-{etc} >/dev/null 2>&1")
     os.system(f"rm -rf /var/lib/systemd/* >/dev/null 2>&1")
     os.system(f"cp --reflink=auto -r /.snapshots/rootfs/snapshot-{tmp}/var/lib/systemd/* /var/lib/systemd >/dev/null 2>&1")
     os.system(f"btrfs sub snap {immutability} /.snapshots/rootfs/snapshot-chr{snapshot} /.snapshots/rootfs/snapshot-{snapshot} >/dev/null 2>&1")
+    #os.system(f"mkdir -p /.snapshots/rootfs/snapshot-{i}/usr/share/ast") ### REVIEW_LATER MOST PROBABLY NOT NEEDED
+    os.system(f"touch /.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable")
     os.system(f"btrfs sub snap {immutability} /.snapshots/boot/boot-chr{snapshot} /.snapshots/boot/boot-{etc} >/dev/null 2>&1")
     unchr(snapshot)
 
@@ -1008,9 +1054,13 @@ def main(args):
     elif arg == "dist" or arg == "distro" or arg == "distros":
         switch_distro()
     elif arg == "enable":
-        immutability = "-r"
+        ast_lock()
+        immutability_enable(snapshot)
+        ast_unlock()
     elif arg == "disable":
-        immutability = ""
+        ast_lock()
+        immutability_disable(snapshot)
+        ast_unlock()
     else:
         print("Operation not found.")
 
