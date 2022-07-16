@@ -401,7 +401,8 @@ def clone_as_tree(snapshot):
         i = findnew()
         os.system(f"btrfs sub snap {immutability} /.snapshots/rootfs/snapshot-{snapshot} /.snapshots/rootfs/snapshot-{i} >/dev/null 2>&1")
         #os.system(f"mkdir -p /.snapshots/rootfs/snapshot-{i}/usr/share/ast") ### REVIEW_LATER MOST PROBABLY NOT NEEDED
-        os.system(f"touch /.snapshots/rootfs/snapshot-{i}/usr/share/ast/mutable")
+        if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
+            os.system(f"touch /.snapshots/rootfs/snapshot-{i}/usr/share/ast/mutable")
         os.system(f"btrfs sub snap {immutability} /.snapshots/etc/etc-{snapshot} /.snapshots/etc/etc-{i} >/dev/null 2>&1")
         os.system(f"btrfs sub snap {immutability} /.snapshots/boot/boot-{snapshot} /.snapshots/boot/boot-{i} >/dev/null 2>&1")
         append_base_tree(fstree,i)
