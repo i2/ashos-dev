@@ -9,7 +9,7 @@ def clear():
     os.system("#clear")
 
 def to_uuid(part):
-    return subprocess.check_output(f"/usr/sbin/blkid -s UUID -o value {part}", shell=True).decode('utf-8').strip()
+    return subprocess.check_output(f"blkid -s UUID -o value {part}", shell=True).decode('utf-8').strip()
 
 #   This function returns a tuple: (1. choice whether partitioning and formatting should happen
 #   2. Underscore plus name of distro if it should be appended to sub-volume names
@@ -144,19 +144,19 @@ def main(args, distro):
 
 #   Pacstrap then install anytree and necessary packages in chroot
     #os.system("pacstrap /mnt base linux linux-firmware neovim python3 python-anytree bash dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo tmux") # os-prober
-    os.system(f"dnf makecache --refresh --releasever={RELEASE} -c ./src/distros/fedora/base.repo")
+###MAYBEDONTUSE    os.system(f"dnf makecache --refresh --releasever={RELEASE} -c ./src/distros/fedora/base.repo") # This causes many errors 'insert into requirename values'
     #os.system("pacstrap /mnt base linux neovim python3 python-anytree arch-install-scripts btrfs-progs grub sudo tmux")
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):  ### REZA In debian, these mount-points operations go 'after' debootstrapping and there is no complaint! In fedora, if so, dnf would complain /dev is not mounted!
         os.system(f"mkdir -p /mnt{i}")
         os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
     print("Im here")
-    os.system(f"dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install dnf -y --releasever={RELEASE} --forcearch={ARCH}")
+    os.system(f"dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install dnf -y --releasever={RELEASE} --forcearch={ARCH}") ###MAYBE don't use --forcearch={ARCH}" if errors
 
 ############ STEP2 NEW STAARTS HERE july 15 2022
 
     print("Im here as well")
     if efi:
-        os.system("chroot /mnt dnf install -y efibootmgr grub2-efi-x64") #addeed grub2-efi as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?  # grub2-common already installed at this point
+        os.system("chroot /mnt dnf install -y efibootmgr grub2-efi-x64") #addeed grub2-efi-x64 as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?  # grub2-common already installed at this point
 
     os.system(f"chroot /mnt dnf install -y {packages}")
     ### NOT NEEDED AT ALL os.system("cp /etc/resolv.conf /mnt/etc/")  ###########NEW FOR FEDORA, it says already cped this file!
