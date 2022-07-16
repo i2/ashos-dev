@@ -1,8 +1,8 @@
 [examplerepo]
 #[ashos]
 name=AshOS Fedora Repository
-baseurl=http://download.fedoraproject.org/pub/fedora/linux/development/$releasever/Everything/$forcearch/os
-#baseurl=http://download.fedoraproject.org/pub/fedora/linux/development/$releasever/Everything/$basearch/os ###THIS WORKS
+#baseurl=http://download.fedoraproject.org/pub/fedora/linux/development/$releasever/Everything/$forcearch/os
+baseurl=http://download.fedoraproject.org/pub/fedora/linux/development/$releasever/Everything/$basearch/os ###THIS WORKS
 enabled=1
 
 #name=Fedora $releasever - $basearch
