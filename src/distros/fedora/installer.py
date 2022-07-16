@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+#https://docs.fedoraproject.org/en-US/fedora/latest/system-administrators-guide/kernel-module-driver-configuration/Manually_Upgrading_the_Kernel/
+
 import os
 import subprocess
 
