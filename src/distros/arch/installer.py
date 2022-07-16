@@ -209,6 +209,8 @@ def main(args, distro):
 #   Initialize fstree
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | tee /mnt/.snapshots/ast/fstree")
 
+    holup = input("> ") ################# Just a break-point
+
 #   GRUB and EFI
 ###    os.system(f"arch-chroot /mnt sed -i s,Arch,astOS,g /etc/default/grub") ###NOT_PLANNING_TO_USE_THIS_APPROACH_AT_ALL
     os.system(f"chroot /mnt grub-install {args[2]}") #REZA --recheck --no-nvram --removable
