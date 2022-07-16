@@ -22,7 +22,7 @@ import sys
 
 #   Make a node mutable (and hopefully maintain inheritance to its children too)
 def immutability_disable(snapshot):
-    if snapshot:
+    if snapshot != "0":
         if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
             print(f"F: Snapshot {snapshot} doesn't exist.")
         else:
@@ -35,17 +35,17 @@ def immutability_disable(snapshot):
     else:
         print(f"F: Snapshot {snapshot} (base) should not be modified.")
 
-#   Make a node mutable (and hopefully maintain inheritance to its children too)
+#   Make a node immutable (and hopefully maintain inheritance to its children too)
 def immutability_enable(snapshot):
-    if snapshot:
+    if snapshot != "0":
         if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
             print(f"F: Snapshot {snapshot} doesn't exist.")
         else:
             if not os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
                 print(f"F: Snapshot {snapshot} is already immutable.")
             else:
-                os.system(f"btrfs property set -ts /.snapshots/rootfs/snapshot-{snapshot} ro true")
                 os.system(f"rm /.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable")
+                os.system(f"btrfs property set -ts /.snapshots/rootfs/snapshot-{snapshot} ro true")
                 print(f"Snapshot {snapshot} successfully made immutable.")
     else:
         print(f"F: Snapshot {snapshot} (base) should not be modified.")
