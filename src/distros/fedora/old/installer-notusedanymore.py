@@ -1,3 +1,5 @@
+# might need to append /bin/sh or /bin/bash to chroot commands, as arch iso live cd use zsh and chroot environment is bash
+
     for i in ("dnf", "rpm", "systemd"): # what about rpm-state
         os.system(f"mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")
     os.system("cp --reflink=auto -r /mnt/var/lib/dnf/* /mnt/.snapshots/var/var-tmp/lib/dnf/")

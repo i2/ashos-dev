@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 
-# might need to append /bin/sh or /bin/bash to chroot commands, as arch iso live cd use zsh and choroot environment is bash
-
 import os
 import subprocess
 
