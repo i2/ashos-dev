@@ -22,27 +22,33 @@ import sys
 
 #   Make a node mutable (and hopefully maintain inheritance to its children too)
 def immutability_disable(snapshot):
-    if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
-        print(f"F: Snapshot {snapshot} doesn't exist.")
-    else:
-        if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
-            print(f"F: Snapshot {snapshot} is already mutable.")
+    if snapshot:
+        if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
+            print(f"F: Snapshot {snapshot} doesn't exist.")
         else:
-            os.system(f"btrfs property set -ts /.snapshots/rootfs/snapshot-{snapshot} ro false")
-            os.system(f"touch /.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable")
-            print(f"F: Snapshot {snapshot} successfully made mutable.")
+            if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
+                print(f"F: Snapshot {snapshot} is already mutable.")
+            else:
+                os.system(f"btrfs property set -ts /.snapshots/rootfs/snapshot-{snapshot} ro false")
+                os.system(f"touch /.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable")
+                print(f"Snapshot {snapshot} successfully made mutable.")
+    else:
+        print(f"F: Snapshot {snapshot} (base) should not be modified.")
 
 #   Make a node mutable (and hopefully maintain inheritance to its children too)
 def immutability_enable(snapshot):
-    if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
-        print(f"F: Snapshot {snapshot} doesn't exist.")
-    else:
-        if not os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
-            print(f"F: Snapshot {snapshot} is already immutable.")
+    if snapshot:
+        if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
+            print(f"F: Snapshot {snapshot} doesn't exist.")
         else:
-            os.system(f"btrfs property set -ts /.snapshots/rootfs/snapshot-{snapshot} ro true")
-            os.system(f"rm /.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable")
-            print(f"F: Snapshot {snapshot} successfully made immutable.")
+            if not os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
+                print(f"F: Snapshot {snapshot} is already immutable.")
+            else:
+                os.system(f"btrfs property set -ts /.snapshots/rootfs/snapshot-{snapshot} ro true")
+                os.system(f"rm /.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable")
+                print(f"Snapshot {snapshot} successfully made immutable.")
+    else:
+        print(f"F: Snapshot {snapshot} (base) should not be modified.")
 
 #   This function returns either empty string or underscore plus name of distro if it was appended to sub-volume names to distinguish
 def get_distro_suffix():
@@ -1067,11 +1073,11 @@ def main(args):
         switch_distro()
     elif arg == "enable":
         ast_lock()
-        immutability_enable(snapshot)
+        immutability_enable(args[args.index(arg)+1])
         ast_unlock()
     elif arg == "disable":
         ast_lock()
-        immutability_disable(snapshot)
+        immutability_disable(args[args.index(arg)+1])
         ast_unlock()
     else:
         print("Operation not found.")
