@@ -1,3 +1,7 @@
+souldn;t /.snashotr/rootfs/snapshot-tmp/ be read-only?!!!
+
+how does ubranch work with immutabity toggle? mixing a parent mutable with immutable child of another branch?!!!!
+
 Incorporate https://github.com/Antynea/grub-btrfs
 
 REPLACE excode != 0 with try except else

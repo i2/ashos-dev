@@ -53,7 +53,7 @@ def immutability_enable(snapshot):
 #   This function returns either empty string or underscore plus name of distro if it was appended to sub-volume names to distinguish
 def get_distro_suffix():
     if "ashos" in distro:
-        return f'_{distro.replace("_ashos","")}'
+        return f'_{distro.replace("_ashos", "")}'
     else:
         return ""
 
@@ -83,7 +83,7 @@ def switch_distro():
 
 #   Import filesystem tree file in this function
 def import_tree_file(treename):
-    treefile = open(treename,"r")
+    treefile = open(treename, "r")
     tree = ast.literal_eval(treefile.readline())
     return(tree)
 
@@ -92,7 +92,7 @@ def print_tree(tree):
     snapshot = get_snapshot()
     for pre, fill, node in anytree.RenderTree(tree):
         if os.path.isfile(f"/.snapshots/ast/snapshots/{node.name}-desc"):
-            descfile = open(f"/.snapshots/ast/snapshots/{node.name}-desc","r")
+            descfile = open(f"/.snapshots/ast/snapshots/{node.name}-desc", "r")
             desc = descfile.readline()
             descfile.close()
         else:
@@ -104,15 +104,16 @@ def print_tree(tree):
         else:
             print("%s%s*- %s" % (pre, node.name, desc))
 
-#   Write new description
+#   Write new description or append to an existing one
 def write_desc(snapshot, desc):
-    os.system(f"touch /.snapshots/ast/snapshots/{snapshot}-desc")
-    descfile = open(f"/.snapshots/ast/snapshots/{snapshot}-desc","w")
+    if not os.path.exists(f"/.snapshots/ast/snapshots/{snapshot}-desc"):
+        os.system(f"touch /.snapshots/ast/snapshots/{snapshot}-desc")
+    descfile = open(f"/.snapshots/ast/snapshots/{snapshot}-desc", "w")
     descfile.write(desc)
     descfile.close()
 
 #   Add to root tree
-def append_base_tree(tree,val):
+def append_base_tree(tree, val):
     add = anytree.Node(val, parent=tree.root)
 
 #   Add child to node
@@ -121,7 +122,7 @@ def add_node_to_parent(tree, id, val):
     add = anytree.Node(val, parent=par)
 
 #   Clone within node
-def add_node_to_level(tree,id, val):
+def add_node_to_level(tree, id, val):
     npar = get_parent(tree, id)
     par = (anytree.find(tree, filter_=lambda node: ("x"+str(node.name)+"x") in ("x"+str(npar)+"x")))
     add = anytree.Node(val, parent=par)
@@ -135,7 +136,7 @@ def remove_node(tree, id):
 def write_tree(tree):
     exporter = DictExporter()
     to_write = exporter.export(tree)
-    fsfile = open(fstreepath,"w")
+    fsfile = open(fstreepath, "w")
     fsfile.write(str(to_write))
 
 #   Get parent
@@ -156,7 +157,7 @@ def return_children(tree, id):
 #   Return order to recurse tree
 def recurstree(tree, cid):
     order = []
-    for child in (return_children(tree,cid)):
+    for child in (return_children(tree, cid)):
         par = get_parent(tree, child)
         if child != cid:
             order.append(par)
@@ -165,19 +166,19 @@ def recurstree(tree, cid):
 
 #   Get current snapshot
 def get_snapshot():
-    csnapshot = open("/usr/share/ast/snap","r")
+    csnapshot = open("/usr/share/ast/snap", "r")
     snapshot = csnapshot.readline()
     csnapshot.close()
-    snapshot = snapshot.replace('\n',"")
+    snapshot = snapshot.replace('\n', "")
     return(snapshot)
 
 #   Get drive partition
 def get_part():
-    cpart = open("/.snapshots/ast/part","r")
-    uuid = cpart.readline().replace('\n',"")
+    cpart = open("/.snapshots/ast/part", "r")
+    uuid = cpart.readline().replace('\n', "")
     cpart.close()
     part = str(subprocess.check_output(f"blkid | grep '{uuid}' | awk '{{print $1}}'", shell=True))
-    return(part.replace(":","").replace("b'","").replace("\\n'",""))
+    return(part.replace(":", "").replace("b'", "").replace("\\n'", ""))
 
 #   Get tmp partition state
 def get_tmp():
@@ -232,12 +233,12 @@ def extend_branch(snapshot, desc=""):
         os.system(f"touch /.snapshots/rootfs/snapshot-{i}/usr/share/ast/mutable")
         os.system(f"btrfs sub snap {immutability} /.snapshots/etc/etc-{snapshot} /.snapshots/etc/etc-{i} >/dev/null 2>&1")
         os.system(f"btrfs sub snap {immutability} /.snapshots/boot/boot-{snapshot} /.snapshots/boot/boot-{i} >/dev/null 2>&1")
-        add_node_to_parent(fstree,snapshot,i)
+        add_node_to_parent(fstree, snapshot, i)
         write_tree(fstree)
         if desc: write_desc(i, desc)
         print(f"Branch {i} added under snapshot {snapshot}.")
 
-#   Clone branch under same parent,
+#   Clone branch under same parent
 def clone_branch(snapshot):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
         print(f"F: cannot clone as snapshot {snapshot} doesn't exist.")
@@ -252,7 +253,7 @@ def clone_branch(snapshot):
         os.system(f"touch /.snapshots/rootfs/snapshot-{i}/usr/share/ast/mutable")
         os.system(f"btrfs sub snap {immutability} /.snapshots/etc/etc-{snapshot} /.snapshots/etc/etc-{i} >/dev/null 2>&1")
         os.system(f"btrfs sub snap {immutability} /.snapshots/boot/boot-{snapshot} /.snapshots/boot/boot-{i} >/dev/null 2>&1")
-        add_node_to_level(fstree,snapshot,i)
+        add_node_to_level(fstree, snapshot, i)
         write_tree(fstree)
         desc = str(f"clone of {snapshot}")
         write_desc(i, desc)
@@ -273,7 +274,7 @@ def clone_under(snapshot, branch):
         os.system(f"touch /.snapshots/rootfs/snapshot-{i}/usr/share/ast/mutable")
         os.system(f"btrfs sub snap {immutability} /.snapshots/etc/etc-{branch} /.snapshots/etc/etc-{i} >/dev/null 2>&1")
         os.system(f"btrfs sub snap {immutability} /.snapshots/boot/boot-{branch} /.snapshots/boot/boot-{i} >/dev/null 2>&1")
-        add_node_to_parent(fstree,snapshot,i)
+        add_node_to_parent(fstree, snapshot, i)
         write_tree(fstree)
         desc = str(f"clone of {snapshot}")
         write_desc(i, desc)
@@ -294,7 +295,7 @@ def get_lock():
         return(False)
 
 #   Recursively remove package in tree
-def remove_from_tree(tree,treename,pkg):
+def remove_from_tree(tree, treename, pkg):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{treename}")):
         print(f"F: cannot update as tree {treename} doesn't exist.")
     else:
@@ -308,14 +309,14 @@ def remove_from_tree(tree,treename,pkg):
                 break
             arg = order[0]
             sarg = order[1]
-            print(arg,sarg)
+            print(arg, sarg)
             order.remove(order[0])
             order.remove(order[0])
-            remove(sarg,pkg)
+            remove(sarg, pkg)
         print(f"Tree {treename} updated.")
 
 #   Recursively run an update in tree
-def update_tree(tree,treename):
+def update_tree(tree, treename):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{treename}")):
         print(f"F: cannot update as tree {treename} doesn't exist.")
     else:
@@ -329,14 +330,14 @@ def update_tree(tree,treename):
                 break
             arg = order[0]
             sarg = order[1]
-            print(arg,sarg)
+            print(arg, sarg)
             order.remove(order[0])
             order.remove(order[0])
             autoupgrade(sarg)
         print(f"Tree {treename} updated.")
 
 #   Recursively run an update in tree
-def run_tree(tree,treename,cmd):
+def run_tree(tree, treename, cmd):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{treename}")):
         print(f"F: cannot update as tree {treename} doesn't exist.")
     else:
@@ -352,7 +353,7 @@ def run_tree(tree,treename,cmd):
                 break
             arg = order[0]
             sarg = order[1]
-            print(arg,sarg)
+            print(arg, sarg)
             order.remove(order[0])
             order.remove(order[0])
             if os.path.exists(f"/.snapshots/rootfs/snapshot-chr{sarg}"):
@@ -366,7 +367,7 @@ def run_tree(tree,treename,cmd):
         print(f"Tree {treename} updated.")
 
 #   Sync tree and all it's snapshots
-def sync_tree(tree,treename,forceOffline):
+def sync_tree(tree, treename, forceOffline):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{treename}")):
         print(f"F: cannot sync as tree {treename} doesn't exist.")
     else:
@@ -381,7 +382,7 @@ def sync_tree(tree,treename,forceOffline):
                 break
             arg = order[0]
             sarg = order[1]
-            print(arg,sarg)
+            print(arg, sarg)
             order.remove(order[0])
             order.remove(order[0])
             if os.path.exists(f"/.snapshots/rootfs/snapshot-chr{sarg}"):
@@ -411,7 +412,7 @@ def clone_as_tree(snapshot):
             os.system(f"touch /.snapshots/rootfs/snapshot-{i}/usr/share/ast/mutable")
         os.system(f"btrfs sub snap {immutability} /.snapshots/etc/etc-{snapshot} /.snapshots/etc/etc-{i} >/dev/null 2>&1")
         os.system(f"btrfs sub snap {immutability} /.snapshots/boot/boot-{snapshot} /.snapshots/boot/boot-{i} >/dev/null 2>&1")
-        append_base_tree(fstree,i)
+        append_base_tree(fstree, i)
         write_tree(fstree)
         desc = str(f"clone of {snapshot}")
         write_desc(i, desc)
@@ -423,7 +424,7 @@ def new_snapshot(desc=""): # immutability toggle not used as base is always cons
     os.system(f"btrfs sub snap -r /.snapshots/rootfs/snapshot-0 /.snapshots/rootfs/snapshot-{i} >/dev/null 2>&1")
     os.system(f"btrfs sub snap -r /.snapshots/etc/etc-0 /.snapshots/etc/etc-{i} >/dev/null 2>&1")
     os.system(f"btrfs sub snap -r /.snapshots/boot/boot-0 /.snapshots/boot/boot-{i} >/dev/null 2>&1")
-    append_base_tree(fstree,i)
+    append_base_tree(fstree, i)
     write_tree(fstree)
     if desc: write_desc(i, desc)
     print(f"New tree {i} created.")
@@ -472,7 +473,7 @@ def chroot(snapshot):
         posttrans(snapshot)
 
 #   Run command in snapshot
-def chrrun(snapshot,cmd):
+def chrrun(snapshot, cmd):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
         print(f"F: cannot chroot as snapshot {snapshot} doesn't exist.")
     elif snapshot == "0":
@@ -530,7 +531,7 @@ def live_unlock():
     os.system(f"umount /.snapshots/rootfs/snapshot-{tmp} >/dev/null 2>&1")
 
 #   Install packages
-def install(snapshot,pkg):
+def install(snapshot, pkg):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
         print(f"F: cannot install as snapshot {snapshot} doesn't exist.")
     elif snapshot == "0":
@@ -552,7 +553,7 @@ def install_profile(snapshot, profile):
     install(snapshot, subprocess.check_output(f"cat {profile}", shell=True).decode('utf-8').strip())
 
 #   Remove packages
-def remove(snapshot,pkg):
+def remove(snapshot, pkg):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
         print(f"F: cannot remove as snapshot {snapshot} doesn't exist.")
     elif snapshot == "0":
@@ -582,7 +583,7 @@ def delete(snapshot):
     elif snapshot == "0":
         print("F: changing base snapshot is not allowed.")
     elif run == True:
-        children = return_children(fstree,snapshot)
+        children = return_children(fstree, snapshot)
         os.system(f"btrfs sub del /.snapshots/boot/boot-{snapshot} >/dev/null 2>&1")
         os.system(f"btrfs sub del /.snapshots/etc/etc-{snapshot} >/dev/null 2>&1")
         os.system(f"btrfs sub del /.snapshots/rootfs/snapshot-{snapshot} >/dev/null 2>&1")
@@ -590,7 +591,7 @@ def delete(snapshot):
             os.system(f"btrfs sub del /.snapshots/boot/boot-{child} >/dev/null 2>&1")
             os.system(f"btrfs sub del /.snapshots/etc/etc-{child} >/dev/null 2>&1")
             os.system(f"btrfs sub del /.snapshots/rootfs/snapshot-{child} >/dev/null 2>&1")
-        remove_node(fstree,snapshot) # Remove node from tree or root
+        remove_node(fstree, snapshot) # Remove node from tree or root
         write_tree(fstree)
         print(f"Snapshot {snapshot} removed.")
 
@@ -757,7 +758,7 @@ def switchtmp():
         os.system(f"sed -i 's,@.snapshots{distro_suffix}/rootfs/snapshot-tmp0,@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab") # Write fstab for new deployment
         os.system(f"sed -i 's,@.snapshots{distro_suffix}/etc/etc-tmp0,@.snapshots{distro_suffix}/etc/etc-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
         os.system(f"sed -i 's,@.snapshots{distro_suffix}/boot/boot-tmp0,@.snapshots{distro_suffix}/boot/boot-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
-        sfile = open("/.snapshots/rootfs/snapshot-tmp0/usr/share/ast/snap","r")
+        sfile = open("/.snapshots/rootfs/snapshot-tmp0/usr/share/ast/snap", "r")
         snap = sfile.readline()
         snap = snap.replace(" ", "")
         sfile.close()
@@ -770,11 +771,11 @@ def switchtmp():
         os.system(f"sed -i 's,@.snapshots{distro_suffix}/boot/boot-tmp,@.snapshots{distro_suffix}/boot/boot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
         sfile = open("/.snapshots/rootfs/snapshot-tmp/usr/share/ast/snap", "r")
         snap = sfile.readline()
-        snap = snap.replace(" ","")
+        snap = snap.replace(" ", "")
         sfile.close()
     #
-    snap = snap.replace('\n',"")
-    grubconf = open("/etc/mnt/boot/grub/grub.cfg","r")
+    snap = snap.replace('\n', "")
+    grubconf = open("/etc/mnt/boot/grub/grub.cfg", "r")
     line = grubconf.readline()
     while "BEGIN /etc/grub.d/10_linux" not in line:
         line = grubconf.readline()
@@ -784,7 +785,7 @@ def switchtmp():
         gconf = str(gconf)+str(line)
         line = grubconf.readline()
     if "snapshot-tmp0" in gconf:
-        gconf = gconf.replace("snapshot-tmp0","snapshot-tmp")
+        gconf = gconf.replace("snapshot-tmp0", "snapshot-tmp")
     else:
         gconf = gconf.replace("snapshot-tmp", "snapshot-tmp0")
     if "Arch Linux" in gconf:
@@ -798,7 +799,7 @@ def switchtmp():
     grubconf.write("### END /etc/grub.d/41_custom ###")
     grubconf.close()
 
-    grubconf = open("/.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg","r")
+    grubconf = open("/.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg", "r")
     line = grubconf.readline()
     while "BEGIN /etc/grub.d/10_linux" not in line:
         line = grubconf.readline()
@@ -808,7 +809,7 @@ def switchtmp():
         gconf = str(gconf)+str(line)
         line = grubconf.readline()
     if "snapshot-tmp0" in gconf:
-        gconf = gconf.replace("snapshot-tmp0","snapshot-tmp")
+        gconf = gconf.replace("snapshot-tmp0", "snapshot-tmp")
     else:
         gconf = gconf.replace("snapshot-tmp", "snapshot-tmp0")
     if "Arch Linux" in gconf:
@@ -1029,11 +1030,11 @@ def main(args):
         ast_unlock()
     elif arg == "sync" or arg == "tree-sync" and (lock != True):
         ast_lock()
-        sync_tree(fstree,args[args.index(arg)+1],False)
+        sync_tree(fstree, args[args.index(arg)+1], False)
         ast_unlock()
     elif arg == "fsync" or arg == "force-sync" and (lock != True):
         ast_lock()
-        sync_tree(fstree,args[args.index(arg)+1],True)
+        sync_tree(fstree, args[args.index(arg)+1], True)
         ast_unlock()
     elif arg == "auto-upgrade" and (lock != True):
         ast_lock()
@@ -1044,7 +1045,7 @@ def main(args):
     elif arg == "tree-upgrade" or arg == "tupgrade" and (lock != True):
         ast_lock()
         upgrade(args[args.index(arg)+1])
-        update_tree(fstree,args[args.index(arg)+1])
+        update_tree(fstree, args[args.index(arg)+1])
         ast_unlock()
     elif arg == "tree-run" or arg == "trun" and (lock != True):
         ast_lock()
@@ -1088,6 +1089,6 @@ if __name__ == "__main__":
     from anytree.exporter import DictExporter
     import anytree
     args = list(sys.argv)
-    distro = subprocess.check_output(['sh', '/usr/bin/detect_os.sh']).decode('utf-8').replace('"',"").strip()
+    distro = subprocess.check_output(['sh', '/usr/bin/detect_os.sh']).decode('utf-8').replace('"', "").strip()
     main(args)
 
