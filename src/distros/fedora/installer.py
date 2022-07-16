@@ -243,11 +243,11 @@ def main(args, distro):
 #### In Fedora files are under /boot/loader/entries/
     os.system(f"sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/loader/entries/*")
     # Create a symlink to the newest systemd-boot entry
-    os.system(f"ln -s /mnt/boot/loader/entries/`ls -rt /mnt/boot/loader/entries | tail -n1` current.cfg")
+    os.system(f"ln -sf /mnt/boot/loader/entries/`ls -rt /mnt/boot/loader/entries | tail -n1` /mnt/boot/loader/entries/current.cfg") ###REVIEW_LATER I think without sudo can't create
     if efi: # Create EFI entry and a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
         if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
             os.system("echo DISTRO,BootOrder | tee /mnt/boot/efi/EFI/map.txt")
-        os.system(f"efibootmgr -c -d {args[2]} -p 1 -L 'Fedora' -l '\EFI\fedora\grubx64.efi'")
+        os.system(f"efibootmgr -c -d {args[2]} -p 1 -L 'Fedora' -l '\EFI\fedora\shimx64.efi'")
         os.system(f"echo '{distro},' $(efibootmgr -v | grep -i {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
 
 #### STEP 8 Begins here
