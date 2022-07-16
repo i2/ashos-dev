@@ -228,6 +228,7 @@ def main(args, distro):
     create_user(username)
     set_password(username)
 
+#   Systemd
     #os.system("sudo chroot /mnt systemctl enable NetworkManager")
 
 #   Initialize fstree

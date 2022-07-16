@@ -1,5 +1,25 @@
+REPLACE excode != 0 with try except else
+
+#################### IMPORTANT: For Fedora, installed binaries continue to go into /usr/sbin which is not in PATH and binaries are not found automatically. I should find a way to add /usr/sbin to PATH
+################### cp /usr/sbin/btrfs* /usr/bin/
+################### cp /usr/sbin/blkid /usr/bin/
+
+---------------- bug ----------------
+ran dnf remove tmux from outside chroot and it deleted 'tmux' from database but because of immutability didn't actually uninstall it (I could still run tmux). trying to uninstall for second time, results in package not found!
+:beetle: I think I found a bug that we need to think about. :lady_beetle: 
+```- base 0
+- node 1 clone of base 0```
+You install a package, say tmux in node 1 either by chrooting in and installing or live-installing. The way we have ast allows removing packages from `database` even if package is not actually uninstalled at all!
+--------------------------------------
+
+chroot as a user and run a command: https://catonmat.net/chroot-su-sh-trick
+Add this functionality: sudo chroot /chroot su - {user} -c "command_that_runs_testling_tests <args>"
+
 failed to remove /var/lib/os-prober/mount device or resource busy
 
+
+For Fedora: disable rpmdb-migrate.service
+https://fedoraproject.org/wiki/Changes/RelocateRPMToUsr
 
 Change all:
 cp --reflink=auto -r /mnt/boot/*

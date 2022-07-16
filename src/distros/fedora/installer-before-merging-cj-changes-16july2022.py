@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-### incorporated changes up to and including commit 5a93f8d018773f01512a71ff1560077ea974ceb7 from AstOS
+# might need to append /bin/sh or /bin/bash to chroot commands, as arch iso live cd use zsh and choroot environment is bash
 
 import os
 import subprocess
@@ -74,7 +74,7 @@ def get_username():
     return username
 
 def create_user(u):
-    os.system(f"chroot /mnt useradd -m -G wheel -s /bin/bash {u}")
+    os.system(f"chroot /mnt /usr/sbin/useradd -m -G wheel -s /bin/bash {u}")
     os.system("echo '%wheel ALL=(ALL:ALL) ALL' | tee -a /mnt/etc/sudoers")
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | tee -a /mnt/home/{u}/.bashrc")
 
@@ -91,28 +91,29 @@ def set_password(u):
             continue
 
 def main(args, distro):
-    print("Welcome to the AshOS installer!\n\n\n\n\n")
+    print("Welcome to the astOS installer!\n\n\n\n\n")
     choice, distro_suffix = get_multiboot(distro)
 
 #   Define variables
-    packages = "base linux linux-firmware nano python3 python-anytree bash dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo tmux os-prober"
+    ARCH="x86_64"
+    RELEASE="rawhide"
     #astpart = to_uuid(args[1])
-    btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
-    mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
+    btrdirs = [f"@{distro_suffix}",f"@.snapshots{distro_suffix}",f"@home{distro_suffix}",f"@var{distro_suffix}",f"@etc{distro_suffix}",f"@boot{distro_suffix}"]
+    mntdirs = ["",".snapshots","home","var","etc","boot"]
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
         efi = False
+    packages = "passwd which grub2-efi-x64-modules shim-x64 btrfs-progs python python-anytree sudo tmux neovim NetworkManager dhcpcd efibootmgr" # bash os-prober
 
     tz = get_timezone()
     hostname = get_hostname()
 
 #   Partition and format
     if choice != "3":
-        if efi:
-            os.system(f"/usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}") ### DELETE THIS LINE WHEN PRODUCTION READY
+        os.system(f"/usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}") ### DELETE THIS LINE WHEN PRODUCTION READY
         os.system(f"/usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
-    os.system("pacman -Syy --noconfirm archlinux-keyring")
+    os.system("pacman -Syy --noconfirm archlinux-keyring dnf")
 
     astpart = to_uuid(args[1]) ### DELETE THIS LINE WHEN PRODUCTION READY
 
@@ -129,7 +130,7 @@ def main(args, distro):
         os.system(f"mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
     for i in ("tmp", "root"):
         os.system(f"mkdir -p /mnt/{i}")
-    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp"): ###JULY11,2022 var removed as it's not needed!
+    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp", "var"):
         os.system(f"mkdir -p /mnt/.snapshots/{i}")
     if efi:
         os.system("mkdir /mnt/boot/efi")
@@ -141,23 +142,23 @@ def main(args, distro):
     #os.system("find /mnt/root/ -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C | sudo tee -a $1' -- {} \;")
     #os.system("echo -e 'setw -g mode-keys vi\nset -g history-limit 999999' >> $HOME/.tmux.conf")
 
-#   Pacstrap then install anytree and necessary packages in chroot
-    excode = int(os.system(f"pacstrap /mnt {packages}"))
-    if excode != 0:
-        print("Failed to download packages!")
-        sys.exit()
-    if efi:
-        excode = int(os.system("pacstrap /mnt efibootmgr"))
-        if excode != 0:
-            print("Failed to download packages!")
-            sys.exit()
-    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
+#   Bootstrap
+    #os.system(f"dnf makecache --refresh --releasever={RELEASE} -c ./src/distros/fedora/base.repo") # This causes many errors 'insert into requirename values'
+    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):  ### REZA In debian, these mount-points operations go 'after' debootstrapping and there is no complaint! In fedora, if so, dnf would complain /dev is not mounted!
+        os.system(f"mkdir -p /mnt{i}")
         os.system(f"mount -B {i} /mnt{i}") # Mount-points needed for chrooting
+    os.system(f"dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install dnf -y --releasever={RELEASE} --forcearch={ARCH}")
+
+    if efi:
+        os.system("chroot /mnt dnf install -y efibootmgr grub2-efi-x64") #addeed grub2-efi-x64 as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?  # grub2-common already installed at this point
+
+    os.system(f"chroot /mnt dnf install -y {packages}")
+    ### NOT NEEDED AT ALL os.system("cp /etc/resolv.conf /mnt/etc/")  ###########NEW FOR FEDORA, it says already cped this file!
 
 #   Update fstab
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
     for mntdir in mntdirs:
-        os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}{distro_suffix},compress=zstd,noatime 0 0' | tee -a /mnt/etc/fstab")
+        os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}{distro_suffix},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
     if efi:
         os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | tee -a /mnt/etc/fstab")
@@ -165,31 +166,37 @@ def main(args, distro):
 
     os.system("mkdir -p /mnt/usr/share/ast/db")
     os.system("echo '0' | tee /mnt/usr/share/ast/snap")
-    os.system(f"cp -r /mnt/var/lib/pacman/* /mnt/usr/share/ast/db")
-    os.system(f"sed -i s,\"#DBPath      = /var/lib/pacman/\",\"DBPath      = /usr/share/ast/db/\",g /mnt/etc/pacman.conf")
+    #os.system(f"cp -r /mnt/var/lib/pacman/* /mnt/usr/share/ast/db")
+    #os.system(f"sed -i s,\"#DBPath      = /var/lib/pacman/\",\"DBPath      = /usr/share/ast/db/\",g /mnt/etc/pacman.conf")
 
 #   Modify OS release information (optional)
-    os.system(f"sed -i '/^NAME/ s/Arch Linux/Arch Linux (ashos)/' /mnt/etc/os-release")
-    os.system(f"sed -i '/PRETTY_NAME/ s/Arch Linux/Arch Linux (ashos)/' /mnt/etc/os-release")
-    os.system(f"sed -i '/^ID/ s/arch/arch_ashos/' /mnt/etc/os-release")
+    os.system(f"sed -i '/^NAME/ s/Fedora Linux/Fedora Linux (ashos)/' /mnt/etc/os-release")
+    os.system(f"sed -i '/PRETTY_NAME/ s/Fedora Linux/Fedora Linux (ashos)/' /mnt/etc/os-release")
+    os.system(f"sed -i '/^ID/ s/fedora/fedora_ashos/' /mnt/etc/os-release")
     #os.system("echo 'HOME_URL=\"https://github.com/astos/astos\"' | tee -a /mnt/etc/os-release")
+
+    os.system(f"echo 'releasever={RELEASE}' | tee /mnt/etc/yum.conf") ########NEW FOR FEDORA
+
+    ### glibc-locale-source is already installed
+    os.system(f"chroot /mnt dnf install -y systemd ncurses bash-completion kernel glibc-locale-source glibc-langpack-en --releasever={RELEASE}") ########NEW FOR FEDORA package 'systemd' already installed using whatever above packages came
 
 #   Update hostname, hosts, locales and timezone, hosts
     os.system(f"echo {hostname} | tee /mnt/etc/hostname")
     os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
-    os.system("sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen")
-    os.system("chroot /mnt locale-gen")
+#    os.system("sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen")
+    ### os.system("yum -y install glibc-langpack-en") ######### glibc-locale-source is already installed
+    os.system("chroot /mnt localedef -v -c -i en_US -f UTF-8 en_US.UTF-8") #######REZA got error (
     os.system("echo 'LANG=en_US.UTF-8' | tee /mnt/etc/locale.conf")
     os.system(f"chroot /mnt ln -sf {tz} /etc/localtime")
-    os.system("chroot /mnt hwclock --systohc")
+    os.system("chroot /mnt /usr/sbin/hwclock --systohc")    #REZA hwclock and locale-gen commands not found!
 
     os.system(f"sed -i '0,/@{distro_suffix}/ s,@{distro_suffix},@.snapshots{distro_suffix}/rootfs/snapshot-tmp,' /mnt/etc/fstab")
     os.system(f"sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
     os.system(f"sed -i '0,/@etc{distro_suffix}/ s,@etc{distro_suffix},@.snapshots{distro_suffix}/etc/etc-tmp,' /mnt/etc/fstab")
-    # Delete fstab created for @{distro_suffix} which is going to be deleted (at the end of installer)
+    # Delete fstab created for @{distro_suffix} which is going to be deleted at the end
     os.system(f"sed -i.bak '/\@{distro_suffix}/d' /mnt/etc/fstab")
 
-#   Copy and symlink astpk and detect_os.sh                                     ###MOVEDTOHERE
+#   Copy and symlink astpk and detect_os.sh                                                              ###MOVEDTOHERE
     os.system("mkdir -p /mnt/.snapshots/ast/snapshots")
     os.system(f"cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
     os.system("cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
@@ -205,35 +212,54 @@ def main(args, distro):
 
 #   Systemd
     os.system("chroot /mnt systemctl enable NetworkManager")
+    os.system("chroot /mnt systemctl disable rpmdb-migrate") # https://fedoraproject.org/wiki/Changes/RelocateRPMToUsr
 
 #   Initialize fstree
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | tee /mnt/.snapshots/ast/fstree")
 
+#### STEP 7 Begins here
+
+#################### IMPORTANT: Installations continue to go into  /usr/sbin which is not in PATH and binaries are not found automatically. I should find a way to add /usr/sbin to PATH
+################### cp /usr/sbin/btrfs* /usr/bin/
+################### cp /usr/sbin/blkid /usr/bin/
+
 #   GRUB and EFI
-###    os.system(f"arch-chroot /mnt sed -i s,Arch,astOS,g /etc/default/grub") ###NOT_PLANNING_TO_USE_THIS_APPROACH_AT_ALL
-    os.system(f"chroot /mnt grub-install {args[2]}") #REZA --recheck --no-nvram --removable
-    os.system(f"chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
-    os.system("mkdir -p /mnt/boot/grub/BAK/") # Folder for backing up grub configs created by astpk
-    os.system(f"sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
-    # Create a mapping of "distro" <=> "BootOrder number". Ash reads from this file to switch between distros.
-    if efi:
+#   REALLY ANNOYING BUG: https://bugzilla.redhat.com/show_bug.cgi?id=1917213
+#   https://fedoraproject.org/wiki/GRUB_2#Instructions_for_UEFI-based_systems
+    #os.system(f"chroot /mnt /usr/sbin/grub2-install {args[2]}") #REZA --recheck --no-nvram --removable (not needed for Fedora on EFI)
+    # if dnf reinstall shim-* grub2-efi-* grub2-common return an exitcode of error (excode != 0), run dnf install shim-x64 grub2-efi-x64 grub2-common
+    os.system("mkdir -p /mnt/boot/grub2/BAK") # Folder for backing up grub configs created by astpk
+    os.system(f"chroot /mnt sudo /usr/sbin/grub2-mkconfig {args[2]} -o /boot/grub2/grub.cfg") ### THIS MIGHT BE TOTALLY REDUNDANT
+#### In Fedora files are under /boot/loader/entries/
+    os.system(f"sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/loader/entries/*")
+    # Create a symlink to the newest systemd-boot entry
+    os.system(f"ln -sf /mnt/boot/loader/entries/`ls -rt /mnt/boot/loader/entries | tail -n1` /mnt/boot/loader/entries/current.cfg") ###REVIEW_LATER I think without sudo can't create
+    if efi: # Create EFI entry and a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
         if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
             os.system("echo DISTRO,BootOrder | tee /mnt/boot/efi/EFI/map.txt")
+        os.system(f"efibootmgr -c -d {args[2]} -p 1 -L 'Fedora' -l '\\EFI\\fedora\\shim.efi'") ###REVIEW_LATER shim.efi vs shimx64.efi
         os.system(f"echo '{distro},' $(efibootmgr -v | grep -i {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
 
     os.system("btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("btrfs sub create /mnt/.snapshots/boot/boot-tmp")
     os.system("btrfs sub create /mnt/.snapshots/etc/etc-tmp")
+    os.system("btrfs sub create /mnt/.snapshots/var/var-tmp")
 
+    for i in ("dnf", "rpm", "systemd"): # what about rpm-state
+        os.system(f"mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")
+    os.system("cp --reflink=auto -r /mnt/var/lib/dnf/* /mnt/.snapshots/var/var-tmp/lib/dnf/")
+    os.system("cp --reflink=auto -r /mnt/var/lib/rpm/* /mnt/.snapshots/var/var-tmp/lib/rpm/")
+    os.system("cp --reflink=auto -r /mnt/var/lib/systemd/* /mnt/.snapshots/var/var-tmp/lib/systemd/")
     os.system("cp --reflink=auto -r /mnt/boot/* /mnt/.snapshots/boot/boot-tmp")
     os.system("cp --reflink=auto -r /mnt/etc/* /mnt/.snapshots/etc/etc-tmp")
     os.system("btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-0")
     os.system("btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-0")
+    os.system("btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-0")
 
     os.system(f"echo '{astpart}' | tee /mnt/.snapshots/ast/part")
 
     os.system("btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
-    os.system("chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
+    os.system("chroot /mnt sudo btrfs sub set-default /.snapshots/rootfs/snapshot-tmp") # without sudo, would not find btrfs command (ENV_SUPATH)
 
     os.system("cp -r /mnt/root/. /mnt/.snapshots/root/")
     os.system("cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")
@@ -252,6 +278,7 @@ def main(args, distro):
 
     os.system("cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/. /mnt/.snapshots/rootfs/snapshot-tmp/boot/")
     os.system("cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/. /mnt/.snapshots/rootfs/snapshot-tmp/etc/")
+    os.system("cp --reflink=auto -r /mnt/.snapshots/var/var-0/. /mnt/.snapshots/rootfs/snapshot-tmp/var/")
 
 #   Unmount everything
     os.system("umount -R /mnt")
@@ -263,3 +290,11 @@ def main(args, distro):
     print("Installation complete")
     print("You can reboot now :)")
 
+#### grubby shim-x64
+#grub2-common grub2-tools-minimal grub2-tools-efi os-prober grub2-tools grub2-efi-x64
+
+#  efibootmgr -c -d /dev/sda -p 1 -L "Fedora" -l '\EFI\fedora\grubx64.efi'
+
+#args = list(sys.argv)
+#distro="fedora"
+#main(args, distro)

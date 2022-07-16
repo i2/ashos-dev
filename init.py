@@ -5,7 +5,7 @@ import subprocess
 
 args = list(sys.argv)
 distro = subprocess.check_output(['sh', './src/detect_os.sh']).decode('utf-8').replace('"',"").strip()
-#distro = "fedora" # Use this instead if the distro you want to bootstrap != live iso
+#distro = "fedora" # If distro to be installed does not match live environment
 
 if 'arch' in distro:
     from src.distros.arch import installer
