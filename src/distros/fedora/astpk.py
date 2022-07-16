@@ -394,7 +394,7 @@ def update_boot(snapshot):
         prepare(snapshot)
         ### TODO: DELETE grub.cfg.DATE.BAK older than 90 days
         subprocess.check_output("cp /boot/grub2/grub.cfg /boot/grub2/BAK/grub.cfg.`date '+%Y%m%d-%H%M%S'`", shell=True)
-        os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} grub-mkconfig {part} -o /boot/grub2/grub.cfg") ### THIS MIGHT BE TOTALLY REDUNDANT
+        os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} grub2-mkconfig {part} -o /boot/grub2/grub.cfg") ### THIS MIGHT BE TOTALLY REDUNDANT
         os.system(f"ln -sf /boot/loader/entries/`ls -rt /boot/loader/entries | tail -n1` /boot/loader/entries/current.cfg") ###REVIEW_LATER I think without sudo can't create
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i s,snapshot-chr{snapshot},snapshot-{tmp},g /boot/loader/entries/current.cfg")
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i '0,/Fedora\ Linux/ s##Fedora\ Linux\ snapshot\ {snapshot}#' /boot/loader/entries/current.cfg")
