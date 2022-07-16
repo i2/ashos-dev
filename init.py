@@ -5,7 +5,7 @@ import subprocess
 
 args = list(sys.argv)
 distro = subprocess.check_output(['sh', './src/detect_os.sh']).decode('utf-8').replace('"',"").strip()
-#distro = "fedora" # Use this if using archiso just to bootstrap another distro
+#distro = "fedora" # Use this instead if the distro you want to bootstrap != live iso
 
 if 'arch' in distro:
     from src.distros.arch import installer
