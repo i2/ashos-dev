@@ -656,6 +656,8 @@ def posttrans(snapshot):
     os.system(f"btrfs sub del /.snapshots/boot/boot-{etc} >/dev/null 2>&1")
     
     ###########
+    print("snapshot:")
+    print(snapshot)
     input("BREAKPOINT> ")
     
     if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
