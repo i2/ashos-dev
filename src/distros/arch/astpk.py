@@ -211,7 +211,7 @@ def deploy(snapshot):
         os.system(f"cp --reflink=auto -r /.snapshots/etc/etc-{etc}/* /.snapshots/rootfs/snapshot-{tmp}/etc >/dev/null 2>&1")
         # If snapshot is mutable, modify '/' entry in fstab to 'rw' ### REVIEW_LATER
         if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
-            os.system(f"sed -i '0,/@.snapshots{distro_suffix}/rootfs/snapshot-tmp/ s/noatime,ro/noatime/' /.snapshots/rootfs/snapshot-{tmp}/etc/fstab")
+            os.system(f"sed -i '0,/@.snapshots{distro_suffix}/rootfs/snapshot-tmp/ s/noatime,ro/noatime/' /.snapshots/rootfs/snapshot-{tmp}/etc/fstab") ### REVIEW_LATER
         os.system(f"btrfs sub snap /var /.snapshots/rootfs/snapshot-{tmp}/var >/dev/null 2>&1")
         os.system(f"cp --reflink=auto -r /.snapshots/boot/boot-{etc}/* /.snapshots/rootfs/snapshot-{tmp}/boot >/dev/null 2>&1")
         os.system(f"echo '{snapshot}' > /.snapshots/rootfs/snapshot-{tmp}/usr/share/ast/snap")
