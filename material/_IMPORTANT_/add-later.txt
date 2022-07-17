@@ -1,4 +1,13 @@
+------------
+change
+if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
+to
+try(touch or mkdir f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable ) catch logic instead!
+------------
+
 souldn;t /.snashotr/rootfs/snapshot-tmp/ be read-only?!!!
+
+even after implementing immutability toggle, when I reboot I can't write straight on /usr/XYZ, but I can write on /.snapshots/rootfs/snapshot-{booted-snapshot}/usr/XYZ
 
 how does ubranch work with immutabity toggle? mixing a parent mutable with immutable child of another branch?!!!!
 
