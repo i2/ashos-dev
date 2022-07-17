@@ -196,17 +196,17 @@ def deploy(snapshot):
         tmp = get_tmp()
         
         #######
-        input("BREAKPOINT 2> "
+        input("BREAKPOINT 2> ")
         
         os.system(f"btrfs sub set-default /.snapshots/rootfs/snapshot-{tmp} >/dev/null 2>&1") # Set default volume
         
         #######
-        input("BREAKPOINT 3> "
+        input("BREAKPOINT 3> ")
         
         untmp()
         
         #######
-        input("BREAKPOINT 4> "
+        input("BREAKPOINT 4> ")
         
         if "tmp0" in tmp:
             tmp = "tmp"
@@ -215,7 +215,7 @@ def deploy(snapshot):
         etc = snapshot
         
         #######
-        input("BREAKPOINT 5> "
+        input("BREAKPOINT 5> ")
         
         os.system(f"btrfs sub snap /.snapshots/rootfs/snapshot-{snapshot} /.snapshots/rootfs/snapshot-{tmp} >/dev/null 2>&1")
         os.system(f"btrfs sub snap /.snapshots/etc/etc-{snapshot} /.snapshots/etc/etc-{tmp} >/dev/null 2>&1")
@@ -683,7 +683,7 @@ def posttrans(snapshot):
     os.system(f"btrfs sub snap {immutability} /.snapshots/boot/boot-chr{snapshot} /.snapshots/boot/boot-{etc} >/dev/null 2>&1")
     
     #######
-    input("BREAKPOINT 1> "
+    input("BREAKPOINT 1> ")
     
     unchr(snapshot)
 
