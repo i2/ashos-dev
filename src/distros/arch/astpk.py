@@ -48,7 +48,7 @@ def immutability_enable(snapshot):
                 os.system(f"rm /.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable")
                 os.system(f"btrfs property set -ts /.snapshots/rootfs/snapshot-{snapshot} ro true")
                 print(f"Snapshot {snapshot} successfully made immutable.")
-                os.system(f"sed 's/ mutable //' /.snapshots/ast/snapshots/{snapshot}-desc")
+                os.system(f"sed 's/ mutable //g' /.snapshots/ast/snapshots/{snapshot}-desc")
     else:
         print(f"F: Snapshot {snapshot} (base) should not be modified.")
 
