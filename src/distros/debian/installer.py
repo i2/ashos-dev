@@ -2,7 +2,6 @@
 
 import os
 import subprocess
-#from src.distros.arch import astpk
 
 def clear():
     os.system("#clear")
@@ -19,13 +18,13 @@ def get_multiboot(dist):
         print("Please be aware choosing option 1 and 2 will wipe {args[1]}")
         i = input("> ")
         if i == "1":
-            return i,""
+            return i, ""
             break
         elif i == "2":
-            return i,f"_{dist}"
+            return i, f"_{dist}"
             break
         elif i == "3":
-            return i,f"_{dist}"
+            return i, f"_{dist}"
             break
         else:
             print("Invalid choice!")
@@ -90,7 +89,7 @@ def set_password(u):
             continue
 
 def main(args, distro):
-    print("Welcome to the astOS installer!\n\n\n\n\n")
+    print("Welcome to the AshOS installer!\n\n\n\n\n")
     choice, distro_suffix = get_multiboot(distro)
 
 #   Define variables
@@ -98,8 +97,8 @@ def main(args, distro):
     RELEASE = "bullseye"
     ARCH = "amd64"
     #astpart = to_uuid(args[1])
-    btrdirs = [f"@{distro_suffix}",f"@.snapshots{distro_suffix}",f"@home{distro_suffix}",f"@var{distro_suffix}",f"@etc{distro_suffix}",f"@boot{distro_suffix}"]
-    mntdirs = ["",".snapshots","home","var","etc","boot"]
+    btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
+    mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
@@ -115,7 +114,8 @@ def main(args, distro):
     os.system("sudo apt-get install -y --fix-broken parted dosfstools") ### DELETE THIS LINE WHEN PRODUCTION READY
     os.system("sudo apt-get install -y --fix-broken btrfs-progs ntp efibootmgr") # Add this to the first apt-get install to fix any broken package
     if choice != "3":
-        os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}") ### DELETE THIS LINE WHEN PRODUCTION READY
+        if efi:
+            os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}") ### DELETE THIS LINE WHEN PRODUCTION READY
         os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
 
     astpart = to_uuid(args[1]) ### DELETE THIS LINE WHEN PRODUCTION READY
@@ -133,7 +133,7 @@ def main(args, distro):
         os.system(f"sudo mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
     for i in ("tmp", "root"):
         os.system(f"mkdir -p /mnt/{i}")
-    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp", "var"):
+    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp"): ### JULY11, 2022 removed "var" as it's not needed!
         os.system(f"mkdir -p /mnt/.snapshots/{i}")
     if efi:
         os.system("sudo mkdir /mnt/boot/efi")
@@ -191,7 +191,7 @@ def main(args, distro):
     os.system("sudo mkdir -p /mnt/usr/share/ast/db")
     os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
     os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db")
-    #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf")
+    #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf") ### REVIEW_LATER
 
 #   Modify OS release information (optional)
     os.system(f"sudo sed -i '/^NAME/ s/Debian/Debian (ashos)/' /mnt/etc/os-release")
@@ -211,10 +211,10 @@ def main(args, distro):
     os.system(f"sudo sed -i '0,/@{distro_suffix}/ s,@{distro_suffix},@.snapshots{distro_suffix}/rootfs/snapshot-tmp,' /mnt/etc/fstab")
     os.system(f"sudo sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
     os.system(f"sudo sed -i '0,/@etc{distro_suffix}/ s,@etc{distro_suffix},@.snapshots{distro_suffix}/etc/etc-tmp,' /mnt/etc/fstab")
-    # Delete fstab created for @{distro_suffix} which is going to be deleted at the end
+    # Delete fstab created for @{distro_suffix} which is going to be deleted (at the end of installer)
     os.system(f"sed -i.bak '/\@{distro_suffix}/d' /mnt/etc/fstab")
 
-#   Copy and symlink astpk and detect_os.sh                                                              ###MOVEDTOHERE
+#   Copy and symlink astpk and detect_os.sh                                     ###MOVEDTOHERE
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
     os.system(f"sudo cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
     os.system("sudo cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
@@ -229,36 +229,31 @@ def main(args, distro):
     set_password(username)
 
 #   Systemd
-    #os.system("sudo chroot /mnt systemctl enable NetworkManager")
+    os.system("sudo chroot /mnt systemctl enable NetworkManager")
 
 #   Initialize fstree
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
 
 #   GRUB and EFI
+###    os.system(f"sudo arch-chroot /mnt sed -i s,Arch,astOS,g /etc/default/grub") ###NOT_PLANNING_TO_USE_THIS_APPROACH_AT_ALL
     os.system(f"sudo chroot /mnt grub-install {args[2]}") #REZA --recheck --no-nvram --removable
-    os.system(f"sudo mkdir -p /mnt/boot/grub/BAK/") # Folder for backing up grub configs created by astpk
     os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
-    os.system(f"sudo sed -i '0,/subvol=@{distro_suffix} /s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
-    if os.path.exists("/mnt/boot/efi/EFI/map.txt"):
-        if efi: # Create a map.txt file "distro" <=> "BootOrder number" Ash reads from this file to switch between distros
-            os.system(f"echo '{distro},' $(efibootmgr -v | grep {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | sudo tee -a /mnt/boot/efi/EFI/map.txt")
-    else:
-        os.system("echo DISTRO,BootOrder | sudo tee -a /mnt/boot/efi/EFI/map.txt")
+    os.system("sudo mkdir -p /mnt/boot/grub/BAK/") # Folder for backing up grub configs created by astpk
+    os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
+    # Create a mapping of "distro" <=> "BootOrder number". Ash reads from this file to switch between distros.
+    if efi:
+        if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
+            os.system("echo DISTRO,BootOrder | sudo tee /mnt/boot/efi/EFI/map.txt")
+        os.system(f"echo '{distro},' $(efibootmgr -v | grep -i {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | sudo tee -a /mnt/boot/efi/EFI/map.txt")
 
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")
     os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp")
-    os.system("sudo btrfs sub create /mnt/.snapshots/var/var-tmp")
 
-    for i in ("dpkg", "systemd"):
-        os.system(f"sudo mkdir -p /mnt/.snapshots/var/var-tmp/lib/{i}")
-    os.system("sudo cp --reflink=auto -r /mnt/var/lib/dpkg/* /mnt/.snapshots/var/var-tmp/lib/dpkg/")
-    os.system("sudo cp --reflink=auto -r /mnt/var/lib/systemd/* /mnt/.snapshots/var/var-tmp/lib/systemd/")
     os.system("sudo cp --reflink=auto -r /mnt/boot/* /mnt/.snapshots/boot/boot-tmp")
     os.system("sudo cp --reflink=auto -r /mnt/etc/* /mnt/.snapshots/etc/etc-tmp")
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-0")
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-0")
-    os.system("sudo btrfs sub snap -r /mnt/.snapshots/var/var-tmp /mnt/.snapshots/var/var-0")
 
     os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
 
@@ -274,15 +269,14 @@ def main(args, distro):
     if efi:
         os.system("sudo umount /mnt/boot/efi")
     os.system("sudo umount /mnt/boot")
-    os.system(f"sudo mount {args[1]} -o subvol=@boot{distro_suffix},compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp") #IS this mnt point empty?
-    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-tmp/* /mnt/boot")
+    os.system(f"sudo mount {args[1]} -o subvol=@boot{distro_suffix},compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp") ### IS this mnt point empty?
+    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-tmp/. /mnt/boot/")
     os.system("sudo umount /mnt/etc")
     os.system(f"sudo mount {args[1]} -o subvol=@etc{distro_suffix},compress=zstd,noatime /mnt/.snapshots/etc/etc-tmp")
-    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-tmp/* /mnt/etc")
+    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-tmp/. /mnt/etc/")
 
-    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/* /mnt/.snapshots/rootfs/snapshot-tmp/boot")
-    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/* /mnt/.snapshots/rootfs/snapshot-tmp/etc")
-    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/var/var-0/* /mnt/.snapshots/rootfs/snapshot-tmp/var")
+    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/. /mnt/.snapshots/rootfs/snapshot-tmp/boot/")
+    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/. /mnt/.snapshots/rootfs/snapshot-tmp/etc/")
 
 #   Unmount everything
     os.system("sudo umount -R /mnt")

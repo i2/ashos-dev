@@ -20,7 +20,7 @@ import sys
 # /var/lib/ast(/fstree)           : ast files, stores fstree, symlink to /.snapshots/ast
 # Failed prompts start with "F: "
 
-#   Make a node mutable (and hopefully maintain inheritance to its children too)
+#   Make a node mutable
 def immutability_disable(snapshot):
     if snapshot != "0":
         if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
@@ -36,7 +36,7 @@ def immutability_disable(snapshot):
     else:
         print(f"F: Snapshot {snapshot} (base) should not be modified.")
 
-#   Make a node immutable (and hopefully maintain inheritance to its children too)
+#   Make a node immutable
 def immutability_enable(snapshot):
     if snapshot != "0":
         if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
@@ -394,7 +394,7 @@ def sync_tree(tree, treename, forceOffline):
             else:
                 prepare(sarg)
                 os.system(f"cp --reflink=auto -n -r /.snapshots/rootfs/snapshot-{arg}/* /.snapshots/rootfs/snapshot-chr{sarg}/ >/dev/null 2>&1")
-                # os.system(f"cp --reflink=auto -r /.snapshots/rootfs/snapshot-{arg}/etc/* /.snapshots/rootfs/snapshot-chr{sarg}/etc/ >/dev/null 2>&1") # Commented out due to causing issues
+                #os.system(f"cp --reflink=auto -r /.snapshots/rootfs/snapshot-{arg}/etc/* /.snapshots/rootfs/snapshot-chr{sarg}/etc/ >/dev/null 2>&1") ### Commented out due to causing issues
                 posttrans(sarg)
         print(f"Tree {treename} synced.")
 
@@ -655,7 +655,8 @@ def posttrans(snapshot):
     os.system(f"btrfs sub del /.snapshots/rootfs/snapshot-{snapshot} >/dev/null 2>&1")
     os.system(f"rm -rf /.snapshots/etc/etc-chr{snapshot}/* >/dev/null 2>&1")
     os.system(f"cp -r --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/etc/* /.snapshots/etc/etc-chr{snapshot} >/dev/null 2>&1")
-    os.system(f"cp -r -n --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/var/cache/dnf/* /var/cache/dnf/ >/dev/null 2>&1") ### REVIEW_LATER
+    # Keep package manager's cache after installing packages. This prevents unnecessary downloads for each snapshot when upgrading multiple snapshots
+    os.system(f"cp -r -n --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/var/cache/dnf/* /var/cache/dnf/ >/dev/null 2>&1") ### REVIEW_LATER IS THIS NEEDED?
     os.system(f"rm -rf /.snapshots/boot/boot-chr{snapshot}/* >/dev/null 2>&1")
     os.system(f"cp -r --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/boot/* /.snapshots/boot/boot-chr{snapshot} >/dev/null 2>&1")
     os.system(f"btrfs sub del /.snapshots/etc/etc-{etc} >/dev/null 2>&1")

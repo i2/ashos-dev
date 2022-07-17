@@ -1,3 +1,18 @@
+Can I put space after comma here: os.system(f"mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
+
+Todo: *Make sure to sync the tree after* in readme file --> auto-sync after ubranch
+
+#   test if making a node mutable, maintains inheritance to its children too
+
+Make astpk modular: 1. a core/common denom between all distros and 2. an extension for each distro.
+|- ashcore.py
+|-- arch\ashpk.py
+|-- fedora\ashpk.py
+|-- debian\ashpk.py
+And copy a merge of ashcore.py and |-- when installing a distro.
+IDEA: put a ### PLACEHOLDER FOR DISTRO SPECIFIC EXTENSION ### in ashcore.py and copy |-- there to retain order of commands etc.
+A similar idea might be good for installer.py?
+
 move /etc/mnt/boot under /.snapshots/.....
 
 /etc/mnt/bootMake T2SDE immutable
@@ -751,3 +766,6 @@ In my multiboot (arch installed first and then debian), here is what I have in /
 ramin:
 شیره افرا
 taffee
+
+
+https://www.tonymacx86.com/threads/guide-how-to-keep-clover-working-when-installing-windows-and-linux.272807/

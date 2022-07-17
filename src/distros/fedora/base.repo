@@ -3,13 +3,3 @@ name=AshOS Fedora Repository
 baseurl=http://download.fedoraproject.org/pub/fedora/linux/development/$releasever/Everything/$basearch/os
 enabled=1
 
-#name=Fedora $releasever - $basearch
-#failovermethod=priority
-#baseurl=http://download.fedoraproject.org/pub/fedora/linux/releases/$releasever/Everything/$basearch/os/
-#mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=fedora-13&arch=i386
-#mirrorlist=https://admin.fedoraproject.org/mirrormanager/mirrors/Fedora/development/x86_64
-#enabled=1
-#metadata_expire=7d
-#gpgcheck=1
-#gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-$basearch
-

@@ -20,7 +20,7 @@ import sys
 # /var/lib/ast(/fstree)           : ast files, stores fstree, symlink to /.snapshots/ast
 # Failed prompts start with "F: "
 
-#   Make a node mutable (and hopefully maintain inheritance to its children too)
+#   Make a node mutable
 def immutability_disable(snapshot):
     if snapshot != "0":
         if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
@@ -36,7 +36,7 @@ def immutability_disable(snapshot):
     else:
         print(f"F: Snapshot {snapshot} (base) should not be modified.")
 
-#   Make a node immutable (and hopefully maintain inheritance to its children too)
+#   Make a node immutable
 def immutability_enable(snapshot):
     if snapshot != "0":
         if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
@@ -652,7 +652,8 @@ def posttrans(snapshot):
     os.system(f"btrfs sub del /.snapshots/rootfs/snapshot-{snapshot} >/dev/null 2>&1")
     os.system(f"rm -rf /.snapshots/etc/etc-chr{snapshot}/* >/dev/null 2>&1")
     os.system(f"cp -r --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/etc/* /.snapshots/etc/etc-chr{snapshot} >/dev/null 2>&1")
-    os.system(f"cp -r -n --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/var/cache/pacman/pkg/* /var/cache/pacman/pkg/ >/dev/null 2>&1") ### REVIEW_LATER IS THIS NEEDED
+    # Keep package manager's cache after installing packages. This prevents unnecessary downloads for each snapshot when upgrading multiple snapshots
+    os.system(f"cp -r -n --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/var/cache/pacman/pkg/* /var/cache/pacman/pkg/ >/dev/null 2>&1") ### REVIEW_LATER IS THIS NEEDED?
     os.system(f"rm -rf /.snapshots/boot/boot-chr{snapshot}/* >/dev/null 2>&1")
     os.system(f"cp -r --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/boot/* /.snapshots/boot/boot-chr{snapshot} >/dev/null 2>&1")
     os.system(f"btrfs sub del /.snapshots/etc/etc-{etc} >/dev/null 2>&1")

@@ -18,7 +18,7 @@
   * [Saving configuration changes made in /etc persistent](https://github.com/astos/astos#saving-configuration-changes-made-in-etc-persistent)
   * [Configuring dual boot](https://github.com/astos/astos#dual-boot)
   * [Updating ast itself](https://github.com/astos/astos#updating-ast-itself)
-  * [Debugging ast](https://github.com/astos/astos#debuggin-ast)
+  * [Debugging ast](https://github.com/astos/astos#debugging-ast)
 * [Known bugs](https://github.com/astos/astos#known-bugs)
 * [Contributing](https://github.com/astos/astos#contributing)
 * [Community](https://github.com/astos/astos#community)
@@ -211,7 +211,7 @@ ast cbranch <snapshot>
 ```
 #### Clone snapshot under specified parent
 
-* Make sure to sync the tree after
+* Make sure to sync the tree afterwards
 
 ```
 ast ubranch <parent> <snapshot>
