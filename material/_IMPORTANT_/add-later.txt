@@ -1,3 +1,13 @@
+move /etc/mnt/boot under /.snapshots/.....
+
+/etc/mnt/bootMake T2SDE immutable
+
+In Arch:
+enable GRUB_ENABLE_BLSCFG so entries go in /boot/loader/entries
+
+In Fedora:
+https://utcc.utoronto.ca/~cks/space/blog/linux/Fedora30GrubBLSGotcha
+
 ------------
 change
 if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):

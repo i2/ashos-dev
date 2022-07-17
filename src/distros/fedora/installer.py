@@ -219,6 +219,9 @@ def main(args, distro):
 #   GRUB and EFI
 #   REALLY ANNOYING BUG: https://bugzilla.redhat.com/show_bug.cgi?id=1917213 & https://fedoraproject.org/wiki/GRUB_2#Instructions_for_UEFI-based_systems
     #os.system(f"chroot /mnt /usr/sbin/grub2-install {args[2]}") #REZA --recheck --no-nvram --removable (not needed for Fedora on EFI)
+    # For now I use non-BLS format. Entries go in /boot/grub2/grub.cfg not in /boot/loader/entries/
+    os.system('grep -qxF GRUB_ENABLE_BLSCFG="false" /mnt/etc/default/grub || \
+               echo GRUB_ENABLE_BLSCFG="false" | sudo tee -a /mnt/etc/default/grub')
     # if dnf reinstall shim-* grub2-efi-* grub2-common return an exitcode of error (excode != 0), run dnf install shim-x64 grub2-efi-x64 grub2-common
     os.system(f"chroot /mnt sudo /usr/sbin/grub2-mkconfig {args[2]} -o /boot/grub2/grub.cfg") ### THIS MIGHT BE TOTALLY REDUNDANT
     os.system("mkdir -p /mnt/boot/grub2/BAK") # Folder for backing up grub configs created by astpk

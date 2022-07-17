@@ -189,7 +189,6 @@ def get_tmp():
 
 #   Deploy snapshot
 def deploy(snapshot):
-    #distro_suffix = get_distro_suffix() ### REVIEW_LATER ### JUST FOR FSTAB LINE BELOW, MIGHT NOT NEED IT IF I JUST REPLACE noatime,ro with noatime
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
         print(f"F: cannot deploy as snapshot {snapshot} doesn't exist.")
     else:
@@ -395,7 +394,7 @@ def sync_tree(tree, treename, forceOffline):
             else:
                 prepare(sarg)
                 os.system(f"cp --reflink=auto -n -r /.snapshots/rootfs/snapshot-{arg}/* /.snapshots/rootfs/snapshot-chr{sarg}/ >/dev/null 2>&1")
-                # os.system(f"cp --reflink=auto -r /.snapshots/rootfs/snapshot-{arg}/etc/* /.snapshots/rootfs/snapshot-chr{sarg}/etc/ >/dev/null 2>&1") # Commented out due to causing issues
+                #os.system(f"cp --reflink=auto -r /.snapshots/rootfs/snapshot-{arg}/etc/* /.snapshots/rootfs/snapshot-chr{sarg}/etc/ >/dev/null 2>&1") ### Commented out due to causing issues
                 posttrans(sarg)
         print(f"Tree {treename} synced.")
 
@@ -422,7 +421,7 @@ def clone_as_tree(snapshot):
         print(f"Tree {i} cloned from {snapshot}.")
 
 #   Creates new tree from base file
-def new_snapshot(desc=""): # immutability toggle not used as base is always considered to be immutable
+def new_snapshot(desc=""): # immutability toggle not used as base should always be immutable
     i = findnew()
     os.system(f"btrfs sub snap -r /.snapshots/rootfs/snapshot-0 /.snapshots/rootfs/snapshot-{i} >/dev/null 2>&1")
     os.system(f"btrfs sub snap -r /.snapshots/etc/etc-0 /.snapshots/etc/etc-{i} >/dev/null 2>&1")
@@ -653,7 +652,7 @@ def posttrans(snapshot):
     os.system(f"btrfs sub del /.snapshots/rootfs/snapshot-{snapshot} >/dev/null 2>&1")
     os.system(f"rm -rf /.snapshots/etc/etc-chr{snapshot}/* >/dev/null 2>&1")
     os.system(f"cp -r --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/etc/* /.snapshots/etc/etc-chr{snapshot} >/dev/null 2>&1")
-    os.system(f"cp -r -n --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/var/cache/pacman/pkg/* /var/cache/pacman/pkg/ >/dev/null 2>&1")
+    os.system(f"cp -r -n --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/var/cache/pacman/pkg/* /var/cache/pacman/pkg/ >/dev/null 2>&1") ### REVIEW_LATER IS THIS NEEDED
     os.system(f"rm -rf /.snapshots/boot/boot-chr{snapshot}/* >/dev/null 2>&1")
     os.system(f"cp -r --reflink=auto /.snapshots/rootfs/snapshot-chr{snapshot}/boot/* /.snapshots/boot/boot-chr{snapshot} >/dev/null 2>&1")
     os.system(f"btrfs sub del /.snapshots/etc/etc-{etc} >/dev/null 2>&1")
@@ -1073,11 +1072,11 @@ def main(args):
         list_subvolumes()
     elif arg == "dist" or arg == "distro" or arg == "distros":
         switch_distro()
-    elif arg == "enable":
+    elif arg == "immenable" or arg == "immen":
         ast_lock()
         immutability_enable(args[args.index(arg)+1])
         ast_unlock()
-    elif arg == "disable":
+    elif arg == "immdisable" or arg == "immdis":
         ast_lock()
         immutability_disable(args[args.index(arg)+1])
         ast_unlock()
