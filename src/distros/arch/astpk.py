@@ -32,6 +32,7 @@ def immutability_disable(snapshot):
                 os.system(f"btrfs property set -ts /.snapshots/rootfs/snapshot-{snapshot} ro false")
                 os.system(f"touch /.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable")
                 print(f"Snapshot {snapshot} successfully made mutable.")
+                write_desc(snapshot, " mutable ")
     else:
         print(f"F: Snapshot {snapshot} (base) should not be modified.")
 
@@ -47,6 +48,7 @@ def immutability_enable(snapshot):
                 os.system(f"rm /.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable")
                 os.system(f"btrfs property set -ts /.snapshots/rootfs/snapshot-{snapshot} ro true")
                 print(f"Snapshot {snapshot} successfully made immutable.")
+                os.system(f"sed 's/ mutable //' /.snapshots/ast/snapshots/{snapshot}-desc")
     else:
         print(f"F: Snapshot {snapshot} (base) should not be modified.")
 
@@ -106,11 +108,8 @@ def print_tree(tree):
 
 #   Write new description or append to an existing one
 def write_desc(snapshot, desc):
-    if not os.path.exists(f"/.snapshots/ast/snapshots/{snapshot}-desc"):
-        os.system(f"touch /.snapshots/ast/snapshots/{snapshot}-desc")
-    descfile = open(f"/.snapshots/ast/snapshots/{snapshot}-desc", "w")
-    descfile.write(desc)
-    descfile.close()
+    with open(f"/.snapshots/ast/snapshots/{snapshot}-desc", 'a+') as descfile:
+        descfile.write(desc)
 
 #   Add to root tree
 def append_base_tree(tree, val):
