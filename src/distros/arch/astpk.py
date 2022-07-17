@@ -194,13 +194,29 @@ def deploy(snapshot):
     else:
         update_boot(snapshot)
         tmp = get_tmp()
+        
+        #######
+        input("BREAKPOINT 2> "
+        
         os.system(f"btrfs sub set-default /.snapshots/rootfs/snapshot-{tmp} >/dev/null 2>&1") # Set default volume
+        
+        #######
+        input("BREAKPOINT 3> "
+        
         untmp()
+        
+        #######
+        input("BREAKPOINT 4> "
+        
         if "tmp0" in tmp:
             tmp = "tmp"
         else:
             tmp = "tmp0"
         etc = snapshot
+        
+        #######
+        input("BREAKPOINT 5> "
+        
         os.system(f"btrfs sub snap /.snapshots/rootfs/snapshot-{snapshot} /.snapshots/rootfs/snapshot-{tmp} >/dev/null 2>&1")
         os.system(f"btrfs sub snap /.snapshots/etc/etc-{snapshot} /.snapshots/etc/etc-{tmp} >/dev/null 2>&1")
         os.system(f"btrfs sub snap /.snapshots/boot/boot-{snapshot} /.snapshots/boot/boot-{tmp} >/dev/null 2>&1")
@@ -665,6 +681,10 @@ def posttrans(snapshot):
     #os.system(f"mkdir -p /.snapshots/rootfs/snapshot-{i}/usr/share/ast") ### REVIEW_LATER MOST PROBABLY NOT NEEDED
     os.system(f"touch /.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable")
     os.system(f"btrfs sub snap {immutability} /.snapshots/boot/boot-chr{snapshot} /.snapshots/boot/boot-{etc} >/dev/null 2>&1")
+    
+    #######
+    input("BREAKPOINT 1> "
+    
     unchr(snapshot)
 
 #   Upgrade snapshot
