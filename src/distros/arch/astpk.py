@@ -209,10 +209,9 @@ def deploy(snapshot):
         os.system(f"rm -rf /.snapshots/rootfs/snapshot-{tmp}/var >/dev/null 2>&1")
         os.system(f"mkdir /.snapshots/rootfs/snapshot-{tmp}/boot >/dev/null 2>&1")
         os.system(f"cp --reflink=auto -r /.snapshots/etc/etc-{etc}/* /.snapshots/rootfs/snapshot-{tmp}/etc >/dev/null 2>&1")
-        # If snapshot is mutable, modify '/' entry in fstab to 'rw' ### REVIEW_LATER
+        # If snapshot is mutable, modify '/' entry (1st line) in fstab to read-write
         if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
-            #os.system(f"sed -i '0,/@.snapshots{distro_suffix}/rootfs/snapshot-tmp/ s/noatime,ro/noatime/' /.snapshots/rootfs/snapshot-{tmp}/etc/fstab") ### REVIEW_LATER
-            os.system(f"sed -i 's/noatime,ro/noatime/' /.snapshots/rootfs/snapshot-{tmp}/etc/fstab") ### REVIEW_LATER
+            os.system(f"sed -i '0,/snapshots_tmp/ s/,ro//' /.snapshots/rootfs/snapshot-{tmp}/etc/fstab") # ,rw
         os.system(f"btrfs sub snap /var /.snapshots/rootfs/snapshot-{tmp}/var >/dev/null 2>&1")
         os.system(f"cp --reflink=auto -r /.snapshots/boot/boot-{etc}/* /.snapshots/rootfs/snapshot-{tmp}/boot >/dev/null 2>&1")
         os.system(f"echo '{snapshot}' > /.snapshots/rootfs/snapshot-{tmp}/usr/share/ast/snap")
@@ -667,8 +666,6 @@ def posttrans(snapshot):
     os.system(f"rm -rf /var/lib/systemd/* >/dev/null 2>&1")
     os.system(f"cp --reflink=auto -r /.snapshots/rootfs/snapshot-{tmp}/var/lib/systemd/* /var/lib/systemd >/dev/null 2>&1")
     os.system(f"btrfs sub snap {immutability} /.snapshots/rootfs/snapshot-chr{snapshot} /.snapshots/rootfs/snapshot-{snapshot} >/dev/null 2>&1")
-    #os.system(f"mkdir -p /.snapshots/rootfs/snapshot-{i}/usr/share/ast") ### REVIEW_LATER MOST PROBABLY NOT NEEDED
-    ###os.system(f"touch /.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable") ###WHY DID I HAVE THIS UNCOMMENTED EARLIER?! WEIRD! MAYBE THERE WAS A REASON?!
     os.system(f"btrfs sub snap {immutability} /.snapshots/boot/boot-chr{snapshot} /.snapshots/boot/boot-{etc} >/dev/null 2>&1")
     unchr(snapshot)
 
