@@ -660,7 +660,7 @@ def posttrans(snapshot):
     print(snapshot)
     input("BREAKPOINT> ")
     
-    if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
+    if os.path.exists(f"/.snapshots/rootfs/snapshot-chr{snapshot}/usr/share/ast/mutable"):
         immutability = ""
     else:
         immutability = "-r"
