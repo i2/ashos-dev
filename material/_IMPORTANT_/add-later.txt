@@ -1,3 +1,5 @@
+WHile making grub2-mkconfig in fedora, it saw debian kernel butnot arch?!!!
+
 Can I put space after comma here: os.system(f"mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
 
 Todo: *Make sure to sync the tree after* in readme file --> auto-sync after ubranch

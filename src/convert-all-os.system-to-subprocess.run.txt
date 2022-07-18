@@ -1,3 +1,4 @@
+----------------
 import subprocess
 
 commands = '''
@@ -11,7 +12,7 @@ process = subprocess.Popen('/bin/bash', stdin=subprocess.PIPE, stdout=subprocess
 out, err = process.communicate(commands)
 print out
 
-
+----------------
 
 import subprocess
 
@@ -27,3 +28,15 @@ ret = subprocess.run(command, capture_output=True, shell=True)
 # ret = subprocess.run(command, stdout=subprocess.PIPE, shell=True)
 
 print(ret.stdout.decode())
+
+-----------
+
+https://stackoverflow.com/questions/12373563/python-try-block-does-not-catch-os-system-exceptions
+
+import subprocess
+try:
+    subprocess.run(['wrongcommand'], check = True)
+except subprocess.CalledProcessError:
+    print ('wrongcommand does not exist')
+    
+----------------

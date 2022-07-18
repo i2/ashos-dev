@@ -110,6 +110,7 @@ def main(args, distro):
     hostname = get_hostname()
 
 #   Prep (format, etc.)
+    os.system(f"sudo sed -i 's/[^ ]*[^ ]/{RELEASE}/3' /etc/apt/sources.list")
     os.system("sudo apt-get clean && sudo apt-get -y update && sudo apt-get -y check")
     os.system("sudo apt-get -y install --fix-broken btrfs-progs ntp efibootmgr")
     if choice != "3":

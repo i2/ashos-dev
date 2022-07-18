@@ -209,7 +209,7 @@ def main(args, distro):
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
 
 #######
-    input("breakpoint1 before grub check if any entries in /boot/grub2/grub.cfg>")
+    input("breakpoint1 before grub check if any entries in /boot/grub2/grub.cfg>") ### YES THERE IS BUT IT IS GENERIC ONE WITHOUT ANY Fedora entry in 10_linux section or anywhere!
 #######
 
 #   GRUB and EFI (For now I use non-BLS format. Entries go in /boot/grub2/grub.cfg not in /boot/loader/entries/)
@@ -223,7 +223,7 @@ def main(args, distro):
         if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
             os.system("echo DISTRO,BootOrder | sudo tee /mnt/boot/efi/EFI/map.txt")
 #######
-        input("breakpoint2 before creating efi entry. was it automatically created? >")
+        input("breakpoint2 before creating efi entry. was it automatically created? >") ### NO Fedora efi entry is created yet!
 #######
         os.system(f"efibootmgr -c -d {args[2]} -p 1 -L 'Fedora' -l '\\EFI\\fedora\\shim.efi'") ###REVIEW_LATER shim.efi vs shimx64.efi ### CAN I REMOVE THIS?
         os.system(f"echo '{distro},' $(efibootmgr -v | grep -i {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")

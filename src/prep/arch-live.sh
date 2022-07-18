@@ -1,3 +1,4 @@
+# Ignore signature checking in pacman.conf (bad idea but sometimes necessary in VirtualBox)
 sed -e '/^SigLevel/ s/^#*/SigLevel = Never\n#/' -i /etc/pacman.conf
 sed -e '/^LocalFileSigLevel/ s/^#*/#/' -i /etc/pacman.conf
 pacman -Syy --noconfirm archlinux-keyring
