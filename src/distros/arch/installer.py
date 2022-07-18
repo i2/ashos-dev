@@ -139,8 +139,10 @@ def main(args, distro):
         if excode != 0:
             print("Failed to download packages!")
             sys.exit()
-    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):
-        os.system(f"sudo mount -B {i} /mnt{i}") # Mount-points needed for chrooting
+    for i in ("/dev", "/proc", "/run", "/sys"): # Mount-points needed for chrooting ### "/dev/pts" removed as rbind dev will include it
+        os.system(f"sudo mount -o x-mount.mkdir --rbind {i} /mnt{i}")
+    if efi:
+        os.system("sudo mount -o x-mount.mkdir -t efivarfs none /mnt/sys/firmware/efi/efivars")
 
 #   Update fstab
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")

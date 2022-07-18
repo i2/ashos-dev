@@ -20,6 +20,14 @@
 
     os.system("cp --reflink=auto -r /mnt/.snapshots/var/var-0/. /mnt/.snapshots/rootfs/snapshot-tmp/var/")
 
+    ### NOT NEEDED AT ALL os.system("cp /etc/resolv.conf /mnt/etc/")  ###########NEW FOR FEDORA, it says already cped this file!
+    ### glibc-locale-source is already installed
+
+    ### os.system("yum -y install glibc-langpack-en") ######### glibc-locale-source is already installed
+
+
+
+
 #### grubby shim-x64
 #grub2-common grub2-tools-minimal grub2-tools-efi os-prober grub2-tools grub2-efi-x64
 
@@ -28,3 +36,5 @@
 #args = list(sys.argv)
 #distro="fedora"
 #main(args, distro)
+
+

@@ -132,15 +132,14 @@ def main(args, distro):
         os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
 #   Bootstrap then install anytree and necessary packages in chroot
-    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):  ### REZA In debian, these mount-points operations go 'after' debootstrapping and there is no complaint! In fedora, if so, dnf would complain /dev is not mounted!
-        os.system(f"sudo mkdir -p /mnt{i}")
-        os.system(f"sudo mount -B {i} /mnt{i}") # Mount-points needed for chrooting
+    for i in ("/dev", "/proc", "/run", "/sys"): # Mount-points needed for chrooting ### "/dev/pts" removed as rbind dev will include it
+        os.system(f"sudo mount -o x-mount.mkdir --rbind {i} /mnt{i}")
+    if efi:
+        os.system("sudo mount -o x-mount.mkdir -t efivarfs none /mnt/sys/firmware/efi/efivars")
     os.system(f"sudo dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install dnf -y --releasever={RELEASE} --forcearch={ARCH}")
     if efi:
         os.system("sudo chroot /mnt dnf install -y efibootmgr grub2-efi-x64") #addeed grub2-efi-x64 as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?  # grub2-common already installed at this point
     os.system(f"sudo chroot /mnt dnf install -y {packages}")
-    ### NOT NEEDED AT ALL os.system("cp /etc/resolv.conf /mnt/etc/")  ###########NEW FOR FEDORA, it says already cped this file!
-    ### glibc-locale-source is already installed
     os.system(f"sudo chroot /mnt dnf install -y systemd ncurses bash-completion kernel glibc-locale-source glibc-langpack-en --releasever={RELEASE}") ########NEW FOR FEDORA package 'systemd' already installed using whatever above packages came
 
 #   Update fstab
@@ -179,7 +178,6 @@ def main(args, distro):
 #   Update hostname, hosts, locales and timezone, hosts
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
     os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
-    ### os.system("yum -y install glibc-langpack-en") ######### glibc-locale-source is already installed
     os.system("sudo chroot /mnt localedef -v -c -i en_US -f UTF-8 en_US.UTF-8") #######REZA got error (
     os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
     os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
