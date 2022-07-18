@@ -72,7 +72,7 @@ def get_username():
     return username
 
 def create_user(u):
-    os.system(f"sudo chroot /mnt useradd -m -G wheel -s /bin/bash {u}")
+    os.system(f"sudo chroot /mnt /usr/sbin/useradd -m -G wheel -s /bin/bash {u}")
     os.system("echo '%wheel ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /mnt/home/{u}/.bashrc")
 
@@ -170,7 +170,7 @@ def main(args, distro):
     os.system(f"sudo sed -i '/^NAME/ s/Arch Linux/Arch Linux (ashos)/' /mnt/etc/os-release")
     os.system(f"sudo sed -i '/PRETTY_NAME/ s/Arch Linux/Arch Linux (ashos)/' /mnt/etc/os-release")
     os.system(f"sudo sed -i '/^ID/ s/arch/arch_ashos/' /mnt/etc/os-release")
-    #os.system("echo 'HOME_URL=\"https://github.com/astos/astos\"' | tee -a /mnt/etc/os-release")
+    #os.system("echo 'HOME_URL=\"https://github.com/astos/astos\"' | sudo tee -a /mnt/etc/os-release")
 
 #   Update hostname, hosts, locales and timezone, hosts
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
@@ -179,13 +179,13 @@ def main(args, distro):
     os.system("sudo chroot /mnt locale-gen")
     os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
     os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
-    os.system("sudo chroot /mnt hwclock --systohc")
+    os.system("sudo chroot /mnt /usr/sbin/hwclock --systohc")
 
     os.system(f"sudo sed -i '0,/@{distro_suffix}/ s,@{distro_suffix},@.snapshots{distro_suffix}/rootfs/snapshot-tmp,' /mnt/etc/fstab")
     os.system(f"sudo sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
     os.system(f"sudo sed -i '0,/@etc{distro_suffix}/ s,@etc{distro_suffix},@.snapshots{distro_suffix}/etc/etc-tmp,' /mnt/etc/fstab")
     # Delete fstab created for @{distro_suffix} which is going to be deleted (at the end of installer)
-    os.system(f"sed -i.bak '/\@{distro_suffix}/d' /mnt/etc/fstab")
+    os.system(f"sudo sed -i.bak '/\@{distro_suffix}/d' /mnt/etc/fstab")
 
 #   Copy and symlink astpk and detect_os.sh                                     ###MOVEDTOHERE
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")

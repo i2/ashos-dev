@@ -212,7 +212,7 @@ def main(args, distro):
     os.system(f"sudo sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
     os.system(f"sudo sed -i '0,/@etc{distro_suffix}/ s,@etc{distro_suffix},@.snapshots{distro_suffix}/etc/etc-tmp,' /mnt/etc/fstab")
     # Delete fstab created for @{distro_suffix} which is going to be deleted (at the end of installer)
-    os.system(f"sed -i.bak '/\@{distro_suffix}/d' /mnt/etc/fstab")
+    os.system(f"sudo sed -i.bak '/\@{distro_suffix}/d' /mnt/etc/fstab")
 
 #   Copy and symlink astpk and detect_os.sh                                     ###MOVEDTOHERE
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
