@@ -94,9 +94,10 @@ def main(args, distro):
     choice, distro_suffix = get_multiboot(distro)
 
 #   Define variables
-    packages = "firmware-linux-nonfree python3 python3-anytree btrfs-progs network-manager locales sudo nano"
+    ###packages = "firmware-linux-nonfree python3 python3-anytree btrfs-progs network-manager locales sudo nano"
+    packages = "btrfs-progs locales sudo nano"
     ARCH = "amd64"
-    RELEASE = "bullseye"
+    RELEASE = "sid"
     astpart = to_uuid(args[1])
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
@@ -212,7 +213,7 @@ def main(args, distro):
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
     os.system(f"sudo cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
     os.system("sudo cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
-    os.system("sudo chroot /mnt ln -s /.snapshots/ast/ast /usr/bin/ast")             ####PR32 Can I moved it somewhere better?
+    os.system("sudo chroot /mnt ln -s /.snapshots/ast/ast /usr/bin/ast")
     os.system("sudo chroot /mnt ln -s /.snapshots/ast/detect_os.sh /usr/bin/detect_os.sh")
     os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
 
@@ -255,7 +256,7 @@ def main(args, distro):
     os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
 
     os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
-    os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
+    os.system("sudo chroot /mnt /usr/bin/btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
 
     os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/")
     os.system("sudo cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")

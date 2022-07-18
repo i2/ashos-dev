@@ -183,7 +183,7 @@ def main(args, distro):
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
     os.system(f"sudo cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
     os.system("sudo cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
-    os.system("sudo chroot /mnt ln -s /.snapshots/ast/ast /usr/bin/ast")             ####PR32 Can I moved it somewhere better?
+    os.system("sudo chroot /mnt ln -s /.snapshots/ast/ast /usr/bin/ast")
     os.system("sudo chroot /mnt ln -s /.snapshots/ast/detect_os.sh /usr/bin/detect_os.sh")
     os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
 
