@@ -1,6 +1,8 @@
 # If you are installing this on VirtualBox to test it out, set RAM bigger than
 # 1024MB as otherwise it errors out (running out of cache/RAM space)
-sudo apt-get remove -y --purge man-db # Fix slow man-db trigger
+sudo apt-get -y autoremove
+sudo apt-get -y autoclean
+sudo apt-get -y remove --purge man-db # Fix slow man-db trigger
 sudo apt-get -y update && sudo apt-get -y --fix-broken install git tmux parted btrfs-progs dosfstools
 echo "export LC_ALL=C LC_CTYPE=C LANGUAGE=C" | tee -a $HOME/.bashrc
 echo "alias p='curl -F "'"sprunge=<-"'" sprunge.us'" | tee -a $HOME/.bashrc
