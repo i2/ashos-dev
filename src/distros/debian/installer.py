@@ -110,8 +110,8 @@ def main(args, distro):
     hostname = get_hostname()
 
 #   Prep (format, etc.)
-    os.system("sudo apt-get clean && sudo apt-get update -y && sudo apt-get check -y")
-    os.system("sudo apt-get install -y --fix-broken btrfs-progs ntp efibootmgr")
+    os.system("sudo apt-get clean && sudo apt-get -y update && sudo apt-get -y check")
+    os.system("sudo apt-get -y install --fix-broken btrfs-progs ntp efibootmgr")
     if choice != "3":
         os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
 
@@ -135,14 +135,14 @@ def main(args, distro):
 #        os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
 #   Bootstrap (minimal)
-    os.system("sudo apt-get install -y debootstrap")
+    os.system("sudo apt-get -y install debootstrap")
     excl = subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | awk '{print $1}'", shell=True).decode('utf-8').strip().replace("\n",",")
     os.system(f"sudo debootstrap --arch {ARCH} --exclude={excl} {RELEASE} /mnt http://ftp.debian.org/debian")
     for i in ("/dev", "/proc", "/run", "/sys"): # Mount-points needed for chrooting ### "/dev/pts" removed as rbind dev will include it
         os.system(f"sudo mount -o x-mount.mkdir --rbind {i} /mnt{i}")
     if efi:
         os.system("sudo mount -o x-mount.mkdir -t efivarfs none /mnt/sys/firmware/efi/efivars")
-    os.system(f"sudo chroot /mnt apt-get install --fix-broken -y linux-image-{ARCH}")
+    os.system(f"sudo chroot /mnt apt-get -y install --fix-broken linux-image-{ARCH}")
 
 #MOVEDUPBEFOREDEBOOTSTRAP    if efi: ###REZA #MOVED FROM ABOVE See if there are still files in sda1 unnecessarily heavy (ONLY FOR DEBOOSTRAP BASED OS, NOT FOR ARCH)
 #MOVEDUPBEFOREDEBOOTSTRAP        os.system("sudo mkdir /mnt/boot/efi")
@@ -156,21 +156,21 @@ def main(args, distro):
 #   Install anytree and necessary packages in chroot
     os.system("sudo systemctl enable --now ntp && sleep 30s && ntpq -p") # Sync time in the live iso
     os.system(f"echo 'deb [trusted=yes] http://www.deb-multimedia.org {RELEASE} main' | sudo tee -a /mnt/etc/apt/sources.list.d/multimedia.list >/dev/null")
-    os.system("sudo chroot /mnt apt-get update -y -oAcquire::AllowInsecureRepositories=true")
-    os.system("sudo chroot /mnt apt-get install -y deb-multimedia-keyring --allow-unauthenticated")
-    #os.system("sudo chroot /mnt apt-get install -y python3-anytree network-manager btrfs-progs dhcpcd5 locales sudo tmux") # os-prober
-    excode = int(os.system(f"sudo chroot /mnt apt-get install -y {packages}"))
+    os.system("sudo chroot /mnt apt-get -y update -oAcquire::AllowInsecureRepositories=true")
+    os.system("sudo chroot /mnt apt-get -y install deb-multimedia-keyring --allow-unauthenticated")
+    #os.system("sudo chroot /mnt apt-get -y install python3-anytree network-manager btrfs-progs dhcpcd5 locales sudo tmux") # os-prober
+    excode = int(os.system(f"sudo chroot /mnt apt-get -y install {packages}"))
     if excode != 0:
         print("Failed to download packages!")
         sys.exit()
-    #os.system("sudo chroot /mnt apt-get install -y btrfs-progs locales")
+    #os.system("sudo chroot /mnt apt-get -y install btrfs-progs locales")
     if efi:
-        excode = int(os.system("sudo chroot /mnt apt-get install -y grub-efi"))
+        excode = int(os.system("sudo chroot /mnt apt-get -y install grub-efi"))
         if excode != 0:
             print("Failed to download packages!")
             sys.exit()
     else:
-        excode = int(os.system("sudo chroot /mnt apt-get install -y grub-pc"))
+        excode = int(os.system("sudo chroot /mnt apt-get -y install grub-pc"))
         if excode != 0:
             print("Failed to download packages!")
             sys.exit()
