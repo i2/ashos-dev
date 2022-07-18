@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+import sys ### REMOVE WHEN USING TRY CATCH
 
 def clear():
     os.system("#clear")
