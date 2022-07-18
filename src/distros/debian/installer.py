@@ -72,7 +72,7 @@ def get_username():
     return username
 
 def create_user(u):
-    os.system(f"sudo chroot /mnt useradd -m -G sudo -s /bin/bash {u}")
+    os.system(f"sudo chroot /mnt /usr/sbin/useradd -m -G sudo -s /bin/bash {u}")
     os.system("echo '%sudo ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /mnt/home/{u}/.bashrc")
 
@@ -94,9 +94,9 @@ def main(args, distro):
 
 #   Define variables
     packages = "firmware-linux-nonfree python3 python3-anytree btrfs-progs network-manager locales sudo nano"
-    RELEASE = "bullseye"
     ARCH = "amd64"
-    #astpart = to_uuid(args[1])
+    RELEASE = "bullseye"
+    astpart = to_uuid(args[1])
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
     if os.path.exists("/sys/firmware/efi"):
@@ -107,18 +107,12 @@ def main(args, distro):
     tz = get_timezone()
     hostname = get_hostname()
 
-#   Partition and format
-    #os.system("find $HOME -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C LANGUAGE=C LANG=C >> $1' -- {} \;") # Perl complains if not set
-    os.system("sudo apt-get remove -y --purge man-db") # make installs faster (because of trigger man-db bug)
+#   Prep (format, etc.)
+    os.system("sudo apt-get remove -y --purge man-db") # Fix slow man-db trigger
     os.system("sudo apt-get clean && sudo apt-get update -y && sudo apt-get check -y")
-    os.system("sudo apt-get install -y --fix-broken parted dosfstools") ### DELETE THIS LINE WHEN PRODUCTION READY
-    os.system("sudo apt-get install -y --fix-broken btrfs-progs ntp efibootmgr") # Add this to the first apt-get install to fix any broken package
+    os.system("sudo apt-get install -y --fix-broken btrfs-progs ntp efibootmgr")
     if choice != "3":
-        if efi:
-            os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}") ### DELETE THIS LINE WHEN PRODUCTION READY
         os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
-
-    astpart = to_uuid(args[1]) ### DELETE THIS LINE WHEN PRODUCTION READY
 
 #   Mount and create necessary sub-volumes and directories
     if choice != "3":
@@ -138,12 +132,6 @@ def main(args, distro):
     if efi:
         os.system("sudo mkdir /mnt/boot/efi")
         os.system(f"sudo mount {args[3]} /mnt/boot/efi")
-
-#   Modify shell profile for debug purposes in live iso (optional temporary)
-    #os.system('echo "alias paste='"'"'curl -F "'"'"'"sprunge=<-"'"'"'" http://sprunge.us'"'"' " | tee -a $HOME/.*shrc')
-    #os.system("shopt -s nullglob && echo 'export LC_ALL=C' | sudo tee -a /mnt/root/.*shrc")
-    #os.system("find /mnt/root/ -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C | sudo tee -a $1' -- {} \;")
-    #os.system("echo -e 'setw -g mode-keys vi\nset -g history-limit 999999' >> $HOME/.tmux.conf")
 
 #   Bootstrap (minimal)
     os.system("sudo apt-get install -y debootstrap")
@@ -194,10 +182,10 @@ def main(args, distro):
     #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf") ### REVIEW_LATER
 
 #   Modify OS release information (optional)
-    os.system(f"sudo sed -i '/^NAME/ s/Debian/Debian (ashos)/' /mnt/etc/os-release")
-    os.system(f"sudo sed -i '/PRETTY_NAME/ s/Debian/Debian (ashos)/' /mnt/etc/os-release")
-    os.system(f"sudo sed -i '/^ID/ s/debian/debian_ashos/' /mnt/etc/os-release")
-    #os.system("echo 'HOME_URL=\"https://github.com/astos/astos\"' | tee -a /mnt/etc/os-release")
+    #os.system(f"sudo sed -i '/^NAME/ s/Debian/Debian (ashos)/' /mnt/etc/os-release")
+    #os.system(f"sudo sed -i '/PRETTY_NAME/ s/Debian/Debian (ashos)/' /mnt/etc/os-release")
+    os.system(f"sudo sed -i '/^ID/ s/{distro}/{distro}_ashos/' /mnt/etc/os-release")
+    #os.system("echo 'HOME_URL=\"https://github.com/astos/astos\"' | sudo tee -a /mnt/etc/os-release")
 
 #   Update hostname, hosts, locales and timezone, hosts
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
@@ -206,13 +194,12 @@ def main(args, distro):
     os.system("sudo chroot /mnt locale-gen")
     os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
     os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
-    os.system("sudo chroot /mnt hwclock --systohc")
+    os.system("sudo chroot /mnt /usr/sbin/hwclock --systohc")
 
     os.system(f"sudo sed -i '0,/@{distro_suffix}/ s,@{distro_suffix},@.snapshots{distro_suffix}/rootfs/snapshot-tmp,' /mnt/etc/fstab")
     os.system(f"sudo sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
     os.system(f"sudo sed -i '0,/@etc{distro_suffix}/ s,@etc{distro_suffix},@.snapshots{distro_suffix}/etc/etc-tmp,' /mnt/etc/fstab")
-    # Delete fstab created for @{distro_suffix} which is going to be deleted (at the end of installer)
-    os.system(f"sudo sed -i.bak '/\@{distro_suffix}/d' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '/\@{distro_suffix}/d' /mnt/etc/fstab") # Delete @_distro entry
 
 #   Copy and symlink astpk and detect_os.sh                                     ###MOVEDTOHERE
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")

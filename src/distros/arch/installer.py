@@ -94,7 +94,7 @@ def main(args, distro):
 
 #   Define variables
     packages = "base linux linux-firmware nano python3 python-anytree bash dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo tmux os-prober"
-    #astpart = to_uuid(args[1])
+    astpart = to_uuid(args[1])
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
     if os.path.exists("/sys/firmware/efi"):
@@ -105,14 +105,10 @@ def main(args, distro):
     tz = get_timezone()
     hostname = get_hostname()
 
-#   Partition and format
+#   Prep (format, etc.)
     if choice != "3":
-        if efi:
-            os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}") ### DELETE THIS LINE WHEN PRODUCTION READY
         os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
     os.system("pacman -Syy --noconfirm archlinux-keyring")
-
-    astpart = to_uuid(args[1]) ### DELETE THIS LINE WHEN PRODUCTION READY
 
 #   Mount and create necessary sub-volumes and directories
     if choice != "3":
@@ -132,12 +128,6 @@ def main(args, distro):
     if efi:
         os.system("sudo mkdir /mnt/boot/efi")
         os.system(f"sudo mount {args[3]} /mnt/boot/efi")
-
-#   Modify shell profile for debug purposes in live iso (optional temporary)
-    #os.system('echo "alias paste='"'"'curl -F "'"'"'"sprunge=<-"'"'"'" http://sprunge.us'"'"' " | tee -a $HOME/.*shrc')
-    #os.system("shopt -s nullglob && echo 'export LC_ALL=C' | sudo tee -a /mnt/root/.*shrc")
-    #os.system("find /mnt/root/ -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C | sudo tee -a $1' -- {} \;")
-    #os.system("echo -e 'setw -g mode-keys vi\nset -g history-limit 999999' >> $HOME/.tmux.conf")
 
 #   Bootstrap then install anytree and necessary packages in chroot
     excode = int(os.system(f"sudo pacstrap /mnt {packages}"))
@@ -167,9 +157,9 @@ def main(args, distro):
     os.system(f"sed -i s,\"#DBPath      = /var/lib/pacman/\",\"DBPath      = /usr/share/ast/db/\",g /mnt/etc/pacman.conf")
 
 #   Modify OS release information (optional)
-    os.system(f"sudo sed -i '/^NAME/ s/Arch Linux/Arch Linux (ashos)/' /mnt/etc/os-release")
-    os.system(f"sudo sed -i '/PRETTY_NAME/ s/Arch Linux/Arch Linux (ashos)/' /mnt/etc/os-release")
-    os.system(f"sudo sed -i '/^ID/ s/arch/arch_ashos/' /mnt/etc/os-release")
+    #os.system(f"sudo sed -i '/^NAME/ s/Arch Linux/Arch Linux (ashos)/' /mnt/etc/os-release")
+    #os.system(f"sudo sed -i '/PRETTY_NAME/ s/Arch Linux/Arch Linux (ashos)/' /mnt/etc/os-release")
+    os.system(f"sudo sed -i '/^ID/ s/{distro}/{distro}_ashos/' /mnt/etc/os-release")
     #os.system("echo 'HOME_URL=\"https://github.com/astos/astos\"' | sudo tee -a /mnt/etc/os-release")
 
 #   Update hostname, hosts, locales and timezone, hosts
@@ -184,8 +174,7 @@ def main(args, distro):
     os.system(f"sudo sed -i '0,/@{distro_suffix}/ s,@{distro_suffix},@.snapshots{distro_suffix}/rootfs/snapshot-tmp,' /mnt/etc/fstab")
     os.system(f"sudo sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
     os.system(f"sudo sed -i '0,/@etc{distro_suffix}/ s,@etc{distro_suffix},@.snapshots{distro_suffix}/etc/etc-tmp,' /mnt/etc/fstab")
-    # Delete fstab created for @{distro_suffix} which is going to be deleted (at the end of installer)
-    os.system(f"sudo sed -i.bak '/\@{distro_suffix}/d' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '/\@{distro_suffix}/d' /mnt/etc/fstab") # Delete @_distro entry
 
 #   Copy and symlink astpk and detect_os.sh                                     ###MOVEDTOHERE
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
@@ -231,7 +220,7 @@ def main(args, distro):
     os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
 
     os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
-    os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
+    os.system("sudo chroot /mnt /usr/sbin/btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
 
     os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/")
     os.system("sudo cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")

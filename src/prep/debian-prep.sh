@@ -7,6 +7,7 @@ echo "set -g history-limit 999999" | tee -a $HOME/.tmux.conf
 git clone http://github.com/i2/ashos-dev
 cd ashos-dev
 git checkout debian
+sudo apt-get install -y --fix-broken parted dosfstools
 /bin/bash ./src/prep/part-efi-example.sh /dev/sda
 #sudo python3 init.py /dev/sda2 /dev/sda /dev/sda1
 

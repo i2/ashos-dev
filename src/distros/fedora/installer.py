@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 
-#https://docs.fedoraproject.org/en-US/fedora/latest/system-administrators-guide/kernel-module-driver-configuration/Manually_Upgrading_the_Kernel/
-
 import os
 import subprocess
 
@@ -20,13 +18,13 @@ def get_multiboot(dist):
         print("Please be aware choosing option 1 and 2 will wipe {args[1]}")
         i = input("> ")
         if i == "1":
-            return i,""
+            return i, ""
             break
         elif i == "2":
-            return i,f"_{dist}"
+            return i, f"_{dist}"
             break
         elif i == "3":
-            return i,f"_{dist}"
+            return i, f"_{dist}"
             break
         else:
             print("Invalid choice!")
@@ -95,10 +93,10 @@ def main(args, distro):
     choice, distro_suffix = get_multiboot(distro)
 
 #   Define variables
-    ARCH="x86_64"
-    RELEASE="rawhide"
     packages = "passwd which grub2-efi-x64-modules shim-x64 btrfs-progs python python-anytree sudo tmux neovim NetworkManager dhcpcd efibootmgr" # bash os-prober
-    #astpart = to_uuid(args[1])
+    ARCH = "x86_64"
+    RELEASE = "rawhide"
+    astpart = to_uuid(args[1])
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
     if os.path.exists("/sys/firmware/efi"):
@@ -109,14 +107,10 @@ def main(args, distro):
     tz = get_timezone()
     hostname = get_hostname()
 
-#   Partition and format
+#   Prep (format, etc.)
     if choice != "3":
-        if efi:
-            os.system(f"sudo /usr/sbin/mkfs.vfat -F32 -n EFI {args[3]}") ### DELETE THIS LINE WHEN PRODUCTION READY
         os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
     os.system("pacman -Syy --noconfirm archlinux-keyring dnf")
-
-    astpart = to_uuid(args[1]) ### DELETE THIS LINE WHEN PRODUCTION READY
 
 #   Mount and create necessary sub-volumes and directories
     if choice != "3":
@@ -137,14 +131,7 @@ def main(args, distro):
         os.system("sudo mkdir /mnt/boot/efi")
         os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
-#   Modify shell profile for debug purposes in live iso (optional temporary)
-    #os.system('echo "alias paste='"'"'curl -F "'"'"'"sprunge=<-"'"'"'" http://sprunge.us'"'"' " | tee -a $HOME/.*shrc')
-    #os.system("shopt -s nullglob && echo 'export LC_ALL=C' | sudo tee -a /mnt/root/.*shrc")
-    #os.system("find /mnt/root/ -maxdepth 1 -type f -iname '.*shrc' -exec sh -c 'echo export LC_ALL=C | sudo tee -a $1' -- {} \;")
-    #os.system("echo -e 'setw -g mode-keys vi\nset -g history-limit 999999' >> $HOME/.tmux.conf")
-
-#   Bootstrap
-    #os.system(f"sudo dnf makecache --refresh --releasever={RELEASE} -c ./src/distros/fedora/base.repo") # This causes many errors 'insert into requirename values'
+#   Bootstrap then install anytree and necessary packages in chroot
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys", "/sys/firmware/efi/efivars"):  ### REZA In debian, these mount-points operations go 'after' debootstrapping and there is no complaint! In fedora, if so, dnf would complain /dev is not mounted!
         os.system(f"sudo mkdir -p /mnt{i}")
         os.system(f"sudo mount -B {i} /mnt{i}") # Mount-points needed for chrooting
@@ -169,11 +156,22 @@ def main(args, distro):
     os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
     #os.system(f"sudo cp -r /mnt/var/lib/pacman/* /mnt/usr/share/ast/db")
     #os.system(f"sudo sed -i s,\"#DBPath      = /var/lib/pacman/\",\"DBPath      = /usr/share/ast/db/\",g /mnt/etc/pacman.conf")
+    #os.system("if [ ! -L /usr/lib/sysimage/rpm/rpmdb.sqlite || -L /var/lib/rpm ]; then \
+    #           mv /usr/lib/sysimage/rpm/* /var/lib/rpm/")
+    # If rpmdb is under /usr, move it to /var and create a symlink
+    if os.path.islink("/var/lib/dnf") or os.path.isfile("/usr/lib/sysimage/dnf/history.sqlite"):
+        os.system("sudo rm -r /var/lib/dnf")
+        os.system("sudo mv /usr/lib/sysimage/dnf /var/lib/")
+        os.system("sudo ln -s /usr/lib/sysimage/dnf /var/lib/dnf")
+    if os.path.islink("/var/lib/rpm") or os.path.isfile("/usr/lib/sysimage/rpm/rpmdb.sqlite"):
+        os.system("sudo rm -r /var/lib/rpm")
+        os.system("sudo mv /usr/lib/sysimage/rpm /var/lib/")
+        os.system("sudo ln -s /usr/lib/sysimage/rpm /var/lib/rpm")
 
 #   Modify OS release information (optional)
-    os.system(f"sudo sed -i '/^NAME/ s/Fedora Linux/Fedora Linux (ashos)/' /mnt/etc/os-release")
-    os.system(f"sudo sed -i '/PRETTY_NAME/ s/Fedora Linux/Fedora Linux (ashos)/' /mnt/etc/os-release")
-    os.system(f"sudo sed -i '/^ID/ s/fedora/fedora_ashos/' /mnt/etc/os-release")
+    #os.system(f"sudo sed -i '/^NAME/ s/Fedora Linux/Fedora Linux (ashos)/' /mnt/etc/os-release")
+    #os.system(f"sudo sed -i '/PRETTY_NAME/ s/Fedora Linux/Fedora Linux (ashos)/' /mnt/etc/os-release")
+    os.system(f"sudo sed -i '/^ID/ s/{distro}/{distro}_ashos/' /mnt/etc/os-release")
     #os.system("echo 'HOME_URL=\"https://github.com/astos/astos\"' | sudo tee -a /mnt/etc/os-release")
 
     os.system(f"echo 'releasever={RELEASE}' | tee /mnt/etc/yum.conf") ########NEW FOR FEDORA WHY DID I ADD THIS?
@@ -190,8 +188,7 @@ def main(args, distro):
     os.system(f"sudo sed -i '0,/@{distro_suffix}/ s,@{distro_suffix},@.snapshots{distro_suffix}/rootfs/snapshot-tmp,' /mnt/etc/fstab")
     os.system(f"sudo sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
     os.system(f"sudo sed -i '0,/@etc{distro_suffix}/ s,@etc{distro_suffix},@.snapshots{distro_suffix}/etc/etc-tmp,' /mnt/etc/fstab")
-    # Delete fstab created for @{distro_suffix} which is going to be deleted (at the end of installer)
-    os.system(f"sudo sed -i.bak '/\@{distro_suffix}/d' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '/\@{distro_suffix}/d' /mnt/etc/fstab") # Delete @_distro entry
 
 #   Copy and symlink astpk and detect_os.sh                                     ###MOVEDTOHERE
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
@@ -246,7 +243,7 @@ def main(args, distro):
     os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
 
     os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
-    os.system("sudo chroot /mnt sudo btrfs sub set-default /.snapshots/rootfs/snapshot-tmp") # without sudo, would not find btrfs command (ENV_SUPATH)
+    os.system("sudo chroot /mnt /usr/sbin/btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
 
     os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/")
     os.system("sudo cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")
@@ -257,7 +254,7 @@ def main(args, distro):
     if efi:
         os.system("sudo umount /mnt/boot/efi")
     os.system("sudo umount /mnt/boot")
-    os.system(f"sudo mount {args[1]} -o subvol=@boot{distro_suffix},compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp")
+    os.system(f"sudo mount {args[1]} -o subvol=@boot{distro_suffix},compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp") ### IS this mnt point empty?
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-tmp/. /mnt/boot/")
     os.system("sudo umount /mnt/etc")
     os.system(f"sudo mount {args[1]} -o subvol=@etc{distro_suffix},compress=zstd,noatime /mnt/.snapshots/etc/etc-tmp")
