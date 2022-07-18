@@ -1,0 +1,744 @@
+an:~/ashos-dev$ sudo python3 init.py /dev/sda2 /dev/sda /dev/sda1
+Welcome to the AshOS installer!
+
+
+
+
+
+Please choose one of the following:
+1. Single OS installation
+2. Initiate a multi-boot ashos setup
+3. Adding to an already installed ashos
+Please be aware choosing option 1 and 2 will wipe {args[1]}
+> 3
+Select a timezone (type list to list):
+> UTC
+Enter hostname:
+> debian
+Happy with your hostname (y/n)?
+> y
+Hit:1 http://deb.debian.org/debian bullseye InRelease
+Reading package lists... Done
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+btrfs-progs is already the newest version (5.10.1-2).
+The following package was automatically installed and is no longer required:
+  libpipeline1
+Use 'sudo apt autoremove' to remove it.
+The following additional packages will be installed:
+  libefiboot1 libefivar1 libevent-core-2.1-7 libevent-pthreads-2.1-7 libopts25 sntp
+Suggested packages:
+  ntp-doc
+The following NEW packages will be installed:
+  efibootmgr libefiboot1 libefivar1 libevent-core-2.1-7 libevent-pthreads-2.1-7 libopts25 ntp sntp
+0 upgraded, 8 newly installed, 0 to remove and 43 not upgraded.
+Need to get 1346 kB of archives.
+After this operation, 3440 kB of additional disk space will be used.
+Get:1 http://deb.debian.org/debian bullseye/main amd64 libefivar1 amd64 37-6 [50.0 kB]
+Get:2 http://deb.debian.org/debian bullseye/main amd64 libefiboot1 amd64 37-6 [44.1 kB]
+Get:3 http://deb.debian.org/debian bullseye/main amd64 efibootmgr amd64 17-1 [31.2 kB]
+Get:4 http://deb.debian.org/debian bullseye/main amd64 libevent-core-2.1-7 amd64 2.1.12-stable-1 [139 kB]
+Get:5 http://deb.debian.org/debian bullseye/main amd64 libevent-pthreads-2.1-7 amd64 2.1.12-stable-1 [57.1 kB]
+Get:6 http://deb.debian.org/debian bullseye/main amd64 libopts25 amd64 1:5.18.16-4 [69.2 kB]
+Get:7 http://deb.debian.org/debian bullseye/main amd64 ntp amd64 1:4.2.8p15+dfsg-1 [785 kB]
+Get:8 http://deb.debian.org/debian bullseye/main amd64 sntp amd64 1:4.2.8p15+dfsg-1 [171 kB]
+Fetched 1346 kB in 0s (6467 kB/s)
+Selecting previously unselected package libefivar1:amd64.
+(Reading database ... 77987 files and directories currently installed.)
+Preparing to unpack .../0-libefivar1_37-6_amd64.deb ...
+Unpacking libefivar1:amd64 (37-6) ...
+Selecting previously unselected package libefiboot1:amd64.
+Preparing to unpack .../1-libefiboot1_37-6_amd64.deb ...
+Unpacking libefiboot1:amd64 (37-6) ...
+Selecting previously unselected package efibootmgr.
+Preparing to unpack .../2-efibootmgr_17-1_amd64.deb ...
+Unpacking efibootmgr (17-1) ...
+Selecting previously unselected package libevent-core-2.1-7:amd64.
+Preparing to unpack .../3-libevent-core-2.1-7_2.1.12-stable-1_amd64.deb ...
+Unpacking libevent-core-2.1-7:amd64 (2.1.12-stable-1) ...
+Selecting previously unselected package libevent-pthreads-2.1-7:amd64.
+Preparing to unpack .../4-libevent-pthreads-2.1-7_2.1.12-stable-1_amd64.deb ...
+Unpacking libevent-pthreads-2.1-7:amd64 (2.1.12-stable-1) ...
+Selecting previously unselected package libopts25:amd64.
+Preparing to unpack .../5-libopts25_1%3a5.18.16-4_amd64.deb ...
+Unpacking libopts25:amd64 (1:5.18.16-4) ...
+Selecting previously unselected package ntp.
+Preparing to unpack .../6-ntp_1%3a4.2.8p15+dfsg-1_amd64.deb ...
+Unpacking ntp (1:4.2.8p15+dfsg-1) ...
+Selecting previously unselected package sntp.
+Preparing to unpack .../7-sntp_1%3a4.2.8p15+dfsg-1_amd64.deb ...
+Unpacking sntp (1:4.2.8p15+dfsg-1) ...
+Setting up libopts25:amd64 (1:5.18.16-4) ...
+Setting up ntp (1:4.2.8p15+dfsg-1) ...
+Created symlink /etc/systemd/system/multi-user.target.wants/ntp.service -> /lib/systemd/system/ntp.service.
+invoke-rc.d: policy-rc.d denied execution of start.
+Setting up libevent-core-2.1-7:amd64 (2.1.12-stable-1) ...
+Setting up libefivar1:amd64 (37-6) ...
+Setting up libevent-pthreads-2.1-7:amd64 (2.1.12-stable-1) ...
+Setting up sntp (1:4.2.8p15+dfsg-1) ...
+Setting up libefiboot1:amd64 (37-6) ...
+Setting up efibootmgr (17-1) ...
+Processing triggers for libc-bin (2.31-13+deb11u3) ...
+ERROR: target path already exists: /mnt/@_debian
+ERROR: target path already exists: /mnt/@.snapshots_debian
+ERROR: target path already exists: /mnt/@boot_debian
+ERROR: target path already exists: /mnt/@etc_debian
+ERROR: target path already exists: /mnt/@home_debian
+ERROR: target path already exists: /mnt/@var_debian
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following package was automatically installed and is no longer required:
+  libpipeline1
+Use 'sudo apt autoremove' to remove it.
+The following additional packages will be installed:
+  arch-test
+Suggested packages:
+  ubuntu-archive-keyring squid-deb-proxy-client
+The following NEW packages will be installed:
+  arch-test debootstrap
+0 upgraded, 2 newly installed, 0 to remove and 43 not upgraded.
+Need to get 88.2 kB of archives.
+After this operation, 554 kB of additional disk space will be used.
+Get:1 http://deb.debian.org/debian bullseye/main amd64 arch-test all 0.17-1 [12.9 kB]
+Get:2 http://deb.debian.org/debian bullseye/main amd64 debootstrap all 1.0.123 [75.3 kB]
+Fetched 88.2 kB in 0s (1010 kB/s)
+Selecting previously unselected package arch-test.
+(Reading database ... 78103 files and directories currently installed.)
+Preparing to unpack .../arch-test_0.17-1_all.deb ...
+Unpacking arch-test (0.17-1) ...
+Selecting previously unselected package debootstrap.
+Preparing to unpack .../debootstrap_1.0.123_all.deb ...
+Unpacking debootstrap (1.0.123) ...
+Setting up debootstrap (1.0.123) ...
+Setting up arch-test (0.17-1) ...
+I: Target architecture can be executed
+I: Retrieving InRelease
+I: Checking Release signature
+I: Valid Release signature (key id A7236886F3CCCAAD148A27F80E98404D386FA1D9)
+I: Retrieving Packages
+I: Validating Packages
+I: Resolving dependencies of required packages...
+I: Resolving dependencies of base packages...
+I: Checking component main on http://ftp.debian.org/debian...
+I: Retrieving libacl1 2.3.1-1
+I: Validating libacl1 2.3.1-1
+I: Retrieving adduser 3.122
+I: Validating adduser 3.122
+I: Retrieving libapparmor1 3.0.4-3
+I: Validating libapparmor1 3.0.4-3
+I: Retrieving apt 2.5.1
+I: Validating apt 2.5.1
+I: Retrieving apt-utils 2.5.1
+I: Validating apt-utils 2.5.1
+I: Retrieving libapt-pkg6.0 2.5.1
+I: Validating libapt-pkg6.0 2.5.1
+I: Retrieving libargon2-1 0~20171227-0.3
+I: Validating libargon2-1 0~20171227-0.3
+I: Retrieving libattr1 1:2.5.1-1
+I: Validating libattr1 1:2.5.1-1
+I: Retrieving libaudit-common 1:3.0.7-1
+I: Validating libaudit-common 1:3.0.7-1
+I: Retrieving libaudit1 1:3.0.7-1+b1
+I: Validating libaudit1 1:3.0.7-1+b1
+I: Retrieving base-files 12.2
+I: Validating base-files 12.2
+I: Retrieving base-passwd 3.5.52
+I: Validating base-passwd 3.5.52
+I: Retrieving bash 5.1-6.1
+I: Validating bash 5.1-6.1
+I: Retrieving libbz2-1.0 1.0.8-5
+I: Validating libbz2-1.0 1.0.8-5
+I: Retrieving libdebconfclient0 0.263
+I: Validating libdebconfclient0 0.263
+I: Retrieving coreutils 8.32-4.1
+I: Validating coreutils 8.32-4.1
+I: Retrieving cpio 2.13+dfsg-7
+I: Validating cpio 2.13+dfsg-7
+I: Retrieving cron 3.0pl1-148
+I: Validating cron 3.0pl1-148
+I: Retrieving cron-daemon-common 3.0pl1-148
+I: Validating cron-daemon-common 3.0pl1-148
+I: Retrieving libcryptsetup12 2:2.4.3-1+b1
+I: Validating libcryptsetup12 2:2.4.3-1+b1
+I: Retrieving dash 0.5.11+git20210903+057cd650a4ed-8
+I: Validating dash 0.5.11+git20210903+057cd650a4ed-8
+I: Retrieving libdb5.3 5.3.28+dfsg1-0.10
+I: Validating libdb5.3 5.3.28+dfsg1-0.10
+I: Retrieving debconf 1.5.79
+I: Validating debconf 1.5.79
+I: Retrieving debconf-i18n 1.5.79
+I: Validating debconf-i18n 1.5.79
+I: Validating debian-archive-keyring 2021.1.1
+I: Retrieving debianutils 5.7-0.2
+I: Validating debianutils 5.7-0.2
+I: Validating diffutils 1:3.7-5
+I: Retrieving dmidecode 3.4-1
+I: Validating dmidecode 3.4-1
+I: Retrieving dpkg 1.21.9
+I: Validating dpkg 1.21.9
+I: Retrieving e2fsprogs 1.46.5-2
+I: Validating e2fsprogs 1.46.5-2
+I: Retrieving libcom-err2 1.46.5-2
+I: Validating libcom-err2 1.46.5-2
+I: Retrieving libext2fs2 1.46.5-2
+I: Validating libext2fs2 1.46.5-2
+I: Retrieving libss2 1.46.5-2
+I: Validating libss2 1.46.5-2
+I: Retrieving logsave 1.46.5-2
+I: Validating logsave 1.46.5-2
+I: Retrieving libelf1 0.187-1
+I: Validating libelf1 0.187-1
+I: Retrieving findutils 4.9.0-3
+I: Validating findutils 4.9.0-3
+I: Retrieving gcc-12-base 12.1.0-5
+I: Validating gcc-12-base 12.1.0-5
+I: Retrieving libgcc-s1 12.1.0-5
+I: Validating libgcc-s1 12.1.0-5
+I: Retrieving libstdc++6 12.1.0-5
+I: Validating libstdc++6 12.1.0-5
+I: Retrieving gcc-9-base 9.5.0-1
+I: Validating gcc-9-base 9.5.0-1
+I: Retrieving libc-bin 2.33-8
+I: Validating libc-bin 2.33-8
+I: Retrieving libc6 2.33-8
+I: Validating libc6 2.33-8
+I: Retrieving libgmp10 2:6.2.1+dfsg1-1
+I: Validating libgmp10 2:6.2.1+dfsg1-1
+I: Retrieving gpgv 2.2.35-3
+I: Validating gpgv 2.2.35-3
+I: Retrieving libgnutls30 3.7.6-2
+I: Validating libgnutls30 3.7.6-2
+I: Retrieving grep 3.7-1
+I: Validating grep 3.7-1
+I: Retrieving gzip 1.12-1
+I: Validating gzip 1.12-1
+I: Validating hostname 3.23
+I: Retrieving ifupdown 0.8.37
+I: Validating ifupdown 0.8.37
+I: Retrieving init 1.64
+I: Validating init 1.64
+I: Retrieving init-system-helpers 1.64
+I: Validating init-system-helpers 1.64
+I: Retrieving iproute2 5.18.0-1
+I: Validating iproute2 5.18.0-1
+I: Retrieving libip4tc2 1.8.8-1
+I: Validating libip4tc2 1.8.8-1
+I: Retrieving libxtables12 1.8.8-1
+I: Validating libxtables12 1.8.8-1
+I: Retrieving iputils-ping 3:20211215-1
+I: Validating iputils-ping 3:20211215-1
+I: Retrieving isc-dhcp-client 4.4.3-2
+I: Validating isc-dhcp-client 4.4.3-2
+I: Retrieving isc-dhcp-common 4.4.3-2
+I: Validating isc-dhcp-common 4.4.3-2
+I: Retrieving libjansson4 2.14-2
+I: Validating libjansson4 2.14-2
+I: Retrieving libjson-c5 0.16-1
+I: Validating libjson-c5 0.16-1
+I: Retrieving libkeyutils1 1.6.3-1
+I: Validating libkeyutils1 1.6.3-1
+I: Retrieving kmod 30+20220630-2
+I: Validating kmod 30+20220630-2
+I: Retrieving libkmod2 30+20220630-2
+I: Validating libkmod2 30+20220630-2
+I: Retrieving libgssapi-krb5-2 1.19.2-2+b2
+I: Validating libgssapi-krb5-2 1.19.2-2+b2
+I: Retrieving libk5crypto3 1.19.2-2+b2
+I: Validating libk5crypto3 1.19.2-2+b2
+I: Retrieving libkrb5-3 1.19.2-2+b2
+I: Validating libkrb5-3 1.19.2-2+b2
+I: Retrieving libkrb5support0 1.19.2-2+b2
+I: Validating libkrb5support0 1.19.2-2+b2
+I: Retrieving less 590-1
+I: Validating less 590-1
+I: Retrieving libbpf0 1:0.8.0-1
+I: Validating libbpf0 1:0.8.0-1
+I: Retrieving libbsd0 0.11.6-1
+I: Validating libbsd0 0.11.6-1
+I: Retrieving libcap-ng0 0.8.3-1
+I: Validating libcap-ng0 0.8.3-1
+I: Validating libcap2 1:2.44-1
+I: Validating libcap2-bin 1:2.44-1
+I: Retrieving libedit2 3.1-20210910-1
+I: Validating libedit2 3.1-20210910-1
+I: Retrieving libestr0 0.1.11-1
+I: Validating libestr0 0.1.11-1
+I: Validating libfastjson4 0.99.9-1
+I: Retrieving libffi8 3.4.2-4
+I: Validating libffi8 3.4.2-4
+I: Retrieving libgcrypt20 1.10.1-2
+I: Validating libgcrypt20 1.10.1-2
+I: Retrieving libgpg-error0 1.45-2
+I: Validating libgpg-error0 1.45-2
+I: Retrieving libidn2-0 2.3.3-1
+I: Validating libidn2-0 2.3.3-1
+I: Retrieving liblocale-gettext-perl 1.07-4+b2
+I: Validating liblocale-gettext-perl 1.07-4+b2
+I: Retrieving liblognorm5 2.0.6-4
+I: Validating liblognorm5 2.0.6-4
+I: Retrieving libmd0 1.0.4-2
+I: Validating libmd0 1.0.4-2
+I: Validating libmnl0 1.0.4-3
+I: Retrieving libnftnl11 1.2.2-1
+I: Validating libnftnl11 1.2.2-1
+I: Retrieving libseccomp2 2.5.4-1
+I: Validating libseccomp2 2.5.4-1
+I: Retrieving libselinux1 3.4-1
+I: Validating libselinux1 3.4-1
+I: Retrieving libsemanage-common 3.4-1
+I: Validating libsemanage-common 3.4-1
+I: Retrieving libsemanage2 3.4-1
+I: Validating libsemanage2 3.4-1
+I: Retrieving libsepol2 3.4-2
+I: Validating libsepol2 3.4-2
+I: Retrieving libtasn1-6 4.18.0-4
+I: Validating libtasn1-6 4.18.0-4
+I: Retrieving libtext-charwidth-perl 0.04-10+b2
+I: Validating libtext-charwidth-perl 0.04-10+b2
+I: Retrieving libtext-iconv-perl 1.7-7+b2
+I: Validating libtext-iconv-perl 1.7-7+b2
+I: Validating libtext-wrapi18n-perl 0.06-9
+I: Retrieving libtirpc-common 1.3.2-2
+I: Validating libtirpc-common 1.3.2-2
+I: Retrieving libtirpc3 1.3.2-2
+I: Validating libtirpc3 1.3.2-2
+I: Retrieving libunistring2 1.0-1
+I: Validating libunistring2 1.0-1
+I: Retrieving libcrypt1 1:4.4.28-2
+I: Validating libcrypt1 1:4.4.28-2
+I: Retrieving libzstd1 1.5.2+dfsg-1
+I: Validating libzstd1 1.5.2+dfsg-1
+I: Retrieving logrotate 3.20.1-1
+I: Validating logrotate 3.20.1-1
+I: Retrieving lsb-base 11.2
+I: Validating lsb-base 11.2
+I: Retrieving dmsetup 2:1.02.183-2
+I: Validating dmsetup 2:1.02.183-2
+I: Retrieving libdevmapper1.02.1 2:1.02.183-2
+I: Validating libdevmapper1.02.1 2:1.02.183-2
+I: Validating liblz4-1 1.9.3-2
+I: Retrieving mawk 1.3.4.20200120-3.1
+I: Validating mawk 1.3.4.20200120-3.1
+I: Retrieving nano 6.3-1
+I: Validating nano 6.3-1
+I: Retrieving libncurses6 6.3+20220423-2
+I: Validating libncurses6 6.3+20220423-2
+I: Retrieving libncursesw6 6.3+20220423-2
+I: Validating libncursesw6 6.3+20220423-2
+I: Retrieving libtinfo6 6.3+20220423-2
+I: Validating libtinfo6 6.3+20220423-2
+I: Retrieving ncurses-base 6.3+20220423-2
+I: Validating ncurses-base 6.3+20220423-2
+I: Retrieving ncurses-bin 6.3+20220423-2
+I: Validating ncurses-bin 6.3+20220423-2
+I: Validating netbase 6.3
+I: Validating libhogweed6 3.7.3-1
+I: Validating libnettle8 3.7.3-1
+I: Retrieving libnewt0.52 0.52.21-5+b1
+I: Validating libnewt0.52 0.52.21-5+b1
+I: Retrieving whiptail 0.52.21-5+b1
+I: Validating whiptail 0.52.21-5+b1
+I: Retrieving libnftables1 1.0.4-2
+I: Validating libnftables1 1.0.4-2
+I: Retrieving nftables 1.0.4-2
+I: Validating nftables 1.0.4-2
+I: Retrieving libssl3 3.0.4-2
+I: Validating libssl3 3.0.4-2
+I: Retrieving libp11-kit0 0.24.1-1
+I: Validating libp11-kit0 0.24.1-1
+I: Retrieving libpam-modules 1.4.0-13
+I: Validating libpam-modules 1.4.0-13
+I: Retrieving libpam-modules-bin 1.4.0-13
+I: Validating libpam-modules-bin 1.4.0-13
+I: Retrieving libpam-runtime 1.4.0-13
+I: Validating libpam-runtime 1.4.0-13
+I: Retrieving libpam0g 1.4.0-13
+I: Validating libpam0g 1.4.0-13
+I: Retrieving libpcre2-8-0 10.40-1
+I: Validating libpcre2-8-0 10.40-1
+I: Retrieving libpcre3 2:8.39-14
+I: Validating libpcre3 2:8.39-14
+I: Retrieving perl-base 5.34.0-5
+I: Validating perl-base 5.34.0-5
+I: Retrieving libpopt0 1.18-3
+I: Validating libpopt0 1.18-3
+I: Retrieving libprocps8 2:3.3.17-7+b1
+I: Validating libprocps8 2:3.3.17-7+b1
+I: Retrieving procps 2:3.3.17-7+b1
+I: Validating procps 2:3.3.17-7+b1
+I: Retrieving libreadline8 8.1.2-1.2
+I: Validating libreadline8 8.1.2-1.2
+I: Retrieving readline-common 8.1.2-1.2
+I: Validating readline-common 8.1.2-1.2
+I: Retrieving rsyslog 8.2206.0-1
+I: Validating rsyslog 8.2206.0-1
+I: Retrieving sed 4.8-1
+I: Validating sed 4.8-1
+I: Retrieving sensible-utils 0.0.17
+I: Validating sensible-utils 0.0.17
+I: Retrieving sgml-base 1.30
+I: Validating sgml-base 1.30
+I: Retrieving login 1:4.11.1+dfsg1-2
+I: Validating login 1:4.11.1+dfsg1-2
+I: Retrieving passwd 1:4.11.1+dfsg1-2
+I: Validating passwd 1:4.11.1+dfsg1-2
+I: Retrieving libslang2 2.3.2-5+b1
+I: Validating libslang2 2.3.2-5+b1
+I: Retrieving libsystemd-shared 251.3-1
+I: Validating libsystemd-shared 251.3-1
+I: Retrieving libsystemd0 251.3-1
+I: Validating libsystemd0 251.3-1
+I: Retrieving libudev1 251.3-1
+I: Validating libudev1 251.3-1
+I: Retrieving systemd 251.3-1
+I: Validating systemd 251.3-1
+I: Retrieving systemd-sysv 251.3-1
+I: Validating systemd-sysv 251.3-1
+I: Retrieving udev 251.3-1
+I: Validating udev 251.3-1
+I: Retrieving sysvinit-utils 3.03-1
+I: Validating sysvinit-utils 3.03-1
+I: Validating tar 1.34+dfsg-1
+I: Retrieving tasksel 3.70
+I: Validating tasksel 3.70
+I: Retrieving tasksel-data 3.70
+I: Validating tasksel-data 3.70
+I: Retrieving tzdata 2022a-1
+I: Validating tzdata 2022a-1
+I: Retrieving bsdutils 1:2.38-5
+I: Validating bsdutils 1:2.38-5
+I: Retrieving fdisk 2.38-5
+I: Validating fdisk 2.38-5
+I: Retrieving libblkid1 2.38-5
+I: Validating libblkid1 2.38-5
+I: Retrieving libfdisk1 2.38-5
+I: Validating libfdisk1 2.38-5
+I: Retrieving libmount1 2.38-5
+I: Validating libmount1 2.38-5
+I: Retrieving libsmartcols1 2.38-5
+I: Validating libsmartcols1 2.38-5
+I: Retrieving libuuid1 2.38-5
+I: Validating libuuid1 2.38-5
+I: Retrieving mount 2.38-5
+I: Validating mount 2.38-5
+I: Retrieving util-linux 2.38-5
+I: Validating util-linux 2.38-5
+I: Retrieving util-linux-extra 2.38-5
+I: Validating util-linux-extra 2.38-5
+I: Retrieving vim-common 2:8.2.4793-1
+I: Validating vim-common 2:8.2.4793-1
+I: Retrieving vim-tiny 2:8.2.4793-1
+I: Validating vim-tiny 2:8.2.4793-1
+I: Retrieving xxd 2:8.2.4793-1
+I: Validating xxd 2:8.2.4793-1
+I: Retrieving libxxhash0 0.8.1-1
+I: Validating libxxhash0 0.8.1-1
+I: Retrieving liblzma5 5.2.5-2.1
+I: Validating liblzma5 5.2.5-2.1
+I: Retrieving zlib1g 1:1.2.11.dfsg-4
+I: Validating zlib1g 1:1.2.11.dfsg-4
+I: Chosen extractor for .deb packages: dpkg-deb
+I: Extracting libacl1...
+E: Tried to extract package, but file already exists. Exit...
+mount: /mnt/sys/firmware/efi/efivars: none already mounted on /sys/fs/bpf.
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+linux-image-amd64 is already the newest version (5.10.127-1).
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+mkdir: cannot create directory '/mnt/boot/efi': File exists
+Synchronizing state of ntp.service with SysV service script with /lib/systemd/systemd-sysv-install.
+Executing: /lib/systemd/systemd-sysv-install enable ntp
+     remote           refid      st t when poll reach   delay   offset  jitter
+==============================================================================
+ 0.debian.pool.n .POOL.          16 p    -   64    0    0.000   +0.000   0.000
+ 1.debian.pool.n .POOL.          16 p    -   64    0    0.000   +0.000   0.000
+ 2.debian.pool.n .POOL.          16 p    -   64    0    0.000   +0.000   0.000
+ 3.debian.pool.n .POOL.          16 p    -   64    0    0.000   +0.000   0.000
+*sth4.ntp.netnod .PPS.            1 u    7   64    1  135.030   -1.055   0.180
+-91.206.16.3 (tm 89.109.251.22    2 u   11   64    1  157.471   +1.268   0.071
+-morgul.deadset. 235.106.237.243  3 u   11   64    1   82.366   -1.386   0.152
++45.83.234.123 ( 10.1.105.4       2 u   12   64    1   97.834   -0.577   0.123
+-ns1.infomir.com 91.236.251.5     3 u   10   64    1  119.547   +4.573   0.134
+-ns1.univ-montp3 145.238.203.14   2 u   12   64    1  115.357   -2.785   0.129
+-ntp2.rrze.uni-e .MBGh.           1 u    9   64    1  120.164   -1.471   0.173
++stratum2-4.NTP. 129.70.137.82    2 u   14   64    1  125.637   -1.114   0.071
+#ntp.udru.ac.th  202.28.116.236   2 u    7   64    1  302.188  -24.850   0.109
+-176-137-36-37.a .GPS.            1 u   17   64    1  104.599   -2.648   0.147
+#200.89.75.198 ( 200.54.149.19    2 u   16   64    1  183.818   -4.629  15.089
+#bom-gw.tipsy.co 220.134.23.41    2 u   19   64    1  209.404  -12.149   6.520
+-dns2.switch.ca  206.108.0.131    2 u   21   64    1   60.777   +0.418   0.027
+#cpt-ntp.mweb.co 194.58.204.148   2 u   17   64    1  215.037   +8.202   0.059
+Hit:1 http://ftp.debian.org/debian bullseye InRelease
+Err:1 http://ftp.debian.org/debian bullseye InRelease
+  Couldn't create temporary file /tmp/apt.conf.M4lQea for passing config to apt-key
+Get:2 http://www.deb-multimedia.org bullseye InRelease [18.5 kB]
+Ign:2 http://www.deb-multimedia.org bullseye InRelease
+Get:3 http://www.deb-multimedia.org sid InRelease [20.8 kB]
+Ign:3 http://www.deb-multimedia.org sid InRelease
+Get:4 http://www.deb-multimedia.org sid/main amd64 Packages [132 kB]
+Get:5 http://www.deb-multimedia.org sid/main Translation-en [89.2 kB]
+Fetched 260 kB in 1s (267 kB/s)
+Reading package lists... Done
+W: An error occurred during the signature verification. The repository is not updated and the previous index files will be used. GPG error: http://ftp.debian.org/debian bullseye InRelease: Couldn't create temporary file /tmp/apt.conf.M4lQea for passing config to apt-key
+W: GPG error: http://www.deb-multimedia.org bullseye InRelease: Couldn't create temporary file /tmp/apt.conf.znW4Jd for passing config to apt-key
+W: GPG error: http://www.deb-multimedia.org sid InRelease: Couldn't create temporary file /tmp/apt.conf.SKnj6h for passing config to apt-key
+W: Failed to fetch http://ftp.debian.org/debian/dists/bullseye/InRelease  Couldn't create temporary file /tmp/apt.conf.M4lQea for passing config to apt-key
+W: Some index files failed to download. They have been ignored, or old ones used instead.
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+deb-multimedia-keyring is already the newest version (2016.8.1).
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+nano is already the newest version (5.4-2+deb11u1).
+The following additional packages will be installed:
+  libc-l10n liblzo2-2
+Suggested packages:
+  duperemove
+The following NEW packages will be installed:
+  btrfs-progs libc-l10n liblzo2-2 locales sudo
+0 upgraded, 5 newly installed, 0 to remove and 0 not upgraded.
+Need to get 6761 kB of archives.
+After this operation, 29.8 MB of additional disk space will be used.
+Get:1 http://ftp.debian.org/debian bullseye/main amd64 libc-l10n all 2.31-13+deb11u3 [863 kB]
+Get:2 http://ftp.debian.org/debian bullseye/main amd64 locales all 2.31-13+deb11u3 [4084 kB]
+Get:3 http://ftp.debian.org/debian bullseye/main amd64 liblzo2-2 amd64 2.10-2 [56.9 kB]
+Get:4 http://ftp.debian.org/debian bullseye/main amd64 btrfs-progs amd64 5.10.1-2 [698 kB]
+Get:5 http://ftp.debian.org/debian bullseye/main amd64 sudo amd64 1.9.5p2-3 [1059 kB]
+Fetched 6761 kB in 1s (10.2 MB/s)
+Preconfiguring packages ...
+Selecting previously unselected package libc-l10n.
+(Reading database ... 14776 files and directories currently installed.)
+Preparing to unpack .../libc-l10n_2.31-13+deb11u3_all.deb ...
+Unpacking libc-l10n (2.31-13+deb11u3) ...
+Selecting previously unselected package locales.
+Preparing to unpack .../locales_2.31-13+deb11u3_all.deb ...
+Unpacking locales (2.31-13+deb11u3) ...
+Selecting previously unselected package liblzo2-2:amd64.
+Preparing to unpack .../liblzo2-2_2.10-2_amd64.deb ...
+Unpacking liblzo2-2:amd64 (2.10-2) ...
+Selecting previously unselected package btrfs-progs.
+Preparing to unpack .../btrfs-progs_5.10.1-2_amd64.deb ...
+Unpacking btrfs-progs (5.10.1-2) ...
+Selecting previously unselected package sudo.
+Preparing to unpack .../sudo_1.9.5p2-3_amd64.deb ...
+Unpacking sudo (1.9.5p2-3) ...
+Setting up libc-l10n (2.31-13+deb11u3) ...
+Setting up liblzo2-2:amd64 (2.10-2) ...
+Setting up locales (2.31-13+deb11u3) ...
+Generating locales (this might take a while)...
+Generation complete.
+Setting up sudo (1.9.5p2-3) ...
+Running in chroot, ignoring command 'daemon-reload'
+Running in chroot, ignoring request.
+Running in chroot, ignoring command 'start'
+Setting up btrfs-progs (5.10.1-2) ...
+Processing triggers for initramfs-tools (0.140) ...
+update-initramfs: Generating /boot/initrd.img-5.10.0-16-amd64
+Processing triggers for libc-bin (2.31-13+deb11u3) ...
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following additional packages will be installed:
+  efibootmgr gettext-base grub-common grub-efi-amd64 grub-efi-amd64-bin grub-efi-amd64-signed
+  grub2-common libbrotli1 libefiboot1 libefivar1 libfreetype6 libfuse2 libpng16-16 mokutil
+  os-prober shim-helpers-amd64-signed shim-signed shim-signed-common shim-unsigned ucf
+Suggested packages:
+  multiboot-doc grub-emu mtools xorriso desktop-base console-setup fuse
+Recommended packages:
+  secureboot-db
+The following NEW packages will be installed:
+  efibootmgr gettext-base grub-common grub-efi grub-efi-amd64 grub-efi-amd64-bin
+  grub-efi-amd64-signed grub2-common libbrotli1 libefiboot1 libefivar1 libfreetype6 libfuse2
+  libpng16-16 mokutil os-prober shim-helpers-amd64-signed shim-signed shim-signed-common
+  shim-unsigned ucf
+0 upgraded, 21 newly installed, 0 to remove and 0 not upgraded.
+Need to get 7047 kB of archives.
+After this operation, 42.0 MB of additional disk space will be used.
+Get:1 http://ftp.debian.org/debian bullseye/main amd64 gettext-base amd64 0.21-4 [175 kB]
+Get:2 http://ftp.debian.org/debian bullseye/main amd64 ucf all 3.0043 [74.0 kB]
+Get:3 http://ftp.debian.org/debian bullseye/main amd64 libefivar1 amd64 37-6 [50.0 kB]
+Get:4 http://ftp.debian.org/debian bullseye/main amd64 libefiboot1 amd64 37-6 [44.1 kB]
+Get:5 http://ftp.debian.org/debian bullseye/main amd64 efibootmgr amd64 17-1 [31.2 kB]
+Get:6 http://ftp.debian.org/debian bullseye/main amd64 libbrotli1 amd64 1.0.9-2+b2 [279 kB]
+Get:7 http://ftp.debian.org/debian bullseye/main amd64 libpng16-16 amd64 1.6.37-3 [294 kB]
+Get:8 http://ftp.debian.org/debian bullseye/main amd64 libfreetype6 amd64 2.10.4+dfsg-1+deb11u1 [418 kB]
+Get:9 http://ftp.debian.org/debian bullseye/main amd64 libfuse2 amd64 2.9.9-5 [130 kB]
+Get:10 http://ftp.debian.org/debian bullseye/main amd64 grub-common amd64 2.04-20 [2629 kB]
+Get:11 http://ftp.debian.org/debian bullseye/main amd64 grub2-common amd64 2.04-20 [597 kB]
+Get:12 http://ftp.debian.org/debian bullseye/main amd64 grub-efi-amd64-bin amd64 2.04-20 [699 kB]
+Get:13 http://ftp.debian.org/debian bullseye/main amd64 grub-efi-amd64 amd64 2.04-20 [39.8 kB]
+Get:14 http://ftp.debian.org/debian bullseye/main amd64 grub-efi amd64 2.04-20 [2536 B]
+Get:15 http://ftp.debian.org/debian bullseye/main amd64 grub-efi-amd64-signed amd64 1+2.04+20 [469 kB]
+Get:16 http://ftp.debian.org/debian bullseye/main amd64 mokutil amd64 0.3.0+1538710437.fb6250f-1+b1 [22.9 kB]
+Get:17 http://ftp.debian.org/debian bullseye/main amd64 os-prober amd64 1.79 [30.4 kB]
+Get:18 http://ftp.debian.org/debian bullseye/main amd64 shim-unsigned amd64 15.4-7 [431 kB]
+Get:19 http://ftp.debian.org/debian bullseye/main amd64 shim-helpers-amd64-signed amd64 1+15.4+7 [298 kB]
+Get:20 http://ftp.debian.org/debian bullseye/main amd64 shim-signed-common all 1.38+15.4-7 [13.6 kB]
+Get:21 http://ftp.debian.org/debian bullseye/main amd64 shim-signed amd64 1.38+15.4-7 [320 kB]
+Fetched 7047 kB in 1s (8448 kB/s)
+Preconfiguring packages ...
+Selecting previously unselected package gettext-base.
+(Reading database ... 15623 files and directories currently installed.)
+Preparing to unpack .../00-gettext-base_0.21-4_amd64.deb ...
+Unpacking gettext-base (0.21-4) ...
+Selecting previously unselected package ucf.
+Preparing to unpack .../01-ucf_3.0043_all.deb ...
+Moving old data out of the way
+Unpacking ucf (3.0043) ...
+Selecting previously unselected package libefivar1:amd64.
+Preparing to unpack .../02-libefivar1_37-6_amd64.deb ...
+Unpacking libefivar1:amd64 (37-6) ...
+Selecting previously unselected package libefiboot1:amd64.
+Preparing to unpack .../03-libefiboot1_37-6_amd64.deb ...
+Unpacking libefiboot1:amd64 (37-6) ...
+Selecting previously unselected package efibootmgr.
+Preparing to unpack .../04-efibootmgr_17-1_amd64.deb ...
+Unpacking efibootmgr (17-1) ...
+Selecting previously unselected package libbrotli1:amd64.
+Preparing to unpack .../05-libbrotli1_1.0.9-2+b2_amd64.deb ...
+Unpacking libbrotli1:amd64 (1.0.9-2+b2) ...
+Selecting previously unselected package libpng16-16:amd64.
+Preparing to unpack .../06-libpng16-16_1.6.37-3_amd64.deb ...
+Unpacking libpng16-16:amd64 (1.6.37-3) ...
+Selecting previously unselected package libfreetype6:amd64.
+Preparing to unpack .../07-libfreetype6_2.10.4+dfsg-1+deb11u1_amd64.deb ...
+Unpacking libfreetype6:amd64 (2.10.4+dfsg-1+deb11u1) ...
+Selecting previously unselected package libfuse2:amd64.
+Preparing to unpack .../08-libfuse2_2.9.9-5_amd64.deb ...
+Unpacking libfuse2:amd64 (2.9.9-5) ...
+Selecting previously unselected package grub-common.
+Preparing to unpack .../09-grub-common_2.04-20_amd64.deb ...
+Unpacking grub-common (2.04-20) ...
+Selecting previously unselected package grub2-common.
+Preparing to unpack .../10-grub2-common_2.04-20_amd64.deb ...
+Unpacking grub2-common (2.04-20) ...
+Selecting previously unselected package grub-efi-amd64-bin.
+Preparing to unpack .../11-grub-efi-amd64-bin_2.04-20_amd64.deb ...
+Unpacking grub-efi-amd64-bin (2.04-20) ...
+Selecting previously unselected package grub-efi-amd64.
+Preparing to unpack .../12-grub-efi-amd64_2.04-20_amd64.deb ...
+Unpacking grub-efi-amd64 (2.04-20) ...
+Selecting previously unselected package grub-efi.
+Preparing to unpack .../13-grub-efi_2.04-20_amd64.deb ...
+Unpacking grub-efi (2.04-20) ...
+Selecting previously unselected package grub-efi-amd64-signed.
+Preparing to unpack .../14-grub-efi-amd64-signed_1+2.04+20_amd64.deb ...
+Unpacking grub-efi-amd64-signed (1+2.04+20) ...
+Selecting previously unselected package mokutil.
+Preparing to unpack .../15-mokutil_0.3.0+1538710437.fb6250f-1+b1_amd64.deb ...
+Unpacking mokutil (0.3.0+1538710437.fb6250f-1+b1) ...
+Selecting previously unselected package os-prober.
+Preparing to unpack .../16-os-prober_1.79_amd64.deb ...
+Unpacking os-prober (1.79) ...
+Selecting previously unselected package shim-unsigned.
+Preparing to unpack .../17-shim-unsigned_15.4-7_amd64.deb ...
+Unpacking shim-unsigned (15.4-7) ...
+Selecting previously unselected package shim-helpers-amd64-signed.
+Preparing to unpack .../18-shim-helpers-amd64-signed_1+15.4+7_amd64.deb ...
+Unpacking shim-helpers-amd64-signed (1+15.4+7) ...
+Selecting previously unselected package shim-signed-common.
+Preparing to unpack .../19-shim-signed-common_1.38+15.4-7_all.deb ...
+Unpacking shim-signed-common (1.38+15.4-7) ...
+Selecting previously unselected package shim-signed:amd64.
+Preparing to unpack .../20-shim-signed_1.38+15.4-7_amd64.deb ...
+Unpacking shim-signed:amd64 (1.38+15.4-7) ...
+Setting up libbrotli1:amd64 (1.0.9-2+b2) ...
+Setting up gettext-base (0.21-4) ...
+Setting up libfuse2:amd64 (2.9.9-5) ...
+Setting up libpng16-16:amd64 (1.6.37-3) ...
+Setting up ucf (3.0043) ...
+Setting up libefivar1:amd64 (37-6) ...
+Setting up shim-unsigned (15.4-7) ...
+Setting up mokutil (0.3.0+1538710437.fb6250f-1+b1) ...
+Setting up libefiboot1:amd64 (37-6) ...
+Setting up libfreetype6:amd64 (2.10.4+dfsg-1+deb11u1) ...
+Setting up shim-signed-common (1.38+15.4-7) ...
+No DKMS packages installed: not changing Secure Boot validation state.
+Setting up shim-helpers-amd64-signed (1+15.4+7) ...
+Setting up efibootmgr (17-1) ...
+Setting up grub-common (2.04-20) ...
+Setting up os-prober (1.79) ...
+Setting up grub-efi-amd64-bin (2.04-20) ...
+Setting up grub-efi-amd64-signed (1+2.04+20) ...
+Setting up grub2-common (2.04-20) ...
+Setting up shim-signed:amd64 (1.38+15.4-7) ...
+No DKMS packages installed: not changing Secure Boot validation state.
+Setting up grub-efi-amd64 (2.04-20) ...
+
+Creating config file /etc/default/grub with new version
+Setting up grub-efi (2.04-20) ...
+Processing triggers for libc-bin (2.31-13+deb11u3) ...
+Processing triggers for shim-signed:amd64 (1.38+15.4-7) ...
+UUID="0bfef835-ec2f-402d-91f3-10874a3d9f57" / btrfs subvol=@_debian,compress=zstd,noatime,ro 0 0
+UUID="0bfef835-ec2f-402d-91f3-10874a3d9f57" / btrfs subvol=@_debian,compress=zstd,noatime 0 0
+UUID="0bfef835-ec2f-402d-91f3-10874a3d9f57" /.snapshots btrfs subvol=@.snapshots_debian,compress=zstd,noatime 0 0
+UUID="0bfef835-ec2f-402d-91f3-10874a3d9f57" /boot btrfs subvol=@boot_debian,compress=zstd,noatime 0 0
+UUID="0bfef835-ec2f-402d-91f3-10874a3d9f57" /etc btrfs subvol=@etc_debian,compress=zstd,noatime 0 0
+UUID="0bfef835-ec2f-402d-91f3-10874a3d9f57" /home btrfs subvol=@home_debian,compress=zstd,noatime 0 0
+UUID="0bfef835-ec2f-402d-91f3-10874a3d9f57" /var btrfs subvol=@var_debian,compress=zstd,noatime 0 0
+UUID="ACF2-95BC" /boot/efi vfat umask=0077 0 2
+/.snapshots/ast/root /root none bind 0 0
+/.snapshots/ast/tmp /tmp none bind 0 0
+0
+debian
+127.0.0.1 debian
+Generating locales (this might take a while)...
+Generation complete.
+LANG=en_US.UTF-8
+Setting a password for 'root':
+New password:
+Retype new password:
+passwd: password updated successfully
+Was your password set properly (y/n)?
+> y
+Enter username (all lowercase, max 8 letters)
+> me
+Happy with your username (y/n)?
+> y
+%sudo ALL=(ALL:ALL) ALL
+export XDG_RUNTIME_DIR="/run/user/1000"
+Setting a password for 'me':
+New password:
+Retype new password:
+passwd: password updated successfully
+Was your password set properly (y/n)?
+> y
+Failed to enable unit, unit NetworkManager.service does not exist.
+{'name': 'root', 'children': [{'name': '0'}]}
+BREAKPOINT1>
+Installing for x86_64-efi platform.
+Installation finished. No error reported.
+Generating grub configuration file ...
+Found linux image: /boot/vmlinuz-5.10.0-16-amd64
+Found initrd image: /boot/initrd.img-5.10.0-16-amd64
+Adding boot menu entry for EFI firmware configuration
+done
+debian, 0006
+Create a readonly snapshot of '/mnt' in '/mnt/.snapshots/rootfs/snapshot-0'
+Create subvolume '/mnt/.snapshots/boot/boot-tmp'
+Create subvolume '/mnt/.snapshots/etc/etc-tmp'
+Create a readonly snapshot of '/mnt/.snapshots/boot/boot-tmp' in '/mnt/.snapshots/boot/boot-0'
+Create a readonly snapshot of '/mnt/.snapshots/etc/etc-tmp' in '/mnt/.snapshots/etc/etc-0'
+0bfef835-ec2f-402d-91f3-10874a3d9f57
+Create a snapshot of '/mnt/.snapshots/rootfs/snapshot-0' in '/mnt/.snapshots/rootfs/snapshot-tmp'
+umount: /mnt/dev/pts: target is busy.
+mount: /mnt: /dev/sda2 already mounted on /mnt.
+ERROR: Could not statfs: No such file or directory
+umount: /mnt/dev/pts: target is busy.
+Installation complete
+You can reboot now :)
+user@debian:~/ashos-dev$
+:WQ
+:wq
+
+
+

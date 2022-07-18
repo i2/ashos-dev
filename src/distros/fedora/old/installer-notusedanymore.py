@@ -25,6 +25,26 @@
 
     ### os.system("yum -y install glibc-langpack-en") ######### glibc-locale-source is already installed
 
+#   Modify OS release information (optional)
+    #os.system(f"sudo sed -i '/^NAME/ s/Fedora Linux/Fedora Linux (ashos)/' /mnt/etc/os-release")
+    #os.system(f"sudo sed -i '/PRETTY_NAME/ s/Fedora Linux/Fedora Linux (ashos)/' /mnt/etc/os-release")
+    os.system(f"sudo sed -i '/^ID/ s/{distro}/{distro}_ashos/' /mnt/etc/os-release")
+    #os.system("echo 'HOME_URL=\"https://github.com/astos/astos\"' | sudo tee -a /mnt/etc/os-release")
+
+#   GRUB and EFI
+#   REALLY ANNOYING BUG: https://bugzilla.redhat.com/show_bug.cgi?id=1917213 & https://fedoraproject.org/wiki/GRUB_2#Instructions_for_UEFI-based_systems
+    #os.system(f"chroot /mnt /usr/sbin/grub2-install {args[2]}") #REZA --recheck --no-nvram --removable (not needed for Fedora on EFI)
+    # if dnf reinstall shim-* grub2-efi-* grub2-common return an exitcode of error (excode != 0), run dnf install shim-x64 grub2-efi-x64 grub2-common
+...
+    os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/loader/entries/*")
+    # Create a symlink to the newest systemd-boot entry
+    os.system(f"sudo ln -sf /mnt/boot/loader/entries/`ls -rt /mnt/boot/loader/entries | tail -n1` /mnt/boot/loader/entries/current.cfg") ###REVIEW_LATER I think without sudo can't create
+
+
+
+#   Database
+    #os.system("if [ ! -L /usr/lib/sysimage/rpm/rpmdb.sqlite || -L /var/lib/rpm ]; then \
+    #           mv /usr/lib/sysimage/rpm/* /var/lib/rpm/")
 
 
 
@@ -36,5 +56,9 @@
 #args = list(sys.argv)
 #distro="fedora"
 #main(args, distro)
+
+
+#   Unmount everything
+    os.system(f"sudo mount {args[1]} -o subvolid=0 /mnt") # subvolid=5 needed for any cases?
 
 

@@ -73,8 +73,8 @@ def get_username():
     return username
 
 def create_user(u):
-    os.system(f"sudo chroot /mnt /usr/sbin/useradd -m -G sudo -s /bin/bash {u}")
-    os.system("echo '%sudo ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
+    os.system(f"sudo chroot /mnt /usr/sbin/useradd -m -G wheel -s /bin/bash {u}")
+    os.system("echo '%wheel ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /mnt/home/{u}/.bashrc")
 
 def set_password(u):
@@ -94,10 +94,9 @@ def main(args, distro):
     choice, distro_suffix = get_multiboot(distro)
 
 #   Define variables
-    ###packages = "firmware-linux-nonfree python3 python3-anytree btrfs-progs network-manager locales sudo nano"
-    packages = "btrfs-progs locales sudo nano"
-    ARCH = "amd64"
-    RELEASE = "sid"
+    packages = "passwd which grub2-efi-x64-modules shim-x64 btrfs-progs python python-anytree sudo tmux neovim NetworkManager dhcpcd efibootmgr" # bash os-prober
+    ARCH = "x86_64"
+    RELEASE = "rawhide"
     astpart = to_uuid(args[1])
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
@@ -110,10 +109,9 @@ def main(args, distro):
     hostname = get_hostname()
 
 #   Prep (format, etc.)
-    os.system("sudo apt-get clean && sudo apt-get -y update && sudo apt-get -y check")
-    os.system("sudo apt-get -y install --fix-broken btrfs-progs ntp efibootmgr")
     if choice != "3":
         os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
+    os.system("pacman -Syy --noconfirm archlinux-keyring dnf")
 
 #   Mount and create necessary sub-volumes and directories
     if choice != "3":
@@ -134,37 +132,16 @@ def main(args, distro):
         os.system("sudo mkdir /mnt/boot/efi")
         os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
-#   Bootstrap (minimal)
-    os.system("sudo apt-get -y install debootstrap")
-    excl = subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | awk '{print $1}'", shell=True).decode('utf-8').strip().replace("\n",",")
-    os.system(f"sudo debootstrap --arch {ARCH} --exclude={excl} {RELEASE} /mnt http://ftp.debian.org/debian")
+#   Bootstrap then install anytree and necessary packages in chroot
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys"): # Mount-points needed for chrooting
         os.system(f"sudo mount -o x-mount.mkdir --bind {i} /mnt{i}")
     if efi:
         os.system("sudo mount -o x-mount.mkdir -t efivarfs none /mnt/sys/firmware/efi/efivars")
-    os.system(f"sudo chroot /mnt apt-get -y install --fix-broken linux-image-{ARCH}")
-
-#   Install anytree and necessary packages in chroot
-    os.system("sudo systemctl enable --now ntp && sleep 30s && ntpq -p") # Sync time in the live iso
-    os.system(f"echo 'deb [trusted=yes] http://www.deb-multimedia.org {RELEASE} main' | sudo tee -a /mnt/etc/apt/sources.list.d/multimedia.list >/dev/null")
-    os.system("sudo chroot /mnt apt-get -y update -oAcquire::AllowInsecureRepositories=true")
-    os.system("sudo chroot /mnt apt-get -y install deb-multimedia-keyring --allow-unauthenticated")
-    #os.system("sudo chroot /mnt apt-get -y install python3-anytree network-manager btrfs-progs dhcpcd5 locales sudo tmux") # os-prober
-    excode = int(os.system(f"sudo chroot /mnt apt-get -y install {packages}"))
-    if excode != 0:
-        print("Failed to download packages!")
-        sys.exit()
-    #os.system("sudo chroot /mnt apt-get -y install btrfs-progs locales")
+    os.system(f"sudo dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install dnf -y --releasever={RELEASE} --forcearch={ARCH}")
     if efi:
-        excode = int(os.system("sudo chroot /mnt apt-get -y install grub-efi"))
-        if excode != 0:
-            print("Failed to download packages!")
-            sys.exit()
-    else:
-        excode = int(os.system("sudo chroot /mnt apt-get -y install grub-pc"))
-        if excode != 0:
-            print("Failed to download packages!")
-            sys.exit()
+        os.system("sudo chroot /mnt dnf install -y efibootmgr grub2-efi-x64") #addeed grub2-efi-x64 as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?  # grub2-common already installed at this point
+    os.system(f"sudo chroot /mnt dnf install -y {packages}")
+    os.system(f"sudo chroot /mnt dnf install -y systemd ncurses bash-completion kernel glibc-locale-source glibc-langpack-en --releasever={RELEASE}") ########NEW FOR FEDORA package 'systemd' already installed using whatever above packages came
 
 #   Update fstab part 1
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
@@ -178,17 +155,28 @@ def main(args, distro):
 #   Database
     os.system("sudo mkdir -p /mnt/usr/share/ast/db")
     os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
-    os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db")
-    #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf") ### REVIEW_LATER
+    # If rpmdb is under /usr, move it to /var and create a symlink
+    if os.path.islink("/var/lib/dnf") or os.path.isfile("/usr/lib/sysimage/dnf/history.sqlite"):
+        os.system("sudo rm -r /var/lib/dnf")
+        os.system("sudo mv /usr/lib/sysimage/dnf /var/lib/")
+        os.system("sudo ln -s /usr/lib/sysimage/dnf /var/lib/dnf")
+    if os.path.islink("/var/lib/rpm") or os.path.isfile("/usr/lib/sysimage/rpm/rpmdb.sqlite"):
+        os.system("sudo rm -r /var/lib/rpm")
+        os.system("sudo mv /usr/lib/sysimage/rpm /var/lib/")
+        os.system("sudo ln -s /usr/lib/sysimage/rpm /var/lib/rpm")
+    os.system(f"sudo cp -a /mnt/var/lib/dnf /mnt/usr/share/ast/db/")
+    os.system("sudo cp -a /mnt/var/lib/rpm /mnt/usr/share/ast/db/")
+    #os.system(f"sudo sed -i s,\"#DBPath      = /var/lib/pacman/\",\"DBPath      = /usr/share/ast/db/\",g /mnt/etc/pacman.conf")
 
 #   Modify OS release information (optional)
     os.system(f"sudo sed -i '/^ID/ s/{distro}/{distro}_ashos/' /mnt/etc/os-release")
 
+    os.system(f"echo 'releasever={RELEASE}' | tee /mnt/etc/yum.conf") ########NEW FOR FEDORA WHY DID I ADD THIS? ### CAN I REMOVE THIS?
+
 #   Update hostname, hosts, locales and timezone, hosts
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
     os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
-    os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen")
-    os.system("sudo chroot /mnt locale-gen")
+    os.system("sudo chroot /mnt localedef -v -c -i en_US -f UTF-8 en_US.UTF-8") #######REZA got error (
     os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
     os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
     os.system("sudo chroot /mnt /usr/sbin/hwclock --systohc")
@@ -215,20 +203,27 @@ def main(args, distro):
 
 #   Systemd
     os.system("sudo chroot /mnt systemctl enable NetworkManager")
+    os.system("sudo chroot /mnt systemctl disable rpmdb-migrate") # https://fedoraproject.org/wiki/Changes/RelocateRPMToUsr ### WHEN IS THIS SERVICE ACTIVATED, DO A BREAKPOINT CHECK
 
 #   Initialize fstree
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
 
 #   GRUB and EFI
-    os.system(f"sudo chroot /mnt grub-install {args[2]}") #REZA --recheck --no-nvram --removable
-    os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
-    os.system("sudo mkdir -p /mnt/boot/grub/BAK/") # Folder for backing up grub configs created by astpk
-    os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
-    # Create a mapping of "distro" <=> "BootOrder number". Ash reads from this file to switch between distros.
+    # For now I use non-BLS format. Entries go in /boot/grub2/grub.cfg not in /boot/loader/entries/
+    os.system('grep -qxF GRUB_ENABLE_BLSCFG="false" /mnt/etc/default/grub || \
+               echo GRUB_ENABLE_BLSCFG="false" | sudo tee -a /mnt/etc/default/grub')
+    os.system(f"chroot /mnt sudo /usr/sbin/grub2-mkconfig {args[2]} -o /boot/grub2/grub.cfg") ### THIS MIGHT BE TOTALLY REDUNDANT
+    os.system("sudo mkdir -p /mnt/boot/grub2/BAK") # Folder for backing up grub configs created by astpk
+    os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub2/grub.cfg")
+    os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/loader/entries/*")
+    # Create a symlink to the newest systemd-boot entry
+    os.system(f"sudo ln -sf /mnt/boot/loader/entries/`ls -rt /mnt/boot/loader/entries | tail -n1` /mnt/boot/loader/entries/current.cfg") ###REVIEW_LATER I think without sudo can't create
+    # Create EFI entry and a mapping of "distro" <=> "BootOrder number". Ash reads from this file to switch between distros.
     if efi:
         if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
-            os.system("echo DISTRO,BootOrder | sudo tee /mnt/boot/efi/EFI/map.txt")
-        os.system(f"echo '{distro},' $(efibootmgr -v | grep -i {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | sudo tee -a /mnt/boot/efi/EFI/map.txt")
+            os.system("echo DISTRO,BootOrder | tee /mnt/boot/efi/EFI/map.txt")
+        os.system(f"efibootmgr -c -d {args[2]} -p 1 -L 'Fedora' -l '\\EFI\\fedora\\shim.efi'") ###REVIEW_LATER shim.efi vs shimx64.efi ### CAN I REMOVE THIS?
+        os.system(f"echo '{distro},' $(efibootmgr -v | grep -i {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
 
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")
@@ -242,7 +237,7 @@ def main(args, distro):
     os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
 
     os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
-    os.system("sudo chroot /mnt /usr/bin/btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
+    os.system("sudo chroot /mnt /usr/sbin/btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
 
     os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/")
     os.system("sudo cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")

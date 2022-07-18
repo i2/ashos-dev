@@ -5,3 +5,19 @@
     #os.system("echo -e 'setw -g mode-keys vi\nset -g history-limit 999999' >> $HOME/.tmux.conf")
 
 os.system(f"sudo sed -i.bak '/\@{distro_suffix}/d' /mnt/etc/fstab")
+
+
+### if using --rbind instead of --bind for creating chroot, "/dev/pts" can be removed as rbinding /dev will include /dev/pts as well. But issue with
+--rbind was at the end of installer, it errors out that unmounting can't be done as target is busy! So swithced back to --bind and put /dev/pts back in for loop too!
+
+#   Modify OS release information (optional)
+    #os.system(f"sudo sed -i '/^NAME/ s/Arch Linux/Arch Linux (ashos)/' /mnt/etc/os-release")
+    #os.system(f"sudo sed -i '/PRETTY_NAME/ s/Arch Linux/Arch Linux (ashos)/' /mnt/etc/os-release")
+    os.system(f"sudo sed -i '/^ID/ s/{distro}/{distro}_ashos/' /mnt/etc/os-release")
+    #os.system("echo 'HOME_URL=\"https://github.com/astos/astos\"' | sudo tee -a /mnt/etc/os-release")
+
+#   GRUB and EFI
+###    os.system(f"sudo arch-chroot /mnt sed -i s,Arch,astOS,g /etc/default/grub") ###NOT_PLANNING_TO_USE_THIS_APPROACH_AT_ALL
+
+#   Unmount everything
+    os.system(f"sudo mount {args[1]} -o subvolid=0 /mnt") # subvolid=5 needed for any cases?
