@@ -130,9 +130,9 @@ def main(args, distro):
         os.system(f"mkdir -p /mnt/{i}")
     for i in ("ast", "boot", "etc", "root", "rootfs", "tmp"): ### JULY11, 2022 removed "var" as it's not needed!
         os.system(f"mkdir -p /mnt/.snapshots/{i}")
-#    if efi:
-#        os.system("sudo mkdir /mnt/boot/efi")
-#        os.system(f"sudo mount {args[3]} /mnt/boot/efi")
+    if efi:
+        os.system("sudo mkdir /mnt/boot/efi")
+        os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
 #   Bootstrap (minimal)
     os.system("sudo apt-get -y install debootstrap")
@@ -143,15 +143,6 @@ def main(args, distro):
     if efi:
         os.system("sudo mount -o x-mount.mkdir -t efivarfs none /mnt/sys/firmware/efi/efivars")
     os.system(f"sudo chroot /mnt apt-get -y install --fix-broken linux-image-{ARCH}")
-
-#MOVEDUPBEFOREDEBOOTSTRAP    if efi: ###REZA #MOVED FROM ABOVE See if there are still files in sda1 unnecessarily heavy (ONLY FOR DEBOOSTRAP BASED OS, NOT FOR ARCH)
-#MOVEDUPBEFOREDEBOOTSTRAP        os.system("sudo mkdir /mnt/boot/efi")
-#MOVEDUPBEFOREDEBOOTSTRAP        os.system(f"sudo mount {args[3]} /mnt/boot/efi")
-
-    ### JUST TESTING
-    if efi:
-        os.system("sudo mkdir /mnt/boot/efi")
-        os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
 #   Install anytree and necessary packages in chroot
     os.system("sudo systemctl enable --now ntp && sleep 30s && ntpq -p") # Sync time in the live iso
