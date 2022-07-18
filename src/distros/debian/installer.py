@@ -108,7 +108,6 @@ def main(args, distro):
     hostname = get_hostname()
 
 #   Prep (format, etc.)
-    os.system("sudo apt-get remove -y --purge man-db") # Fix slow man-db trigger
     os.system("sudo apt-get clean && sudo apt-get update -y && sudo apt-get check -y")
     os.system("sudo apt-get install -y --fix-broken btrfs-progs ntp efibootmgr")
     if choice != "3":
