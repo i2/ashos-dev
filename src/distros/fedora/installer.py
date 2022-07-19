@@ -94,12 +94,13 @@ def main(args, distro):
     choice, distro_suffix = get_multiboot(distro)
 
 #   Define variables
-    packages = "passwd which grub2-efi-x64-modules shim-x64 btrfs-progs python python-anytree sudo tmux neovim NetworkManager dhcpcd efibootmgr" # bash os-prober
     ARCH = "x86_64"
     RELEASE = "rawhide"
     astpart = to_uuid(args[1])
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
+    packages = "passwd which grub2-efi-x64-modules shim-x64 btrfs-progs python python-anytree sudo tmux neovim NetworkManager dhcpcd efibootmgr \
+                systemd ncurses bash-completion kernel glibc-locale-source glibc-langpack-en" # bash os-prober
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
@@ -108,7 +109,7 @@ def main(args, distro):
     tz = get_timezone()
     hostname = get_hostname()
 
-#   Prep (format, etc.)
+#   Prep (format partition, etc.)
     if choice != "3":
         os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
     os.system("pacman -Syy --noconfirm archlinux-keyring dnf")
@@ -133,15 +134,19 @@ def main(args, distro):
         os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
 #   Bootstrap then install anytree and necessary packages in chroot
+    excode = int(os.system(f"sudo dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install dnf -y --releasever={RELEASE} --forcearch={ARCH}")) ### TEST IF IT WORKS HERE!
+    if excode != 0:
+        print("Failed to febootstrap!")
+        sys.exit()
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys"): # Mount-points needed for chrooting
         os.system(f"sudo mount -o x-mount.mkdir --bind {i} /mnt{i}")
     if efi:
         os.system("sudo mount -o x-mount.mkdir -t efivarfs none /mnt/sys/firmware/efi/efivars")
-    os.system(f"sudo dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install dnf -y --releasever={RELEASE} --forcearch={ARCH}")
+    #os.system(f"sudo dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install dnf -y --releasever={RELEASE} --forcearch={ARCH}") ### MOVED UP
     if efi:
         os.system("sudo chroot /mnt dnf install -y efibootmgr grub2-efi-x64") #addeed grub2-efi-x64 as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?  # grub2-common already installed at this point
-    os.system(f"sudo chroot /mnt dnf install -y {packages}")
-    os.system(f"sudo chroot /mnt dnf install -y systemd ncurses bash-completion kernel glibc-locale-source glibc-langpack-en --releasever={RELEASE}") ########NEW FOR FEDORA package 'systemd' already installed using whatever above packages came
+    os.system(f"sudo chroot /mnt dnf install -y {packages} --releasever={RELEASE}") ######## 'systemd' can be removed from packages list as it gets installed using some other package?!
+    os.system(f"echo 'releasever={RELEASE}' | tee /mnt/etc/yum.conf") ########NEW FOR FEDORA WHY DID I ADD THIS? ### CAN I REMOVE THIS?
 
 #   Update fstab part 1
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
@@ -152,7 +157,7 @@ def main(args, distro):
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/tmp /tmp none bind 0 0' | sudo tee -a /mnt/etc/fstab")
 
-#   Database
+#   Database and config files
     os.system("sudo mkdir -p /mnt/usr/share/ast/db")
     os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
     # If rpmdb is under /usr, move it to /var and create a symlink
@@ -166,17 +171,15 @@ def main(args, distro):
         os.system("sudo ln -s /usr/lib/sysimage/rpm /var/lib/rpm")
     os.system(f"sudo cp -a /mnt/var/lib/dnf /mnt/usr/share/ast/db/")
     os.system("sudo cp -a /mnt/var/lib/rpm /mnt/usr/share/ast/db/")
-    #os.system(f"sudo sed -i s,\"#DBPath      = /var/lib/pacman/\",\"DBPath      = /usr/share/ast/db/\",g /mnt/etc/pacman.conf")
+    os.system('echo persistdir="/usr/share/ast/db/dnf" | sudo tee -a /mnt/etc/dnf/dnf.conf') ### REVIEW_LATER I'm not sure if this works?!
 
 #   Modify OS release information (optional)
     os.system(f"sudo sed -i '/^ID/ s/{distro}/{distro}_ashos/' /mnt/etc/os-release")
 
-    os.system(f"echo 'releasever={RELEASE}' | tee /mnt/etc/yum.conf") ########NEW FOR FEDORA WHY DID I ADD THIS? ### CAN I REMOVE THIS?
-
 #   Update hostname, hosts, locales and timezone, hosts
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
     os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
-    os.system("sudo chroot /mnt localedef -v -c -i en_US -f UTF-8 en_US.UTF-8") #######REZA got error (
+    os.system("sudo chroot /mnt localedef -v -c -i en_US -f UTF-8 en_US.UTF-8") ####### REVIEW_LATER got error?!
     os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
     os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
     os.system("sudo chroot /mnt /usr/sbin/hwclock --systohc")
@@ -208,10 +211,6 @@ def main(args, distro):
 #   Initialize fstree
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
 
-#######
-    input("breakpoint1 before grub check if any entries in /boot/grub2/grub.cfg>") ### YES THERE IS BUT IT IS GENERIC ONE WITHOUT ANY Fedora entry in 10_linux section or anywhere!
-#######
-
 #   GRUB and EFI (For now I use non-BLS format. Entries go in /boot/grub2/grub.cfg not in /boot/loader/entries/)
     os.system('grep -qxF GRUB_ENABLE_BLSCFG="false" /mnt/etc/default/grub || \
                echo GRUB_ENABLE_BLSCFG="false" | sudo tee -a /mnt/etc/default/grub')
@@ -222,9 +221,6 @@ def main(args, distro):
     if efi:
         if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
             os.system("echo DISTRO,BootOrder | sudo tee /mnt/boot/efi/EFI/map.txt")
-#######
-        input("breakpoint2 before creating efi entry. was it automatically created? >") ### NO Fedora efi entry is created yet!
-#######
         os.system(f"efibootmgr -c -d {args[2]} -p 1 -L 'Fedora' -l '\\EFI\\fedora\\shim.efi'") ###REVIEW_LATER shim.efi vs shimx64.efi ### CAN I REMOVE THIS?
         os.system(f"echo '{distro},' $(efibootmgr -v | grep -i {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
 

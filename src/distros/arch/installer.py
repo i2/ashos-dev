@@ -94,10 +94,10 @@ def main(args, distro):
     choice, distro_suffix = get_multiboot(distro)
 
 #   Define variables
-    packages = "base linux linux-firmware nano python3 python-anytree bash dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo tmux os-prober"
     astpart = to_uuid(args[1])
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
+    packages = "base linux linux-firmware nano python3 python-anytree bash dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo tmux os-prober"
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
@@ -106,7 +106,7 @@ def main(args, distro):
     tz = get_timezone()
     hostname = get_hostname()
 
-#   Prep (format, etc.)
+#   Prep (format partition, etc.)
     if choice != "3":
         os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
     os.system("pacman -Syy --noconfirm archlinux-keyring")
@@ -154,7 +154,7 @@ def main(args, distro):
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/tmp /tmp none bind 0 0' | sudo tee -a /mnt/etc/fstab")
 
-#   Database
+#   Database and config files
     os.system("sudo mkdir -p /mnt/usr/share/ast/db")
     os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
     os.system("sudo cp -r /mnt/var/lib/pacman/* /mnt/usr/share/ast/db")
@@ -199,7 +199,7 @@ def main(args, distro):
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
 
 #   GRUB and EFI
-    os.system(f"sudo chroot /mnt grub-install {args[2]}") #REZA --recheck --no-nvram --removable
+    os.system(f"sudo chroot /mnt grub-install {args[2]}") ### REVIEW_LATER --recheck --no-nvram --removable
     os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo mkdir -p /mnt/boot/grub/BAK/") # Folder for backing up grub configs created by astpk
     os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")

@@ -1,3 +1,11 @@
+https://bugzilla.redhat.com/show_bug.cgi?id=1576516
+
+You can change DNF's persistdir easily.
+But RPMDB location is fixed.
+
+Rpm's database path has always been configurable, just set %_dbpath macro to the desired path prior to explicitly or implicitly opening the db.
+
+
 sudo dnf makecache --refresh
 sudo dnf -y install supermin
 

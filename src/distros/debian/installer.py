@@ -94,13 +94,12 @@ def main(args, distro):
     choice, distro_suffix = get_multiboot(distro)
 
 #   Define variables
-    ###packages = "firmware-linux-nonfree python3 python3-anytree btrfs-progs network-manager locales sudo nano"
-    packages = "btrfs-progs locales sudo nano"
     ARCH = "amd64"
     RELEASE = "sid"
     astpart = to_uuid(args[1])
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
+    packages = f"linux-image-{ARCH} firmware-linux-nonfree python3 python3-anytree btrfs-progs network-manager locales sudo nano tmux dhcpcd5" # os-prober
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
@@ -109,7 +108,7 @@ def main(args, distro):
     tz = get_timezone()
     hostname = get_hostname()
 
-#   Prep (format, etc.)
+#   Prep (format partition, etc.)
     os.system(f"sudo sed -i 's/[^ ]*[^ ]/{RELEASE}/3' /etc/apt/sources.list")
     os.system("sudo apt-get clean && sudo apt-get -y update && sudo apt-get -y check")
     os.system("sudo apt-get -y install --fix-broken btrfs-progs ntp efibootmgr")
@@ -138,33 +137,33 @@ def main(args, distro):
 #   Bootstrap (minimal)
     os.system("sudo apt-get -y install debootstrap")
     excl = subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | awk '{print $1}'", shell=True).decode('utf-8').strip().replace("\n",",")
-    os.system(f"sudo debootstrap --arch {ARCH} --exclude={excl} {RELEASE} /mnt http://ftp.debian.org/debian")
+    excode = int(os.system(f"sudo debootstrap --arch {ARCH} --exclude={excl} {RELEASE} /mnt http://ftp.debian.org/debian"))
+    if excode != 0:
+        print("Failed to debootstrap!")
+        sys.exit()
     for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys"): # Mount-points needed for chrooting
         os.system(f"sudo mount -o x-mount.mkdir --bind {i} /mnt{i}")
     if efi:
         os.system("sudo mount -o x-mount.mkdir -t efivarfs none /mnt/sys/firmware/efi/efivars")
-    os.system(f"sudo chroot /mnt apt-get -y install --fix-broken linux-image-{ARCH}")
 
 #   Install anytree and necessary packages in chroot
     os.system("sudo systemctl enable --now ntp && sleep 30s && ntpq -p") # Sync time in the live iso
     os.system(f"echo 'deb [trusted=yes] http://www.deb-multimedia.org {RELEASE} main' | sudo tee -a /mnt/etc/apt/sources.list.d/multimedia.list >/dev/null")
     os.system("sudo chroot /mnt apt-get -y update -oAcquire::AllowInsecureRepositories=true")
     os.system("sudo chroot /mnt apt-get -y install deb-multimedia-keyring --allow-unauthenticated")
-    #os.system("sudo chroot /mnt apt-get -y install python3-anytree network-manager btrfs-progs dhcpcd5 locales sudo tmux") # os-prober
-    excode = int(os.system(f"sudo chroot /mnt apt-get -y install {packages}"))
+    excode = int(os.system(f"sudo chroot /mnt apt-get -y install --fix-broken {packages}"))
     if excode != 0:
         print("Failed to download packages!")
         sys.exit()
-    #os.system("sudo chroot /mnt apt-get -y install btrfs-progs locales")
     if efi:
-        excode = int(os.system("sudo chroot /mnt apt-get -y install grub-efi"))
+        excode = int(os.system("sudo chroot /mnt apt-get -y install grub-efi")) ### efibootmgr does get installed. Does this do it?
         if excode != 0:
-            print("Failed to download packages!")
+            print("Failed to install grub!")
             sys.exit()
     else:
         excode = int(os.system("sudo chroot /mnt apt-get -y install grub-pc"))
         if excode != 0:
-            print("Failed to download packages!")
+            print("Failed to install grub!")
             sys.exit()
 
 #   Update fstab part 1
@@ -176,11 +175,11 @@ def main(args, distro):
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/tmp /tmp none bind 0 0' | sudo tee -a /mnt/etc/fstab")
 
-#   Database
+#   Database and config files
     os.system("sudo mkdir -p /mnt/usr/share/ast/db")
     os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
     os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db")
-    #os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf") ### REVIEW_LATER
+    os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf") ### REVIEW_LATER I don't think this works?!
 
 #   Modify OS release information (optional)
     os.system(f"sudo sed -i '/^ID/ s/{distro}/{distro}_ashos/' /mnt/etc/os-release")
@@ -221,7 +220,7 @@ def main(args, distro):
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree")
 
 #   GRUB and EFI
-    os.system(f"sudo chroot /mnt grub-install {args[2]}") #REZA --recheck --no-nvram --removable
+    os.system(f"sudo chroot /mnt grub-install {args[2]}") ### REVIEW_LATER --recheck --no-nvram --removable
     os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo mkdir -p /mnt/boot/grub/BAK/") # Folder for backing up grub configs created by astpk
     os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
