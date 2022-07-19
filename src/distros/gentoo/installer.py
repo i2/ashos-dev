@@ -9,7 +9,7 @@ import sys ### REMOVE WHEN USING TRY CATCH
 def clear():
     os.system("#clear")
 
-def to_uuid(part):
+def to_uuid(part):ta
     return subprocess.check_output(f"sudo blkid -s UUID -o value {part}", shell=True).decode('utf-8').strip()
 
 #   This function returns a tuple: (1. choice whether partitioning and formatting should happen
@@ -134,11 +134,12 @@ def main(args, distro):
         os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
 #   Bootstrap then install anytree and necessary packages in chroot
-    tmp = subprocess.check_output(f'curl -L http://distfiles.gentoo.org/releases/{ARCH}/autobuilds/latest-stage3.txt | grep -i systemd | grep -Ev "multi|desktop" | awk '"'{print $1}'"'', shell=True).decode('utf-8').strip()
-    stage3 = f"http://distfiles.gentoo.org/releases/{ARCH}/autobuilds/{tmp}"
-    os.system(f"curl -L -O {stage3}")
-    #os.system("mount -o bind /proc /mnt/proc")
-    os.system(f"tar --numeric-owner --xattrs -xvJpf stage3-*.tar.xz -C /mnt")
+    tmp1 = f"http://distfiles.gentoo.org/releases/{ARCH}/autobuilds/"
+    tmp2 = subprocess.check_output(f'curl -L {tmp1}latest-stage3.txt | grep -i systemd | grep -Ev "multi|desktop" \
+                                     | awk '"'{print $1}'"'', shell=True).decode('utf-8').strip()
+    os.system(f"curl --output-dir /mnt -L -O {tmp1}{tmp2}")
+    os.system(f"tar --numeric-owner --xattrs -xvJpf stage3-*.tar.xz -C /mnt") # add sudo
+    os.system(f"sudo rm -v -f /mnt/stage3-{ARCH}-*")
     
     ### STEP 1 ENDS HERE
     
@@ -154,6 +155,7 @@ def main(args, distro):
     os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /sys /mnt/sys")
     if efi: # Bad idea to combine --make-[r]slave and --[r]bind ? https://unix.stackexchange.com/questions/120827/recursive-umount-after-rbind-mount
         os.system("sudo mount -o x-mount.mkdir,remount,rw --types efivarfs efivarfs /mnt/sys/firmware/efi/efivars")
+    os.system("sudo cp --dereference /etc/resolv.conf /mnt/etc/")
 
     ### STEP 2 ENDS HERE
 
@@ -182,11 +184,17 @@ def main(args, distro):
 
     ### STEP 3 ENDS HERE
 
+    ### CONTINUE debootstrapping (will put it up above eventually)
+    os.system("sudo chroot /mnt emerge sys-boot/efibootmgr") # Removed '--ask'
+
 #   Database and config files
     os.system("sudo mkdir -p /mnt/usr/share/ast/db")
     os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
-    os.system("sudo cp -r /mnt/var/lib/pacman/* /mnt/usr/share/ast/db")
-    os.system(f"sed -i s,\"#DBPath      = /var/lib/pacman/\",\"DBPath      = /usr/share/ast/db/\",g /mnt/etc/pacman.conf")
+    #os.system("sudo cp -r /mnt/var/lib/portage/* /mnt/usr/share/ast/db")
+    os.system("sudo cp -r /mnt/var/db/repos/gentoo/* /mnt/usr/share/ast/db")
+    #   os.system("sudo mkdir --parents /mnt/etc/portage/repos.conf")
+    #os.system("sudo cp /mnt/usr/share/portage/config/repos.conf /mnt/etc/portage/repos.conf/gentoo.conf")
+    os.system(f"sed -i s,\"#DBPath      = /var/lib/pacman/\",\"DBPath      = /usr/share/ast/db/\",g /mnt/usr/share/portage/config/repos.conf")
 
 #   Modify OS release information (optional)
     os.system(f"sudo sed -i '/^ID/ s/{distro}/{distro}_ashos/' /mnt/etc/os-release")
@@ -194,11 +202,11 @@ def main(args, distro):
 #   Update hostname, hosts, locales and timezone, hosts
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
     os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
-    os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen")
+    os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /mnt/etc/locale.gen")
     os.system("sudo chroot /mnt locale-gen")
-    os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
-    os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
-    os.system("sudo chroot /mnt /usr/sbin/hwclock --systohc")
+    #os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf") ### REVIEW_LATER It already has C.UTF-8 should I add en_US.UTF-8 ?
+    os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime") ### REVIEW_LATER
+    os.system("sudo chroot /mnt /sbin/hwclock --systohc")
 
 #   Copy and symlink astpk and detect_os.sh
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")

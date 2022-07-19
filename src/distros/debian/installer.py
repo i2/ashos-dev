@@ -192,7 +192,7 @@ def main(args, distro):
 #   Update hostname, hosts, locales and timezone, hosts
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
     os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
-    os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen")
+    os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /mnt/etc/locale.gen") ### REVIEW_LATER change /etc/locale.gen to /mnt/etc/locale.gen
     os.system("sudo chroot /mnt locale-gen")
     os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
     os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")

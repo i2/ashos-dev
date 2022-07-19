@@ -1,0 +1,1709 @@
+
+t@archiso ~ # cd ~/ashos-dev
+root@archiso ~/ashos-dev (git)-[debian] # git pul
+git: 'pul' is not a git command. See 'git --help'.
+
+The most similar commands are
+        pull
+        push
+1 root@archiso ~/ashos-dev (git)-[debian] # git pull
+warning: redirecting to https://github.com/i2/ashos-dev/
+remote: Enumerating objects: 16, done.
+remote: Counting objects: 100% (16/16), done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 9 (delta 6), reused 9 (delta 6), pack-reused 0
+Unpacking objects: 100% (9/9), 1.26 KiB | 161.00 KiB/s, done.
+From http://github.com/i2/ashos-dev
+   3bd7d3f..9b79224  debian     -> origin/debian
+Updating 3bd7d3f..9b79224
+error: Your local changes to the following files would be overwritten by merge:
+        src/distros/gentoo/tempp.py
+Please commit your changes or stash them before you merge.
+Aborting
+1 root@archiso ~/ashos-dev (git)-[debian] # git diff
+diff --git a/init.py b/init.py
+index c2fa7df..0e93f9c 100644
+--- a/init.py
++++ b/init.py
+@@ -4,8 +4,8 @@ import sys
+ import subprocess
+
+ args = list(sys.argv)
+-distro = subprocess.check_output(['sh', './src/detect_os.sh']).decode('utf-8').replace('"',"").strip()
+-#distro = "fedora" # If distro to be installed does not match live environment
++#distro = subprocess.check_output(['sh', './src/detect_os.sh']).decode('utf-8').replace('"',"").strip()
++distro = "gentoo" # If distro to be installed does not match live environment
+
+ if 'arch' in distro:
+     from src.distros.arch import installer
+@@ -14,9 +14,9 @@ elif 'debian' in distro:
+ elif 'fedora' in distro:
+     from src.distros.fedora import installer
+ elif 'gentoo' in distro:
+-    from src.distros.gentoo import installer
++    from src.distros.gentoo import step1
+ elif 'ubuntu' in distro:
+     from src.distros.ubuntu import installer
+
+-installer.main(args, distro)
++step1.main(args, distro)
+
+diff --git a/src/distros/gentoo/tempp.py b/src/distros/gentoo/tempp.py
+index de46787..5707e46 100644
+--- a/src/distros/gentoo/tempp.py
++++ b/src/distros/gentoo/tempp.py
+@@ -1,10 +1,11 @@
+ import os
++import subprocess
+ ARCH="amd64"
+
+ tmp1 = f"http://distfiles.gentoo.org/releases/{ARCH}/autobuilds/"
+-tmp2 = subprocess.check_output(f'curl -L {tmp1}latest-stage3.txt | grep -i systemd | grep -Ev "multi | \
+-                                 desktop" | awk '"'{print $1}'"'', shell=True).decode('utf-8').strip()
+-os.system(f"curl -L -O {tmp1}{tmp2} --output-dir /mnt")
++tmp2 = subprocess.check_output(f'curl -L {tmp1}latest-stage3.txt | grep -i systemd | grep -Ev "multi|desktop" \
++                                 | awk '"'{print $1}'"'', shell=True).decode('utf-8').strip()
++os.system(f"curl --output-dir /mnt  -L -O {tmp1}{tmp2}")
+ #os.system("mount -o bind /proc /mnt/proc")
+ os.system(f"tar --numeric-owner --xattrs -xvJpf stage3-*.tar.xz -C /mnt")
+
+root@archiso ~/ashos-dev (git)-[debian] # git stash
+Saved working directory and index state WIP on debian: 3bd7d3f 2022/07/19 - 06:31:37
+root@archiso ~/ashos-dev (git)-[debian] # git diff
+root@archiso ~/ashos-dev (git)-[debian] # git pull
+warning: redirecting to https://github.com/i2/ashos-dev/
+Updating 3bd7d3f..9b79224
+Fast-forward
+ src/distros/gentoo/installer.py | 31 +++++++++++++++++++------------
+ src/distros/gentoo/step1.py     |  7 ++++---
+ src/distros/gentoo/step2.py     | 13 +++++++++++++
+ src/distros/gentoo/tempp.py     |  9 ---------
+ 4 files changed, 36 insertions(+), 24 deletions(-)
+ create mode 100644 src/distros/gentoo/step2.py
+root@archiso ~/ashos-dev (git)-[debian] # python3 ./src/distros/gentoo/step2.py
+root@archiso ~/ashos-dev (git)-[debian] # chroot /mnt
+chroot: failed to run command ‘/usr/bin/zsh’: No such file or directory
+127 root@archiso ~/ashos-dev (git)-[debian] # chroot /mnt /bin/bash
+archiso / # uname -a
+Linux archiso 5.18.7-arch1-1 #1 SMP PREEMPT_DYNAMIC Sat, 25 Jun 2022 20:22:01 +0000 x86_64 Intel(R) Core(TM) i7 CPU L 620 @ 2.00GHz GenuineIntel GNU/Linux
+archiso / # exit
+exit
+root@archiso ~/ashos-dev (git)-[debian] # chroot /mnt /bin/env -i TERM=$TERM /bin/bash
+archiso / # ls -al
+total 228056
+drwxr-xr-x   1 root root       378 Jul 17 18:31 .
+drwxr-xr-x   1 root root       378 Jul 17 18:31 ..
+drwxr-xr-x   1 root root        46 Jul 19 08:38 .snapshots
+drwxr-xr-x   1 root root         0 Jul 19 08:44 @.snapshots_gentoo
+drwxr-xr-x   1 root root         0 Jul 19 08:44 @_gentoo
+drwxr-xr-x   1 root root         0 Jul 19 08:44 @boot_gentoo
+drwxr-xr-x   1 root root         0 Jul 19 08:44 @etc_gentoo
+drwxr-xr-x   1 root root         0 Jul 19 08:44 @home_gentoo
+drwxr-xr-x   1 root root         0 Jul 19 08:45 @var_gentoo
+drwxr-xr-x   1 root root      1540 Jul 17 18:47 bin
+drwxr-xr-x   1 root root        16 Jul 17 18:31 boot
+drwxr-xr-x  20 root root      3740 Jul 19 04:59 dev
+drwxr-xr-x   1 root root      1568 Jul 17 18:47 etc
+drwxr-xr-x   1 root root        10 Jul 17 18:31 home
+drwxr-xr-x   1 root root       822 Jul 17 18:40 lib
+drwxr-xr-x   1 root root      3166 Jul 17 18:47 lib64
+drwxr-xr-x   1 root root        10 Jul 17 18:31 media
+drwxr-xr-x   1 root root        10 Jul 17 18:31 mnt
+drwxr-xr-x   1 root root        10 Jul 17 18:31 opt
+dr-xr-xr-x 170 root root         0 Jul 19 10:42 proc
+drwx------   1 root root        80 Jul 19 10:43 root
+drwxr-xr-x  28 root root       640 Jul 19 08:38 run
+drwxr-xr-x   1 root root      2082 Jul 17 18:47 sbin
+-rw-r--r--   1 root root 233528540 Jul 19 09:46 stage3-amd64-systemd-20220717T170537Z.tar.xz
+dr-xr-xr-x  13 root root         0 Jul 19 04:58 sys
+drwxrwxrwt   1 root root        10 Jul 17 18:47 tmp
+drwxr-xr-x   1 root root       128 Jul 17 18:33 usr
+drwxr-xr-x   1 root root        66 Jul 17 18:31 var
+archiso / # env-update
+!!! Section 'gentoo' in repos.conf has location attribute set to nonexistent directory: '/var/db/repos/gentoo'
+!!! Invalid Repository Location (not a dir): '/var/db/repos/gentoo'
+PORTAGE_BZIP2_COMMAND setting is invalid: 'bzip2'
+PORTAGE_BZIP2_COMMAND setting from make.globals is invalid: 'bzip2'
+>>> Regenerating /etc/ld.so.cache...
+archiso / # ls -al /var/db/
+Makefile  pkg/      repos/
+archiso / # ls -al /var/db/repos/
+total 0
+drwxr-xr-x 1 root root  0 Jul 17 18:47 .
+drwxr-xr-x 1 root root 32 Jul 17 18:47 ..
+archiso / # ls -al /var/db/
+total 8
+drwxr-xr-x 1 root root   32 Jul 17 18:47 .
+drwxr-xr-x 1 root root   66 Jul 17 18:31 ..
+-rw-r--r-- 1 root root 5351 Jul  3 19:39 Makefile
+drwxr-xr-x 1 root root  542 Jul 17 18:47 pkg
+drwxr-xr-x 1 root root    0 Jul 17 18:47 repos
+archiso / # ls -al /var/db/pkg/
+acct-group/   app-crypt/    app-portage/  dev-lang/     dev-util/     net-misc/     sys-auth/     sys-libs/
+acct-user/    app-editors/  app-shells/   dev-libs/     net-dns/      perl-core/    sys-devel/    sys-process/
+app-admin/    app-eselect/  app-text/     dev-perl/     net-firewall/ sec-keys/     sys-fs/       virtual/
+app-arch/     app-misc/     dev-db/       dev-python/   net-libs/     sys-apps/     sys-kernel/
+archiso / # mkdir /var/db/repos/gentoo
+archiso / # env-update
+PORTAGE_BZIP2_COMMAND setting is invalid: 'bzip2'
+PORTAGE_BZIP2_COMMAND setting from make.globals is invalid: 'bzip2'
+>>> Regenerating /etc/ld.so.cache...
+archiso / # emerge-webrsync -x -v
+PORTAGE_BZIP2_COMMAND setting is invalid: 'bzip2'
+PORTAGE_BZIP2_COMMAND setting from make.globals is invalid: 'bzip2'
++ [[ -n '' ]]
++ do_latest_snapshot
++ local attempts=0
++ local r=1
++ __vecho 'Fetching most recent snapshot ...'
++ __quiet_mode
++ [[ '' -eq 1 ]]
++ echo 'Fetching most recent snapshot ...'
+Fetching most recent snapshot ...
++ local min_time_diff=7200
+++ get_portage_timestamp
+++ local portage_current_timestamp=0
+++ '[' -f /var/db/repos/gentoo/metadata/timestamp.x ']'
+++ echo 0
++ local existing_timestamp=0
++ local timestamp_difference
++ local timestamp_problem
++ local approx_snapshot_time
+++ get_utc_date_in_seconds
+++ date -u +%s
++ local start_time=1658227844
+++ get_date_part 1658227844 %H
+++ local utc_time_in_secs=1658227844
+++ local part=%H
+++ [[ GNU == BSD ]]
+++ date -d @1658227844 -u +%H
++ local start_hour=10
++ '[' 10 -lt 1 ']'
+++ get_date_part 1658227844 %Y%m%d
+++ local utc_time_in_secs=1658227844
+++ local part=%Y%m%d
+++ [[ GNU == BSD ]]
+++ date -d @1658227844 -u +%Y%m%d
++ local snapshot_date=20220719
+++ get_utc_second_from_string 20220719
+++ local s=20220719
+++ [[ GNU == BSD ]]
+++ date -d 2022-07-19 -u +%s
++ local snapshot_date_seconds=1658188800
++ ((  0 <  40  ))
++ ((  attempts++  ))
++ ((  snapshot_date_seconds -= 86400  ))
++ ((  approx_snapshot_time = snapshot_date_seconds + 86400 + 2700  ))
++ ((  timestamp_difference = existing_timestamp - approx_snapshot_time  ))
++ '[' -1658191500 -lt 0 ']'
++ ((  timestamp_difference = -1 * timestamp_difference  ))
+++ get_date_part 1658102400 %Y%m%d
+++ local utc_time_in_secs=1658102400
+++ local part=%Y%m%d
+++ [[ GNU == BSD ]]
+++ date -d @1658102400 -u +%Y%m%d
++ snapshot_date=20220718
++ timestamp_problem=
++ '[' 1658191500 -eq 0 ']'
++ '[' 1658191500 -lt 7200 ']'
++ '[' 1658191500 -lt 0 ']'
++ '[' -n '' ']'
++ do_snapshot 0 20220718
++ local ignore_timestamp=0
++ local date=20220718
++ local r=1
++ local compression
++ local have_files=0
++ local mirror
++ local compressions=
++ type -P xzcat
++ compressions=' gentoo:xz portage:xz'
++ type -P bzcat
++ compressions=' gentoo:xz portage:xz gentoo:bz2 portage:bz2'
++ type -P zcat
++ compressions=' gentoo:xz portage:xz gentoo:bz2 portage:bz2 gentoo:gz portage:gz'
++ [[ -z  gentoo:xz portage:xz gentoo:bz2 portage:bz2 gentoo:gz portage:gz ]]
++ for mirror in ${GENTOO_MIRRORS}
++ mirror=http://distfiles.gentoo.org
++ __vecho 'Trying to retrieve 20220718 snapshot from http://distfiles.gentoo.org ...'
++ __quiet_mode
++ [[ '' -eq 1 ]]
++ echo 'Trying to retrieve 20220718 snapshot from http://distfiles.gentoo.org ...'
+Trying to retrieve 20220718 snapshot from http://distfiles.gentoo.org ...
++ for compression in ${compressions}
++ local name=gentoo
++ compression=xz
++ local file=gentoo-20220718.tar.xz
++ local digest=gentoo-20220718.tar.xz.md5sum
++ local signature=gentoo-20220718.tar.xz.gpgsig
++ '[' -s /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz -a -s /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz.md5sum -a -s /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz.gpgsig ']'
++ '[' 0 -eq 0 ']'
++ fetch_file http://distfiles.gentoo.org/snapshots/gentoo-20220718.tar.xz.md5sum gentoo-20220718.tar.xz.md5sum
++ local URI=http://distfiles.gentoo.org/snapshots/gentoo-20220718.tar.xz.md5sum
++ local FILE=gentoo-20220718.tar.xz.md5sum
++ local opts
++ '[' ' -t 3 -T 60 --passive-ftp -O "${DISTDIR}/${FILE}" "${URI}"' '!=' 'wget -t 3 -T 60 --passive-ftp -O "${DISTDIR}/${FILE}" "${URI}"' ']'
+++ nvecho -q
+++ [[ 1 -eq 0 ]]
++ opts='--continue '
++ __vecho 'Fetching file gentoo-20220718.tar.xz.md5sum ...'
++ __quiet_mode
++ [[ '' -eq 1 ]]
++ echo 'Fetching file gentoo-20220718.tar.xz.md5sum ...'
+Fetching file gentoo-20220718.tar.xz.md5sum ...
++ eval 'wget -t 3 -T 60 --passive-ftp -O "${DISTDIR}/${FILE}" "${URI}" --continue '
+++ wget -t 3 -T 60 --passive-ftp -O /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz.md5sum http://distfiles.gentoo.org/snapshots/gentoo-20220718.tar.xz.md5sum --continue
+--2022-07-19 10:50:44--  http://distfiles.gentoo.org/snapshots/gentoo-20220718.tar.xz.md5sum
+Resolving distfiles.gentoo.org... 89.187.177.17, 156.146.36.24, 156.146.59.249
+Connecting to distfiles.gentoo.org|89.187.177.17|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 57 [application/x-xz]
+Saving to: '/var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz.md5sum'
+
+/var/tmp/portage/webrsync-cP3UQ 100%[=======================================================>]      57  --.-KB/s    in 0s
+
+2022-07-19 10:50:44 (2.83 MB/s) - '/var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz.md5sum' saved [57/57]
+
++ [[ 0 -eq 0 ]]
++ [[ -s /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz.md5sum ]]
++ return 0
++ fetch_file http://distfiles.gentoo.org/snapshots/gentoo-20220718.tar.xz.gpgsig gentoo-20220718.tar.xz.gpgsig
++ local URI=http://distfiles.gentoo.org/snapshots/gentoo-20220718.tar.xz.gpgsig
++ local FILE=gentoo-20220718.tar.xz.gpgsig
++ local opts
++ '[' ' -t 3 -T 60 --passive-ftp -O "${DISTDIR}/${FILE}" "${URI}"' '!=' 'wget -t 3 -T 60 --passive-ftp -O "${DISTDIR}/${FILE}" "${URI}"' ']'
+++ nvecho -q
+++ [[ 1 -eq 0 ]]
++ opts='--continue '
++ __vecho 'Fetching file gentoo-20220718.tar.xz.gpgsig ...'
++ __quiet_mode
++ [[ '' -eq 1 ]]
++ echo 'Fetching file gentoo-20220718.tar.xz.gpgsig ...'
+Fetching file gentoo-20220718.tar.xz.gpgsig ...
++ eval 'wget -t 3 -T 60 --passive-ftp -O "${DISTDIR}/${FILE}" "${URI}" --continue '
+++ wget -t 3 -T 60 --passive-ftp -O /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz.gpgsig http://distfiles.gentoo.org/snapshots/gentoo-20220718.tar.xz.gpgsig --continue
+--2022-07-19 10:50:44--  http://distfiles.gentoo.org/snapshots/gentoo-20220718.tar.xz.gpgsig
+Resolving distfiles.gentoo.org... 156.146.59.249, 89.187.177.17, 156.146.36.24
+Connecting to distfiles.gentoo.org|156.146.59.249|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 963 [application/x-xz]
+Saving to: '/var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz.gpgsig'
+
+/var/tmp/portage/webrsync-cP3UQ 100%[=======================================================>]     963  --.-KB/s    in 0s
+
+2022-07-19 10:50:44 (50.6 MB/s) - '/var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz.gpgsig' saved [963/963]
+
++ [[ 0 -eq 0 ]]
++ [[ -s /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz.gpgsig ]]
++ return 0
++ fetch_file http://distfiles.gentoo.org/snapshots/gentoo-20220718.tar.xz gentoo-20220718.tar.xz
++ local URI=http://distfiles.gentoo.org/snapshots/gentoo-20220718.tar.xz
++ local FILE=gentoo-20220718.tar.xz
++ local opts
++ '[' ' -t 3 -T 60 --passive-ftp -O "${DISTDIR}/${FILE}" "${URI}"' '!=' 'wget -t 3 -T 60 --passive-ftp -O "${DISTDIR}/${FILE}" "${URI}"' ']'
+++ nvecho -q
+++ [[ 1 -eq 0 ]]
++ opts='--continue '
++ __vecho 'Fetching file gentoo-20220718.tar.xz ...'
++ __quiet_mode
++ [[ '' -eq 1 ]]
++ echo 'Fetching file gentoo-20220718.tar.xz ...'
+Fetching file gentoo-20220718.tar.xz ...
++ eval 'wget -t 3 -T 60 --passive-ftp -O "${DISTDIR}/${FILE}" "${URI}" --continue '
+++ wget -t 3 -T 60 --passive-ftp -O /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz http://distfiles.gentoo.org/snapshots/gentoo-20220718.tar.xz --continue
+--2022-07-19 10:50:44--  http://distfiles.gentoo.org/snapshots/gentoo-20220718.tar.xz
+Resolving distfiles.gentoo.org... 156.146.36.24, 156.146.59.249, 89.187.177.17
+Connecting to distfiles.gentoo.org|156.146.36.24|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 43828232 (42M) [application/x-xz]
+Saving to: '/var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz'
+
+/var/tmp/portage/webrsync-cP3UQ 100%[=======================================================>]  41.80M  13.5MB/s    in 3.2s
+
+2022-07-19 10:50:47 (13.0 MB/s) - '/var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz' saved [43828232/43828232]
+
++ [[ 0 -eq 0 ]]
++ [[ -s /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz ]]
++ return 0
++ check_file_digest /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz.md5sum /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz
++ local digest=/var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz.md5sum
++ local file=/var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz
++ local r=1
++ __vecho 'Checking digest ...'
++ __quiet_mode
++ [[ '' -eq 1 ]]
++ echo 'Checking digest ...'
+Checking digest ...
++ type -P md5sum
+++ md5sum /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz
++ local 'md5sum_output=b1fdeab4fb10e1a0dd2e8bb761860c6c  /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz'
++ local 'digest_content=b1fdeab4fb10e1a0dd2e8bb761860c6c  gentoo-20220718.tar.xz'
++ '[' b1fdeab4fb10e1a0dd2e8bb761860c6c = b1fdeab4fb10e1a0dd2e8bb761860c6c ']'
++ r=0
++ return 0
++ check_file_signature /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz.gpgsig /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz
++ local signature=/var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz.gpgsig
++ local file=/var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz
++ local r=1
++ local gnupg_status line
++ '[' 0 '!=' 0 ']'
++ r=0
++ return 0
++ have_files=1
++ '[' 1 -eq 1 ']'
++ __vecho 'Getting snapshot timestamp ...'
++ __quiet_mode
++ [[ '' -eq 1 ]]
++ echo 'Getting snapshot timestamp ...'
+Getting snapshot timestamp ...
+++ get_snapshot_timestamp /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz
+++ local file=/var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz
+++ cut -f 1 -d ' '
+++ do_tar /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz --to-stdout -f - --wildcards -x '*/metadata/timestamp.x'
+++ local file=/var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz
+++ shift
+++ local decompressor
+++ case ${file} in
+++ decompressor=xzcat
+++ tar --to-stdout -f - --wildcards -x '*/metadata/timestamp.x'
+++ xzcat /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz
+++ _pipestatus='0 0'
+++ [[ 00 -eq 0 ]]
++ local snapshot_timestamp=1658191201
++ '[' 0 == 0 ']'
+++ get_portage_timestamp
+++ local portage_current_timestamp=0
+++ '[' -f /var/db/repos/gentoo/metadata/timestamp.x ']'
+++ echo 0
++ '[' 1658191201 -lt 0 ']'
++ '[' 1 -eq 1 ']'
++ break
++ '[' 1 -eq 1 ']'
++ break
++ '[' 1 -eq 1 ']'
++ sync_local /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz
++ local file=/var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz
++ __vecho 'Syncing local tree ...'
++ __quiet_mode
++ [[ '' -eq 1 ]]
++ echo 'Syncing local tree ...'
+Syncing local tree ...
++ local ownership=portage:portage
++ has usersync assume-digests binpkg-docompress binpkg-dostrip binpkg-logs binpkg-multi-instance buildpkg-live config-protect-if-modified distlocks ebuild-locks fixlafiles ipc-sandbox merge-sync multilib-strict network-sandbox news parallel-fetch pid-sandbox preserve-libs protect-owned qa-unresolved-soname-deps sandbox sfperms strict unknown-features-warn unmerge-logs unmerge-orphans userfetch userpriv usersandbox usersync xattr
++ local needle=usersync
++ shift
++ local x
++ for x in "$@"
++ '[' assume-digests = usersync ']'
++ for x in "$@"
++ '[' binpkg-docompress = usersync ']'
++ for x in "$@"
++ '[' binpkg-dostrip = usersync ']'
++ for x in "$@"
++ '[' binpkg-logs = usersync ']'
++ for x in "$@"
++ '[' binpkg-multi-instance = usersync ']'
++ for x in "$@"
++ '[' buildpkg-live = usersync ']'
++ for x in "$@"
++ '[' config-protect-if-modified = usersync ']'
++ for x in "$@"
++ '[' distlocks = usersync ']'
++ for x in "$@"
++ '[' ebuild-locks = usersync ']'
++ for x in "$@"
++ '[' fixlafiles = usersync ']'
++ for x in "$@"
++ '[' ipc-sandbox = usersync ']'
++ for x in "$@"
++ '[' merge-sync = usersync ']'
++ for x in "$@"
++ '[' multilib-strict = usersync ']'
++ for x in "$@"
++ '[' network-sandbox = usersync ']'
++ for x in "$@"
++ '[' news = usersync ']'
++ for x in "$@"
++ '[' parallel-fetch = usersync ']'
++ for x in "$@"
++ '[' pid-sandbox = usersync ']'
++ for x in "$@"
++ '[' preserve-libs = usersync ']'
++ for x in "$@"
++ '[' protect-owned = usersync ']'
++ for x in "$@"
++ '[' qa-unresolved-soname-deps = usersync ']'
++ for x in "$@"
++ '[' sandbox = usersync ']'
++ for x in "$@"
++ '[' sfperms = usersync ']'
++ for x in "$@"
++ '[' strict = usersync ']'
++ for x in "$@"
++ '[' unknown-features-warn = usersync ']'
++ for x in "$@"
++ '[' unmerge-logs = usersync ']'
++ for x in "$@"
++ '[' unmerge-orphans = usersync ']'
++ for x in "$@"
++ '[' userfetch = usersync ']'
++ for x in "$@"
++ '[' userpriv = usersync ']'
++ for x in "$@"
++ '[' usersandbox = usersync ']'
++ for x in "$@"
++ '[' usersync = usersync ']'
++ return 0
++ case "${USERLAND}" in
+++ stat -c %U:%G /var/db/repos/gentoo
++ ownership=root:root
++ type -P tarsync
++ do_tar /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz -x --strip-components=1 -f -
++ local file=/var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz
++ shift
++ local decompressor
++ case ${file} in
++ decompressor=xzcat
++ tar -x --strip-components=1 -f -
++ xzcat /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz
+
+
++ _pipestatus='0 0'
++ [[ 00 -eq 0 ]]
++ false
++ rm -f /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz
++ local 'rsync_opts=--recursive --links --safe-links --perms --times --omit-dir-times --compress --force --whole-file --delete --stats --human-readable --timeout=180 --exclude=/distfiles --exclude=/local --exclude=/packages --exclude=/.git '
++ chown root:root .
++ chown -R root:root .
++ rsync_opts+=' --owner --group'
++ chmod 755 .
++ rsync --recursive --links --safe-links --perms --times --omit-dir-times --compress --force --whole-file --delete --stats --human-readable --timeout=180 --exclude=/distfiles --exclude=/local --exclude=/packages --exclude=/.git --owner --group . /var/db/repos/gentoo
+
+Number of files: 150,709 (reg: 123,394, dir: 27,315)
+Number of created files: 150,708 (reg: 123,394, dir: 27,314)
+Number of deleted files: 0
+Number of regular files transferred: 123,394
+Total file size: 204.70M bytes
+Total transferred file size: 204.70M bytes
+Literal data: 204.70M bytes
+Matched data: 0 bytes
+File list size: 4.30M
+File list generation time: 0.001 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 106.74M
+Total bytes received: 2.47M
+
+sent 106.74M bytes  received 2.47M bytes  1.25M bytes/sec
+total size is 204.70M  speedup is 1.87
++ __vecho 'Cleaning up ...'
++ __quiet_mode
++ [[ '' -eq 1 ]]
++ echo 'Cleaning up ...'
+Cleaning up ...
++ has metadata-transfer assume-digests binpkg-docompress binpkg-dostrip binpkg-logs binpkg-multi-instance buildpkg-live config-protect-if-modified distlocks ebuild-locks fixlafiles ipc-sandbox merge-sync multilib-strict network-sandbox news parallel-fetch pid-sandbox preserve-libs protect-owned qa-unresolved-soname-deps sandbox sfperms strict unknown-features-warn unmerge-logs unmerge-orphans userfetch userpriv usersandbox usersync xattr
++ local needle=metadata-transfer
++ shift
++ local x
++ for x in "$@"
++ '[' assume-digests = metadata-transfer ']'
++ for x in "$@"
++ '[' binpkg-docompress = metadata-transfer ']'
++ for x in "$@"
++ '[' binpkg-dostrip = metadata-transfer ']'
++ for x in "$@"
++ '[' binpkg-logs = metadata-transfer ']'
++ for x in "$@"
++ '[' binpkg-multi-instance = metadata-transfer ']'
++ for x in "$@"
++ '[' buildpkg-live = metadata-transfer ']'
++ for x in "$@"
++ '[' config-protect-if-modified = metadata-transfer ']'
++ for x in "$@"
++ '[' distlocks = metadata-transfer ']'
++ for x in "$@"
++ '[' ebuild-locks = metadata-transfer ']'
++ for x in "$@"
++ '[' fixlafiles = metadata-transfer ']'
++ for x in "$@"
++ '[' ipc-sandbox = metadata-transfer ']'
++ for x in "$@"
++ '[' merge-sync = metadata-transfer ']'
++ for x in "$@"
++ '[' multilib-strict = metadata-transfer ']'
++ for x in "$@"
++ '[' network-sandbox = metadata-transfer ']'
++ for x in "$@"
++ '[' news = metadata-transfer ']'
++ for x in "$@"
++ '[' parallel-fetch = metadata-transfer ']'
++ for x in "$@"
++ '[' pid-sandbox = metadata-transfer ']'
++ for x in "$@"
++ '[' preserve-libs = metadata-transfer ']'
++ for x in "$@"
++ '[' protect-owned = metadata-transfer ']'
++ for x in "$@"
++ '[' qa-unresolved-soname-deps = metadata-transfer ']'
++ for x in "$@"
++ '[' sandbox = metadata-transfer ']'
++ for x in "$@"
++ '[' sfperms = metadata-transfer ']'
++ for x in "$@"
++ '[' strict = metadata-transfer ']'
++ for x in "$@"
++ '[' unknown-features-warn = metadata-transfer ']'
++ for x in "$@"
++ '[' unmerge-logs = metadata-transfer ']'
++ for x in "$@"
++ '[' unmerge-orphans = metadata-transfer ']'
++ for x in "$@"
++ '[' userfetch = metadata-transfer ']'
++ for x in "$@"
++ '[' userpriv = metadata-transfer ']'
++ for x in "$@"
++ '[' usersandbox = metadata-transfer ']'
++ for x in "$@"
++ '[' usersync = metadata-transfer ']'
++ for x in "$@"
++ '[' xattr = metadata-transfer ']'
++ return 1
++ local post_sync=/etc/portage/bin/post_sync
++ '[' -x /etc/portage/bin/post_sync ']'
++ has news assume-digests binpkg-docompress binpkg-dostrip binpkg-logs binpkg-multi-instance buildpkg-live config-protect-if-modified distlocks ebuild-locks fixlafiles ipc-sandbox merge-sync multilib-strict network-sandbox news parallel-fetch pid-sandbox preserve-libs protect-owned qa-unresolved-soname-deps sandbox sfperms strict unknown-features-warn unmerge-logs unmerge-orphans userfetch userpriv usersandbox usersync xattr
++ local needle=news
++ shift
++ local x
++ for x in "$@"
++ '[' assume-digests = news ']'
++ for x in "$@"
++ '[' binpkg-docompress = news ']'
++ for x in "$@"
++ '[' binpkg-dostrip = news ']'
++ for x in "$@"
++ '[' binpkg-logs = news ']'
++ for x in "$@"
++ '[' binpkg-multi-instance = news ']'
++ for x in "$@"
++ '[' buildpkg-live = news ']'
++ for x in "$@"
++ '[' config-protect-if-modified = news ']'
++ for x in "$@"
++ '[' distlocks = news ']'
++ for x in "$@"
++ '[' ebuild-locks = news ']'
++ for x in "$@"
++ '[' fixlafiles = news ']'
++ for x in "$@"
++ '[' ipc-sandbox = news ']'
++ for x in "$@"
++ '[' merge-sync = news ']'
++ for x in "$@"
++ '[' multilib-strict = news ']'
++ for x in "$@"
++ '[' network-sandbox = news ']'
++ for x in "$@"
++ '[' news = news ']'
++ return 0
++ emerge --check-news --quiet
+PORTAGE_BZIP2_COMMAND setting is invalid: 'bzip2'
+PORTAGE_BZIP2_COMMAND setting from make.globals is invalid: 'bzip2'
+
+ * IMPORTANT: 9 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
++ return 0
++ r=0
++ false
++ rm -f /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz.md5sum /var/tmp/portage/webrsync-cP3UQV/gentoo-20220718.tar.xz.gpgsig
++ return 0
++ r=0
++ break
++ return 0
++ cd /
++ rm -rf /var/tmp/portage/webrsync-cP3UQV
+archiso / #
+archiso / #
+archiso / # env-update
+PORTAGE_BZIP2_COMMAND setting is invalid: 'bzip2'
+PORTAGE_BZIP2_COMMAND setting from make.globals is invalid: 'bzip2'
+>>> Regenerating /etc/ld.so.cache...
+archiso / # ls -al /var/db/repos/gentoo/
+Display all 181 possibilities? (y or n)
+Manifest                       dev-lua/                       kde-misc/                      sci-electronics/
+Manifest.files.gz              dev-ml/                        kde-plasma/                    sci-geosciences/
+acct-group/                    dev-perl/                      licenses/                      sci-libs/
+acct-user/                     dev-php/                       lxde-base/                     sci-mathematics/
+app-accessibility/             dev-python/                    lxqt-base/                     sci-misc/
+app-admin/                     dev-qt/                        mail-client/                   sci-physics/
+app-antivirus/                 dev-ros/                       mail-filter/                   sci-visualization/
+app-arch/                      dev-ruby/                      mail-mta/                      scripts/
+app-backup/                    dev-scheme/                    mate-base/                     sec-keys/
+app-benchmarks/                dev-tcltk/                     mate-extra/                    sec-policy/
+app-cdr/                       dev-tex/                       media-fonts/                   skel.ebuild
+app-containers/                dev-texlive/                   media-gfx/                     skel.metadata.xml
+app-crypt/                     dev-util/                      media-libs/                    sys-apps/
+app-dicts/                     dev-vcs/                       media-plugins/                 sys-auth/
+app-doc/                       eclass/                        media-radio/                   sys-block/
+app-editors/                   games-action/                  media-sound/                   sys-boot/
+app-emacs/                     games-arcade/                  media-tv/                      sys-cluster/
+app-emulation/                 games-board/                   media-video/                   sys-devel/
+app-eselect/                   games-emulation/               metadata/                      sys-fabric/
+app-forensics/                 games-engines/                 net-analyzer/                  sys-firmware/
+app-i18n/                      games-fps/                     net-dialup/                    sys-fs/
+app-laptop/                    games-kids/                    net-dns/                       sys-kernel/
+app-metrics/                   games-misc/                    net-firewall/                  sys-libs/
+app-misc/                      games-mud/                     net-fs/                        sys-power/
+app-mobilephone/               games-puzzle/                  net-ftp/                       sys-process/
+app-office/                    games-roguelike/               net-im/                        virtual/
+app-officeext/                 games-rpg/                     net-irc/                       www-apache/
+app-pda/                       games-server/                  net-libs/                      www-apps/
+app-portage/                   games-simulation/              net-mail/                      www-client/
+app-shells/                    games-sports/                  net-misc/                      www-misc/
+app-text/                      games-strategy/                net-nds/                       www-plugins/
+app-vim/                       games-util/                    net-news/                      www-servers/
+app-xemacs/                    gentoo-20220718.tar.xz.gpgsig  net-nntp/                      x11-apps/
+dev-ada/                       gentoo-20220718.tar.xz.md5sum  net-p2p/                       x11-base/
+dev-cpp/                       gnome-base/                    net-print/                     x11-drivers/
+dev-db/                        gnome-extra/                   net-proxy/                     x11-libs/
+dev-dotnet/                    gnustep-apps/                  net-voip/                      x11-misc/
+dev-embedded/                  gnustep-base/                  net-vpn/                       x11-plugins/
+dev-erlang/                    gnustep-libs/                  net-wireless/                  x11-terms/
+dev-games/                     gui-apps/                      perl-core/                     x11-themes/
+dev-go/                        gui-libs/                      profiles/                      x11-wm/
+dev-haskell/                   gui-wm/                        ros-meta/                      xfce-base/
+dev-java/                      header.txt                     sci-astronomy/                 xfce-extra/
+dev-lang/                      java-virtuals/                 sci-biology/
+dev-libs/                      kde-apps/                      sci-calculators/
+dev-lisp/                      kde-frameworks/                sci-chemistry/
+archiso / # env-update
+PORTAGE_BZIP2_COMMAND setting is invalid: 'bzip2'
+PORTAGE_BZIP2_COMMAND setting from make.globals is invalid: 'bzip2'
+>>> Regenerating /etc/ld.so.cache...
+archiso / # source /etc/pro
+profile      profile.d/   profile.env  protocols
+archiso / # source /etc/pro
+profile      profile.d/   profile.env  protocols
+archiso / # source /etc/profile
+archiso / # env-update
+>>> Regenerating /etc/ld.so.cache...
+archiso / # export PS1="(chroot) $PS1"
+(chroot) archiso / # exit
+exit
+chroot /mnt /bin/env -i TERM=$TERM /bin/bash  31.08s user 51.72s system 7% cpu 17:27.33 total
+root has logged on pts/2 from tmux(1822).
+root@archiso ~/ashos-dev (git)-[debian] # chroot /mnt /bin/env -i TERM=$TERM /bin/bash
+archiso / # env-update
+PORTAGE_BZIP2_COMMAND setting is invalid: 'bzip2'
+PORTAGE_BZIP2_COMMAND setting from make.globals is invalid: 'bzip2'
+>>> Regenerating /etc/ld.so.cache...
+archiso / # source /etc/profile
+archiso / # env-update
+>>> Regenerating /etc/ld.so.cache...
+archiso / # export PS1="(chroot) $PS1"
+(chroot) archiso / # vi
+vigr  vipw
+(chroot) archiso / # nano /etc/fstab
+(chroot) archiso / # cat
+cat        catchsegv  catman
+(chroot) archiso / # cat /etc/portage/
+make.conf                make.profile/            package.accept_keywords/ package.mask/            package.use/
+(chroot) archiso / # cat /etc/portage/make.conf
+# These settings were set by the catalyst build script that automatically
+# built this stage.
+# Please consult /usr/share/portage/config/make.conf.example for a more
+# detailed example.
+COMMON_FLAGS="-O2 -pipe"
+CFLAGS="${COMMON_FLAGS}"
+CXXFLAGS="${COMMON_FLAGS}"
+FCFLAGS="${COMMON_FLAGS}"
+FFLAGS="${COMMON_FLAGS}"
+
+# NOTE: This stage was built with the bindist Use flag enabled
+PORTDIR="/var/db/repos/gentoo"
+DISTDIR="/var/cache/distfiles"
+PKGDIR="/var/cache/binpkgs"
+
+# This sets the language of build output to English.
+# Please keep this setting intact when reporting bugs.
+LC_MESSAGES=C
+(chroot) archiso / # ls -al /var/
+cache/ db/    empty/ lib/   lock/  log/   run/   spool/ tmp/
+(chroot) archiso / # ls -al /var/db/
+Makefile  pkg/      repos/
+(chroot) archiso / # ls -al /var/db/pkg/
+acct-group/   app-crypt/    app-portage/  dev-lang/     dev-util/     net-misc/     sys-auth/     sys-libs/
+acct-user/    app-editors/  app-shells/   dev-libs/     net-dns/      perl-core/    sys-devel/    sys-process/
+app-admin/    app-eselect/  app-text/     dev-perl/     net-firewall/ sec-keys/     sys-fs/       virtual/
+app-arch/     app-misc/     dev-db/       dev-python/   net-libs/     sys-apps/     sys-kernel/
+(chroot) archiso / # ls -al /var/db/
+Makefile  pkg/      repos/
+(chroot) archiso / # ls -al /var/db/repos/gentoo/
+Display all 181 possibilities? (y or n)
+Manifest                       dev-lua/                       kde-misc/                      sci-electronics/
+Manifest.files.gz              dev-ml/                        kde-plasma/                    sci-geosciences/
+acct-group/                    dev-perl/                      licenses/                      sci-libs/
+acct-user/                     dev-php/                       lxde-base/                     sci-mathematics/
+app-accessibility/             dev-python/                    lxqt-base/                     sci-misc/
+app-admin/                     dev-qt/                        mail-client/                   sci-physics/
+app-antivirus/                 dev-ros/                       mail-filter/                   sci-visualization/
+app-arch/                      dev-ruby/                      mail-mta/                      scripts/
+app-backup/                    dev-scheme/                    mate-base/                     sec-keys/
+app-benchmarks/                dev-tcltk/                     mate-extra/                    sec-policy/
+app-cdr/                       dev-tex/                       media-fonts/                   skel.ebuild
+app-containers/                dev-texlive/                   media-gfx/                     skel.metadata.xml
+app-crypt/                     dev-util/                      media-libs/                    sys-apps/
+app-dicts/                     dev-vcs/                       media-plugins/                 sys-auth/
+app-doc/                       eclass/                        media-radio/                   sys-block/
+app-editors/                   games-action/                  media-sound/                   sys-boot/
+app-emacs/                     games-arcade/                  media-tv/                      sys-cluster/
+app-emulation/                 games-board/                   media-video/                   sys-devel/
+app-eselect/                   games-emulation/               metadata/                      sys-fabric/
+app-forensics/                 games-engines/                 net-analyzer/                  sys-firmware/
+app-i18n/                      games-fps/                     net-dialup/                    sys-fs/
+app-laptop/                    games-kids/                    net-dns/                       sys-kernel/
+app-metrics/                   games-misc/                    net-firewall/                  sys-libs/
+app-misc/                      games-mud/                     net-fs/                        sys-power/
+app-mobilephone/               games-puzzle/                  net-ftp/                       sys-process/
+app-office/                    games-roguelike/               net-im/                        virtual/
+app-officeext/                 games-rpg/                     net-irc/                       www-apache/
+app-pda/                       games-server/                  net-libs/                      www-apps/
+app-portage/                   games-simulation/              net-mail/                      www-client/
+app-shells/                    games-sports/                  net-misc/                      www-misc/
+app-text/                      games-strategy/                net-nds/                       www-plugins/
+app-vim/                       games-util/                    net-news/                      www-servers/
+app-xemacs/                    gentoo-20220718.tar.xz.gpgsig  net-nntp/                      x11-apps/
+dev-ada/                       gentoo-20220718.tar.xz.md5sum  net-p2p/                       x11-base/
+dev-cpp/                       gnome-base/                    net-print/                     x11-drivers/
+dev-db/                        gnome-extra/                   net-proxy/                     x11-libs/
+dev-dotnet/                    gnustep-apps/                  net-voip/                      x11-misc/
+dev-embedded/                  gnustep-base/                  net-vpn/                       x11-plugins/
+dev-erlang/                    gnustep-libs/                  net-wireless/                  x11-terms/
+dev-games/                     gui-apps/                      perl-core/                     x11-themes/
+dev-go/                        gui-libs/                      profiles/                      x11-wm/
+dev-haskell/                   gui-wm/                        ros-meta/                      xfce-base/
+dev-java/                      header.txt                     sci-astronomy/                 xfce-extra/
+dev-lang/                      java-virtuals/                 sci-biology/
+dev-libs/                      kde-apps/                      sci-calculators/
+dev-lisp/                      kde-frameworks/                sci-chemistry/
+(chroot) archiso / # ls -al /.snapshots/
+ast/    boot/   etc/    root/   rootfs/ tmp/
+(chroot) archiso / # which hwclock
+/sbin/hwclock
+(chroot) archiso / # ls -al /
+total 228060
+drwxr-xr-x   1 root root       378 Jul 17 18:31 .
+drwxr-xr-x   1 root root       378 Jul 17 18:31 ..
+drwxr-xr-x   1 root root        46 Jul 19 08:38 .snapshots
+drwxr-xr-x   1 root root         0 Jul 19 08:44 @.snapshots_gentoo
+drwxr-xr-x   1 root root         0 Jul 19 08:44 @_gentoo
+drwxr-xr-x   1 root root         0 Jul 19 08:44 @boot_gentoo
+drwxr-xr-x   1 root root         0 Jul 19 08:44 @etc_gentoo
+drwxr-xr-x   1 root root         0 Jul 19 08:44 @home_gentoo
+drwxr-xr-x   1 root root         0 Jul 19 08:45 @var_gentoo
+drwxr-xr-x   1 root root      1540 Jul 17 18:47 bin
+drwxr-xr-x   1 root root        16 Jul 17 18:31 boot
+drwxr-xr-x  20 root root      3740 Jul 19 04:59 dev
+drwxr-xr-x   1 root root      1568 Jul 19 11:23 etc
+drwxr-xr-x   1 root root        10 Jul 17 18:31 home
+drwxr-xr-x   1 root root       822 Jul 17 18:40 lib
+drwxr-xr-x   1 root root      3166 Jul 17 18:47 lib64
+drwxr-xr-x   1 root root        10 Jul 17 18:31 media
+drwxr-xr-x   1 root root        10 Jul 17 18:31 mnt
+drwxr-xr-x   1 root root        10 Jul 17 18:31 opt
+dr-xr-xr-x 172 root root         0 Jul 19 10:42 proc
+drwx------   1 root root        80 Jul 19 10:43 root
+drwxr-xr-x  28 root root       640 Jul 19 08:38 run
+drwxr-xr-x   1 root root      2082 Jul 17 18:47 sbin
+-rw-r--r--   1 root root 233528540 Jul 19 09:46 stage3-amd64-systemd-20220717T170537Z.tar.xz
+dr-xr-xr-x  13 root root         0 Jul 19 04:58 sys
+drwxrwxrwt   1 root root        10 Jul 19 11:02 tmp
+drwxr-xr-x   1 root root       128 Jul 17 18:33 usr
+drwxr-xr-x   1 root root        66 Jul 17 18:31 var
+(chroot) archiso / # emerge --ask sys-boot/efibootmgr
+
+ * IMPORTANT: 9 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+
+These are the packages that would be merged, in order:
+
+Calculating dependencies... done!
+[ebuild  N     ] sys-apps/hwdata-0.358
+[ebuild  N     ] sys-apps/pciutils-3.8.0-r1  USE="kmod udev zlib -dns -static-libs" ABI_X86="(64) -32 (-x32)"
+[ebuild  N     ] sys-libs/efivar-37
+[ebuild  N     ] sys-boot/efibootmgr-17
+
+Would you like to merge these packages? [Yes/No] Yes
+
+>>> Verifying ebuild manifests
+
+>>> Running pre-merge checks for sys-apps/pciutils-3.8.0-r1
+
+>>> Emerging (1 of 4) sys-apps/hwdata-0.358::gentoo
+ * hwdata-0.358.tar.gz BLAKE2B SHA512 size ;-) ...                                                                       [ ok ]
+>>> Unpacking source...
+>>> Unpacking hwdata-0.358.tar.gz to /var/tmp/portage/sys-apps/hwdata-0.358/work
+>>> Source unpacked in /var/tmp/portage/sys-apps/hwdata-0.358/work
+>>> Preparing source in /var/tmp/portage/sys-apps/hwdata-0.358/work/hwdata-0.358 ...
+>>> Source prepared.
+>>> Configuring source in /var/tmp/portage/sys-apps/hwdata-0.358/work/hwdata-0.358 ...
+./configure --prefix=/usr --libdir=/lib --datadir=/usr/share
+>>> Source configured.
+>>> Compiling source in /var/tmp/portage/sys-apps/hwdata-0.358/work/hwdata-0.358 ...
+make -j1
+/bin/sh: line 1: git: command not found
+make: Nothing to be done for 'all'.
+>>> Source compiled.
+ * Skipping make test/check due to ebuild restriction.
+>>> Test phase [disabled because of RESTRICT=test]: sys-apps/hwdata-0.358
+
+>>> Install sys-apps/hwdata-0.358 into /var/tmp/portage/sys-apps/hwdata-0.358/image
+make -j1 DESTDIR=/var/tmp/portage/sys-apps/hwdata-0.358/image install
+/bin/sh: line 1: git: command not found
+mkdir -p -m 755 /var/tmp/portage/sys-apps/hwdata-0.358/image/usr/share/hwdata
+for foo in pci.ids usb.ids oui.txt iab.txt pnp.ids ; do \
+        install -m 644 $foo /var/tmp/portage/sys-apps/hwdata-0.358/image/usr/share/hwdata ;\
+done
+mkdir -p -m 755 /var/tmp/portage/sys-apps/hwdata-0.358/image/lib/modprobe.d
+install -m 644 -T blacklist.conf /var/tmp/portage/sys-apps/hwdata-0.358/image/lib/modprobe.d/dist-blacklist.conf
+>>> Completed installing sys-apps/hwdata-0.358 into /var/tmp/portage/sys-apps/hwdata-0.358/image
+
+ * Final size of build directory: 8680 KiB (8.4 MiB)
+ * Final size of installed tree:  8576 KiB (8.3 MiB)
+
+ * QA Notice: command not found:
+ *
+ *      /bin/sh: line 1: git: command not found
+ *      /bin/sh: line 1: git: command not found
+
+>>> Installing (1 of 4) sys-apps/hwdata-0.358::gentoo
+
+>>> Emerging (2 of 4) sys-apps/pciutils-3.8.0-r1::gentoo
+ * pciutils-3.8.0.tar.gz BLAKE2B SHA512 size ;-) ...                                                                     [ ok ]
+>>> Unpacking source...
+>>> Unpacking pciutils-3.8.0.tar.gz to /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/work
+>>> Source unpacked in /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/work
+>>> Preparing source in /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/work/pciutils-3.8.0 ...
+ * Applying pciutils-3.8.0-no-which.patch ...                                                                            [ ok ]
+ * Applying pciutils-3.8.0-pkg-config.patch ...                                                                          [ ok ]
+ * Will copy sources from /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/work/pciutils-3.8.0
+ * abi_x86_64.amd64: copying to /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/work/pciutils-3.8.0-abi_x86_64.amd64
+>>> Source prepared.
+>>> Configuring source in /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/work/pciutils-3.8.0 ...
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_configure
+>>> Source configured.
+>>> Compiling source in /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/work/pciutils-3.8.0 ...
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_compile
+make -j1 HOST=x86_64-pc-linux-gnu CROSS_COMPILE=x86_64-pc-linux-gnu- CC=x86_64-pc-linux-gnu-gcc AR=x86_64-pc-linux-gnu-ar PKG_CONFIG=x86_64-pc-linux-gnu-pkg-config RANLIB=x86_64-pc-linux-gnu-ranlib DNS=no IDSDIR=$(SHAREDIR)/hwdata MANDIR=$(SHAREDIR)/man PREFIX=/usr SHARED=yes STRIP= ZLIB=yes PCI_COMPRESSED_IDS=0 PCI_IDS=pci.ids LIBDIR=${PREFIX}/lib64 LIBKMOD=yes HWDB=yes 'OPT=-O2 -pipe' all
+cd lib && ./configure
+Configuring libpci for your system... x86_64--linux  x86_64 linux
+Looking for access methods... sysfs proc i386-ports dump
+Checking for zlib support... yes (set manually)
+Checking for DNS support... no (set manually)
+Checking for libkmod... yes (set manually)
+Checking for udev hwdb support... yes (set manually)
+Checking whether to build a shared library... yes (set manually)
+make -C lib all
+make[1]: Entering directory '/var/tmp/portage/sys-apps/pciutils-3.8.0-r1/work/pciutils-3.8.0-abi_x86_64.amd64/lib'
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -fPIC -fvisibility=hidden  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o init.o init.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -fPIC -fvisibility=hidden  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o access.o access.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -fPIC -fvisibility=hidden  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o generic.o generic.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -fPIC -fvisibility=hidden  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o dump.o dump.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -fPIC -fvisibility=hidden  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o names.o names.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -fPIC -fvisibility=hidden  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o filter.o filter.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -fPIC -fvisibility=hidden  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o names-hash.o names-hash.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -fPIC -fvisibility=hidden  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o names-parse.o names-parse.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -fPIC -fvisibility=hidden  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o names-net.o names-net.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -fPIC -fvisibility=hidden  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o names-cache.o names-cache.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -fPIC -fvisibility=hidden  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o names-hwdb.o names-hwdb.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -fPIC -fvisibility=hidden  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o params.o params.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -fPIC -fvisibility=hidden  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o caps.o caps.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -fPIC -fvisibility=hidden  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o sysfs.o sysfs.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -fPIC -fvisibility=hidden  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o proc.o proc.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -fPIC -fvisibility=hidden  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o i386-ports.o i386-ports.c
+x86_64-pc-linux-gnu-gcc -shared -Wl,-O1 -Wl,--as-needed -Wl,-soname,libpci.so.3 -Wl,--version-script=libpci.ver -o libpci.so.3.8.0 init.o access.o generic.o dump.o names.o filter.o names-hash.o names-parse.o names-net.o names-cache.o names-hwdb.o params.o caps.o sysfs.o proc.o i386-ports.o -lz -ludev
+sed <libpci.pc.in >libpci.pc -e 's,@PREFIX@,/usr,' \
+        -e 's,@INCDIR@,/usr/include,' \
+        -e 's,@LIBDIR@,/usr/lib64,' \
+        -e 's,@IDSDIR@,/usr/share/hwdata,' \
+        -e 's,@VERSION@,3.8.0,' \
+        -e 's,@LDLIBS@,,' \
+        -e 's,@WITH_LIBS@,-lz -ludev,'
+make[1]: Leaving directory '/var/tmp/portage/sys-apps/pciutils-3.8.0-r1/work/pciutils-3.8.0-abi_x86_64.amd64/lib'
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o lspci.o lspci.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o ls-vpd.o ls-vpd.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o ls-caps.o ls-caps.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o ls-caps-vendor.o ls-caps-vendor.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o ls-ecaps.o ls-ecaps.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes   -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o ls-kernel.o ls-kernel.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o ls-tree.o ls-tree.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o ls-map.o ls-map.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o common.o common.c
+x86_64-pc-linux-gnu-gcc -Wl,-O1 -Wl,--as-needed  lspci.o ls-vpd.o ls-caps.o ls-caps-vendor.o ls-ecaps.o ls-kernel.o ls-tree.o ls-map.o common.o lib/libpci.so.3.8.0 -lkmod  -o lspci
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o setpci.o setpci.c
+x86_64-pc-linux-gnu-gcc -Wl,-O1 -Wl,--as-needed  setpci.o common.o lib/libpci.so.3.8.0  -o setpci
+x86_64-pc-linux-gnu-gcc -O2 -pipe -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE  -c -o example.o example.c
+x86_64-pc-linux-gnu-gcc -Wl,-O1 -Wl,--as-needed  example.o lib/libpci.so.3.8.0  -o example
+M=`echo 2022-04-18 | sed 's/-01-/-January-/;s/-02-/-February-/;s/-03-/-March-/;s/-04-/-April-/;s/-05-/-May-/;s/-06-/-June-/;s/-07-/-July-/;s/-08-/-August-/;s/-09-/-September-/;s/-10-/-October-/;s/-11-/-November-/;s/-12-/-December-/;s/\(.*\)-\(.*\)-\(.*\)/\3 \2 \1/'` ; sed <lspci.man >lspci.8 "s/@TODAY@/$M/;s/@VERSION@/pciutils-3.8.0/;s#@IDSDIR@#/usr/share/hwdata#;s#@PCI_IDS@#pci.ids#"
+M=`echo 2022-04-18 | sed 's/-01-/-January-/;s/-02-/-February-/;s/-03-/-March-/;s/-04-/-April-/;s/-05-/-May-/;s/-06-/-June-/;s/-07-/-July-/;s/-08-/-August-/;s/-09-/-September-/;s/-10-/-October-/;s/-11-/-November-/;s/-12-/-December-/;s/\(.*\)-\(.*\)-\(.*\)/\3 \2 \1/'` ; sed <setpci.man >setpci.8 "s/@TODAY@/$M/;s/@VERSION@/pciutils-3.8.0/;s#@IDSDIR@#/usr/share/hwdata#;s#@PCI_IDS@#pci.ids#"
+M=`echo 2022-04-18 | sed 's/-01-/-January-/;s/-02-/-February-/;s/-03-/-March-/;s/-04-/-April-/;s/-05-/-May-/;s/-06-/-June-/;s/-07-/-July-/;s/-08-/-August-/;s/-09-/-September-/;s/-10-/-October-/;s/-11-/-November-/;s/-12-/-December-/;s/\(.*\)-\(.*\)-\(.*\)/\3 \2 \1/'` ; sed <pcilib.man >pcilib.7 "s/@TODAY@/$M/;s/@VERSION@/pciutils-3.8.0/;s#@IDSDIR@#/usr/share/hwdata#;s#@PCI_IDS@#pci.ids#"
+M=`echo 2022-04-18 | sed 's/-01-/-January-/;s/-02-/-February-/;s/-03-/-March-/;s/-04-/-April-/;s/-05-/-May-/;s/-06-/-June-/;s/-07-/-July-/;s/-08-/-August-/;s/-09-/-September-/;s/-10-/-October-/;s/-11-/-November-/;s/-12-/-December-/;s/\(.*\)-\(.*\)-\(.*\)/\3 \2 \1/'` ; sed <pci.ids.man >pci.ids.5 "s/@TODAY@/$M/;s/@VERSION@/pciutils-3.8.0/;s#@IDSDIR@#/usr/share/hwdata#;s#@PCI_IDS@#pci.ids#"
+sed <update-pciids.sh >update-pciids "s@^DEST=.*@DEST=/usr/share/hwdata/pci.ids@;s@^PCI_COMPRESSED_IDS=.*@PCI_COMPRESSED_IDS=0@"
+chmod +x update-pciids
+M=`echo 2022-04-18 | sed 's/-01-/-January-/;s/-02-/-February-/;s/-03-/-March-/;s/-04-/-April-/;s/-05-/-May-/;s/-06-/-June-/;s/-07-/-July-/;s/-08-/-August-/;s/-09-/-September-/;s/-10-/-October-/;s/-11-/-November-/;s/-12-/-December-/;s/\(.*\)-\(.*\)-\(.*\)/\3 \2 \1/'` ; sed <update-pciids.man >update-pciids.8 "s/@TODAY@/$M/;s/@VERSION@/pciutils-3.8.0/;s#@IDSDIR@#/usr/share/hwdata#;s#@PCI_IDS@#pci.ids#"
+>>> Source compiled.
+>>> Test phase [not enabled]: sys-apps/pciutils-3.8.0-r1
+
+>>> Install sys-apps/pciutils-3.8.0-r1 into /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image
+ * abi_x86_64.amd64: running multilib-minimal_abi_src_install
+make -j1 HOST=x86_64-pc-linux-gnu CROSS_COMPILE=x86_64-pc-linux-gnu- CC=x86_64-pc-linux-gnu-gcc AR=x86_64-pc-linux-gnu-ar PKG_CONFIG=x86_64-pc-linux-gnu-pkg-config RANLIB=x86_64-pc-linux-gnu-ranlib DNS=no IDSDIR=$(SHAREDIR)/hwdata MANDIR=$(SHAREDIR)/man PREFIX=/usr SHARED=yes STRIP= ZLIB=yes PCI_COMPRESSED_IDS=0 PCI_IDS=pci.ids LIBDIR=${PREFIX}/lib64 LIBKMOD=yes HWDB=yes DESTDIR=/var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image install install-lib
+make -C lib all
+make[1]: Entering directory '/var/tmp/portage/sys-apps/pciutils-3.8.0-r1/work/pciutils-3.8.0-abi_x86_64.amd64/lib'
+make[1]: Nothing to be done for 'all'.
+make[1]: Leaving directory '/var/tmp/portage/sys-apps/pciutils-3.8.0-r1/work/pciutils-3.8.0-abi_x86_64.amd64/lib'
+install -d -m 755 /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image/usr/lib64
+install -c -m 644 lib/libpci.so.3.8.0 /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image/usr/lib64
+install -d -m 755 /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image/usr/bin /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image/usr/sbin /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image/usr/share/hwdata /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image/usr/share/man/man8 /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image/usr/share/man/man7 /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image//usr/share/man/man5
+install -c -m 755  lspci /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image/usr/bin
+install -c -m 755  setpci /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image/usr/sbin
+install -c -m 755 update-pciids /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image/usr/sbin
+install -c -m 644 pci.ids /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image/usr/share/hwdata
+install -c -m 644 lspci.8 setpci.8 update-pciids.8 /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image/usr/share/man/man8
+install -c -m 644 pcilib.7 /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image/usr/share/man/man7
+install -c -m 644 pci.ids.5 /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image/usr/share/man/man5
+ln -sf libpci.so.3.8.0 /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image/usr/lib64/libpci.so.3
+install -d -m 755 /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image/usr/include/pci /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image/usr/lib64/pkgconfig
+install -c -m 644 lib/config.h lib/header.h lib/pci.h lib/types.h /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image/usr/include/pci
+install -c -m 644 lib/libpci.pc /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image/usr/lib64/pkgconfig
+ln -sf libpci.so.3.8.0 /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image/usr/lib64/libpci.so.3
+ln -sf libpci.so.3 /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image/usr/lib64/libpci.so
+>>> Completed installing sys-apps/pciutils-3.8.0-r1 into /var/tmp/portage/sys-apps/pciutils-3.8.0-r1/image
+
+ * Final size of build directory: 7088 KiB (6.9 MiB)
+ * Final size of installed tree:   444 KiB
+
+making executable: /usr/lib64/libpci.so.3.8.0
+strip: x86_64-pc-linux-gnu-strip --strip-unneeded -N __gentoo_check_ldflags__ -R .comment -R .GCC.command.line -R .note.gnu.gold-version
+   /usr/lib64/libpci.so.3.8.0
+   /usr/bin/lspci
+   /usr/sbin/setpci
+
+>>> Installing (2 of 4) sys-apps/pciutils-3.8.0-r1::gentoo
+
+>>> Emerging (3 of 4) sys-libs/efivar-37::gentoo
+ * efivar-37.tar.bz2 BLAKE2B SHA512 size ;-) ...                                                                         [ ok ]
+>>> Unpacking source...
+>>> Unpacking efivar-37.tar.bz2 to /var/tmp/portage/sys-libs/efivar-37/work
+>>> Source unpacked in /var/tmp/portage/sys-libs/efivar-37/work
+>>> Preparing source in /var/tmp/portage/sys-libs/efivar-37/work/efivar-37 ...
+ * Applying efivar-37-ia64-relro.patch ...                                                                               [ ok ]
+>>> Source prepared.
+>>> Configuring source in /var/tmp/portage/sys-libs/efivar-37/work/efivar-37 ...
+>>> Source configured.
+>>> Compiling source in /var/tmp/portage/sys-libs/efivar-37/work/efivar-37 ...
+make -j1
+make[1]: Entering directory '/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src'
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -L.  -Wl,-O1 -Wl,--as-needed -Wl,-z,muldefs     -DEFIVAR_BUILD_ENVIRONMENT -o makeguids makeguids.c guid.c -ldl
+In file included from efivar.h:30,
+                 from makeguids.c:30:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+In file included from efivar.h:30,
+                 from guid.c:27:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+./makeguids guids.txt guids.bin names.bin \
+        guid-symbols.c include/efivar/efivar-guids.h
+35 lines
+make -f /var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/Make.deps deps SOURCES="crc32.c creator.c disk.c gpt.c loadopt.c path-helpers.c linux.c linux-acpi-root.c linux-acpi.c linux-ata.c linux-emmc.c linux-i2o.c linux-md.c linux-nvme.c linux-pci-root.c linux-pci.c linux-pmem.c linux-sas.c linux-sata.c linux-scsi.c linux-soc-root.c linux-virtblk.c dp.c dp-acpi.c dp-hw.c dp-media.c dp-message.c efivarfs.c error.c export.c guid.c guids.S guid-symbols.c lib.c vars.c makeguids.c guid.c include/efivar/efiboot-creator.h include/efivar/efiboot-loadopt.h include/efivar/efiboot.h include/efivar/efivar-dp.h include/efivar/efivar.h include/efivar/efivar-guids.h guid-symbols.c efivar.c"
+make[2]: Entering directory '/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src'
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .crc32.d crc32.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .creator.d creator.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .disk.d disk.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .gpt.d gpt.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .loadopt.d loadopt.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .path-helpers.d path-helpers.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .linux.d linux.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .linux-acpi-root.d linux-acpi-root.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .linux-acpi.d linux-acpi.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .linux-ata.d linux-ata.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .linux-emmc.d linux-emmc.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .linux-i2o.d linux-i2o.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .linux-md.d linux-md.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .linux-nvme.d linux-nvme.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .linux-pci-root.d linux-pci-root.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .linux-pci.d linux-pci.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .linux-pmem.d linux-pmem.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .linux-sas.d linux-sas.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .linux-sata.d linux-sata.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .linux-scsi.d linux-scsi.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .linux-soc-root.d linux-soc-root.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .linux-virtblk.d linux-virtblk.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .dp.d dp.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .dp-acpi.d dp-acpi.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .dp-hw.d dp-hw.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .dp-media.d dp-media.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .dp-message.d dp-message.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .efivarfs.d efivarfs.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .error.d error.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .export.d export.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .guid.d guid.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .guid-symbols.d guid-symbols.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .lib.d lib.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .vars.d vars.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .makeguids.d makeguids.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .efivar.d efivar.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs   -MM -MG -MF .guids.d guids.S
+make[2]: Leaving directory '/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src'
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o dp.o dp.c
+In file included from efivar.h:30,
+                 from dp.c:27:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o dp-acpi.o dp-acpi.c
+In file included from efivar.h:30,
+                 from dp-acpi.c:28:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o dp-hw.o dp-hw.c
+In file included from efivar.h:30,
+                 from dp-hw.c:26:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+dp-hw.c: In function ‘_format_hw_dn’:
+dp-hw.c:59:35: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+   59 |                 if (!efi_guid_cmp(&dp->hw_vendor.vendor_guid, &edd10_guid)) {
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o dp-media.o dp-media.c
+In file included from efivar.h:30,
+                 from dp-media.c:28:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+dp-media.c: In function ‘_format_media_dn’:
+dp-media.c:50:51: warning: taking address of packed member of ‘union <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+   50 |                                     (efi_guid_t *)dp->hd.signature);
+      |                                                   ^~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+dp-media.c:86:29: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+   86 |                             &dp->protocol.protocol_guid);
+      |                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+dp-media.c:92:29: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+   92 |                             &dp->protocol.protocol_guid);
+      |                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+dp-media.c:98:29: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+   98 |                             &dp->protocol.protocol_guid);
+      |                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+dp-media.c:122:43: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  122 |                                           &dp->ramdisk.disk_type_guid))
+      |                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from efivar.h:30,
+                 from dp-media.c:28:
+dp-media.c:142:29: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  142 |                             &dp->ramdisk.disk_type_guid);
+      |                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+dp-media.c: In function ‘efidp_make_file’:
+dp-media.c:175:34: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  175 |                 utf8_to_ucs2(file->name, req-4, 1, lf);
+      |                              ~~~~^~~~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o dp-message.o dp-message.c
+In file included from efivar.h:30,
+                 from dp-message.c:28:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+dp-message.c: In function ‘_format_message_dn’:
+dp-message.c:367:51: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  367 |                                     (efi_guid_t *)&dp->infiniband.ioc_guid);
+      |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+dp-message.c:426:43: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  426 |                                           &dp->msg_vendor.vendor_guid))
+      |                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+dp-message.c:623:53: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  623 |                         const efi_ip_addr_t *addr = &dp->dns.addrs[i];
+      |                                                     ^~~~~~~~~~~~~~~~~
+In file included from efivar.h:30,
+                 from dp-message.c:28:
+dp-message.c:634:55: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  634 |                 format_guid(buf, size, off, "NVDIMM", &dp->nvdimm.uuid);
+      |                                                       ^~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o efivarfs.o efivarfs.c
+In file included from efivar.h:30,
+                 from efivarfs.c:36:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o error.o error.c
+In file included from efivar.h:30,
+                 from efiboot.h:23,
+                 from error.c:31:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o export.o export.c
+In file included from efivar.h:30,
+                 from export.c:28:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o guid.o guid.c
+In file included from efivar.h:30,
+                 from guid.c:27:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o guids.o guids.S
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o guid-symbols.o guid-symbols.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o lib.o lib.c
+In file included from efivar.h:30,
+                 from lib.c:31:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o vars.o vars.c
+In file included from efivar.h:30,
+                 from vars.c:34:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -L.  -Wl,-O1 -Wl,--as-needed -Wl,-z,muldefs      -shared \
+  -Wl,-soname,libefivar.so.1 \
+  -Wl,--version-script=libefivar.map \
+  -o libefivar.so dp.o dp-acpi.o dp-hw.o dp-media.o dp-message.o efivarfs.o error.o export.o guid.o guids.o guid-symbols.o lib.o vars.o -ldl
+ln -vfs libefivar.so libefivar.so.1
+'libefivar.so.1' -> 'libefivar.so'
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o crc32.o crc32.c
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o creator.o creator.c
+In file included from efivar.h:30,
+                 from efiboot.h:23,
+                 from creator.c:35:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o disk.o disk.c
+In file included from efivar.h:30,
+                 from efiboot.h:23,
+                 from disk.c:39:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o gpt.o gpt.c
+In file included from efivar.h:30,
+                 from gpt.c:39:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o loadopt.o loadopt.c
+In file included from efivar.h:30,
+                 from efiboot.h:23,
+                 from loadopt.c:26:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+loadopt.c: In function ‘efi_loadopt_optional_data_size’:
+loadopt.c:141:26: warning: taking address of packed member of ‘struct efi_load_option_s’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  141 |         sz = ucs2size(opt->description, ret);
+      |                       ~~~^~~~~~~~~~~~~
+loadopt.c: In function ‘efi_loadopt_path’:
+loadopt.c:219:26: warning: taking address of packed member of ‘struct efi_load_option_s’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  219 |         sz = ucs2size(opt->description, left);
+      |                       ~~~^~~~~~~~~~~~~
+loadopt.c: In function ‘efi_loadopt_optional_data’:
+loadopt.c:250:26: warning: taking address of packed member of ‘struct efi_load_option_s’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  250 |         ul = ucs2size(opt->description, opt_size - l);
+      |                       ~~~^~~~~~~~~~~~~
+loadopt.c: In function ‘efi_loadopt_desc’:
+loadopt.c:374:37: warning: taking address of packed member of ‘struct efi_load_option_s’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  374 |         last_desc = ucs2_to_utf8(opt->description, limit);
+      |                                  ~~~^~~~~~~~~~~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o path-helpers.o path-helpers.c
+In file included from efivar.h:30,
+                 from path-helpers.c:21:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o linux.o linux.c
+In file included from efivar.h:30,
+                 from efiboot.h:23,
+                 from linux.c:44:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o linux-acpi-root.o linux-acpi-root.c
+In file included from efivar.h:30,
+                 from efiboot.h:23,
+                 from linux-acpi-root.c:29:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o linux-acpi.o linux-acpi.c
+In file included from efivar.h:30,
+                 from efiboot.h:23,
+                 from linux-acpi.c:29:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o linux-ata.o linux-ata.c
+In file included from efivar.h:30,
+                 from efiboot.h:23,
+                 from linux-ata.c:29:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o linux-emmc.o linux-emmc.c
+In file included from efivar.h:30,
+                 from efiboot.h:23,
+                 from linux-emmc.c:29:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o linux-i2o.o linux-i2o.c
+In file included from efivar.h:30,
+                 from efiboot.h:23,
+                 from linux-i2o.c:29:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o linux-md.o linux-md.c
+In file included from efivar.h:30,
+                 from efiboot.h:23,
+                 from linux-md.c:29:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o linux-nvme.o linux-nvme.c
+In file included from efivar.h:30,
+                 from efiboot.h:23,
+                 from linux-nvme.c:29:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o linux-pci-root.o linux-pci-root.c
+In file included from efivar.h:30,
+                 from efiboot.h:23,
+                 from linux-pci-root.c:29:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o linux-pci.o linux-pci.c
+In file included from efivar.h:30,
+                 from efiboot.h:23,
+                 from linux-pci.c:29:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o linux-pmem.o linux-pmem.c
+In file included from efivar.h:30,
+                 from efiboot.h:23,
+                 from linux-pmem.c:29:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o linux-sas.o linux-sas.c
+In file included from efivar.h:30,
+                 from efiboot.h:23,
+                 from linux-sas.c:29:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o linux-sata.o linux-sata.c
+In file included from efivar.h:30,
+                 from efiboot.h:23,
+                 from linux-sata.c:30:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o linux-scsi.o linux-scsi.c
+In file included from efivar.h:30,
+                 from efiboot.h:23,
+                 from linux-scsi.c:29:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o linux-soc-root.o linux-soc-root.c
+In file included from efivar.h:30,
+                 from efiboot.h:23,
+                 from linux-soc-root.c:29:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -fPIC  -c -o linux-virtblk.o linux-virtblk.c
+In file included from efivar.h:30,
+                 from efiboot.h:23,
+                 from linux-virtblk.c:29:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -L.  -Wl,-O1 -Wl,--as-needed -Wl,-z,muldefs      -shared \
+  -Wl,-soname,libefiboot.so.1 \
+  -Wl,--version-script=libefiboot.map \
+  -o libefiboot.so crc32.o creator.o disk.o gpt.o loadopt.o path-helpers.o linux.o linux-acpi-root.o linux-acpi.o linux-ata.o linux-emmc.o linux-i2o.o linux-md.o linux-nvme.o linux-pci-root.o linux-pci.o linux-pmem.o linux-sas.o linux-sata.o linux-scsi.o linux-soc-root.o linux-virtblk.o -lefivar
+ln -vfs libefiboot.so libefiboot.so.1
+'libefiboot.so.1' -> 'libefiboot.so'
+x86_64-pc-linux-gnu-gcc -O2 -pipe -I/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/   -specs=/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/gcc.specs  -L.  -Wl,-O1 -Wl,--as-needed -Wl,-z,muldefs      -o efivar efivar.c -lefivar -ldl
+In file included from efivar.h:30,
+                 from efivar.c:40:
+dp.h: In function ‘format_vendor_helper’:
+dp.h:118:44: warning: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  118 |         format_guid(buf, size, off, label, &dp->hw_vendor.vendor_guid);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+dp.h:74:39: note: in definition of macro ‘format_guid’
+   74 |                 _rc = efi_guid_to_str(guid, &_guidstr);                 \
+      |                                       ^~~~
+In file included from /usr/include/string.h:519,
+                 from efivar.c:34:
+In function ‘strncpy’,
+    inlined from ‘text_to_guid’ at guid.h:114:2,
+    inlined from ‘parse_name.constprop’ at efivar.c:157:8:
+/usr/include/bits/string_fortified.h:95:10: warning: ‘__builtin_strncpy’ output may be truncated copying 4 bytes from a string of length 29 [-Wstringop-truncation]
+   95 |   return __builtin___strncpy_chk (__dest, __src, __len,
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   96 |                                   __glibc_objsize (__dest));
+      |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~
+In function ‘strncpy’,
+    inlined from ‘text_to_guid’ at guid.h:122:2,
+    inlined from ‘parse_name.constprop’ at efivar.c:157:8:
+/usr/include/bits/string_fortified.h:95:10: warning: ‘__builtin_strncpy’ output may be truncated copying 4 bytes from a string of length 24 [-Wstringop-truncation]
+   95 |   return __builtin___strncpy_chk (__dest, __src, __len,
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   96 |                                   __glibc_objsize (__dest));
+      |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~
+In function ‘strncpy’,
+    inlined from ‘text_to_guid’ at guid.h:130:2,
+    inlined from ‘parse_name.constprop’ at efivar.c:157:8:
+/usr/include/bits/string_fortified.h:95:10: warning: ‘__builtin_strncpy’ output may be truncated copying 4 bytes from a string of length 19 [-Wstringop-truncation]
+   95 |   return __builtin___strncpy_chk (__dest, __src, __len,
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   96 |                                   __glibc_objsize (__dest));
+      |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~
+In function ‘strncpy’,
+    inlined from ‘text_to_guid’ at guid.h:138:2,
+    inlined from ‘parse_name.constprop’ at efivar.c:157:8:
+/usr/include/bits/string_fortified.h:95:10: warning: ‘__builtin_strncpy’ output may be truncated copying 2 bytes from a string of length 14 [-Wstringop-truncation]
+   95 |   return __builtin___strncpy_chk (__dest, __src, __len,
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   96 |                                   __glibc_objsize (__dest));
+      |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~
+In function ‘strncpy’,
+    inlined from ‘text_to_guid’ at guid.h:145:2,
+    inlined from ‘parse_name.constprop’ at efivar.c:157:8:
+/usr/include/bits/string_fortified.h:95:10: warning: ‘__builtin_strncpy’ output may be truncated copying 2 bytes from a string of length 12 [-Wstringop-truncation]
+   95 |   return __builtin___strncpy_chk (__dest, __src, __len,
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   96 |                                   __glibc_objsize (__dest));
+      |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~
+In function ‘strncpy’,
+    inlined from ‘text_to_guid’ at guid.h:152:2,
+    inlined from ‘parse_name.constprop’ at efivar.c:157:8:
+/usr/include/bits/string_fortified.h:95:10: warning: ‘__builtin_strncpy’ output may be truncated copying 2 bytes from a string of length 10 [-Wstringop-truncation]
+   95 |   return __builtin___strncpy_chk (__dest, __src, __len,
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   96 |                                   __glibc_objsize (__dest));
+      |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~
+In function ‘strncpy’,
+    inlined from ‘text_to_guid’ at guid.h:159:2,
+    inlined from ‘parse_name.constprop’ at efivar.c:157:8:
+/usr/include/bits/string_fortified.h:95:10: warning: ‘__builtin_strncpy’ output may be truncated copying 2 bytes from a string of length 8 [-Wstringop-truncation]
+   95 |   return __builtin___strncpy_chk (__dest, __src, __len,
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   96 |                                   __glibc_objsize (__dest));
+      |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~
+In function ‘strncpy’,
+    inlined from ‘text_to_guid’ at guid.h:166:2,
+    inlined from ‘parse_name.constprop’ at efivar.c:157:8:
+/usr/include/bits/string_fortified.h:95:10: warning: ‘__builtin_strncpy’ output may be truncated copying 2 bytes from a string of length 6 [-Wstringop-truncation]
+   95 |   return __builtin___strncpy_chk (__dest, __src, __len,
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   96 |                                   __glibc_objsize (__dest));
+      |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~
+In function ‘strncpy’,
+    inlined from ‘text_to_guid’ at guid.h:173:2,
+    inlined from ‘parse_name.constprop’ at efivar.c:157:8:
+/usr/include/bits/string_fortified.h:95:10: warning: ‘__builtin_strncpy’ output may be truncated copying 2 bytes from a string of length 4 [-Wstringop-truncation]
+   95 |   return __builtin___strncpy_chk (__dest, __src, __len,
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   96 |                                   __glibc_objsize (__dest));
+      |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~
+make[1]: Leaving directory '/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src'
+make[1]: Entering directory '/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/docs'
+make[1]: Nothing to be done for 'all'.
+make[1]: Leaving directory '/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/docs'
+>>> Source compiled.
+>>> Test phase [not enabled]: sys-libs/efivar-37
+
+>>> Install sys-libs/efivar-37 into /var/tmp/portage/sys-libs/efivar-37/image/
+make -j1 DESTDIR=/var/tmp/portage/sys-libs/efivar-37/image/ install
+make[1]: Entering directory '/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src'
+make -f /var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/Make.deps deps SOURCES="crc32.c creator.c disk.c gpt.c loadopt.c path-helpers.c linux.c linux-acpi-root.c linux-acpi.c linux-ata.c linux-emmc.c linux-i2o.c linux-md.c linux-nvme.c linux-pci-root.c linux-pci.c linux-pmem.c linux-sas.c linux-sata.c linux-scsi.c linux-soc-root.c linux-virtblk.c dp.c dp-acpi.c dp-hw.c dp-media.c dp-message.c efivarfs.c error.c export.c guid.c guids.S guid-symbols.c lib.c vars.c makeguids.c guid.c include/efivar/efiboot-creator.h include/efivar/efiboot-loadopt.h include/efivar/efiboot.h include/efivar/efivar-dp.h include/efivar/efivar-guids.h include/efivar/efivar.h include/efivar/efivar-guids.h guid-symbols.c efivar.c"
+make[2]: Entering directory '/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src'
+make[2]: Nothing to be done for 'deps'.
+make[2]: Leaving directory '/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src'
+install -d -m 755 /var/tmp/portage/sys-libs/efivar-37/image//usr/lib64
+install -m 755 libefivar.so /var/tmp/portage/sys-libs/efivar-37/image//usr/lib64/libefivar.so.1.37 ; ln -fs libefivar.so.1.37 /var/tmp/portage/sys-libs/efivar-37/image//usr/lib64/libefivar.so.1 ; ln -fs libefivar.so.1.37 /var/tmp/portage/sys-libs/efivar-37/image//usr/lib64/libefivar.so ;   install -m 755 libefiboot.so /var/tmp/portage/sys-libs/efivar-37/image//usr/lib64/libefiboot.so.1.37 ; ln -fs libefiboot.so.1.37 /var/tmp/portage/sys-libs/efivar-37/image//usr/lib64/libefiboot.so.1 ; ln -fs libefiboot.so.1.37 /var/tmp/portage/sys-libs/efivar-37/image//usr/lib64/libefiboot.so ;
+install -d -m 755 /var/tmp/portage/sys-libs/efivar-37/image//usr/lib64/pkgconfig
+install -m 644 efivar.pc /var/tmp/portage/sys-libs/efivar-37/image//usr/lib64/pkgconfig ;  install -m 644 efiboot.pc /var/tmp/portage/sys-libs/efivar-37/image//usr/lib64/pkgconfig ;
+install -d -m 755 /var/tmp/portage/sys-libs/efivar-37/image//usr/include/efivar
+install -m 644 /var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/efivar/efiboot-creator.h /var/tmp/portage/sys-libs/efivar-37/image//usr/include/efivar/efiboot-creator.h;  install -m 644 /var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/efivar/efiboot-loadopt.h /var/tmp/portage/sys-libs/efivar-37/image//usr/include/efivar/efiboot-loadopt.h;  install -m 644 /var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/efivar/efiboot.h /var/tmp/portage/sys-libs/efivar-37/image//usr/include/efivar/efiboot.h;  install -m 644 /var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/efivar/efivar-dp.h /var/tmp/portage/sys-libs/efivar-37/image//usr/include/efivar/efivar-dp.h;  install -m 644 /var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/efivar/efivar-guids.h /var/tmp/portage/sys-libs/efivar-37/image//usr/include/efivar/efivar-guids.h;  install -m 644 /var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src/include/efivar/efivar.h /var/tmp/portage/sys-libs/efivar-37/image//usr/include/efivar/efivar.h;
+install -d -m 755 /var/tmp/portage/sys-libs/efivar-37/image//usr/bin
+install -m 755 efivar /var/tmp/portage/sys-libs/efivar-37/image//usr/bin;
+make[1]: Leaving directory '/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/src'
+make[1]: Entering directory '/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/docs'
+install -d -m 755 /var/tmp/portage/sys-libs/efivar-37/image//usr/share/man/man1
+install -m 644 efivar.1 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man1/;
+install -d -m 755 /var/tmp/portage/sys-libs/efivar-37/image//usr/share/man/man3
+install -m 644 efi_append_variable.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_del_variable.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_get_next_variable_name.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_get_variable.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_get_variable_attributes.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_get_variable_size.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_guid_to_id_guid.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_guid_to_name.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_guid_to_str.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_guid_to_symbol.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_name_to_guid.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_set_variable.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_str_to_guid.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_symbol_to_guid.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_variables_supported.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_variable_t.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_variable_import.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_variable_export.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_variable_alloc.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_variable_free.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_variable_set_name.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_variable_get_name.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_variable_set_guid.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_variable_get_guid.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_variable_set_data.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_variable_get_data.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_variable_get_attributes.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_variable_set_attributes.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;  install -m 644 efi_variable_realize.3 /var/tmp/portage/sys-libs/efivar-37/image///usr/share/man/man3/;
+make[1]: Leaving directory '/var/tmp/portage/sys-libs/efivar-37/work/efivar-37/docs'
+>>> Completed installing sys-libs/efivar-37 into /var/tmp/portage/sys-libs/efivar-37/image/
+
+ * Final size of build directory: 2204 KiB (2.1 MiB)
+ * Final size of installed tree:   544 KiB
+
+strip: x86_64-pc-linux-gnu-strip --strip-unneeded -N __gentoo_check_ldflags__ -R .comment -R .GCC.command.line -R .note.gnu.gold-version
+   /usr/lib64/libefivar.so.1.37
+   /usr/lib64/libefiboot.so.1.37
+   /usr/bin/efivar
+
+>>> Installing (3 of 4) sys-libs/efivar-37::gentoo
+
+>>> Emerging (4 of 4) sys-boot/efibootmgr-17::gentoo
+ * efibootmgr-17.tar.gz BLAKE2B SHA512 size ;-) ...                                                                      [ ok ]
+>>> Unpacking source...
+>>> Unpacking efibootmgr-17.tar.gz to /var/tmp/portage/sys-boot/efibootmgr-17/work
+>>> Source unpacked in /var/tmp/portage/sys-boot/efibootmgr-17/work
+>>> Preparing source in /var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17 ...
+ * Applying efibootmgr-17-fix-efivar-37-conflict.patch ...                                                               [ ok ]
+ * Applying efibootmgr-17-clang.patch ...                                                                                [ ok ]
+>>> Source prepared.
+>>> Configuring source in /var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17 ...
+>>> Source configured.
+>>> Compiling source in /var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17 ...
+make -j1 PKG_CONFIG=x86_64-pc-linux-gnu-pkg-config
+Building with EFIDIR as Gentoo
+make[1]: Entering directory '/var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/src'
+make -f /var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/Make.deps \
+        SOURCES="efibootmgr.c efi.c unparse_path.c" \
+        SUBDIR_CFLAGS="-I/var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/src/include" \
+        PKGS="efivar efiboot popt" \
+        deps
+make[2]: Entering directory '/var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/src'
+x86_64-pc-linux-gnu-gcc   -O2 -pipe -I/var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/src/include -Wall -Wextra -Wsign-compare -Wstrict-aliasing -std=gnu11 -fPIC -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -DLOCALEDIR=\"/usr/share/locale/\" -DEFIBOOTMGR_VERSION="\"17\"" -DDEFAULT_LOADER=\"\\\\EFI\\\\Gentoo\\\\grub.efi\"   -I/usr/include/efivar   -MM -MG -MF .efibootmgr.d efibootmgr.c
+x86_64-pc-linux-gnu-gcc   -O2 -pipe -I/var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/src/include -Wall -Wextra -Wsign-compare -Wstrict-aliasing -std=gnu11 -fPIC -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -DLOCALEDIR=\"/usr/share/locale/\" -DEFIBOOTMGR_VERSION="\"17\"" -DDEFAULT_LOADER=\"\\\\EFI\\\\Gentoo\\\\grub.efi\"   -I/usr/include/efivar   -MM -MG -MF .efi.d efi.c
+x86_64-pc-linux-gnu-gcc   -O2 -pipe -I/var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/src/include -Wall -Wextra -Wsign-compare -Wstrict-aliasing -std=gnu11 -fPIC -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -DLOCALEDIR=\"/usr/share/locale/\" -DEFIBOOTMGR_VERSION="\"17\"" -DDEFAULT_LOADER=\"\\\\EFI\\\\Gentoo\\\\grub.efi\"   -I/usr/include/efivar   -MM -MG -MF .unparse_path.d unparse_path.c
+make[2]: Leaving directory '/var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/src'
+make[1]: Leaving directory '/var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/src'
+make[1]: Entering directory '/var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/src'
+make -f /var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/Make.deps \
+        SOURCES="efibootmgr.c efi.c unparse_path.c" \
+        SUBDIR_CFLAGS="-I/var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/src/include" \
+        PKGS="efivar efiboot popt" \
+        deps
+make[2]: Entering directory '/var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/src'
+make[2]: Nothing to be done for 'deps'.
+make[2]: Leaving directory '/var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/src'
+x86_64-pc-linux-gnu-gcc   -O2 -pipe -I/var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/src/include -Wall -Wextra -Wsign-compare -Wstrict-aliasing -std=gnu11 -fPIC -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -DLOCALEDIR=\"/usr/share/locale/\" -DEFIBOOTMGR_VERSION="\"17\"" -DDEFAULT_LOADER=\"\\\\EFI\\\\Gentoo\\\\grub.efi\"   -I/usr/include/efivar   -c -o efibootmgr.o efibootmgr.c
+x86_64-pc-linux-gnu-gcc   -O2 -pipe -I/var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/src/include -Wall -Wextra -Wsign-compare -Wstrict-aliasing -std=gnu11 -fPIC -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -DLOCALEDIR=\"/usr/share/locale/\" -DEFIBOOTMGR_VERSION="\"17\"" -DDEFAULT_LOADER=\"\\\\EFI\\\\Gentoo\\\\grub.efi\"   -I/usr/include/efivar   -c -o efi.o efi.c
+x86_64-pc-linux-gnu-gcc   -O2 -pipe -I/var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/src/include -Wall -Wextra -Wsign-compare -Wstrict-aliasing -std=gnu11 -fPIC -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -DLOCALEDIR=\"/usr/share/locale/\" -DEFIBOOTMGR_VERSION="\"17\"" -DDEFAULT_LOADER=\"\\\\EFI\\\\Gentoo\\\\grub.efi\"   -I/usr/include/efivar   -c -o unparse_path.o unparse_path.c
+x86_64-pc-linux-gnu-gcc   -O2 -pipe -I/var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/src/include -Wall -Wextra -Wsign-compare -Wstrict-aliasing -std=gnu11 -fPIC -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -DLOCALEDIR=\"/usr/share/locale/\" -DEFIBOOTMGR_VERSION="\"17\"" -DDEFAULT_LOADER=\"\\\\EFI\\\\Gentoo\\\\grub.efi\"   -I/usr/include/efivar   -Wl,-O1 -Wl,--as-needed  -fno-merge-constants -Wl,--fatal-warnings,--no-allow-shlib-undefined -Wl,-O2 -Wl,--no-undefined-version   -o efibootmgr efibootmgr.o efi.o unparse_path.o  -lefivar -lefiboot
+x86_64-pc-linux-gnu-gcc   -O2 -pipe -I/var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/src/include -Wall -Wextra -Wsign-compare -Wstrict-aliasing -std=gnu11 -fPIC -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -DLOCALEDIR=\"/usr/share/locale/\" -DEFIBOOTMGR_VERSION="\"17\"" -DDEFAULT_LOADER=\"\\\\EFI\\\\Gentoo\\\\grub.efi\"   -I/usr/include/efivar   -c -o efibootdump.o efibootdump.c
+x86_64-pc-linux-gnu-gcc   -O2 -pipe -I/var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/src/include -Wall -Wextra -Wsign-compare -Wstrict-aliasing -std=gnu11 -fPIC -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -DLOCALEDIR=\"/usr/share/locale/\" -DEFIBOOTMGR_VERSION="\"17\"" -DDEFAULT_LOADER=\"\\\\EFI\\\\Gentoo\\\\grub.efi\"   -I/usr/include/efivar   -Wl,-O1 -Wl,--as-needed  -fno-merge-constants -Wl,--fatal-warnings,--no-allow-shlib-undefined -Wl,-O2 -Wl,--no-undefined-version   -o efibootdump efibootdump.o unparse_path.o  -lefivar -lefiboot -lpopt
+make[1]: Leaving directory '/var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/src'
+>>> Source compiled.
+>>> Test phase [not enabled]: sys-boot/efibootmgr-17
+
+>>> Install sys-boot/efibootmgr-17 into /var/tmp/portage/sys-boot/efibootmgr-17/image
+make -j1 DESTDIR=/var/tmp/portage/sys-boot/efibootmgr-17/image install
+Building with EFIDIR as Gentoo
+make[1]: Entering directory '/var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/src'
+install -d -m 755 /var/tmp/portage/sys-boot/efibootmgr-17/image//usr/sbin/
+install -m 755 efibootmgr /var/tmp/portage/sys-boot/efibootmgr-17/image//usr/sbin/efibootmgr
+install -m 755 efibootdump /var/tmp/portage/sys-boot/efibootmgr-17/image//usr/sbin/efibootdump
+install -d -m 755 /var/tmp/portage/sys-boot/efibootmgr-17/image//usr/share/man/man8/
+install -m 644 efibootmgr.8 /var/tmp/portage/sys-boot/efibootmgr-17/image//usr/share/man/man8/efibootmgr.8
+install -m 644 efibootdump.8 /var/tmp/portage/sys-boot/efibootmgr-17/image//usr/share/man/man8/efibootdump.8
+make[1]: Leaving directory '/var/tmp/portage/sys-boot/efibootmgr-17/work/efibootmgr-17/src'
+>>> Completed installing sys-boot/efibootmgr-17 into /var/tmp/portage/sys-boot/efibootmgr-17/image
+
+ * Final size of build directory: 404 KiB
+ * Final size of installed tree:  116 KiB
+
+strip: x86_64-pc-linux-gnu-strip --strip-unneeded -N __gentoo_check_ldflags__ -R .comment -R .GCC.command.line -R .note.gnu.gold-version
+   /usr/sbin/efibootmgr
+   /usr/sbin/efibootdump
+
+>>> Installing (4 of 4) sys-boot/efibootmgr-17::gentoo
+
+>>> Recording sys-boot/efibootmgr in "world" favorites file...
+>>> Auto-cleaning packages...
+
+>>> No outdated packages were found on your system.
+
+ * GNU info directory index is up-to-date.
+
+ * IMPORTANT: 9 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+(chroot) archiso / # efi
+efibootdump  efibootmgr   efivar
+(chroot) archiso / #
+

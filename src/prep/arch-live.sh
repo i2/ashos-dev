@@ -4,7 +4,8 @@ sed -e '/^LocalFileSigLevel/ s/^#*/#/' -i /etc/pacman.conf
 pacman -Syy --noconfirm archlinux-keyring
 pacman -S --noconfirm git
 echo "export LC_ALL=C LC_CTYPE=C LANGUAGE=C" | tee -a $HOME/.zshrc
-echo "alias p='curl -F "'"sprunge=<-"'" sprunge.us'" | tee -a $HOME/.zshrc
+#echo "alias p='curl -F "'"sprunge=<-"'" sprunge.us'" | tee -a $HOME/.zshrc
+echo "alias p='curl -F "'"f:1=<-"'" ix.io'" | tee -a $HOME/.zshrc
 echo "alias d='df -h | grep -v sda'" | tee -a $HOME/.zshrc
 echo "setw -g mode-keys vi" | tee -a $HOME/.tmux.conf
 echo "set -g history-limit 999999" | tee -a $HOME/.tmux.conf

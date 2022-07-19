@@ -1,3 +1,6 @@
+make it so only two args are needed. /dev/sda1 /dev/sda2 ---> args[2] can be deduced from them. duh? or maybe it's a good idea to leave as is, install on
+multi disks in mind?
+
 WHile making grub2-mkconfig in fedora, it saw debian kernel butnot arch?!!!
 
 Can I put space after comma here: os.system(f"mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")

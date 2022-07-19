@@ -133,7 +133,7 @@ def main(args, distro):
     os.system(f"sudo sed -i '0,/@etc{distro_suffix}/ s,@etc{distro_suffix},@.snapshots{distro_suffix}/etc/etc-tmp,' /mnt/etc/fstab")
     os.system(f"sudo sed -i '/\@{distro_suffix}/d' /mnt/etc/fstab") # Delete @_distro entry
 
-
+    ### STEP 3 ENDS HERE
 
 
 args = list(sys.argv)
