@@ -157,8 +157,17 @@ def main(args, distro):
 
     ### STEP 2 ENDS HERE
 
+#   Chroot into it
+    os.system("sudo mkdir -p /mnt/var/db/repos/gentoo")
+    os.system("sudo chroot /mnt /bin/env -i TERM=$TERM /bin/bash")
+    #source /etc/profile
+    #env-update
+    #export PS1="(chroot) $PS1"
+    
+    ### emerge-webrsync -x -v           ### Needed?
+
 #   Update fstab part 1
-    os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
+    os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee -a /mnt/etc/fstab")
     for mntdir in mntdirs:
         os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}{distro_suffix},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
     if efi:
@@ -170,6 +179,8 @@ def main(args, distro):
     os.system(f"sudo sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
     os.system(f"sudo sed -i '0,/@etc{distro_suffix}/ s,@etc{distro_suffix},@.snapshots{distro_suffix}/etc/etc-tmp,' /mnt/etc/fstab")
     os.system(f"sudo sed -i '/\@{distro_suffix}/d' /mnt/etc/fstab") # Delete @_distro entry
+
+    ### STEP 3 ENDS HERE
 
 #   Database and config files
     os.system("sudo mkdir -p /mnt/usr/share/ast/db")
