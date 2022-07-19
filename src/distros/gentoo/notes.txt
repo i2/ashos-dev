@@ -1,1 +1,5 @@
 https://wiki.gentoo.org/wiki/Installation_alternatives#Installation_from_non-Gentoo_LiveCDs
+
+use ROOT="/mnt/gentoo" or ROOT="/mnt"
+and reference it when chrooting:
+chroot {ROOT}

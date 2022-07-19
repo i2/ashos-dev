@@ -1,3 +1,21 @@
+--------------------
+https://docs.fedoraproject.org/en-US/fedora-server/container-nspawn-install/#_2_1_creating_a_container_directory_tree
+
+Creating a minimal container directory tree
+
+Fedora 34 / 35
+
+ […]# dnf --releasever=35 --best --setopt=install_weak_deps=False --installroot=/var/lib/machines/{CTNAME}/ \
+install dhcp-client dnf fedora-release glibc glibc-langpack-en glibc-langpack-de iputils less ncurses passwd systemd systemd-networkd systemd-resolved vim-default-editor
+F34 installs 165 packages (247M) and allocates 557M in the file system. F35 installs 174 packages (270M) and allocates 527M in the file system.
+
+Fedora 36
+
+ […]# dnf --releasever=36 --best --setopt=install_weak_deps=False --installroot=/var/lib/machines/{CTNAME}/ \
+install dhcp-client dnf fedora-release glibc glibc-langpack-en glibc-langpack-de iputils less ncurses passwd systemd systemd-networkd systemd-resolved util-linux vim-default-editor
+F36 installs 171 packages (247M) and allocates 550M in the file system.
+--------------------
+
 https://bugzilla.redhat.com/show_bug.cgi?id=1576516
 
 You can change DNF's persistdir easily.

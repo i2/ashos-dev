@@ -142,6 +142,7 @@ def main(args, distro):
         os.system(f"sudo mount -o x-mount.mkdir --bind {i} /mnt{i}")
     if efi:
         os.system("sudo mount -o x-mount.mkdir -t efivarfs none /mnt/sys/firmware/efi/efivars")
+    os.system("sudo cp --dereference /etc/resolv.conf /mnt/etc/") ### REVIEW_LATER
     #os.system(f"sudo dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install dnf -y --releasever={RELEASE} --forcearch={ARCH}") ### MOVED UP
     if efi:
         os.system("sudo chroot /mnt dnf install -y efibootmgr grub2-efi-x64") #addeed grub2-efi-x64 as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?  # grub2-common already installed at this point

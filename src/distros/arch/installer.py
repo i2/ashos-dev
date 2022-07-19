@@ -140,10 +140,13 @@ def main(args, distro):
         if excode != 0:
             print("Failed to download packages!")
             sys.exit()
-    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys"): # Mount-points needed for chrooting
-        os.system(f"sudo mount -o x-mount.mkdir --bind {i} /mnt{i}")
-    if efi:
-        os.system("sudo mount -o x-mount.mkdir -t efivarfs none /mnt/sys/firmware/efi/efivars")
+    if efi: # Mount-points needed for chrooting
+        os.system("sudo mount -o x-mount.mkdir,remount,rw --types efivarfs efivarfs /mnt/sys/firmware/efi/efivars")
+    os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /dev /mnt/dev")
+    os.system("sudo mount -o x-mount.mkdir --types proc /proc /mnt/proc")
+    os.system("sudo mount -o x-mount.mkdir --bind --make-slave /run /mnt/run")
+    os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /sys /mnt/sys")
+    os.system("sudo cp --dereference /etc/resolv.conf /mnt/etc/")
 
 #   Update fstab part 1
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee -a /mnt/etc/fstab") ### REVIEW_LATER change 'sudo tee' to 'sudo tee -a' July 18, 2022

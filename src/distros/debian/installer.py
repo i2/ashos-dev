@@ -145,6 +145,7 @@ def main(args, distro):
         os.system(f"sudo mount -o x-mount.mkdir --bind {i} /mnt{i}")
     if efi:
         os.system("sudo mount -o x-mount.mkdir -t efivarfs none /mnt/sys/firmware/efi/efivars")
+    os.system("sudo cp --dereference /etc/resolv.conf /mnt/etc/") ### REVIEW_LATER
 
 #   Install anytree and necessary packages in chroot
     os.system("sudo systemctl enable --now ntp && sleep 30s && ntpq -p") # Sync time in the live iso

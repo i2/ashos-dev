@@ -9,7 +9,7 @@ import sys ### REMOVE WHEN USING TRY CATCH
 def clear():
     os.system("#clear")
 
-def to_uuid(part):ta
+def to_uuid(part):
     return subprocess.check_output(f"sudo blkid -s UUID -o value {part}", shell=True).decode('utf-8').strip()
 
 #   This function returns a tuple: (1. choice whether partitioning and formatting should happen
