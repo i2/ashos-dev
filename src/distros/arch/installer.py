@@ -124,7 +124,7 @@ def main(args, distro):
         os.system(f"sudo mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
     for i in ("tmp", "root"):
         os.system(f"mkdir -p /mnt/{i}")
-    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp"): ### JULY11, 2022 removed "var" as it's not needed!
+    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp", "var"): ### JULY11, 2022 removed "var" as it's not needed!
         os.system(f"mkdir -p /mnt/.snapshots/{i}")
     if efi:
         os.system("sudo mkdir /mnt/boot/efi")
@@ -174,8 +174,14 @@ def main(args, distro):
 #   Update hostname, hosts, locales and timezone, hosts
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
     os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
+#################
+    input("breakpoint-1 before editing locale.gen ----- any file in var? >")
+#################
     os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /mnt/etc/locale.gen") ### REVIEW_LATER change /etc/locale.gen to /mnt/etc/locale.gen
     os.system("sudo chroot /mnt locale-gen")
+#################
+    input("breakpoint-1 after executing locale.gen ----- any file in var? >")
+#################
     os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
     os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
     os.system("sudo chroot /mnt /usr/sbin/hwclock --systohc")
@@ -199,7 +205,7 @@ def main(args, distro):
     os.system("sudo chroot /mnt systemctl enable NetworkManager")
 
 #   GRUB and EFI
-    os.system(f"sudo chroot /mnt grub-install {args[2]}") ### REVIEW_LATER --recheck --no-nvram --removable
+    os.system(f"sudo chroot /mnt grub-install {args[2]}")
     os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo mkdir -p /mnt/boot/grub/BAK/") # Folder for backing up grub configs created by astpk
     os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
@@ -226,9 +232,15 @@ def main(args, distro):
     #---4---#
     os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/")
     os.system("sudo cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")
+#################
+    input("breakpoint1 any file in var? >")
+#################
     os.system("sudo rm -rf /mnt/root/*")
     os.system("sudo rm -rf /mnt/tmp/*")
 
+#################
+    input("breakpoint2 any file in var? >")
+#################
 #   Copy boot and etc from snapshot's tmp to common
     if efi:
         os.system("sudo umount /mnt/boot/efi")
@@ -241,6 +253,10 @@ def main(args, distro):
     #---1---#
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/. /mnt/.snapshots/rootfs/snapshot-tmp/boot/")
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/. /mnt/.snapshots/rootfs/snapshot-tmp/etc/")
+
+#################
+    input("breakpoint3 any file in var? >")
+#################
 
 #   Unmount everything and finish
     os.system("sudo umount -R /mnt")

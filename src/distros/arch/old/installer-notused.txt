@@ -17,6 +17,7 @@ os.system(f"sudo sed -i.bak '/\@{distro_suffix}/d' /mnt/etc/fstab")
     #os.system("echo 'HOME_URL=\"https://github.com/astos/astos\"' | sudo tee -a /mnt/etc/os-release")
 
 #   GRUB and EFI
+os.system(f"sudo chroot /mnt grub-install {args[2]}") ### REVIEW_LATER --recheck --no-nvram --removable
 ###    os.system(f"sudo arch-chroot /mnt sed -i s,Arch,astOS,g /etc/default/grub") ###NOT_PLANNING_TO_USE_THIS_APPROACH_AT_ALL
 
 #   Unmount everything
