@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+#https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Base#Mounting_the_necessary_filesystems
+
 import os
 import subprocess
 import sys ### REMOVE WHEN USING TRY CATCH
@@ -138,17 +140,22 @@ def main(args, distro):
     #os.system("mount -o bind /proc /mnt/proc")
     os.system(f"tar --numeric-owner --xattrs -xvJpf stage3-*.tar.xz -C /mnt")
     
-    ### STEP 2 STARTS HERE
+    ### STEP 1 ENDS HERE
     
-    if efi:
-        excode = int(os.system("sudo pacstrap /mnt efibootmgr"))
-        if excode != 0:
-            print("Failed to download packages!")
-            sys.exit()
-    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys"): # Mount-points needed for chrooting
-        os.system(f"sudo mount -o x-mount.mkdir --bind {i} /mnt{i}")
-    if efi:
-        os.system("sudo mount -o x-mount.mkdir -t efivarfs none /mnt/sys/firmware/efi/efivars")
+#    if efi:
+#        excode = int(os.system("sudo pacstrap /mnt efibootmgr"))
+#        if excode != 0:
+#            print("Failed to download packages!")
+#            sys.exit()
+
+    os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /dev /mnt/dev")
+    os.system("sudo mount -o x-mount.mkdir --types proc /proc /mnt/proc")
+    os.system("sudo mount -o x-mount.mkdir --bind --make-slave /run /mnt/run")
+    os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /sys /mnt/sys")
+    if efi: # Bad idea to combine --make-[r]slave and --[r]bind ? https://unix.stackexchange.com/questions/120827/recursive-umount-after-rbind-mount
+        os.system("sudo mount -o x-mount.mkdir,remount,rw --types efivarfs efivarfs /mnt/sys/firmware/efi/efivars")
+
+    ### STEP 2 ENDS HERE
 
 #   Update fstab part 1
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee /mnt/etc/fstab")
@@ -245,10 +252,10 @@ def main(args, distro):
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/. /mnt/.snapshots/rootfs/snapshot-tmp/etc/")
 
 #   Unmount everything and finish
-    os.system("sudo umount -R /mnt")
+    os.system("sudo umount --recursive /mnt")
     os.system(f"sudo mount {args[1]} -o subvolid=0 /mnt")
     os.system(f"sudo btrfs sub del /mnt/@{distro_suffix}")
-    os.system("sudo umount -R /mnt")
+    os.system("sudo umount --recursive /mnt")
     clear()
     print("Installation complete")
     print("You can reboot now :)")
