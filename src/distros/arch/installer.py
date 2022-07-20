@@ -132,7 +132,7 @@ def main(args, distro):
 #   Bootstrap then install anytree and necessary packages in chroot
     excode = int(os.system(f"sudo pacstrap /mnt {packages}"))
     if excode != 0:
-        print("Failed to download packages!")
+        print("Failed to bootstrap!")
         sys.exit()
     if efi:
         excode = int(os.system("sudo pacstrap /mnt efibootmgr"))
@@ -172,7 +172,7 @@ def main(args, distro):
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
     os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
     os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /mnt/etc/locale.gen")
-    os.system("sudo chroot /mnt locale-gen")
+    os.system("sudo chroot /mnt sudo locale-gen")
     os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
     os.system(f"sudo ln -srf /mnt{tz} /mnt/etc/localtime")
     os.system("sudo chroot /mnt sudo hwclock --systohc")
@@ -197,7 +197,7 @@ def main(args, distro):
     os.system("sudo chroot /mnt systemctl enable NetworkManager")
 
 #   GRUB and EFI
-    os.system(f"sudo chroot /mnt grub-install {args[2]}")
+    os.system(f"sudo chroot /mnt sudo grub-install {args[2]}")
     os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
     os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
@@ -216,7 +216,7 @@ def main(args, distro):
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-0")
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-0")
     os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
-    os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
+    os.system("sudo chroot /mnt sudo btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
     os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/")
     os.system("sudo cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")
     os.system("sudo rm -rf /mnt/root/*")

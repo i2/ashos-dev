@@ -55,7 +55,7 @@ def get_timezone():
         elif os.path.isfile(f"/usr/share/zoneinfo/{zone}"):
             return str(f"/usr/share/zoneinfo/{zone}")
         else:
-            print("Invalid Timezone!")
+            print("Invalid timezone!")
             continue
 
 def get_username():
@@ -73,7 +73,6 @@ def get_username():
     return username
 
 def create_user(u, g):
-    ###os.system(f"sudo chroot /mnt /usr/sbin/useradd -m -G {g} -s /bin/bash {u}")
     os.system(f"sudo chroot /mnt sudo useradd -m -G {g} -s /bin/bash {u}")
     os.system(f"echo '%{g} ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /mnt/home/{u}/.bashrc")
@@ -82,7 +81,6 @@ def set_password(u):
     clear()
     while True:
         print(f"Setting a password for '{u}':")
-        ###os.system(f"sudo chroot /mnt passwd {u}")
         os.system(f"sudo chroot /mnt sudo passwd {u}")
         print("Was your password set properly (y/n)?")
         reply = input("> ")
@@ -97,15 +95,11 @@ def main(args, distro):
 #   Define variables
     ARCH = "x86_64"
     RELEASE = "rawhide"
-###    packages = "dnf passwd which grub2-efi-x64-modules shim-x64 btrfs-progs python python-anytree sudo tmux neovim NetworkManager \
-###                dhcpcd efibootmgr systemd ncurses bash-completion kernel glibc-locale-source glibc-langpack-en" # bash os-prober
-    packages = "dnf passwd which grub2-efi-x64-modules shim-x64 btrfs-progs sudo \
-                efibootmgr systemd kernel glibc-locale-source glibc-langpack-en" # bash os-prober
+    packages = "dnf passwd which grub2-efi-x64-modules shim-x64 btrfs-progs python python-anytree sudo tmux neovim NetworkManager \
+                dhcpcd efibootmgr systemd ncurses bash-completion kernel glibc-locale-source glibc-langpack-en" # bash os-prober
     choice, distro_suffix = get_multiboot(distro)
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
-    envsupath = "ENV_SUPATH	PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-    envpath = "ENV_PATH	PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games"
     tz = get_timezone()
     hostname = get_hostname()
     if os.path.exists("/sys/firmware/efi"):
@@ -140,8 +134,6 @@ def main(args, distro):
 #   Bootstrap then install anytree and necessary packages in chroot
 #################
     input("bp0 > any systemd rpmdb services? I don't think so!") # NOPE!
-###    os.system(f"sudo sed -i '/^[#?]ENV_SUPATH/ s|^#*|ENV_SUPATH PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin   #|' /mnt/etc/login.defs")
-###    os.system(f'sudo sed -i "/^[#?]ENV_PATH/ s|^#*|ENV_PATH	PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games   #|" /mnt/etc/login.defs')
     # Mount-points needed for chrooting
     os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /dev /mnt/dev")
     os.system("sudo mount -o x-mount.mkdir --types proc /proc /mnt/proc")
@@ -156,6 +148,7 @@ def main(args, distro):
         sys.exit()
 #################
     input("bp1 > any systemd rpmdb services? maybe!") #YES there is service in /mnt/usr/lib/systemd/system/rpmXYZ not sure if it's active yet (it exists under /mnt/etc/systemd/system/basic-tafrget/rpm-migrateXYZ yet) /mnt/usr/lib/sysimage/rpm/XYZ files are symlinked to /var/lib/rpm/XYZ files
+    ####### in the 2nd most recent installatiom with smaller number of packages installed, there is no trace of the above!
     if efi:
         os.system("sudo dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install -y efibootmgr grub2-efi-x64") #addeed grub2-efi-x64 as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?  # grub2-common already installed at this point
 ### MOVED UP    if efi:
@@ -202,12 +195,9 @@ def main(args, distro):
 #   Update hostname, hosts, locales and timezone, hosts
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
     os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
-    ###os.system("sudo chroot /mnt localedef -v -c -i en_US -f UTF-8 en_US.UTF-8") ####### REVIEW_LATER got error?!
     os.system("sudo chroot /mnt sudo localedef -v -c -i en_US -f UTF-8 en_US.UTF-8") ####### REVIEW_LATER got error?!
     os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
-    ###os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime") replicate in other installers too!
     os.system(f"sudo ln -srf /mnt{tz} /mnt/etc/localtime")
-    ###os.system("sudo chroot /mnt /usr/sbin/hwclock --systohc")
     os.system("sudo chroot /mnt sudo hwclock --systohc")
 
 #   Copy and symlink astpk and detect_os.sh
@@ -215,11 +205,8 @@ def main(args, distro):
     os.system(f"echo '{to_uuid(args[1])}' | sudo tee /mnt/.snapshots/ast/part")
     os.system(f"sudo cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
     os.system("sudo cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
-    ###os.system("sudo chroot /mnt ln -s /.snapshots/ast/ast /usr/bin/ast") replicate in other distros
     os.system("sudo ln -srf /mnt/.snapshots/ast/ast /mnt/usr/bin/ast")
-    ###os.system("sudo chroot /mnt ln -s /.snapshots/ast/detect_os.sh /usr/bin/detect_os.sh")
     os.system("sudo ln -srf /mnt/.snapshots/ast/detect_os.sh /mnt/usr/bin/detect_os.sh")
-    ###os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
     os.system("sudo ln -srf /mnt/.snapshots/ast /mnt/var/lib/ast")
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree") # Initialize fstree
 
@@ -236,9 +223,9 @@ def main(args, distro):
 #   GRUB and EFI (For now I use non-BLS format. Entries go in /boot/grub2/grub.cfg not in /boot/loader/entries/)
     os.system('grep -qxF GRUB_ENABLE_BLSCFG="false" /mnt/etc/default/grub || \
                echo GRUB_ENABLE_BLSCFG="false" | sudo tee -a /mnt/etc/default/grub')
-    ###os.system(f"sudo chroot /mnt sudo /usr/sbin/grub2-mkconfig {args[2]} -o /boot/grub2/grub.cfg") ### THIS MIGHT BE TOTALLY REDUNDANT
-    input("bp888 > any good grub.cfg in boot/grub2 ?") # No grub.cfg in /mnt/boot/grub2/
-    os.system(f"sudo chroot /mnt sudo grub2-mkconfig {args[2]} -o /boot/grub2/grub.cfg") ### THIS MIGHT BE TOTALLY REDUNDANT
+############
+    input("bp888 > any good grub.cfg in boot/grub2 ?") ### No grub.cfg in /mnt/boot/grub2/
+    os.system(f"sudo chroot /mnt sudo grub2-mkconfig {args[2]} -o /boot/grub2/grub.cfg")
     os.system("sudo mkdir -p /mnt/boot/grub2/BAK") # Folder for backing up grub configs created by astpk
     os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub2/grub.cfg")
     # Create EFI entry and a mapping of "distro" <=> "BootOrder number". Ash reads from this file to switch between distros.
@@ -257,7 +244,6 @@ def main(args, distro):
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-0")
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-0")
     os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
-    ###os.system("sudo chroot /mnt /usr/sbin/btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
     os.system("sudo chroot /mnt sudo btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
     os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/")
     os.system("sudo cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")

@@ -6,5 +6,20 @@
     os.system(f"sudo sed -i '/^ID/ s/{distro}/{distro}_ashos/' /mnt/etc/os-release")
     #os.system("echo 'HOME_URL=\"https://github.com/astos/astos\"' | sudo tee -a /mnt/etc/os-release")
 
+---------------------------------------
+
+#   Bootstrap (minimal)
+.
+.
+.
 #   Unmount everything
     os.system(f"sudo mount {args[1]} -o subvolid=0 /mnt") # subvolid=5 needed for any cases?
+
+    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys"): # Mount-points needed for chrooting
+        os.system(f"sudo mount -o x-mount.mkdir --bind {i} /mnt{i}")
+    if efi:
+        os.system("sudo mount -o x-mount.mkdir -t efivarfs none /mnt/sys/firmware/efi/efivars")
+    os.system("sudo cp --dereference /etc/resolv.conf /mnt/etc/") ### REVIEW_LATER
+
+---------------------------------------
+

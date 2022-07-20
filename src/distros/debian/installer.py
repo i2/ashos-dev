@@ -55,7 +55,7 @@ def get_timezone():
         elif os.path.isfile(f"/usr/share/zoneinfo/{zone}"):
             return str(f"/usr/share/zoneinfo/{zone}")
         else:
-            print("Invalid Timezone!")
+            print("Invalid timezone!")
             continue
 
 def get_username():
@@ -73,7 +73,7 @@ def get_username():
     return username
 
 def create_user(u, g):
-    os.system(f"sudo chroot /mnt /usr/sbin/useradd -m -G {g} -s /bin/bash {u}")
+    os.system(f"sudo chroot /mnt sudo useradd -m -G {g} -s /bin/bash {u}")
     os.system(f"echo '%{g} ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /mnt/home/{u}/.bashrc")
 
@@ -81,7 +81,7 @@ def set_password(u):
     clear()
     while True:
         print(f"Setting a password for '{u}':")
-        os.system(f"sudo chroot /mnt passwd {u}")
+        os.system(f"sudo chroot /mnt sudo passwd {u}")
         print("Was your password set properly (y/n)?")
         reply = input("> ")
         if reply.casefold() == "y":
@@ -95,12 +95,11 @@ def main(args, distro):
 #   Define variables
     ARCH = "amd64"
     RELEASE = "sid"
-    packages = f"linux-image-{ARCH} firmware-linux-nonfree python3 python3-anytree btrfs-progs network-manager locales sudo nano tmux dhcpcd5" # os-prober
+    packages = f"linux-image-{ARCH} firmware-linux-nonfree python3 python3-anytree \
+                 btrfs-progs network-manager locales sudo nano tmux dhcpcd5" # os-prober
     choice, distro_suffix = get_multiboot(distro)
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
-    envsupath = "ENV_SUPATH	PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-    envpath = "ENV_PATH	PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games"
     tz = get_timezone()
     hostname = get_hostname()
     if os.path.exists("/sys/firmware/efi"):
@@ -139,13 +138,16 @@ def main(args, distro):
     excl = subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | awk '{print $1}'", shell=True).decode('utf-8').strip().replace("\n",",")
     excode = int(os.system(f"sudo debootstrap --arch {ARCH} --exclude={excl} {RELEASE} /mnt http://ftp.debian.org/debian"))
     if excode != 0:
-        print("Failed to debootstrap!")
+        print("Failed to bootstrap!")
         sys.exit()
-    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys"): # Mount-points needed for chrooting
-        os.system(f"sudo mount -o x-mount.mkdir --bind {i} /mnt{i}")
+    # Mount-points needed for chrooting
+    os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /dev /mnt/dev")
+    os.system("sudo mount -o x-mount.mkdir --types proc /proc /mnt/proc")
+    os.system("sudo mount -o x-mount.mkdir --bind --make-slave /run /mnt/run")
+    os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /sys /mnt/sys")
     if efi:
-        os.system("sudo mount -o x-mount.mkdir -t efivarfs none /mnt/sys/firmware/efi/efivars")
-    os.system("sudo cp --dereference /etc/resolv.conf /mnt/etc/") ### REVIEW_LATER
+        os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars")
+    os.system("sudo cp --dereference /etc/resolv.conf /mnt/etc/")
 
 #   Install anytree and necessary packages in chroot
     os.system("sudo systemctl enable --now ntp && sleep 30s && ntpq -p") # Sync time in the live iso
@@ -191,19 +193,19 @@ def main(args, distro):
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
     os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
     os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /mnt/etc/locale.gen")
-    os.system("sudo chroot /mnt locale-gen")
+    os.system("sudo chroot /mnt sudo locale-gen")
     os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
-    os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
-    os.system("sudo chroot /mnt /usr/sbin/hwclock --systohc")
+    os.system(f"sudo ln -srf /mnt{tz} /mnt/etc/localtime")
+    os.system("sudo chroot /mnt sudo hwclock --systohc")
 
 #   Copy and symlink astpk and detect_os.sh
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
     os.system(f"echo '{to_uuid(args[1])}' | sudo tee /mnt/.snapshots/ast/part")
     os.system(f"sudo cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
     os.system("sudo cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
-    os.system("sudo chroot /mnt ln -s /.snapshots/ast/ast /usr/bin/ast")
-    os.system("sudo chroot /mnt ln -s /.snapshots/ast/detect_os.sh /usr/bin/detect_os.sh")
-    os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
+    os.system("sudo ln -srf /mnt/.snapshots/ast/ast /mnt/usr/bin/ast")
+    os.system("sudo ln -srf /mnt/.snapshots/ast/detect_os.sh /mnt/usr/bin/detect_os.sh")
+    os.system("sudo ln -srf /mnt/.snapshots/ast /mnt/var/lib/ast")
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree") # Initialize fstree
 
 #   Create user and set password
@@ -216,8 +218,8 @@ def main(args, distro):
     os.system("sudo chroot /mnt systemctl enable NetworkManager")
 
 #   GRUB and EFI
-    os.system(f"sudo chroot /mnt grub-install {args[2]}")
-    os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
+    os.system(f"sudo chroot /mnt sudo grub-install {args[2]}")
+    os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
     os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
     # Create a mapping of "distro" <=> "BootOrder number". Ash reads from this file to switch between distros.
@@ -235,7 +237,7 @@ def main(args, distro):
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-0")
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-0")
     os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
-    os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
+    os.system("sudo chroot /mnt sudo btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
     os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/")
     os.system("sudo cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")
     os.system("sudo rm -rf /mnt/root/*")

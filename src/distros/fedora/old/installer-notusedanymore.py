@@ -115,3 +115,72 @@
     if efi:
         os.system("sudo mount -o x-mount.mkdir -t efivarfs none /mnt/sys/firmware/efi/efivars")
     os.system("sudo cp --dereference /etc/resolv.conf /mnt/etc/") ### REVIEW_LATER
+
+---------------------------------------------------------------------
+
+def create_user(u, g):
+    ###os.system(f"sudo chroot /mnt /usr/sbin/useradd -m -G {g} -s /bin/bash {u}")
+    
+---------------------------------------------------------------------
+
+        ###os.system(f"sudo chroot /mnt passwd {u}")
+        
+        
+---------------------------------------------------------------------
+
+    envsupath = "ENV_SUPATH	PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    envpath = "ENV_PATH	PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games"
+
+---------------------------------------------------------------------
+
+...
+###    os.system(f"sudo sed -i '/^[#?]ENV_SUPATH/ s|^#*|ENV_SUPATH PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin   #|' /mnt/etc/login.defs")
+###    os.system(f'sudo sed -i "/^[#?]ENV_PATH/ s|^#*|ENV_PATH	PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games   #|" /mnt/etc/login.defs')
+    # Mount-points needed for chrooting
+
+
+---------------------------------------------------------------------
+
+#   Bootstrap then install anytree and necessary packages in chroot
+...
+    if efi:
+        os.system("sudo dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install -y efibootmgr grub2-efi-x64") #addeed grub2-efi-x64 as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?  # grub2-common already installed at this point
+### MOVED UP    if efi:
+### MOVED UP        os.system("sudo chroot /mnt dnf install -y efibootmgr grub2-efi-x64") #addeed grub2-efi-x64 as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?  # grub2-common already installed at this point
+### MOVED UP    os.system(f"sudo chroot /mnt dnf install -y {packages} --releasever={RELEASE}") ######## 'systemd' can be removed from packages list as it gets installed using some other package?!
+...
+
+--------------------------------------------------------------------
+
+#   Update hostname, hosts, locales and timezone, hosts
+
+    ###os.system("sudo chroot /mnt localedef -v -c -i en_US -f UTF-8 en_US.UTF-8") ####### REVIEW_LATER got error?!
+
+    ###os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime") replicate in other installers too!
+
+    ###os.system("sudo chroot /mnt /usr/sbin/hwclock --systohc")
+
+--------------------------------------------------------------------
+
+#   Copy and symlink astpk and detect_os.sh
+
+    ###os.system("sudo chroot /mnt ln -s /.snapshots/ast/ast /usr/bin/ast") replicate in other distros
+
+    ###os.system("sudo chroot /mnt ln -s /.snapshots/ast/detect_os.sh /usr/bin/detect_os.sh")
+
+    ###os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
+
+---------------------------------------------------------------------
+
+#   BTRFS snapshots
+
+    ###os.system("sudo chroot /mnt /usr/sbin/btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
+    
+    
+---------------------------------------------------------------------
+
+#   GRUB and EFI (For now I use non-BLS format. Entries go in /boot/grub2/grub.cfg not in /boot/loader/entries/)
+...
+    ###os.system(f"sudo chroot /mnt sudo /usr/sbin/grub2-mkconfig {args[2]} -o /boot/grub2/grub.cfg") ### THIS MIGHT BE TOTALLY REDUNDANT
+    
+    
