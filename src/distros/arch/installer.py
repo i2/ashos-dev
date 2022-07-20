@@ -193,11 +193,11 @@ def main(args, distro):
     os.system(f"sudo cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
     os.system("sudo cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
     ###os.system("sudo chroot /mnt ln -s /.snapshots/ast/ast /usr/bin/ast")
-	os.system("sudo ln -srf /mnt/.snapshots/ast/ast /mnt/usr/bin/ast")
+    os.system("sudo ln -srf /mnt/.snapshots/ast/ast /mnt/usr/bin/ast")
     ###os.system("sudo chroot /mnt ln -s /.snapshots/ast/detect_os.sh /usr/bin/detect_os.sh")
     os.system("sudo ln -srf /mnt/.snapshots/ast/detect_os.sh /mnt/usr/bin/detect_os.sh")
     ###os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
-	os.system("sudo ln -srf /mnt/.snapshots/ast /mnt/var/lib/ast")
+    os.system("sudo ln -srf /mnt/.snapshots/ast /mnt/var/lib/ast")
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree") # Initialize fstree
 
 #   Create user and set password
