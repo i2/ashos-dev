@@ -143,7 +143,7 @@ def main(args, distro):
         print("Failed to febootstrap!")
         sys.exit()
 #################
-    input("bp1 > any systemd rpmdb services? maybe!") #YES there is service in /mnt/usr/lib/systemd/system/rpmXYZ but it's not active yet (it doesn't exist under /mnt/etc/systemd/system/rpmXYZ yet) /mnt/usr/lib/sysimage/rpm/XYZ files are symlinked to /var/lib/rpm/XYZ files
+    input("bp1 > any systemd rpmdb services? maybe!") #YES there is service in /mnt/usr/lib/systemd/system/rpmXYZ not sure if it's active yet (it exists under /mnt/etc/systemd/system/basic-tafrget/rpm-migrateXYZ yet) /mnt/usr/lib/sysimage/rpm/XYZ files are symlinked to /var/lib/rpm/XYZ files
     if efi:
         os.system("sudo dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install -y efibootmgr grub2-efi-x64") #addeed grub2-efi-x64 as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?  # grub2-common already installed at this point
     os.system(f"sudo sed -i '/^[#?]ENV_SUPATH/ s|^#*|ENV_SUPATH PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin   #|' /mnt/etc/login.defs")
@@ -235,7 +235,7 @@ def main(args, distro):
     os.system('grep -qxF GRUB_ENABLE_BLSCFG="false" /mnt/etc/default/grub || \
                echo GRUB_ENABLE_BLSCFG="false" | sudo tee -a /mnt/etc/default/grub')
     ###os.system(f"sudo chroot /mnt sudo /usr/sbin/grub2-mkconfig {args[2]} -o /boot/grub2/grub.cfg") ### THIS MIGHT BE TOTALLY REDUNDANT
-    input("bp888 > any good grub.cfg in boot/grub2 ?")
+    input("bp888 > any good grub.cfg in boot/grub2 ?") # No grub.cfg in /mnt/boot/grub2/
     os.system(f"sudo chroot /mnt sudo grub2-mkconfig {args[2]} -o /boot/grub2/grub.cfg") ### THIS MIGHT BE TOTALLY REDUNDANT
     os.system("sudo mkdir -p /mnt/boot/grub2/BAK") # Folder for backing up grub configs created by astpk
     os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub2/grub.cfg")

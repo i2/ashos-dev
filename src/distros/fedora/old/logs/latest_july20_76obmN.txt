@@ -1,0 +1,1564 @@
+
+t@archiso ~/ashos-dev (git)-[debian] # python3 init.py /dev/sda2 /dev/sda /dev/sda1
+Welcome to the AshOS installer!
+
+
+
+
+
+Please choose one of the following:
+1. Single OS installation
+2. Initiate a multi-boot ashos setup
+3. Adding to an already installed ashos
+Please be aware choosing option 1 and 2 will wipe {args[1]}
+> 2
+Select a timezone (type list to list):
+> UTC
+Enter hostname:
+> fedclean2
+Happy with your hostname (y/n)?
+> y
+btrfs-progs v5.18.1
+See http://btrfs.wiki.kernel.org for more information.
+
+NOTE: several default settings have changed in version 5.15, please make sure
+      this does not affect your deployments:
+      - DUP for metadata (-m dup)
+      - enabled no-holes (-O no-holes)
+      - enabled free-space-tree (-R free-space-tree)
+
+Label:              LINUX
+UUID:               0f939dc0-23f0-42f4-abaf-4b9ff760d665
+Node size:          16384
+Sector size:        4096
+Filesystem size:    409.35GiB
+Block group profiles:
+  Data:             single            8.00MiB
+  Metadata:         DUP               1.00GiB
+  System:           DUP               8.00MiB
+SSD detected:       no
+Zoned device:       no
+Incompat features:  extref, skinny-metadata, no-holes
+Runtime features:   free-space-tree
+Checksum:           crc32c
+Number of devices:  1
+Devices:
+   ID        SIZE  PATH
+    1   409.35GiB  /dev/sda2
+
+:: Synchronizing package databases...
+ core                                            156.8 KiB   190 KiB/s 00:01 [############################################] 100%
+ extra                                          1716.4 KiB  5.30 MiB/s 00:00 [############################################] 100%
+ community                                         6.7 MiB  12.4 MiB/s 00:01 [############################################] 100%
+warning: archlinux-keyring-20220713-1 is up to date -- reinstalling
+resolving dependencies...
+looking for conflicting packages...
+
+Packages (11) elfutils-0.187-1  libcomps-0.1.18-1  libdnf-0.67.0-1  libmodulemd-2.14.0-1  librepo-1.14.3-1  libsolv-0.7.22-2
+              lua-5.4.4-1  python-gpgme-1.17.1-1  rpm-tools-4.17.1-1  archlinux-keyring-20220713-1  dnf-4.13.0-1
+
+Total Download Size:    5.53 MiB
+Total Installed Size:  29.80 MiB
+Net Upgrade Size:      28.27 MiB
+
+:: Proceed with installation? [Y/n]
+:: Retrieving packages...
+ libdnf-0.67.0-1-x86_64                         1329.2 KiB  6.39 MiB/s 00:00 [############################################] 100%
+ rpm-tools-4.17.1-1-x86_64                       927.4 KiB  6.61 MiB/s 00:00 [############################################] 100%
+ libsolv-0.7.22-2-x86_64                         842.7 KiB  6.19 MiB/s 00:00 [############################################] 100%
+ dnf-4.13.0-1-any                                604.6 KiB  4.80 MiB/s 00:00 [############################################] 100%
+ elfutils-0.187-1-x86_64                         569.5 KiB  5.35 MiB/s 00:00 [############################################] 100%
+ libmodulemd-2.14.0-1-x86_64                     363.2 KiB  3.55 MiB/s 00:00 [############################################] 100%
+ libcomps-0.1.18-1-x86_64                        360.7 KiB  2.94 MiB/s 00:00 [############################################] 100%
+ lua-5.4.4-1-x86_64                              310.2 KiB  3.65 MiB/s 00:00 [############################################] 100%
+ python-gpgme-1.17.1-1-x86_64                    234.6 KiB  2.76 MiB/s 00:00 [############################################] 100%
+ librepo-1.14.3-1-x86_64                         118.5 KiB  1261 KiB/s 00:00 [############################################] 100%
+ Total (10/10)                                     5.5 MiB  4.68 MiB/s 00:01 [############################################] 100%
+(11/11) checking keys in keyring                                             [############################################] 100%
+(11/11) checking package integrity                                           [############################################] 100%
+(11/11) loading package files                                                [############################################] 100%
+(11/11) checking for file conflicts                                          [############################################] 100%
+(11/11) checking available disk space                                        [############################################] 100%
+:: Processing package changes...
+( 1/11) reinstalling archlinux-keyring                                       [############################################] 100%
+( 2/11) installing lua                                                       [############################################] 100%
+( 3/11) installing elfutils                                                  [############################################] 100%
+( 4/11) installing rpm-tools                                                 [############################################] 100%
+    rpm-tools installs RedHat package manager for you.
+    It is useful for those who wants to create/modify RPM files.
+    But do not use rpm-tools to install RedHat packages at your ArchLinux machine.
+    It will break your system!
+    You will need to go back to Arch wiki and read the installation guide again.
+    You've been warned!
+( 5/11) installing libmodulemd                                               [############################################] 100%
+Optional dependencies for libmodulemd
+    python-gobject: for python bindings
+( 6/11) installing librepo                                                   [############################################] 100%
+Optional dependencies for librepo
+    python: for python bindings [installed]
+( 7/11) installing libsolv                                                   [############################################] 100%
+Optional dependencies for libsolv
+    perl: for perl bindings [installed]
+    python: for python bindings [installed]
+    ruby: for ruby bindings
+( 8/11) installing libdnf                                                    [############################################] 100%
+Optional dependencies for libdnf
+    python: for python bindings [installed]
+( 9/11) installing libcomps                                                  [############################################] 100%
+Optional dependencies for libcomps
+    python: for python bindings [installed]
+(10/11) installing python-gpgme                                              [############################################] 100%
+(11/11) installing dnf                                                       [############################################] 100%
+Optional dependencies for dnf
+    unbound: for gpgkey_dns_verification option
+:: Running post-transaction hooks...
+(1/4) Reloading system manager configuration...
+(2/4) Creating temporary files...
+(3/4) Arming ConditionNeedsUpdate...
+(4/4) Warn about old perl modules
+Create subvolume '/mnt/@_fedora'
+Create subvolume '/mnt/@.snapshots_fedora'
+Create subvolume '/mnt/@boot_fedora'
+Create subvolume '/mnt/@etc_fedora'
+Create subvolume '/mnt/@home_fedora'
+Create subvolume '/mnt/@var_fedora'
+bp0 > any systemd rpmdb services? I don't think so!
+AshOS Fedora Repository                                                                         8.1 MB/s |  69 MB     00:08
+Last metadata expiration check: 0:00:37 ago on Wed Jul 20 18:15:17 2022.
+Dependencies resolved.
+================================================================================================================================
+ Package                                   Architecture       Version                                   Repository         Size
+================================================================================================================================
+Installing:
+ NetworkManager                            x86_64             1:1.39.10-1.fc37                          ashos             2.1 M
+ bash-completion                           noarch             1:2.11-7.fc37                             ashos             291 k
+ btrfs-progs                               x86_64             5.18-2.fc37                               ashos             957 k
+ dhcpcd                                    x86_64             9.4.1-2.fc36                              ashos             224 k
+ dnf                                       noarch             4.13.0-2.fc37                             ashos             453 k
+ efibootmgr                                x86_64             18-1.fc37                                 ashos              47 k
+ glibc-langpack-en                         x86_64             2.35.9000-29.fc37                         ashos             607 k
+ glibc-locale-source                       x86_64             2.35.9000-29.fc37                         ashos             4.1 M
+ grub2-efi-x64-modules                     noarch             1:2.06-42.fc37                            ashos             1.0 M
+ kernel                                    x86_64             5.19.0-0.rc7.53.fc37                      ashos             257 k
+ ncurses                                   x86_64             6.3-2.20220501.fc37                       ashos             403 k
+ neovim                                    x86_64             0.7.2-1.fc37                              ashos             5.6 M
+ passwd                                    x86_64             0.80-12.fc36                              ashos             107 k
+ python-unversioned-command                noarch             3.11.0~b4-1.fc37                          ashos             9.7 k
+ python3-anytree                           noarch             2.8.0-8.fc37                              ashos              74 k
+ shim-x64                                  x86_64             15.6-2                                    ashos             469 k
+ sudo                                      x86_64             1.9.11-3.p3.fc37                          ashos             1.2 M
+ tmux                                      x86_64             3.2a-3.fc36                               ashos             475 k
+ which                                     x86_64             2.21-33.fc37                              ashos              42 k
+Installing dependencies:
+ NetworkManager-libnm                      x86_64             1:1.39.10-1.fc37                          ashos             1.7 M
+ alternatives                              x86_64             1.19-2.fc36                               ashos              36 k
+ audit-libs                                x86_64             3.0.8-2.fc37                              ashos             116 k
+ authselect                                x86_64             1.4.0-2.fc37                              ashos             139 k
+ authselect-libs                           x86_64             1.4.0-2.fc37                              ashos             235 k
+ basesystem                                noarch             11-13.fc36                                ashos             7.0 k
+ bash                                      x86_64             5.1.16-2.fc36                             ashos             1.7 M
+ bzip2-libs                                x86_64             1.0.8-11.fc36                             ashos              41 k
+ ca-certificates                           noarch             2022.2.54-2.fc37                          ashos             853 k
+ compat-lua-libs                           x86_64             5.1.5-20.fc36                             ashos             167 k
+ coreutils                                 x86_64             9.1-2.fc37                                ashos             1.1 M
+ coreutils-common                          x86_64             9.1-2.fc37                                ashos             2.0 M
+ cpio                                      x86_64             2.13-12.fc36                              ashos             270 k
+ cracklib                                  x86_64             2.9.6-28.fc36                             ashos              81 k
+ cracklib-dicts                            x86_64             2.9.6-28.fc36                             ashos             3.6 M
+ crypto-policies                           noarch             20220428-2.gitdfb10ea.fc37                ashos              60 k
+ cryptsetup-libs                           x86_64             2.5.0~rc1-1.fc37                          ashos             448 k
+ curl                                      x86_64             7.84.0-1.fc37                             ashos             313 k
+ cyrus-sasl-lib                            x86_64             2.1.28-1.fc37                             ashos             793 k
+ dbus                                      x86_64             1:1.14.0-2.fc37                           ashos             7.4 k
+ dbus-broker                               x86_64             31-1.fc37                                 ashos             176 k
+ dbus-common                               noarch             1:1.14.0-2.fc37                           ashos              14 k
+ dbus-libs                                 x86_64             1:1.14.0-2.fc37                           ashos             155 k
+ device-mapper                             x86_64             1.02.175-8.fc37                           ashos             138 k
+ device-mapper-libs                        x86_64             1.02.175-8.fc37                           ashos             177 k
+ dnf-data                                  noarch             4.13.0-2.fc37                             ashos              42 k
+ dracut                                    x86_64             057-1.fc37                                ashos             370 k
+ duktape                                   x86_64             2.6.0-2.fc36                              ashos             164 k
+ e2fsprogs-libs                            x86_64             1.46.5-2.fc36                             ashos             222 k
+ efi-filesystem                            noarch             5-5.fc36                                  ashos             7.8 k
+ efivar-libs                               x86_64             38-3.fc37                                 ashos             123 k
+ elfutils-default-yama-scope               noarch             0.187-5.fc37                              ashos              17 k
+ elfutils-libelf                           x86_64             0.187-5.fc37                              ashos             197 k
+ elfutils-libs                             x86_64             0.187-5.fc37                              ashos             257 k
+ expat                                     x86_64             2.4.8-1.fc37                              ashos             109 k
+ fedora-gpg-keys                           noarch             37-0.3                                    ashos             114 k
+ fedora-release                            noarch             37-0.7                                    ashos              11 k
+ fedora-release-common                     noarch             37-0.7                                    ashos              22 k
+ fedora-release-identity-basic             noarch             37-0.7                                    ashos              12 k
+ fedora-repos                              noarch             37-0.3                                    ashos              10 k
+ fedora-repos-rawhide                      noarch             37-0.3                                    ashos             9.8 k
+ file                                      x86_64             5.41-6.fc37                               ashos              48 k
+ file-libs                                 x86_64             5.41-6.fc37                               ashos             634 k
+ filesystem                                x86_64             3.16-2.fc36                               ashos             1.1 M
+ findutils                                 x86_64             1:4.9.0-1.fc36                            ashos             483 k
+ fuse-libs                                 x86_64             2.9.9-14.fc36                             ashos              97 k
+ gawk                                      x86_64             5.1.1-3.fc37                              ashos             1.0 M
+ gdbm-libs                                 x86_64             1:1.23-1.fc37                             ashos              56 k
+ gettext                                   x86_64             0.21-15.fc37.0.20220203                   ashos             1.1 M
+ gettext-libs                              x86_64             0.21-15.fc37.0.20220203                   ashos             322 k
+ glib2                                     x86_64             2.73.2-2.fc37                             ashos             2.7 M
+ glibc                                     x86_64             2.35.9000-29.fc37                         ashos             2.1 M
+ glibc-common                              x86_64             2.35.9000-29.fc37                         ashos             349 k
+ gmp                                       x86_64             1:6.2.1-2.fc36                            ashos             315 k
+ gnupg2                                    x86_64             2.3.7-1.fc37                              ashos             2.5 M
+ gnutls                                    x86_64             3.7.6-4.fc37                              ashos             1.1 M
+ gpgme                                     x86_64             1.17.0-3.fc37                             ashos             210 k
+ grep                                      x86_64             3.7-2.fc36                                ashos             263 k
+ grub2-common                              noarch             1:2.06-42.fc37                            ashos             907 k
+ grub2-efi-x64                             x86_64             1:2.06-42.fc37                            ashos             1.3 M
+ grub2-tools                               x86_64             1:2.06-42.fc37                            ashos             1.8 M
+ grub2-tools-minimal                       x86_64             1:2.06-42.fc37                            ashos             606 k
+ gzip                                      x86_64             1.12-1.fc37                               ashos             159 k
+ ima-evm-utils                             x86_64             1.4-5.fc36                                ashos              63 k
+ json-c                                    x86_64             0.16-1.fc37                               ashos              42 k
+ kbd                                       x86_64             2.5.1-1.fc37                              ashos             409 k
+ kbd-misc                                  noarch             2.5.1-1.fc37                              ashos             1.5 M
+ kernel-core                               x86_64             5.19.0-0.rc7.53.fc37                      ashos              50 M
+ kernel-modules                            x86_64             5.19.0-0.rc7.53.fc37                      ashos              58 M
+ keyutils-libs                             x86_64             1.6.1-4.fc36                              ashos              31 k
+ kmod                                      x86_64             30-1.fc37                                 ashos             120 k
+ kmod-libs                                 x86_64             30-1.fc37                                 ashos              68 k
+ krb5-libs                                 x86_64             1.19.2-11.fc37                            ashos             723 k
+ libX11                                    x86_64             1.8.1-1.fc37                              ashos             648 k
+ libX11-common                             noarch             1.8.1-1.fc37                              ashos             150 k
+ libXau                                    x86_64             1.0.9-8.fc36                              ashos              30 k
+ libacl                                    x86_64             2.3.1-3.fc36                              ashos              24 k
+ libarchive                                x86_64             3.6.1-1.fc37                              ashos             397 k
+ libargon2                                 x86_64             20171227-9.fc37                           ashos              28 k
+ libassuan                                 x86_64             2.5.5-4.fc36                              ashos              67 k
+ libattr                                   x86_64             2.5.1-4.fc36                              ashos              18 k
+ libb2                                     x86_64             0.98.1-6.fc37                             ashos              25 k
+ libblkid                                  x86_64             2.38-4.fc37                               ashos             107 k
+ libbrotli                                 x86_64             1.0.9-8.fc37                              ashos             315 k
+ libcap                                    x86_64             2.48-4.fc36                               ashos              67 k
+ libcap-ng                                 x86_64             0.8.3-2.fc37                              ashos              33 k
+ libcbor                                   x86_64             0.7.0-6.fc37                              ashos              56 k
+ libcom_err                                x86_64             1.46.5-2.fc36                             ashos              25 k
+ libcomps                                  x86_64             0.1.18-3.fc37                             ashos              76 k
+ libcurl                                   x86_64             7.84.0-1.fc37                             ashos             306 k
+ libdb                                     x86_64             5.3.28-52.fc37                            ashos             764 k
+ libdnf                                    x86_64             0.67.0-3.fc37                             ashos             662 k
+ libeconf                                  x86_64             0.4.0-3.fc36                              ashos              27 k
+ libevent                                  x86_64             2.1.12-6.fc36                             ashos             261 k
+ libfdisk                                  x86_64             2.38-4.fc37                               ashos             160 k
+ libffi                                    x86_64             3.4.2-8.fc36                              ashos              37 k
+ libfsverity                               x86_64             1.4-7.fc36                                ashos              19 k
+ libgcc                                    x86_64             12.1.1-3.fc37                             ashos             105 k
+ libgcrypt                                 x86_64             1.10.1-3.fc37                             ashos             511 k
+ libgomp                                   x86_64             12.1.1-3.fc37                             ashos             292 k
+ libgpg-error                              x86_64             1.45-1.fc37                               ashos             221 k
+ libidn2                                   x86_64             2.3.3-1.fc37                              ashos             107 k
+ libkcapi                                  x86_64             1.3.1-4.fc36                              ashos              46 k
+ libkcapi-hmaccalc                         x86_64             1.3.1-4.fc36                              ashos              24 k
+ libksba                                   x86_64             1.6.0-3.fc36                              ashos             157 k
+ libmodulemd                               x86_64             2.14.0-3.fc37                             ashos             234 k
+ libmount                                  x86_64             2.38-4.fc37                               ashos             135 k
+ libndp                                    x86_64             1.8-3.fc36                                ashos              37 k
+ libnghttp2                                x86_64             1.48.0-1.fc37                             ashos              75 k
+ libnsl2                                   x86_64             2.0.0-3.fc36                              ashos              30 k
+ libpkgconf                                x86_64             1.8.0-2.fc36                              ashos              36 k
+ libpsl                                    x86_64             0.21.1-5.fc36                             ashos              64 k
+ libpwquality                              x86_64             1.4.4-10.fc37                             ashos             105 k
+ librepo                                   x86_64             1.14.3-2.fc37                             ashos              94 k
+ libreport-filesystem                      noarch             2.17.1-2.fc37                             ashos              13 k
+ libseccomp                                x86_64             2.5.3-2.fc36                              ashos              70 k
+ libsecret                                 x86_64             0.20.5-1.fc37                             ashos             185 k
+ libselinux                                x86_64             3.4-4.fc37                                ashos              86 k
+ libsemanage                               x86_64             3.4-3.fc37                                ashos             120 k
+ libsepol                                  x86_64             3.4-2.fc37                                ashos             322 k
+ libsigsegv                                x86_64             2.14-2.fc36                               ashos              27 k
+ libsmartcols                              x86_64             2.38-4.fc37                               ashos              64 k
+ libsolv                                   x86_64             0.7.22-2.fc37                             ashos             405 k
+ libssh                                    x86_64             0.9.6-4.fc36                              ashos             203 k
+ libssh-config                             noarch             0.9.6-4.fc36                              ashos             7.6 k
+ libstdc++                                 x86_64             12.1.1-3.fc37                             ashos             798 k
+ libtasn1                                  x86_64             4.18.0-2.fc36                             ashos              75 k
+ libtermkey                                x86_64             0.22-2.fc36                               ashos              29 k
+ libtirpc                                  x86_64             1.3.2-1.rc1.fc36.1                        ashos              94 k
+ libtree-sitter                            x86_64             0.20.6-1.fc37                             ashos              96 k
+ libunistring                              x86_64             1.0-1.fc36                                ashos             551 k
+ libusb1                                   x86_64             1.0.25-8.fc37                             ashos              74 k
+ libuser                                   x86_64             0.63-11.fc37                              ashos             383 k
+ libutempter                               x86_64             1.2.1-6.fc36                              ashos              26 k
+ libuuid                                   x86_64             2.38-4.fc37                               ashos              28 k
+ libuv                                     x86_64             1:1.44.2-1.fc37                           ashos             151 k
+ libverto                                  x86_64             0.3.2-3.fc36                              ashos              21 k
+ libvterm                                  x86_64             0.2-3.fc37                                ashos              42 k
+ libxcb                                    x86_64             1.13.1-9.fc36                             ashos             229 k
+ libxcrypt                                 x86_64             4.4.28-1.fc37                             ashos             119 k
+ libxml2                                   x86_64             2.9.14-2.fc37                             ashos             753 k
+ libyaml                                   x86_64             0.2.5-7.fc36                              ashos              60 k
+ libzstd                                   x86_64             1.5.2-2.fc37                              ashos             294 k
+ linux-firmware-whence                     noarch             20220708-136.fc37                         ashos              50 k
+ lua-libs                                  x86_64             5.4.4-2.fc37                              ashos             217 k
+ luajit                                    x86_64             2.1.0-0.23beta3.fc36                      ashos             405 k
+ luajit2.1-luv                             x86_64             1.43.0.0-1.fc37                           ashos              72 k
+ lz4-libs                                  x86_64             1.9.3-4.fc36                              ashos              70 k
+ lzo                                       x86_64             2.10-6.fc36                               ashos              66 k
+ mokutil                                   x86_64             2:0.6.0-4.fc37                            ashos              47 k
+ mpdecimal                                 x86_64             2.5.1-3.fc36                              ashos             102 k
+ mpfr                                      x86_64             4.1.0-9.fc36                              ashos             333 k
+ msgpack                                   x86_64             3.1.0-9.fc36                              ashos              30 k
+ nano                                      x86_64             6.3-1.fc37                                ashos             718 k
+ ncurses-base                              noarch             6.3-2.20220501.fc37                       ashos              61 k
+ ncurses-libs                              x86_64             6.3-2.20220501.fc37                       ashos             328 k
+ nettle                                    x86_64             3.8-1.fc37                                ashos             414 k
+ npth                                      x86_64             1.6-8.fc36                                ashos              24 k
+ openldap                                  x86_64             2.6.2-3.fc37                              ashos             254 k
+ openssl-libs                              x86_64             1:3.0.5-1.fc37                            ashos             2.1 M
+ os-prober                                 x86_64             1.77-9.fc36                               ashos              43 k
+ p11-kit                                   x86_64             0.24.1-2.fc36                             ashos             362 k
+ p11-kit-trust                             x86_64             0.24.1-2.fc36                             ashos             138 k
+ pam                                       x86_64             1.5.2-13.fc37                             ashos             522 k
+ pam-libs                                  x86_64             1.5.2-13.fc37                             ashos              58 k
+ pcre                                      x86_64             8.45-1.fc36.1                             ashos             203 k
+ pcre2                                     x86_64             10.40-1.fc37                              ashos             237 k
+ pcre2-syntax                              noarch             10.40-1.fc37                              ashos             143 k
+ pcsc-lite                                 x86_64             1.9.8-1.fc37                              ashos              94 k
+ pcsc-lite-libs                            x86_64             1.9.8-1.fc37                              ashos              28 k
+ pkgconf                                   x86_64             1.8.0-2.fc36                              ashos              41 k
+ pkgconf-m4                                noarch             1.8.0-2.fc36                              ashos              14 k
+ pkgconf-pkg-config                        x86_64             1.8.0-2.fc36                              ashos              10 k
+ polkit                                    x86_64             121-1.fc37                                ashos             140 k
+ polkit-libs                               x86_64             121-1.fc37                                ashos              66 k
+ polkit-pkla-compat                        x86_64             0.1-21.fc36                               ashos              44 k
+ popt                                      x86_64             1.19~rc1-2.fc37                           ashos              58 k
+ procps-ng                                 x86_64             3.3.17-5.fc37                             ashos             330 k
+ protobuf-c                                x86_64             1.4.0-5.fc37                              ashos              36 k
+ publicsuffix-list-dafsa                   noarch             20210518-4.fc36                           ashos              58 k
+ python-pip-wheel                          noarch             22.0.4-4.fc37                             ashos             1.5 M
+ python-setuptools-wheel                   noarch             62.6.0-1.fc37                             ashos             712 k
+ python3                                   x86_64             3.11.0~b4-1.fc37                          ashos              27 k
+ python3-dnf                               noarch             4.13.0-2.fc37                             ashos             570 k
+ python3-gpg                               x86_64             1.17.0-3.fc37                             ashos             284 k
+ python3-hawkey                            x86_64             0.67.0-3.fc37                             ashos             108 k
+ python3-libcomps                          x86_64             0.1.18-3.fc37                             ashos              48 k
+ python3-libdnf                            x86_64             0.67.0-3.fc37                             ashos             811 k
+ python3-libs                              x86_64             3.11.0~b4-1.fc37                          ashos             9.3 M
+ python3-rpm                               x86_64             4.18.0-0.beta1.2.fc37                     ashos              93 k
+ python3-six                               noarch             1.16.0-7.fc37                             ashos              42 k
+ readline                                  x86_64             8.1-6.fc36                                ashos             211 k
+ rpm                                       x86_64             4.18.0-0.beta1.2.fc37                     ashos             543 k
+ rpm-build-libs                            x86_64             4.18.0-0.beta1.2.fc37                     ashos              94 k
+ rpm-libs                                  x86_64             4.18.0-0.beta1.2.fc37                     ashos             319 k
+ rpm-sign-libs                             x86_64             4.18.0-0.beta1.2.fc37                     ashos              26 k
+ sed                                       x86_64             4.8-10.fc36                               ashos             297 k
+ setup                                     noarch             2.13.10-1.fc37                            ashos             143 k
+ shadow-utils                              x86_64             2:4.11.1-2.fc37                           ashos             1.1 M
+ sqlite-libs                               x86_64             3.39.1-1.fc37                             ashos             657 k
+ systemd                                   x86_64             251.3-1.fc37                              ashos             4.1 M
+ systemd-libs                              x86_64             251.3-1.fc37                              ashos             620 k
+ systemd-pam                               x86_64             251.3-1.fc37                              ashos             335 k
+ systemd-udev                              x86_64             251.3-1.fc37                              ashos             2.0 M
+ tpm2-tss                                  x86_64             3.2.0-1.fc37                              ashos             596 k
+ tzdata                                    noarch             2022a-3.fc37                              ashos             435 k
+ unbound-libs                              x86_64             1.16.0-6.fc37                             ashos             518 k
+ unibilium                                 x86_64             2.1.1-2.fc36                              ashos              36 k
+ util-linux                                x86_64             2.38-4.fc37                               ashos             2.3 M
+ util-linux-core                           x86_64             2.38-4.fc37                               ashos             454 k
+ whois-nls                                 noarch             5.5.13-1.fc37                             ashos              35 k
+ xkeyboard-config                          noarch             2.36-1.fc37                               ashos             901 k
+ xz                                        x86_64             5.2.5-9.fc37                              ashos             214 k
+ xz-libs                                   x86_64             5.2.5-9.fc37                              ashos              92 k
+ zchunk-libs                               x86_64             1.2.2-1.fc37                              ashos              51 k
+ zlib                                      x86_64             1.2.12-3.fc37                             ashos              94 k
+Installing weak dependencies:
+ crypto-policies-scripts                   noarch             20220428-2.gitdfb10ea.fc37                ashos              99 k
+ deltarpm                                  x86_64             3.6.3-3.fc37                              ashos              89 k
+ diffutils                                 x86_64             3.8-2.fc36                                ashos             370 k
+ elfutils-debuginfod-client                x86_64             0.187-5.fc37                              ashos              39 k
+ gawk-all-langpacks                        x86_64             5.1.1-3.fc37                              ashos             232 k
+ glibc-gconv-extra                         x86_64             2.35.9000-29.fc37                         ashos             1.6 M
+ gnupg2-smime                              x86_64             2.3.7-1.fc37                              ashos             248 k
+ grubby                                    x86_64             8.40-61.fc37                              ashos              33 k
+ kpartx                                    x86_64             0.9.0-1.fc37                              ashos              49 k
+ libbpf                                    x86_64             2:0.8.0-1.fc37                            ashos             172 k
+ libfido2                                  x86_64             1.11.0-2.fc37                             ashos              96 k
+ libxcrypt-compat                          x86_64             4.4.28-1.fc37                             ashos              90 k
+ libxkbcommon                              x86_64             1.4.1-1.fc37                              ashos             140 k
+ linux-firmware                            noarch             20220708-136.fc37                         ashos             135 M
+ memstrack                                 x86_64             0.2.4-2.fc36                              ashos              50 k
+ mkpasswd                                  x86_64             5.5.13-1.fc37                             ashos              25 k
+ nano-default-editor                       noarch             6.3-1.fc37                                ashos              10 k
+ openssl-pkcs11                            x86_64             0.4.11-8.fc36                             ashos              74 k
+ pcsc-lite-ccid                            x86_64             1.5.0-1.fc36                              ashos             319 k
+ pigz                                      x86_64             2.7-1.fc37                                ashos              82 k
+ pinentry                                  x86_64             1.2.0-2.fc36                              ashos              98 k
+ python3-dbus                              x86_64             1.2.18-4.fc37                             ashos             146 k
+ python3-unbound                           x86_64             1.16.0-6.fc37                             ashos             109 k
+ qrencode-libs                             x86_64             4.1.1-2.fc36                              ashos              61 k
+ rpm-plugin-systemd-inhibit                x86_64             4.18.0-0.beta1.2.fc37                     ashos              20 k
+ sudo-python-plugin                        x86_64             1.9.11-3.p3.fc37                          ashos              54 k
+ systemd-networkd                          x86_64             251.3-1.fc37                              ashos             609 k
+ systemd-resolved                          x86_64             251.3-1.fc37                              ashos             277 k
+ unbound-anchor                            x86_64             1.16.0-6.fc37                             ashos              37 k
+ xsel                                      x86_64             1.2.0-30.fc36                             ashos              28 k
+
+Transaction Summary
+================================================================================================================================
+Install  265 Packages
+
+Total download size: 353 M
+Installed size: 704 M
+Downloading Packages:
+(1/265): alternatives-1.19-2.fc36.x86_64.rpm                                                     49 kB/s |  36 kB     00:00
+(2/265): NetworkManager-libnm-1.39.10-1.fc37.x86_64.rpm                                         1.8 MB/s | 1.7 MB     00:00
+(3/265): NetworkManager-1.39.10-1.fc37.x86_64.rpm                                               1.9 MB/s | 2.1 MB     00:01
+(4/265): audit-libs-3.0.8-2.fc37.x86_64.rpm                                                     271 kB/s | 116 kB     00:00
+(5/265): authselect-1.4.0-2.fc37.x86_64.rpm                                                     377 kB/s | 139 kB     00:00
+(6/265): authselect-libs-1.4.0-2.fc37.x86_64.rpm                                                823 kB/s | 235 kB     00:00
+(7/265): basesystem-11-13.fc36.noarch.rpm                                                        18 kB/s | 7.0 kB     00:00
+(8/265): btrfs-progs-5.18-2.fc37.x86_64.rpm                                                     3.0 MB/s | 957 kB     00:00
+(9/265): bash-completion-2.11-7.fc37.noarch.rpm                                                 544 kB/s | 291 kB     00:00
+(10/265): bash-5.1.16-2.fc36.x86_64.rpm                                                         2.0 MB/s | 1.7 MB     00:00
+(11/265): compat-lua-libs-5.1.5-20.fc36.x86_64.rpm                                              988 kB/s | 167 kB     00:00
+(12/265): coreutils-9.1-2.fc37.x86_64.rpm                                                       3.5 MB/s | 1.1 MB     00:00
+(13/265): ca-certificates-2022.2.54-2.fc37.noarch.rpm                                           1.0 MB/s | 853 kB     00:00
+(14/265): coreutils-common-9.1-2.fc37.x86_64.rpm                                                1.2 MB/s | 2.0 MB     00:01
+(15/265): bzip2-libs-1.0.8-11.fc36.x86_64.rpm                                                    16 kB/s |  41 kB     00:02
+(16/265): cpio-2.13-12.fc36.x86_64.rpm                                                          155 kB/s | 270 kB     00:01
+(17/265): cracklib-2.9.6-28.fc36.x86_64.rpm                                                     273 kB/s |  81 kB     00:00
+(18/265): crypto-policies-20220428-2.gitdfb10ea.fc37.noarch.rpm                                 215 kB/s |  60 kB     00:00
+(19/265): crypto-policies-scripts-20220428-2.gitdfb10ea.fc37.noarch.rpm                         289 kB/s |  99 kB     00:00
+(20/265): cracklib-dicts-2.9.6-28.fc36.x86_64.rpm                                               3.5 MB/s | 3.6 MB     00:01
+(21/265): cryptsetup-libs-2.5.0~rc1-1.fc37.x86_64.rpm                                           601 kB/s | 448 kB     00:00
+(22/265): curl-7.84.0-1.fc37.x86_64.rpm                                                         476 kB/s | 313 kB     00:00
+(23/265): cyrus-sasl-lib-2.1.28-1.fc37.x86_64.rpm                                               2.0 MB/s | 793 kB     00:00
+(24/265): dbus-broker-31-1.fc37.x86_64.rpm                                                      615 kB/s | 176 kB     00:00
+(25/265): dbus-common-1.14.0-2.fc37.noarch.rpm                                                   79 kB/s |  14 kB     00:00
+(26/265): dbus-libs-1.14.0-2.fc37.x86_64.rpm                                                    903 kB/s | 155 kB     00:00
+(27/265): dbus-1.14.0-2.fc37.x86_64.rpm                                                          11 kB/s | 7.4 kB     00:00
+(28/265): device-mapper-1.02.175-8.fc37.x86_64.rpm                                              499 kB/s | 138 kB     00:00
+(29/265): device-mapper-libs-1.02.175-8.fc37.x86_64.rpm                                         442 kB/s | 177 kB     00:00
+(30/265): diffutils-3.8-2.fc36.x86_64.rpm                                                       1.5 MB/s | 370 kB     00:00
+(31/265): deltarpm-3.6.3-3.fc37.x86_64.rpm                                                       95 kB/s |  89 kB     00:00
+(32/265): dnf-4.13.0-2.fc37.noarch.rpm                                                          1.8 MB/s | 453 kB     00:00
+(33/265): dnf-data-4.13.0-2.fc37.noarch.rpm                                                     102 kB/s |  42 kB     00:00
+(34/265): duktape-2.6.0-2.fc36.x86_64.rpm                                                       881 kB/s | 164 kB     00:00
+(35/265): dhcpcd-9.4.1-2.fc36.x86_64.rpm                                                        183 kB/s | 224 kB     00:01
+(36/265): e2fsprogs-libs-1.46.5-2.fc36.x86_64.rpm                                               1.0 MB/s | 222 kB     00:00
+(37/265): efibootmgr-18-1.fc37.x86_64.rpm                                                       286 kB/s |  47 kB     00:00
+(38/265): efivar-libs-38-3.fc37.x86_64.rpm                                                      585 kB/s | 123 kB     00:00
+(39/265): elfutils-debuginfod-client-0.187-5.fc37.x86_64.rpm                                    210 kB/s |  39 kB     00:00
+(40/265): dracut-057-1.fc37.x86_64.rpm                                                          267 kB/s | 370 kB     00:01
+(41/265): efi-filesystem-5-5.fc36.noarch.rpm                                                    6.5 kB/s | 7.8 kB     00:01
+(42/265): elfutils-libs-0.187-5.fc37.x86_64.rpm                                                 712 kB/s | 257 kB     00:00
+(43/265): expat-2.4.8-1.fc37.x86_64.rpm                                                         430 kB/s | 109 kB     00:00
+(44/265): fedora-gpg-keys-37-0.3.noarch.rpm                                                     438 kB/s | 114 kB     00:00
+(45/265): fedora-release-37-0.7.noarch.rpm                                                       66 kB/s |  11 kB     00:00
+(46/265): fedora-release-common-37-0.7.noarch.rpm                                               126 kB/s |  22 kB     00:00
+(47/265): fedora-release-identity-basic-37-0.7.noarch.rpm                                        70 kB/s |  12 kB     00:00
+(48/265): fedora-repos-37-0.3.noarch.rpm                                                         63 kB/s |  10 kB     00:00
+(49/265): fedora-repos-rawhide-37-0.3.noarch.rpm                                                 34 kB/s | 9.8 kB     00:00
+(50/265): file-5.41-6.fc37.x86_64.rpm                                                           268 kB/s |  48 kB     00:00
+(51/265): file-libs-5.41-6.fc37.x86_64.rpm                                                      2.5 MB/s | 634 kB     00:00
+(52/265): filesystem-3.16-2.fc36.x86_64.rpm                                                     1.3 MB/s | 1.1 MB     00:00
+(53/265): findutils-4.9.0-1.fc36.x86_64.rpm                                                     1.4 MB/s | 483 kB     00:00
+(54/265): fuse-libs-2.9.9-14.fc36.x86_64.rpm                                                    350 kB/s |  97 kB     00:00
+(55/265): gawk-5.1.1-3.fc37.x86_64.rpm                                                          1.9 MB/s | 1.0 MB     00:00
+(56/265): gawk-all-langpacks-5.1.1-3.fc37.x86_64.rpm                                            577 kB/s | 232 kB     00:00
+(57/265): gdbm-libs-1.23-1.fc37.x86_64.rpm                                                      314 kB/s |  56 kB     00:00
+(58/265): gettext-0.21-15.fc37.0.20220203.x86_64.rpm                                            2.0 MB/s | 1.1 MB     00:00
+(59/265): gettext-libs-0.21-15.fc37.0.20220203.x86_64.rpm                                       1.3 MB/s | 322 kB     00:00
+(60/265): glib2-2.73.2-2.fc37.x86_64.rpm                                                        4.0 MB/s | 2.7 MB     00:00
+(61/265): glibc-2.35.9000-29.fc37.x86_64.rpm                                                    3.1 MB/s | 2.1 MB     00:00
+(62/265): glibc-common-2.35.9000-29.fc37.x86_64.rpm                                             1.3 MB/s | 349 kB     00:00
+(63/265): glibc-gconv-extra-2.35.9000-29.fc37.x86_64.rpm                                        1.7 MB/s | 1.6 MB     00:00
+(64/265): glibc-langpack-en-2.35.9000-29.fc37.x86_64.rpm                                        1.2 MB/s | 607 kB     00:00
+(65/265): elfutils-default-yama-scope-0.187-5.fc37.noarch.rpm                                   1.7 kB/s |  17 kB     00:09
+(66/265): elfutils-libelf-0.187-5.fc37.x86_64.rpm                                                21 kB/s | 197 kB     00:09
+(67/265): gmp-6.2.1-2.fc36.x86_64.rpm                                                           604 kB/s | 315 kB     00:00
+(68/265): glibc-locale-source-2.35.9000-29.fc37.x86_64.rpm                                      3.1 MB/s | 4.1 MB     00:01
+(69/265): gnupg2-smime-2.3.7-1.fc37.x86_64.rpm                                                  480 kB/s | 248 kB     00:00
+(70/265): gpgme-1.17.0-3.fc37.x86_64.rpm                                                        1.3 MB/s | 210 kB     00:00
+(71/265): gnutls-3.7.6-4.fc37.x86_64.rpm                                                        2.6 MB/s | 1.1 MB     00:00
+(72/265): grep-3.7-2.fc36.x86_64.rpm                                                            1.1 MB/s | 263 kB     00:00
+(73/265): grub2-common-2.06-42.fc37.noarch.rpm                                                  1.8 MB/s | 907 kB     00:00
+(74/265): grub2-efi-x64-2.06-42.fc37.x86_64.rpm                                                 2.1 MB/s | 1.3 MB     00:00
+(75/265): grub2-tools-2.06-42.fc37.x86_64.rpm                                                   3.5 MB/s | 1.8 MB     00:00
+(76/265): grub2-tools-minimal-2.06-42.fc37.x86_64.rpm                                           3.1 MB/s | 606 kB     00:00
+(77/265): grubby-8.40-61.fc37.x86_64.rpm                                                        237 kB/s |  33 kB     00:00
+(78/265): gzip-1.12-1.fc37.x86_64.rpm                                                            56 kB/s | 159 kB     00:02
+(79/265): ima-evm-utils-1.4-5.fc36.x86_64.rpm                                                    15 kB/s |  63 kB     00:04
+(80/265): grub2-efi-x64-modules-2.06-42.fc37.noarch.rpm                                         127 kB/s | 1.0 MB     00:08
+(81/265): gnupg2-2.3.7-1.fc37.x86_64.rpm                                                        252 kB/s | 2.5 MB     00:10
+(82/265): json-c-0.16-1.fc37.x86_64.rpm                                                          89 kB/s |  42 kB     00:00
+(83/265): kbd-2.5.1-1.fc37.x86_64.rpm                                                           177 kB/s | 409 kB     00:02
+(84/265): kernel-core-5.19.0-0.rc7.53.fc37.x86_64.rpm                                           8.2 MB/s |  50 MB     00:06
+(85/265): kernel-5.19.0-0.rc7.53.fc37.x86_64.rpm                                                 25 kB/s | 257 kB     00:10
+(86/265): kbd-misc-2.5.1-1.fc37.noarch.rpm                                                      144 kB/s | 1.5 MB     00:10
+(87/265): kmod-30-1.fc37.x86_64.rpm                                                             395 kB/s | 120 kB     00:00
+(88/265): kmod-libs-30-1.fc37.x86_64.rpm                                                        383 kB/s |  68 kB     00:00
+(89/265): kpartx-0.9.0-1.fc37.x86_64.rpm                                                        250 kB/s |  49 kB     00:00
+(90/265): keyutils-libs-1.6.1-4.fc36.x86_64.rpm                                                 5.8 kB/s |  31 kB     00:05
+(91/265): krb5-libs-1.19.2-11.fc37.x86_64.rpm                                                   159 kB/s | 723 kB     00:04
+(92/265): libX11-common-1.8.1-1.fc37.noarch.rpm                                                 467 kB/s | 150 kB     00:00
+(93/265): libX11-1.8.1-1.fc37.x86_64.rpm                                                        134 kB/s | 648 kB     00:04
+(94/265): libXau-1.0.9-8.fc36.x86_64.rpm                                                        7.2 kB/s |  30 kB     00:04
+(95/265): libacl-2.3.1-3.fc36.x86_64.rpm                                                         77 kB/s |  24 kB     00:00
+(96/265): libargon2-20171227-9.fc37.x86_64.rpm                                                  138 kB/s |  28 kB     00:00
+(97/265): libarchive-3.6.1-1.fc37.x86_64.rpm                                                    549 kB/s | 397 kB     00:00
+(98/265): libattr-2.5.1-4.fc36.x86_64.rpm                                                        82 kB/s |  18 kB     00:00
+(99/265): libassuan-2.5.5-4.fc36.x86_64.rpm                                                      49 kB/s |  67 kB     00:01
+(100/265): libblkid-2.38-4.fc37.x86_64.rpm                                                      285 kB/s | 107 kB     00:00
+(101/265): kernel-modules-5.19.0-0.rc7.53.fc37.x86_64.rpm                                       3.4 MB/s |  58 MB     00:17
+(102/265): libb2-0.98.1-6.fc37.x86_64.rpm                                                       6.4 kB/s |  25 kB     00:03
+(103/265): libbpf-0.8.0-1.fc37.x86_64.rpm                                                        61 kB/s | 172 kB     00:02
+(104/265): libcap-2.48-4.fc36.x86_64.rpm                                                        199 kB/s |  67 kB     00:00
+(105/265): libcap-ng-0.8.3-2.fc37.x86_64.rpm                                                    108 kB/s |  33 kB     00:00
+(106/265): libcbor-0.7.0-6.fc37.x86_64.rpm                                                      274 kB/s |  56 kB     00:00
+(107/265): libcom_err-1.46.5-2.fc36.x86_64.rpm                                                  121 kB/s |  25 kB     00:00
+(108/265): libcomps-0.1.18-3.fc37.x86_64.rpm                                                    291 kB/s |  76 kB     00:00
+(109/265): libcurl-7.84.0-1.fc37.x86_64.rpm                                                     938 kB/s | 306 kB     00:00
+(110/265): libdb-5.3.28-52.fc37.x86_64.rpm                                                      2.0 MB/s | 764 kB     00:00
+(111/265): libdnf-0.67.0-3.fc37.x86_64.rpm                                                      2.1 MB/s | 662 kB     00:00
+(112/265): libevent-2.1.12-6.fc36.x86_64.rpm                                                    1.3 MB/s | 261 kB     00:00
+(113/265): libfdisk-2.38-4.fc37.x86_64.rpm                                                      864 kB/s | 160 kB     00:00
+(114/265): libffi-3.4.2-8.fc36.x86_64.rpm                                                       217 kB/s |  37 kB     00:00
+(115/265): libeconf-0.4.0-3.fc36.x86_64.rpm                                                      37 kB/s |  27 kB     00:00
+(116/265): libfido2-1.11.0-2.fc37.x86_64.rpm                                                    305 kB/s |  96 kB     00:00
+(117/265): libfsverity-1.4-7.fc36.x86_64.rpm                                                     61 kB/s |  19 kB     00:00
+(118/265): libgcc-12.1.1-3.fc37.x86_64.rpm                                                      345 kB/s | 105 kB     00:00
+(119/265): libgcrypt-1.10.1-3.fc37.x86_64.rpm                                                   505 kB/s | 511 kB     00:01
+(120/265): libgpg-error-1.45-1.fc37.x86_64.rpm                                                  1.1 MB/s | 221 kB     00:00
+(121/265): libgomp-12.1.1-3.fc37.x86_64.rpm                                                     266 kB/s | 292 kB     00:01
+(122/265): libkcapi-1.3.1-4.fc36.x86_64.rpm                                                     159 kB/s |  46 kB     00:00
+(123/265): libkcapi-hmaccalc-1.3.1-4.fc36.x86_64.rpm                                            134 kB/s |  24 kB     00:00
+(124/265): libksba-1.6.0-3.fc36.x86_64.rpm                                                      710 kB/s | 157 kB     00:00
+(125/265): libidn2-2.3.3-1.fc37.x86_64.rpm                                                      110 kB/s | 107 kB     00:00
+(126/265): libmodulemd-2.14.0-3.fc37.x86_64.rpm                                                 644 kB/s | 234 kB     00:00
+(127/265): libndp-1.8-3.fc36.x86_64.rpm                                                         254 kB/s |  37 kB     00:00
+(128/265): libbrotli-1.0.9-8.fc37.x86_64.rpm                                                     57 kB/s | 315 kB     00:05
+(129/265): libnghttp2-1.48.0-1.fc37.x86_64.rpm                                                   81 kB/s |  75 kB     00:00
+(130/265): libpkgconf-1.8.0-2.fc36.x86_64.rpm                                                   250 kB/s |  36 kB     00:00
+(131/265): libpsl-0.21.1-5.fc36.x86_64.rpm                                                      406 kB/s |  64 kB     00:00
+(132/265): libmount-2.38-4.fc37.x86_64.rpm                                                       81 kB/s | 135 kB     00:01
+(133/265): libpwquality-1.4.4-10.fc37.x86_64.rpm                                                457 kB/s | 105 kB     00:00
+(134/265): librepo-1.14.3-2.fc37.x86_64.rpm                                                     427 kB/s |  94 kB     00:00
+(135/265): libreport-filesystem-2.17.1-2.fc37.noarch.rpm                                         78 kB/s |  13 kB     00:00
+(136/265): libsecret-0.20.5-1.fc37.x86_64.rpm                                                   480 kB/s | 185 kB     00:00
+(137/265): libseccomp-2.5.3-2.fc36.x86_64.rpm                                                    64 kB/s |  70 kB     00:01
+(138/265): libsemanage-3.4-3.fc37.x86_64.rpm                                                    817 kB/s | 120 kB     00:00
+(139/265): libselinux-3.4-4.fc37.x86_64.rpm                                                      98 kB/s |  86 kB     00:00
+(140/265): libsepol-3.4-2.fc37.x86_64.rpm                                                       1.5 MB/s | 322 kB     00:00
+(141/265): libsigsegv-2.14-2.fc36.x86_64.rpm                                                     93 kB/s |  27 kB     00:00
+(142/265): libsolv-0.7.22-2.fc37.x86_64.rpm                                                     2.0 MB/s | 405 kB     00:00
+(143/265): libssh-0.9.6-4.fc36.x86_64.rpm                                                       1.1 MB/s | 203 kB     00:00
+(144/265): libssh-config-0.9.6-4.fc36.noarch.rpm                                                 50 kB/s | 7.6 kB     00:00
+(145/265): libstdc++-12.1.1-3.fc37.x86_64.rpm                                                   3.4 MB/s | 798 kB     00:00
+(146/265): libsmartcols-2.38-4.fc37.x86_64.rpm                                                   55 kB/s |  64 kB     00:01
+(147/265): libtasn1-4.18.0-2.fc36.x86_64.rpm                                                    237 kB/s |  75 kB     00:00
+(148/265): libtermkey-0.22-2.fc36.x86_64.rpm                                                    109 kB/s |  29 kB     00:00
+(149/265): libtirpc-1.3.2-1.rc1.fc36.1.x86_64.rpm                                               309 kB/s |  94 kB     00:00
+(150/265): libtree-sitter-0.20.6-1.fc37.x86_64.rpm                                              394 kB/s |  96 kB     00:00
+(151/265): libusb1-1.0.25-8.fc37.x86_64.rpm                                                     252 kB/s |  74 kB     00:00
+(152/265): libuser-0.63-11.fc37.x86_64.rpm                                                      1.2 MB/s | 383 kB     00:00
+(153/265): libutempter-1.2.1-6.fc36.x86_64.rpm                                                  153 kB/s |  26 kB     00:00
+(154/265): libunistring-1.0-1.fc36.x86_64.rpm                                                   373 kB/s | 551 kB     00:01
+(155/265): libuv-1.44.2-1.fc37.x86_64.rpm                                                       410 kB/s | 151 kB     00:00
+(156/265): libuuid-2.38-4.fc37.x86_64.rpm                                                        22 kB/s |  28 kB     00:01
+(157/265): libverto-0.3.2-3.fc36.x86_64.rpm                                                      40 kB/s |  21 kB     00:00
+(158/265): libvterm-0.2-3.fc37.x86_64.rpm                                                       124 kB/s |  42 kB     00:00
+(159/265): libxcrypt-4.4.28-1.fc37.x86_64.rpm                                                   346 kB/s | 119 kB     00:00
+(160/265): libxcb-1.13.1-9.fc36.x86_64.rpm                                                      527 kB/s | 229 kB     00:00
+(161/265): libxkbcommon-1.4.1-1.fc37.x86_64.rpm                                                 389 kB/s | 140 kB     00:00
+(162/265): libxml2-2.9.14-2.fc37.x86_64.rpm                                                     3.5 MB/s | 753 kB     00:00
+(163/265): libyaml-0.2.5-7.fc36.x86_64.rpm                                                      296 kB/s |  60 kB     00:00
+(164/265): libxcrypt-compat-4.4.28-1.fc37.x86_64.rpm                                             93 kB/s |  90 kB     00:00
+(165/265): libzstd-1.5.2-2.fc37.x86_64.rpm                                                      1.1 MB/s | 294 kB     00:00
+(166/265): linux-firmware-whence-20220708-136.fc37.noarch.rpm                                    34 kB/s |  50 kB     00:01
+(167/265): lua-libs-5.4.4-2.fc37.x86_64.rpm                                                     1.0 MB/s | 217 kB     00:00
+(168/265): libnsl2-2.0.0-3.fc36.x86_64.rpm                                                      3.0 kB/s |  30 kB     00:10
+(169/265): luajit-2.1.0-0.23beta3.fc36.x86_64.rpm                                               543 kB/s | 405 kB     00:00
+(170/265): lz4-libs-1.9.3-4.fc36.x86_64.rpm                                                     268 kB/s |  70 kB     00:00
+(171/265): lzo-2.10-6.fc36.x86_64.rpm                                                            88 kB/s |  66 kB     00:00
+(172/265): memstrack-0.2.4-2.fc36.x86_64.rpm                                                     46 kB/s |  50 kB     00:01
+(173/265): mkpasswd-5.5.13-1.fc37.x86_64.rpm                                                     27 kB/s |  25 kB     00:00
+(174/265): mokutil-0.6.0-4.fc37.x86_64.rpm                                                       63 kB/s |  47 kB     00:00
+(175/265): mpdecimal-2.5.1-3.fc36.x86_64.rpm                                                    150 kB/s | 102 kB     00:00
+(176/265): mpfr-4.1.0-9.fc36.x86_64.rpm                                                         382 kB/s | 333 kB     00:00
+(177/265): msgpack-3.1.0-9.fc36.x86_64.rpm                                                      136 kB/s |  30 kB     00:00
+(178/265): nano-6.3-1.fc37.x86_64.rpm                                                           767 kB/s | 718 kB     00:00
+(179/265): nano-default-editor-6.3-1.fc37.noarch.rpm                                             17 kB/s |  10 kB     00:00
+(180/265): linux-firmware-20220708-136.fc37.noarch.rpm                                          8.7 MB/s | 135 MB     00:15
+(181/265): ncurses-6.3-2.20220501.fc37.x86_64.rpm                                                68 kB/s | 403 kB     00:05
+(182/265): ncurses-base-6.3-2.20220501.fc37.noarch.rpm                                          188 kB/s |  61 kB     00:00
+(183/265): neovim-0.7.2-1.fc37.x86_64.rpm                                                       4.8 MB/s | 5.6 MB     00:01
+(184/265): ncurses-libs-6.3-2.20220501.fc37.x86_64.rpm                                          210 kB/s | 328 kB     00:01
+(185/265): nettle-3.8-1.fc37.x86_64.rpm                                                         1.3 MB/s | 414 kB     00:00
+(186/265): npth-1.6-8.fc36.x86_64.rpm                                                           104 kB/s |  24 kB     00:00
+(187/265): openldap-2.6.2-3.fc37.x86_64.rpm                                                     1.3 MB/s | 254 kB     00:00
+(188/265): openssl-pkcs11-0.4.11-8.fc36.x86_64.rpm                                              253 kB/s |  74 kB     00:00
+(189/265): openssl-libs-3.0.5-1.fc37.x86_64.rpm                                                 4.3 MB/s | 2.1 MB     00:00
+(190/265): os-prober-1.77-9.fc36.x86_64.rpm                                                     152 kB/s |  43 kB     00:00
+(191/265): p11-kit-0.24.1-2.fc36.x86_64.rpm                                                     1.4 MB/s | 362 kB     00:00
+(192/265): p11-kit-trust-0.24.1-2.fc36.x86_64.rpm                                               701 kB/s | 138 kB     00:00
+(193/265): pam-libs-1.5.2-13.fc37.x86_64.rpm                                                    310 kB/s |  58 kB     00:00
+(194/265): pam-1.5.2-13.fc37.x86_64.rpm                                                         1.2 MB/s | 522 kB     00:00
+(195/265): passwd-0.80-12.fc36.x86_64.rpm                                                       439 kB/s | 107 kB     00:00
+(196/265): pcre-8.45-1.fc36.1.x86_64.rpm                                                        936 kB/s | 203 kB     00:00
+(197/265): pcre2-10.40-1.fc37.x86_64.rpm                                                        934 kB/s | 237 kB     00:00
+(198/265): pcsc-lite-1.9.8-1.fc37.x86_64.rpm                                                    288 kB/s |  94 kB     00:00
+(199/265): pcre2-syntax-10.40-1.fc37.noarch.rpm                                                 246 kB/s | 143 kB     00:00
+(200/265): pcsc-lite-ccid-1.5.0-1.fc36.x86_64.rpm                                               1.2 MB/s | 319 kB     00:00
+(201/265): pigz-2.7-1.fc37.x86_64.rpm                                                           475 kB/s |  82 kB     00:00
+(202/265): pinentry-1.2.0-2.fc36.x86_64.rpm                                                     377 kB/s |  98 kB     00:00
+(203/265): pcsc-lite-libs-1.9.8-1.fc37.x86_64.rpm                                                29 kB/s |  28 kB     00:00
+(204/265): pkgconf-m4-1.8.0-2.fc36.noarch.rpm                                                   127 kB/s |  14 kB     00:00
+(205/265): pkgconf-pkg-config-1.8.0-2.fc36.x86_64.rpm                                            57 kB/s |  10 kB     00:00
+(206/265): pkgconf-1.8.0-2.fc36.x86_64.rpm                                                       54 kB/s |  41 kB     00:00
+(207/265): polkit-libs-121-1.fc37.x86_64.rpm                                                    386 kB/s |  66 kB     00:00
+(208/265): polkit-121-1.fc37.x86_64.rpm                                                         406 kB/s | 140 kB     00:00
+(209/265): popt-1.19~rc1-2.fc37.x86_64.rpm                                                      429 kB/s |  58 kB     00:00
+(210/265): procps-ng-3.3.17-5.fc37.x86_64.rpm                                                   1.0 MB/s | 330 kB     00:00
+(211/265): protobuf-c-1.4.0-5.fc37.x86_64.rpm                                                   249 kB/s |  36 kB     00:00
+(212/265): publicsuffix-list-dafsa-20210518-4.fc36.noarch.rpm                                   446 kB/s |  58 kB     00:00
+(213/265): python-pip-wheel-22.0.4-4.fc37.noarch.rpm                                            3.8 MB/s | 1.5 MB     00:00
+(214/265): python-setuptools-wheel-62.6.0-1.fc37.noarch.rpm                                     3.2 MB/s | 712 kB     00:00
+(215/265): polkit-pkla-compat-0.1-21.fc36.x86_64.rpm                                             28 kB/s |  44 kB     00:01
+(216/265): python-unversioned-command-3.11.0~b4-1.fc37.noarch.rpm                                40 kB/s | 9.7 kB     00:00
+(217/265): python3-3.11.0~b4-1.fc37.x86_64.rpm                                                  136 kB/s |  27 kB     00:00
+(218/265): python3-anytree-2.8.0-8.fc37.noarch.rpm                                              268 kB/s |  74 kB     00:00
+(219/265): python3-dbus-1.2.18-4.fc37.x86_64.rpm                                                394 kB/s | 146 kB     00:00
+(220/265): python3-dnf-4.13.0-2.fc37.noarch.rpm                                                 2.1 MB/s | 570 kB     00:00
+(221/265): python3-hawkey-0.67.0-3.fc37.x86_64.rpm                                              705 kB/s | 108 kB     00:00
+(222/265): python3-gpg-1.17.0-3.fc37.x86_64.rpm                                                 828 kB/s | 284 kB     00:00
+(223/265): python3-libcomps-0.1.18-3.fc37.x86_64.rpm                                            277 kB/s |  48 kB     00:00
+(224/265): python3-libdnf-0.67.0-3.fc37.x86_64.rpm                                              4.0 MB/s | 811 kB     00:00
+(225/265): python3-rpm-4.18.0-0.beta1.2.fc37.x86_64.rpm                                         426 kB/s |  93 kB     00:00
+(226/265): python3-six-1.16.0-7.fc37.noarch.rpm                                                 140 kB/s |  42 kB     00:00
+(227/265): python3-unbound-1.16.0-6.fc37.x86_64.rpm                                             404 kB/s | 109 kB     00:00
+(228/265): python3-libs-3.11.0~b4-1.fc37.x86_64.rpm                                             5.9 MB/s | 9.3 MB     00:01
+(229/265): qrencode-libs-4.1.1-2.fc36.x86_64.rpm                                                 79 kB/s |  61 kB     00:00
+(230/265): readline-8.1-6.fc36.x86_64.rpm                                                       1.1 MB/s | 211 kB     00:00
+(231/265): rpm-build-libs-4.18.0-0.beta1.2.fc37.x86_64.rpm                                      527 kB/s |  94 kB     00:00
+(232/265): rpm-libs-4.18.0-0.beta1.2.fc37.x86_64.rpm                                            468 kB/s | 319 kB     00:00
+(233/265): rpm-plugin-systemd-inhibit-4.18.0-0.beta1.2.fc37.x86_64.rpm                          115 kB/s |  20 kB     00:00
+(234/265): rpm-4.18.0-0.beta1.2.fc37.x86_64.rpm                                                 409 kB/s | 543 kB     00:01
+(235/265): rpm-sign-libs-4.18.0-0.beta1.2.fc37.x86_64.rpm                                        95 kB/s |  26 kB     00:00
+(236/265): setup-2.13.10-1.fc37.noarch.rpm                                                      1.0 MB/s | 143 kB     00:00
+(237/265): shadow-utils-4.11.1-2.fc37.x86_64.rpm                                                2.3 MB/s | 1.1 MB     00:00
+(238/265): shim-x64-15.6-2.x86_64.rpm                                                           2.1 MB/s | 469 kB     00:00
+(239/265): sed-4.8-10.fc36.x86_64.rpm                                                           200 kB/s | 297 kB     00:01
+(240/265): sudo-1.9.11-3.p3.fc37.x86_64.rpm                                                     3.3 MB/s | 1.2 MB     00:00
+(241/265): sudo-python-plugin-1.9.11-3.p3.fc37.x86_64.rpm                                       319 kB/s |  54 kB     00:00
+(242/265): sqlite-libs-3.39.1-1.fc37.x86_64.rpm                                                 550 kB/s | 657 kB     00:01
+(243/265): systemd-libs-251.3-1.fc37.x86_64.rpm                                                 2.9 MB/s | 620 kB     00:00
+(244/265): systemd-networkd-251.3-1.fc37.x86_64.rpm                                             2.7 MB/s | 609 kB     00:00
+(245/265): systemd-pam-251.3-1.fc37.x86_64.rpm                                                  848 kB/s | 335 kB     00:00
+(246/265): systemd-resolved-251.3-1.fc37.x86_64.rpm                                             1.2 MB/s | 277 kB     00:00
+(247/265): systemd-udev-251.3-1.fc37.x86_64.rpm                                                 1.5 MB/s | 2.0 MB     00:01
+(248/265): tmux-3.2a-3.fc36.x86_64.rpm                                                          1.0 MB/s | 475 kB     00:00
+(249/265): tpm2-tss-3.2.0-1.fc37.x86_64.rpm                                                     2.4 MB/s | 596 kB     00:00
+[MIRROR] luajit2.1-luv-1.43.0.0-1.fc37.x86_64.rpm: Curl error (28): Timeout was reached for http://mirror.xenyth.net/fedora/linux/development/rawhide/Everything/x86_64/os/Packages/l/luajit2.1-luv-1.43.0.0-1.fc37.x86_64.rpm [Operation too slow. Less than 1000 bytes/sec transferred the last 30 seconds]
+(250/265): systemd-251.3-1.fc37.x86_64.rpm                                                      1.0 MB/s | 4.1 MB     00:04
+(251/265): luajit2.1-luv-1.43.0.0-1.fc37.x86_64.rpm                                             2.3 kB/s |  72 kB     00:31
+(252/265): unbound-anchor-1.16.0-6.fc37.x86_64.rpm                                              127 kB/s |  37 kB     00:00
+(253/265): unbound-libs-1.16.0-6.fc37.x86_64.rpm                                                453 kB/s | 518 kB     00:01
+(254/265): unibilium-2.1.1-2.fc36.x86_64.rpm                                                    192 kB/s |  36 kB     00:00
+(255/265): util-linux-2.38-4.fc37.x86_64.rpm                                                    2.9 MB/s | 2.3 MB     00:00
+(256/265): util-linux-core-2.38-4.fc37.x86_64.rpm                                               414 kB/s | 454 kB     00:01
+(257/265): which-2.21-33.fc37.x86_64.rpm                                                        234 kB/s |  42 kB     00:00
+(258/265): whois-nls-5.5.13-1.fc37.noarch.rpm                                                    78 kB/s |  35 kB     00:00
+(259/265): xkeyboard-config-2.36-1.fc37.noarch.rpm                                              755 kB/s | 901 kB     00:01
+(260/265): xsel-1.2.0-30.fc36.x86_64.rpm                                                        163 kB/s |  28 kB     00:00
+(261/265): xz-5.2.5-9.fc37.x86_64.rpm                                                           604 kB/s | 214 kB     00:00
+(262/265): xz-libs-5.2.5-9.fc37.x86_64.rpm                                                      436 kB/s |  92 kB     00:00
+(263/265): zchunk-libs-1.2.2-1.fc37.x86_64.rpm                                                  282 kB/s |  51 kB     00:00
+(264/265): zlib-1.2.12-3.fc37.x86_64.rpm                                                        386 kB/s |  94 kB     00:00
+(265/265): tzdata-2022a-3.fc37.noarch.rpm                                                        29 kB/s | 435 kB     00:15
+--------------------------------------------------------------------------------------------------------------------------------
+Total                                                                                           3.1 MB/s | 353 MB     01:54
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Running scriptlet: filesystem-3.16-2.fc36.x86_64                                                                          1/1
+  Preparing        :                                                                                                        1/1
+  Installing       : libgcc-12.1.1-3.fc37.x86_64                                                                          1/265
+  Running scriptlet: libgcc-12.1.1-3.fc37.x86_64                                                                          1/265
+  Installing       : tzdata-2022a-3.fc37.noarch                                                                           2/265
+  Installing       : fedora-release-identity-basic-37-0.7.noarch                                                          3/265
+  Installing       : xkeyboard-config-2.36-1.fc37.noarch                                                                  4/265
+  Installing       : whois-nls-5.5.13-1.fc37.noarch                                                                       5/265
+  Installing       : python-setuptools-wheel-62.6.0-1.fc37.noarch                                                         6/265
+  Installing       : publicsuffix-list-dafsa-20210518-4.fc36.noarch                                                       7/265
+  Installing       : pkgconf-m4-1.8.0-2.fc36.noarch                                                                       8/265
+  Installing       : pcre2-syntax-10.40-1.fc37.noarch                                                                     9/265
+  Installing       : ncurses-base-6.3-2.20220501.fc37.noarch                                                             10/265
+  Installing       : linux-firmware-whence-20220708-136.fc37.noarch                                                      11/265
+  Installing       : linux-firmware-20220708-136.fc37.noarch                                                             12/265
+  Installing       : libssh-config-0.9.6-4.fc36.noarch                                                                   13/265
+  Installing       : libreport-filesystem-2.17.1-2.fc37.noarch                                                           14/265
+  Installing       : dnf-data-4.13.0-2.fc37.noarch                                                                       15/265
+  Installing       : libX11-common-1.8.1-1.fc37.noarch                                                                   16/265
+  Installing       : kbd-misc-2.5.1-1.fc37.noarch                                                                        17/265
+  Installing       : gawk-all-langpacks-5.1.1-3.fc37.x86_64                                                              18/265
+  Installing       : fedora-gpg-keys-37-0.3.noarch                                                                       19/265
+  Installing       : fedora-release-37-0.7.noarch                                                                        20/265
+  Installing       : fedora-release-common-37-0.7.noarch                                                                 21/265
+  Installing       : fedora-repos-rawhide-37-0.3.noarch                                                                  22/265
+  Installing       : fedora-repos-37-0.3.noarch                                                                          23/265
+  Installing       : setup-2.13.10-1.fc37.noarch                                                                         24/265
+  Running scriptlet: setup-2.13.10-1.fc37.noarch                                                                         24/265
+  Installing       : filesystem-3.16-2.fc36.x86_64                                                                       25/265
+  Installing       : efi-filesystem-5-5.fc36.noarch                                                                      26/265
+  Installing       : basesystem-11-13.fc36.noarch                                                                        27/265
+  Installing       : glibc-gconv-extra-2.35.9000-29.fc37.x86_64                                                          28/265
+  Running scriptlet: glibc-gconv-extra-2.35.9000-29.fc37.x86_64                                                          28/265
+  Installing       : glibc-langpack-en-2.35.9000-29.fc37.x86_64                                                          29/265
+  Installing       : glibc-common-2.35.9000-29.fc37.x86_64                                                               30/265
+  Running scriptlet: glibc-2.35.9000-29.fc37.x86_64                                                                      31/265
+  Installing       : glibc-2.35.9000-29.fc37.x86_64                                                                      31/265
+  Running scriptlet: glibc-2.35.9000-29.fc37.x86_64                                                                      31/265
+  Installing       : ncurses-libs-6.3-2.20220501.fc37.x86_64                                                             32/265
+  Installing       : bash-5.1.16-2.fc36.x86_64                                                                           33/265
+  Running scriptlet: bash-5.1.16-2.fc36.x86_64                                                                           33/265
+  Installing       : zlib-1.2.12-3.fc37.x86_64                                                                           34/265
+  Installing       : xz-libs-5.2.5-9.fc37.x86_64                                                                         35/265
+  Installing       : libzstd-1.5.2-2.fc37.x86_64                                                                         36/265
+  Installing       : bzip2-libs-1.0.8-11.fc36.x86_64                                                                     37/265
+  Installing       : libxcrypt-4.4.28-1.fc37.x86_64                                                                      38/265
+  Installing       : mkpasswd-5.5.13-1.fc37.x86_64                                                                       39/265
+  Installing       : popt-1.19~rc1-2.fc37.x86_64                                                                         40/265
+  Installing       : libcap-2.48-4.fc36.x86_64                                                                           41/265
+  Installing       : sqlite-libs-3.39.1-1.fc37.x86_64                                                                    42/265
+  Installing       : libuuid-2.38-4.fc37.x86_64                                                                          43/265
+  Installing       : libblkid-2.38-4.fc37.x86_64                                                                         44/265
+  Installing       : libxml2-2.9.14-2.fc37.x86_64                                                                        45/265
+  Installing       : elfutils-libelf-0.187-5.fc37.x86_64                                                                 46/265
+  Installing       : libgpg-error-1.45-1.fc37.x86_64                                                                     47/265
+  Installing       : readline-8.1-6.fc36.x86_64                                                                          48/265
+  Installing       : file-libs-5.41-6.fc37.x86_64                                                                        49/265
+  Installing       : expat-2.4.8-1.fc37.x86_64                                                                           50/265
+  Installing       : gmp-1:6.2.1-2.fc36.x86_64                                                                           51/265
+  Installing       : libstdc++-12.1.1-3.fc37.x86_64                                                                      52/265
+  Installing       : libunistring-1.0-1.fc36.x86_64                                                                      53/265
+  Installing       : libidn2-2.3.3-1.fc37.x86_64                                                                         54/265
+  Installing       : lua-libs-5.4.4-2.fc37.x86_64                                                                        55/265
+  Installing       : libassuan-2.5.5-4.fc36.x86_64                                                                       56/265
+  Installing       : grub2-common-1:2.06-42.fc37.noarch                                                                  57/265
+  Installing       : libcom_err-1.46.5-2.fc36.x86_64                                                                     58/265
+  Installing       : libsmartcols-2.38-4.fc37.x86_64                                                                     59/265
+  Installing       : lz4-libs-1.9.3-4.fc36.x86_64                                                                        60/265
+  Installing       : systemd-libs-251.3-1.fc37.x86_64                                                                    61/265
+  Installing       : libgcrypt-1.10.1-3.fc37.x86_64                                                                      62/265
+  Installing       : libfdisk-2.38-4.fc37.x86_64                                                                         63/265
+  Installing       : alternatives-1.19-2.fc36.x86_64                                                                     64/265
+  Installing       : json-c-0.16-1.fc37.x86_64                                                                           65/265
+  Installing       : keyutils-libs-1.6.1-4.fc36.x86_64                                                                   66/265
+  Installing       : libattr-2.5.1-4.fc36.x86_64                                                                         67/265
+  Installing       : libacl-2.3.1-3.fc36.x86_64                                                                          68/265
+  Installing       : libcap-ng-0.8.3-2.fc37.x86_64                                                                       69/265
+  Installing       : audit-libs-3.0.8-2.fc37.x86_64                                                                      70/265
+  Installing       : libffi-3.4.2-8.fc36.x86_64                                                                          71/265
+  Installing       : p11-kit-0.24.1-2.fc36.x86_64                                                                        72/265
+  Installing       : libgomp-12.1.1-3.fc37.x86_64                                                                        73/265
+  Installing       : libnghttp2-1.48.0-1.fc37.x86_64                                                                     74/265
+  Installing       : pcre2-10.40-1.fc37.x86_64                                                                           75/265
+  Installing       : dbus-libs-1:1.14.0-2.fc37.x86_64                                                                    76/265
+  Installing       : libpsl-0.21.1-5.fc36.x86_64                                                                         77/265
+  Installing       : libksba-1.6.0-3.fc36.x86_64                                                                         78/265
+  Installing       : efivar-libs-38-3.fc37.x86_64                                                                        79/265
+  Installing       : gdbm-libs-1:1.23-1.fc37.x86_64                                                                      80/265
+  Installing       : libeconf-0.4.0-3.fc36.x86_64                                                                        81/265
+  Installing       : pam-libs-1.5.2-13.fc37.x86_64                                                                       82/265
+  Installing       : libsepol-3.4-2.fc37.x86_64                                                                          83/265
+  Installing       : libselinux-3.4-4.fc37.x86_64                                                                        84/265
+  Installing       : sed-4.8-10.fc36.x86_64                                                                              85/265
+  Installing       : libmount-2.38-4.fc37.x86_64                                                                         86/265
+  Installing       : util-linux-core-2.38-4.fc37.x86_64                                                                  87/265
+  Installing       : findutils-1:4.9.0-1.fc36.x86_64                                                                     88/265
+  Installing       : libtasn1-4.18.0-2.fc36.x86_64                                                                       89/265
+  Installing       : p11-kit-trust-0.24.1-2.fc36.x86_64                                                                  90/265
+  Running scriptlet: p11-kit-trust-0.24.1-2.fc36.x86_64                                                                  90/265
+  Installing       : libuv-1:1.44.2-1.fc37.x86_64                                                                        91/265
+  Installing       : npth-1.6-8.fc36.x86_64                                                                              92/265
+  Installing       : protobuf-c-1.4.0-5.fc37.x86_64                                                                      93/265
+  Installing       : unibilium-2.1.1-2.fc36.x86_64                                                                       94/265
+  Installing       : libtermkey-0.22-2.fc36.x86_64                                                                       95/265
+  Installing       : libsemanage-3.4-3.fc37.x86_64                                                                       96/265
+  Installing       : shadow-utils-2:4.11.1-2.fc37.x86_64                                                                 97/265
+  Running scriptlet: libutempter-1.2.1-6.fc36.x86_64                                                                     98/265
+  Installing       : libutempter-1.2.1-6.fc36.x86_64                                                                     98/265
+  Installing       : kbd-2.5.1-1.fc37.x86_64                                                                             99/265
+  Installing       : cyrus-sasl-lib-2.1.28-1.fc37.x86_64                                                                100/265
+  Installing       : libb2-0.98.1-6.fc37.x86_64                                                                         101/265
+  Installing       : gettext-libs-0.21-15.fc37.0.20220203.x86_64                                                        102/265
+  Installing       : gettext-0.21-15.fc37.0.20220203.x86_64                                                             103/265
+  Installing       : libusb1-1.0.25-8.fc37.x86_64                                                                       104/265
+  Installing       : procps-ng-3.3.17-5.fc37.x86_64                                                                     105/265
+  Installing       : e2fsprogs-libs-1.46.5-2.fc36.x86_64                                                                106/265
+  Installing       : mpdecimal-2.5.1-3.fc36.x86_64                                                                      107/265
+  Installing       : mpfr-4.1.0-9.fc36.x86_64                                                                           108/265
+  Installing       : nettle-3.8-1.fc37.x86_64                                                                           109/265
+  Installing       : libcomps-0.1.18-3.fc37.x86_64                                                                      110/265
+  Installing       : file-5.41-6.fc37.x86_64                                                                            111/265
+  Installing       : nano-6.3-1.fc37.x86_64                                                                             112/265
+  Installing       : nano-default-editor-6.3-1.fc37.noarch                                                              113/265
+  Installing       : libbpf-2:0.8.0-1.fc37.x86_64                                                                       114/265
+  Installing       : libxkbcommon-1.4.1-1.fc37.x86_64                                                                   115/265
+  Installing       : libxcrypt-compat-4.4.28-1.fc37.x86_64                                                              116/265
+  Installing       : pigz-2.7-1.fc37.x86_64                                                                             117/265
+  Installing       : dbus-common-1:1.14.0-2.fc37.noarch                                                                 118/265
+  Running scriptlet: dbus-common-1:1.14.0-2.fc37.noarch                                                                 118/265
+  Running scriptlet: dbus-broker-31-1.fc37.x86_64                                                                       119/265
+useradd warning: dbus's uid 81 outside of the SYS_UID_MIN 201 and SYS_UID_MAX 999 range.
+
+  Installing       : dbus-broker-31-1.fc37.x86_64                                                                       119/265
+  Running scriptlet: dbus-broker-31-1.fc37.x86_64                                                                       119/265
+  Installing       : dbus-1:1.14.0-2.fc37.x86_64                                                                        120/265
+  Installing       : memstrack-0.2.4-2.fc36.x86_64                                                                      121/265
+  Installing       : compat-lua-libs-5.1.5-20.fc36.x86_64                                                               122/265
+  Installing       : luajit2.1-luv-1.43.0.0-1.fc37.x86_64                                                               123/265
+  Installing       : cpio-2.13-12.fc36.x86_64                                                                           124/265
+  Installing       : diffutils-3.8-2.fc36.x86_64                                                                        125/265
+  Installing       : duktape-2.6.0-2.fc36.x86_64                                                                        126/265
+  Installing       : fuse-libs-2.9.9-14.fc36.x86_64                                                                     127/265
+  Installing       : libXau-1.0.9-8.fc36.x86_64                                                                         128/265
+  Installing       : libxcb-1.13.1-9.fc36.x86_64                                                                        129/265
+  Installing       : libX11-1.8.1-1.fc37.x86_64                                                                         130/265
+  Installing       : xsel-1.2.0-30.fc36.x86_64                                                                          131/265
+  Installing       : libargon2-20171227-9.fc37.x86_64                                                                   132/265
+  Installing       : libbrotli-1.0.9-8.fc37.x86_64                                                                      133/265
+  Installing       : libcbor-0.7.0-6.fc37.x86_64                                                                        134/265
+  Installing       : libdb-5.3.28-52.fc37.x86_64                                                                        135/265
+  Installing       : libndp-1.8-3.fc36.x86_64                                                                           136/265
+  Installing       : libpkgconf-1.8.0-2.fc36.x86_64                                                                     137/265
+  Installing       : pkgconf-1.8.0-2.fc36.x86_64                                                                        138/265
+  Installing       : pkgconf-pkg-config-1.8.0-2.fc36.x86_64                                                             139/265
+  Installing       : libseccomp-2.5.3-2.fc36.x86_64                                                                     140/265
+  Installing       : libsigsegv-2.14-2.fc36.x86_64                                                                      141/265
+  Installing       : gawk-5.1.1-3.fc37.x86_64                                                                           142/265
+  Installing       : libtree-sitter-0.20.6-1.fc37.x86_64                                                                143/265
+  Installing       : libverto-0.3.2-3.fc36.x86_64                                                                       144/265
+  Installing       : libvterm-0.2-3.fc37.x86_64                                                                         145/265
+  Installing       : libyaml-0.2.5-7.fc36.x86_64                                                                        146/265
+  Installing       : luajit-2.1.0-0.23beta3.fc36.x86_64                                                                 147/265
+  Installing       : lzo-2.10-6.fc36.x86_64                                                                             148/265
+  Installing       : msgpack-3.1.0-9.fc36.x86_64                                                                        149/265
+  Installing       : pcre-8.45-1.fc36.1.x86_64                                                                          150/265
+  Installing       : grep-3.7-2.fc36.x86_64                                                                             151/265
+  Installing       : xz-5.2.5-9.fc37.x86_64                                                                             152/265
+  Installing       : pcsc-lite-libs-1.9.8-1.fc37.x86_64                                                                 153/265
+  Installing       : qrencode-libs-4.1.1-2.fc36.x86_64                                                                  154/265
+  Installing       : coreutils-common-9.1-2.fc37.x86_64                                                                 155/265
+  Installing       : python-pip-wheel-22.0.4-4.fc37.noarch                                                              156/265
+  Installing       : python-unversioned-command-3.11.0~b4-1.fc37.noarch                                                 157/265
+  Installing       : python3-libs-3.11.0~b4-1.fc37.x86_64                                                               158/265
+  Installing       : python3-3.11.0~b4-1.fc37.x86_64                                                                    159/265
+  Installing       : libevent-2.1.12-6.fc36.x86_64                                                                      160/265
+  Installing       : grubby-8.40-61.fc37.x86_64                                                                         161/265
+  Running scriptlet: grubby-8.40-61.fc37.x86_64                                                                         161/265
+  Installing       : openldap-2.6.2-3.fc37.x86_64                                                                       162/265
+  Installing       : krb5-libs-1.19.2-11.fc37.x86_64                                                                    163/265
+  Installing       : libtirpc-1.3.2-1.rc1.fc36.1.x86_64                                                                 164/265
+  Installing       : libnsl2-2.0.0-3.fc36.x86_64                                                                        165/265
+  Installing       : libkcapi-1.3.1-4.fc36.x86_64                                                                       166/265
+  Installing       : libkcapi-hmaccalc-1.3.1-4.fc36.x86_64                                                              167/265
+  Installing       : libssh-0.9.6-4.fc36.x86_64                                                                         168/265
+  Installing       : crypto-policies-scripts-20220428-2.gitdfb10ea.fc37.noarch                                          169/265
+  Installing       : crypto-policies-20220428-2.gitdfb10ea.fc37.noarch                                                  170/265
+  Running scriptlet: crypto-policies-20220428-2.gitdfb10ea.fc37.noarch                                                  170/265
+  Installing       : cracklib-dicts-2.9.6-28.fc36.x86_64                                                                171/265
+  Installing       : cracklib-2.9.6-28.fc36.x86_64                                                                      172/265
+  Installing       : libpwquality-1.4.4-10.fc37.x86_64                                                                  173/265
+  Installing       : gzip-1.12-1.fc37.x86_64                                                                            174/265
+  Installing       : authselect-1.4.0-2.fc37.x86_64                                                                     175/265
+  Installing       : grub2-tools-minimal-1:2.06-42.fc37.x86_64                                                          176/265
+  Installing       : kpartx-0.9.0-1.fc37.x86_64                                                                         177/265
+  Installing       : device-mapper-1.02.175-8.fc37.x86_64                                                               178/265
+  Installing       : device-mapper-libs-1.02.175-8.fc37.x86_64                                                          179/265
+  Installing       : elfutils-default-yama-scope-0.187-5.fc37.noarch                                                    180/265
+  Running scriptlet: elfutils-default-yama-scope-0.187-5.fc37.noarch                                                    180/265
+  Installing       : elfutils-debuginfod-client-0.187-5.fc37.x86_64                                                     181/265
+  Installing       : elfutils-libs-0.187-5.fc37.x86_64                                                                  182/265
+  Installing       : libcurl-7.84.0-1.fc37.x86_64                                                                       183/265
+  Installing       : curl-7.84.0-1.fc37.x86_64                                                                          184/265
+  Installing       : openssl-pkcs11-0.4.11-8.fc36.x86_64                                                                185/265
+  Installing       : coreutils-9.1-2.fc37.x86_64                                                                        186/265
+  Running scriptlet: ca-certificates-2022.2.54-2.fc37.noarch                                                            187/265
+  Installing       : ca-certificates-2022.2.54-2.fc37.noarch                                                            187/265
+  Running scriptlet: ca-certificates-2022.2.54-2.fc37.noarch                                                            187/265
+  Installing       : openssl-libs-1:3.0.5-1.fc37.x86_64                                                                 188/265
+  Installing       : kmod-30-1.fc37.x86_64                                                                              189/265
+  Installing       : kmod-libs-30-1.fc37.x86_64                                                                         190/265
+  Installing       : pam-1.5.2-13.fc37.x86_64                                                                           191/265
+  Installing       : cryptsetup-libs-2.5.0~rc1-1.fc37.x86_64                                                            192/265
+  Running scriptlet: tpm2-tss-3.2.0-1.fc37.x86_64                                                                       193/265
+useradd warning: tss's uid 59 outside of the SYS_UID_MIN 201 and SYS_UID_MAX 999 range.
+
+  Installing       : tpm2-tss-3.2.0-1.fc37.x86_64                                                                       193/265
+  Installing       : libarchive-3.6.1-1.fc37.x86_64                                                                     194/265
+  Installing       : libfido2-1.11.0-2.fc37.x86_64                                                                      195/265
+  Installing       : rpm-libs-4.18.0-0.beta1.2.fc37.x86_64                                                              196/265
+  Running scriptlet: rpm-4.18.0-0.beta1.2.fc37.x86_64                                                                   197/265
+  Installing       : rpm-4.18.0-0.beta1.2.fc37.x86_64                                                                   197/265
+  Running scriptlet: authselect-libs-1.4.0-2.fc37.x86_64                                                                198/265
+  Installing       : authselect-libs-1.4.0-2.fc37.x86_64                                                                198/265
+  Installing       : util-linux-2.38-4.fc37.x86_64                                                                      199/265
+  Installing       : dracut-057-1.fc37.x86_64                                                                           200/265
+  Installing       : systemd-networkd-251.3-1.fc37.x86_64                                                               201/265
+  Running scriptlet: systemd-networkd-251.3-1.fc37.x86_64                                                               201/265
+  Installing       : systemd-pam-251.3-1.fc37.x86_64                                                                    202/265
+  Installing       : systemd-resolved-251.3-1.fc37.x86_64                                                               203/265
+  Running scriptlet: systemd-resolved-251.3-1.fc37.x86_64                                                               203/265
+  Installing       : systemd-251.3-1.fc37.x86_64                                                                        204/265
+  Running scriptlet: systemd-251.3-1.fc37.x86_64                                                                        204/265
+Creating group 'input' with GID 104.
+Creating group 'kvm' with GID 36.
+Creating group 'render' with GID 105.
+Creating group 'sgx' with GID 106.
+Creating group 'systemd-journal' with GID 190.
+Creating group 'systemd-network' with GID 192.
+Creating user 'systemd-network' (systemd Network Management) with UID 192 and GID 192.
+Creating group 'systemd-oom' with GID 999.
+Creating user 'systemd-oom' (systemd Userspace OOM Killer) with UID 999 and GID 999.
+Creating group 'systemd-resolve' with GID 193.
+Creating user 'systemd-resolve' (systemd Resolver) with UID 193 and GID 193.
+
+  Installing       : systemd-udev-251.3-1.fc37.x86_64                                                                   205/265
+  Running scriptlet: systemd-udev-251.3-1.fc37.x86_64                                                                   205/265
+Created symlink /etc/systemd/system/sysinit.target.wants/systemd-boot-update.service -> /usr/lib/systemd/system/systemd-boot-update.service.
+
+  Installing       : os-prober-1.77-9.fc36.x86_64                                                                       206/265
+  Running scriptlet: grub2-tools-1:2.06-42.fc37.x86_64                                                                  207/265
+  Installing       : grub2-tools-1:2.06-42.fc37.x86_64                                                                  207/265
+  Installing       : gnutls-3.7.6-4.fc37.x86_64                                                                         208/265
+  Installing       : glib2-2.73.2-2.fc37.x86_64                                                                         209/265
+  Installing       : polkit-libs-121-1.fc37.x86_64                                                                      210/265
+  Running scriptlet: polkit-121-1.fc37.x86_64                                                                           211/265
+  Installing       : polkit-121-1.fc37.x86_64                                                                           211/265
+  Running scriptlet: polkit-121-1.fc37.x86_64                                                                           211/265
+  Installing       : polkit-pkla-compat-0.1-21.fc36.x86_64                                                              212/265
+  Installing       : libmodulemd-2.14.0-3.fc37.x86_64                                                                   213/265
+  Installing       : kernel-core-5.19.0-0.rc7.53.fc37.x86_64                                                            214/265
+  Running scriptlet: kernel-core-5.19.0-0.rc7.53.fc37.x86_64                                                            214/265
+  Installing       : ima-evm-utils-1.4-5.fc36.x86_64                                                                    215/265
+  Installing       : libfsverity-1.4-7.fc36.x86_64                                                                      216/265
+  Installing       : zchunk-libs-1.2.2-1.fc37.x86_64                                                                    217/265
+  Installing       : libsolv-0.7.22-2.fc37.x86_64                                                                       218/265
+  Installing       : kernel-modules-5.19.0-0.rc7.53.fc37.x86_64                                                         219/265
+  Running scriptlet: kernel-modules-5.19.0-0.rc7.53.fc37.x86_64                                                         219/265
+  Installing       : pcsc-lite-ccid-1.5.0-1.fc36.x86_64                                                                 220/265
+  Running scriptlet: pcsc-lite-ccid-1.5.0-1.fc36.x86_64                                                                 220/265
+  Installing       : pcsc-lite-1.9.8-1.fc37.x86_64                                                                      221/265
+  Running scriptlet: pcsc-lite-1.9.8-1.fc37.x86_64                                                                      221/265
+Created symlink /etc/systemd/system/sockets.target.wants/pcscd.socket -> /usr/lib/systemd/system/pcscd.socket.
+
+  Installing       : NetworkManager-libnm-1:1.39.10-1.fc37.x86_64                                                       222/265
+  Installing       : libsecret-0.20.5-1.fc37.x86_64                                                                     223/265
+  Installing       : pinentry-1.2.0-2.fc36.x86_64                                                                       224/265
+  Installing       : gnupg2-smime-2.3.7-1.fc37.x86_64                                                                   225/265
+  Installing       : gnupg2-2.3.7-1.fc37.x86_64                                                                         226/265
+  Installing       : gpgme-1.17.0-3.fc37.x86_64                                                                         227/265
+  Installing       : librepo-1.14.3-2.fc37.x86_64                                                                       228/265
+  Installing       : libdnf-0.67.0-3.fc37.x86_64                                                                        229/265
+  Installing       : python3-libdnf-0.67.0-3.fc37.x86_64                                                                230/265
+  Installing       : python3-hawkey-0.67.0-3.fc37.x86_64                                                                231/265
+  Installing       : python3-gpg-1.17.0-3.fc37.x86_64                                                                   232/265
+  Installing       : rpm-sign-libs-4.18.0-0.beta1.2.fc37.x86_64                                                         233/265
+  Installing       : libuser-0.63-11.fc37.x86_64                                                                        234/265
+  Installing       : python3-dbus-1.2.18-4.fc37.x86_64                                                                  235/265
+  Installing       : grub2-efi-x64-1:2.06-42.fc37.x86_64                                                                236/265
+  Installing       : deltarpm-3.6.3-3.fc37.x86_64                                                                       237/265
+  Installing       : rpm-build-libs-4.18.0-0.beta1.2.fc37.x86_64                                                        238/265
+  Installing       : python3-rpm-4.18.0-0.beta1.2.fc37.x86_64                                                           239/265
+  Installing       : rpm-plugin-systemd-inhibit-4.18.0-0.beta1.2.fc37.x86_64                                            240/265
+  Installing       : sudo-python-plugin-1.9.11-3.p3.fc37.x86_64                                                         241/265
+  Installing       : sudo-1.9.11-3.p3.fc37.x86_64                                                                       242/265
+  Installing       : mokutil-2:0.6.0-4.fc37.x86_64                                                                      243/265
+  Running scriptlet: unbound-anchor-1.16.0-6.fc37.x86_64                                                                244/265
+  Installing       : unbound-anchor-1.16.0-6.fc37.x86_64                                                                244/265
+  Running scriptlet: unbound-anchor-1.16.0-6.fc37.x86_64                                                                244/265
+Created symlink /etc/systemd/system/timers.target.wants/unbound-anchor.timer -> /usr/lib/systemd/system/unbound-anchor.timer.
+
+  Installing       : unbound-libs-1.16.0-6.fc37.x86_64                                                                  245/265
+  Installing       : python3-unbound-1.16.0-6.fc37.x86_64                                                               246/265
+  Installing       : python3-libcomps-0.1.18-3.fc37.x86_64                                                              247/265
+  Installing       : python3-dnf-4.13.0-2.fc37.noarch                                                                   248/265
+  Installing       : python3-six-1.16.0-7.fc37.noarch                                                                   249/265
+  Installing       : python3-anytree-2.8.0-8.fc37.noarch                                                                250/265
+  Installing       : dnf-4.13.0-2.fc37.noarch                                                                           251/265
+  Running scriptlet: dnf-4.13.0-2.fc37.noarch                                                                           251/265
+Created symlink /etc/systemd/system/timers.target.wants/dnf-makecache.timer -> /usr/lib/systemd/system/dnf-makecache.timer.
+
+  Installing       : shim-x64-15.6-2.x86_64                                                                             252/265
+  Installing       : passwd-0.80-12.fc36.x86_64                                                                         253/265
+  Running scriptlet: NetworkManager-1:1.39.10-1.fc37.x86_64                                                             254/265
+  Installing       : NetworkManager-1:1.39.10-1.fc37.x86_64                                                             254/265
+  Running scriptlet: NetworkManager-1:1.39.10-1.fc37.x86_64                                                             254/265
+Created symlink /etc/systemd/system/multi-user.target.wants/NetworkManager.service -> /usr/lib/systemd/system/NetworkManager.service.
+Created symlink /etc/systemd/system/dbus-org.freedesktop.nm-dispatcher.service -> /usr/lib/systemd/system/NetworkManager-dispatcher.service.
+Created symlink /etc/systemd/system/network-online.target.wants/NetworkManager-wait-online.service -> /usr/lib/systemd/system/NetworkManager-wait-online.service.
+
+  Installing       : kernel-5.19.0-0.rc7.53.fc37.x86_64                                                                 255/265
+  Running scriptlet: dhcpcd-9.4.1-2.fc36.x86_64                                                                         256/265
+  Installing       : dhcpcd-9.4.1-2.fc36.x86_64                                                                         256/265
+  Running scriptlet: dhcpcd-9.4.1-2.fc36.x86_64                                                                         256/265
+  Installing       : which-2.21-33.fc37.x86_64                                                                          257/265
+  Installing       : tmux-3.2a-3.fc36.x86_64                                                                            258/265
+  Running scriptlet: tmux-3.2a-3.fc36.x86_64                                                                            258/265
+  Installing       : neovim-0.7.2-1.fc37.x86_64                                                                         259/265
+  Installing       : btrfs-progs-5.18-2.fc37.x86_64                                                                     260/265
+  Installing       : bash-completion-1:2.11-7.fc37.noarch                                                               261/265
+  Installing       : efibootmgr-18-1.fc37.x86_64                                                                        262/265
+  Installing       : grub2-efi-x64-modules-1:2.06-42.fc37.noarch                                                        263/265
+  Installing       : ncurses-6.3-2.20220501.fc37.x86_64                                                                 264/265
+  Installing       : glibc-locale-source-2.35.9000-29.fc37.x86_64                                                       265/265
+  Running scriptlet: filesystem-3.16-2.fc36.x86_64                                                                      265/265
+  Running scriptlet: grub2-common-1:2.06-42.fc37.noarch                                                                 265/265
+/usr/sbin/grub2-probe: error: cannot find a device for / (is /dev mounted?).
+warning: %posttrans(grub2-common-1:2.06-42.fc37.noarch) scriptlet failed, exit status 1
+
+Error in POSTTRANS scriptlet in rpm package grub2-common
+  Running scriptlet: crypto-policies-scripts-20220428-2.gitdfb10ea.fc37.noarch                                          265/265
+  Running scriptlet: ca-certificates-2022.2.54-2.fc37.noarch                                                            265/265
+  Running scriptlet: rpm-4.18.0-0.beta1.2.fc37.x86_64                                                                   265/265
+  Running scriptlet: authselect-libs-1.4.0-2.fc37.x86_64                                                                265/265
+  Running scriptlet: systemd-resolved-251.3-1.fc37.x86_64                                                               265/265
+'/etc/resolv.conf' -> '../run/systemd/resolve/stub-resolv.conf'
+
+  Running scriptlet: kernel-core-5.19.0-0.rc7.53.fc37.x86_64                                                            265/265
+/usr/lib/kernel/install.d/20-grub.install: line 96: /proc/cmdline: No such file or directory
+grub2-probe: error: cannot find a device for / (is /dev mounted?).
+No path or device is specified.
+Usage: grub2-probe [OPTION...] [OPTION]... [PATH|DEVICE]
+Try 'grub2-probe --help' or 'grub2-probe --usage' for more information.
+/usr/lib/kernel/install.d/50-dracut.install: line 41: /proc/cmdline: No such file or directory
+/bin/dracut: line 1054: /sys/module/firmware_class/parameters/path: No such file or directory
+findmnt: can't read /proc/mounts: No such file or directory
+libkmod: ERROR libkmod/libkmod-module.c:1725 kmod_module_new_from_loaded: could not open /proc/modules: No such file or directory
+dracut-install: Could not get list of loaded modules: Unknown error -2. Switching to non-hostonly mode.
+grep: /proc/cpuinfo: No such file or directory
+grep: /proc/cpuinfo: No such file or directory
+grep: /proc/cpuinfo: No such file or directory
+grep: /proc/cpuinfo: No such file or directory
+dracut: Disabling early microcode, because kernel does not support it. CONFIG_MICROCODE_[AMD|INTEL]!=y
+dracut: Turning off host-only mode: '/sys' is not mounted!
+dracut: Turning off host-only mode: '/proc' is not mounted!
+dracut: Turning off host-only mode: '/run' is not mounted!
+dracut: Turning off host-only mode: '/dev' is not mounted!
+/usr/lib/dracut/modules.d/00systemd/module-setup.sh: line 168: /dev/fd/63: No such file or directory
+
+  Running scriptlet: kernel-modules-5.19.0-0.rc7.53.fc37.x86_64                                                         265/265
+  Running scriptlet: glibc-locale-source-2.35.9000-29.fc37.x86_64                                                       265/265
+Creating group 'systemd-coredump' with GID 995.
+Creating user 'systemd-coredump' (systemd Core Dumper) with UID 995 and GID 995.
+Creating group 'systemd-timesync' with GID 994.
+Creating user 'systemd-timesync' (systemd Time Synchronization) with UID 994 and GID 994.
+
+  Verifying        : NetworkManager-1:1.39.10-1.fc37.x86_64                                                               1/265
+  Verifying        : NetworkManager-libnm-1:1.39.10-1.fc37.x86_64                                                         2/265
+  Verifying        : alternatives-1.19-2.fc36.x86_64                                                                      3/265
+  Verifying        : audit-libs-3.0.8-2.fc37.x86_64                                                                       4/265
+  Verifying        : authselect-1.4.0-2.fc37.x86_64                                                                       5/265
+  Verifying        : authselect-libs-1.4.0-2.fc37.x86_64                                                                  6/265
+  Verifying        : basesystem-11-13.fc36.noarch                                                                         7/265
+  Verifying        : bash-5.1.16-2.fc36.x86_64                                                                            8/265
+  Verifying        : bash-completion-1:2.11-7.fc37.noarch                                                                 9/265
+  Verifying        : btrfs-progs-5.18-2.fc37.x86_64                                                                      10/265
+  Verifying        : bzip2-libs-1.0.8-11.fc36.x86_64                                                                     11/265
+  Verifying        : ca-certificates-2022.2.54-2.fc37.noarch                                                             12/265
+  Verifying        : compat-lua-libs-5.1.5-20.fc36.x86_64                                                                13/265
+  Verifying        : coreutils-9.1-2.fc37.x86_64                                                                         14/265
+  Verifying        : coreutils-common-9.1-2.fc37.x86_64                                                                  15/265
+  Verifying        : cpio-2.13-12.fc36.x86_64                                                                            16/265
+  Verifying        : cracklib-2.9.6-28.fc36.x86_64                                                                       17/265
+  Verifying        : cracklib-dicts-2.9.6-28.fc36.x86_64                                                                 18/265
+  Verifying        : crypto-policies-20220428-2.gitdfb10ea.fc37.noarch                                                   19/265
+  Verifying        : crypto-policies-scripts-20220428-2.gitdfb10ea.fc37.noarch                                           20/265
+  Verifying        : cryptsetup-libs-2.5.0~rc1-1.fc37.x86_64                                                             21/265
+  Verifying        : curl-7.84.0-1.fc37.x86_64                                                                           22/265
+  Verifying        : cyrus-sasl-lib-2.1.28-1.fc37.x86_64                                                                 23/265
+  Verifying        : dbus-1:1.14.0-2.fc37.x86_64                                                                         24/265
+  Verifying        : dbus-broker-31-1.fc37.x86_64                                                                        25/265
+  Verifying        : dbus-common-1:1.14.0-2.fc37.noarch                                                                  26/265
+  Verifying        : dbus-libs-1:1.14.0-2.fc37.x86_64                                                                    27/265
+  Verifying        : deltarpm-3.6.3-3.fc37.x86_64                                                                        28/265
+  Verifying        : device-mapper-1.02.175-8.fc37.x86_64                                                                29/265
+  Verifying        : device-mapper-libs-1.02.175-8.fc37.x86_64                                                           30/265
+  Verifying        : dhcpcd-9.4.1-2.fc36.x86_64                                                                          31/265
+  Verifying        : diffutils-3.8-2.fc36.x86_64                                                                         32/265
+  Verifying        : dnf-4.13.0-2.fc37.noarch                                                                            33/265
+  Verifying        : dnf-data-4.13.0-2.fc37.noarch                                                                       34/265
+  Verifying        : dracut-057-1.fc37.x86_64                                                                            35/265
+  Verifying        : duktape-2.6.0-2.fc36.x86_64                                                                         36/265
+  Verifying        : e2fsprogs-libs-1.46.5-2.fc36.x86_64                                                                 37/265
+  Verifying        : efi-filesystem-5-5.fc36.noarch                                                                      38/265
+  Verifying        : efibootmgr-18-1.fc37.x86_64                                                                         39/265
+  Verifying        : efivar-libs-38-3.fc37.x86_64                                                                        40/265
+  Verifying        : elfutils-debuginfod-client-0.187-5.fc37.x86_64                                                      41/265
+  Verifying        : elfutils-default-yama-scope-0.187-5.fc37.noarch                                                     42/265
+  Verifying        : elfutils-libelf-0.187-5.fc37.x86_64                                                                 43/265
+  Verifying        : elfutils-libs-0.187-5.fc37.x86_64                                                                   44/265
+  Verifying        : expat-2.4.8-1.fc37.x86_64                                                                           45/265
+  Verifying        : fedora-gpg-keys-37-0.3.noarch                                                                       46/265
+  Verifying        : fedora-release-37-0.7.noarch                                                                        47/265
+  Verifying        : fedora-release-common-37-0.7.noarch                                                                 48/265
+  Verifying        : fedora-release-identity-basic-37-0.7.noarch                                                         49/265
+  Verifying        : fedora-repos-37-0.3.noarch                                                                          50/265
+  Verifying        : fedora-repos-rawhide-37-0.3.noarch                                                                  51/265
+  Verifying        : file-5.41-6.fc37.x86_64                                                                             52/265
+  Verifying        : file-libs-5.41-6.fc37.x86_64                                                                        53/265
+  Verifying        : filesystem-3.16-2.fc36.x86_64                                                                       54/265
+  Verifying        : findutils-1:4.9.0-1.fc36.x86_64                                                                     55/265
+  Verifying        : fuse-libs-2.9.9-14.fc36.x86_64                                                                      56/265
+  Verifying        : gawk-5.1.1-3.fc37.x86_64                                                                            57/265
+  Verifying        : gawk-all-langpacks-5.1.1-3.fc37.x86_64                                                              58/265
+  Verifying        : gdbm-libs-1:1.23-1.fc37.x86_64                                                                      59/265
+  Verifying        : gettext-0.21-15.fc37.0.20220203.x86_64                                                              60/265
+  Verifying        : gettext-libs-0.21-15.fc37.0.20220203.x86_64                                                         61/265
+  Verifying        : glib2-2.73.2-2.fc37.x86_64                                                                          62/265
+  Verifying        : glibc-2.35.9000-29.fc37.x86_64                                                                      63/265
+  Verifying        : glibc-common-2.35.9000-29.fc37.x86_64                                                               64/265
+  Verifying        : glibc-gconv-extra-2.35.9000-29.fc37.x86_64                                                          65/265
+  Verifying        : glibc-langpack-en-2.35.9000-29.fc37.x86_64                                                          66/265
+  Verifying        : glibc-locale-source-2.35.9000-29.fc37.x86_64                                                        67/265
+  Verifying        : gmp-1:6.2.1-2.fc36.x86_64                                                                           68/265
+  Verifying        : gnupg2-2.3.7-1.fc37.x86_64                                                                          69/265
+  Verifying        : gnupg2-smime-2.3.7-1.fc37.x86_64                                                                    70/265
+  Verifying        : gnutls-3.7.6-4.fc37.x86_64                                                                          71/265
+  Verifying        : gpgme-1.17.0-3.fc37.x86_64                                                                          72/265
+  Verifying        : grep-3.7-2.fc36.x86_64                                                                              73/265
+  Verifying        : grub2-common-1:2.06-42.fc37.noarch                                                                  74/265
+  Verifying        : grub2-efi-x64-1:2.06-42.fc37.x86_64                                                                 75/265
+  Verifying        : grub2-efi-x64-modules-1:2.06-42.fc37.noarch                                                         76/265
+  Verifying        : grub2-tools-1:2.06-42.fc37.x86_64                                                                   77/265
+  Verifying        : grub2-tools-minimal-1:2.06-42.fc37.x86_64                                                           78/265
+  Verifying        : grubby-8.40-61.fc37.x86_64                                                                          79/265
+  Verifying        : gzip-1.12-1.fc37.x86_64                                                                             80/265
+  Verifying        : ima-evm-utils-1.4-5.fc36.x86_64                                                                     81/265
+  Verifying        : json-c-0.16-1.fc37.x86_64                                                                           82/265
+  Verifying        : kbd-2.5.1-1.fc37.x86_64                                                                             83/265
+  Verifying        : kbd-misc-2.5.1-1.fc37.noarch                                                                        84/265
+  Verifying        : kernel-5.19.0-0.rc7.53.fc37.x86_64                                                                  85/265
+  Verifying        : kernel-core-5.19.0-0.rc7.53.fc37.x86_64                                                             86/265
+  Verifying        : kernel-modules-5.19.0-0.rc7.53.fc37.x86_64                                                          87/265
+  Verifying        : keyutils-libs-1.6.1-4.fc36.x86_64                                                                   88/265
+  Verifying        : kmod-30-1.fc37.x86_64                                                                               89/265
+  Verifying        : kmod-libs-30-1.fc37.x86_64                                                                          90/265
+  Verifying        : kpartx-0.9.0-1.fc37.x86_64                                                                          91/265
+  Verifying        : krb5-libs-1.19.2-11.fc37.x86_64                                                                     92/265
+  Verifying        : libX11-1.8.1-1.fc37.x86_64                                                                          93/265
+  Verifying        : libX11-common-1.8.1-1.fc37.noarch                                                                   94/265
+  Verifying        : libXau-1.0.9-8.fc36.x86_64                                                                          95/265
+  Verifying        : libacl-2.3.1-3.fc36.x86_64                                                                          96/265
+  Verifying        : libarchive-3.6.1-1.fc37.x86_64                                                                      97/265
+  Verifying        : libargon2-20171227-9.fc37.x86_64                                                                    98/265
+  Verifying        : libassuan-2.5.5-4.fc36.x86_64                                                                       99/265
+  Verifying        : libattr-2.5.1-4.fc36.x86_64                                                                        100/265
+  Verifying        : libb2-0.98.1-6.fc37.x86_64                                                                         101/265
+  Verifying        : libblkid-2.38-4.fc37.x86_64                                                                        102/265
+  Verifying        : libbpf-2:0.8.0-1.fc37.x86_64                                                                       103/265
+  Verifying        : libbrotli-1.0.9-8.fc37.x86_64                                                                      104/265
+  Verifying        : libcap-2.48-4.fc36.x86_64                                                                          105/265
+  Verifying        : libcap-ng-0.8.3-2.fc37.x86_64                                                                      106/265
+  Verifying        : libcbor-0.7.0-6.fc37.x86_64                                                                        107/265
+  Verifying        : libcom_err-1.46.5-2.fc36.x86_64                                                                    108/265
+  Verifying        : libcomps-0.1.18-3.fc37.x86_64                                                                      109/265
+  Verifying        : libcurl-7.84.0-1.fc37.x86_64                                                                       110/265
+  Verifying        : libdb-5.3.28-52.fc37.x86_64                                                                        111/265
+  Verifying        : libdnf-0.67.0-3.fc37.x86_64                                                                        112/265
+  Verifying        : libeconf-0.4.0-3.fc36.x86_64                                                                       113/265
+  Verifying        : libevent-2.1.12-6.fc36.x86_64                                                                      114/265
+  Verifying        : libfdisk-2.38-4.fc37.x86_64                                                                        115/265
+  Verifying        : libffi-3.4.2-8.fc36.x86_64                                                                         116/265
+  Verifying        : libfido2-1.11.0-2.fc37.x86_64                                                                      117/265
+  Verifying        : libfsverity-1.4-7.fc36.x86_64                                                                      118/265
+  Verifying        : libgcc-12.1.1-3.fc37.x86_64                                                                        119/265
+  Verifying        : libgcrypt-1.10.1-3.fc37.x86_64                                                                     120/265
+  Verifying        : libgomp-12.1.1-3.fc37.x86_64                                                                       121/265
+  Verifying        : libgpg-error-1.45-1.fc37.x86_64                                                                    122/265
+  Verifying        : libidn2-2.3.3-1.fc37.x86_64                                                                        123/265
+  Verifying        : libkcapi-1.3.1-4.fc36.x86_64                                                                       124/265
+  Verifying        : libkcapi-hmaccalc-1.3.1-4.fc36.x86_64                                                              125/265
+  Verifying        : libksba-1.6.0-3.fc36.x86_64                                                                        126/265
+  Verifying        : libmodulemd-2.14.0-3.fc37.x86_64                                                                   127/265
+  Verifying        : libmount-2.38-4.fc37.x86_64                                                                        128/265
+  Verifying        : libndp-1.8-3.fc36.x86_64                                                                           129/265
+  Verifying        : libnghttp2-1.48.0-1.fc37.x86_64                                                                    130/265
+  Verifying        : libnsl2-2.0.0-3.fc36.x86_64                                                                        131/265
+  Verifying        : libpkgconf-1.8.0-2.fc36.x86_64                                                                     132/265
+  Verifying        : libpsl-0.21.1-5.fc36.x86_64                                                                        133/265
+  Verifying        : libpwquality-1.4.4-10.fc37.x86_64                                                                  134/265
+  Verifying        : librepo-1.14.3-2.fc37.x86_64                                                                       135/265
+  Verifying        : libreport-filesystem-2.17.1-2.fc37.noarch                                                          136/265
+  Verifying        : libseccomp-2.5.3-2.fc36.x86_64                                                                     137/265
+  Verifying        : libsecret-0.20.5-1.fc37.x86_64                                                                     138/265
+  Verifying        : libselinux-3.4-4.fc37.x86_64                                                                       139/265
+  Verifying        : libsemanage-3.4-3.fc37.x86_64                                                                      140/265
+  Verifying        : libsepol-3.4-2.fc37.x86_64                                                                         141/265
+  Verifying        : libsigsegv-2.14-2.fc36.x86_64                                                                      142/265
+  Verifying        : libsmartcols-2.38-4.fc37.x86_64                                                                    143/265
+  Verifying        : libsolv-0.7.22-2.fc37.x86_64                                                                       144/265
+  Verifying        : libssh-0.9.6-4.fc36.x86_64                                                                         145/265
+  Verifying        : libssh-config-0.9.6-4.fc36.noarch                                                                  146/265
+  Verifying        : libstdc++-12.1.1-3.fc37.x86_64                                                                     147/265
+  Verifying        : libtasn1-4.18.0-2.fc36.x86_64                                                                      148/265
+  Verifying        : libtermkey-0.22-2.fc36.x86_64                                                                      149/265
+  Verifying        : libtirpc-1.3.2-1.rc1.fc36.1.x86_64                                                                 150/265
+  Verifying        : libtree-sitter-0.20.6-1.fc37.x86_64                                                                151/265
+  Verifying        : libunistring-1.0-1.fc36.x86_64                                                                     152/265
+  Verifying        : libusb1-1.0.25-8.fc37.x86_64                                                                       153/265
+  Verifying        : libuser-0.63-11.fc37.x86_64                                                                        154/265
+  Verifying        : libutempter-1.2.1-6.fc36.x86_64                                                                    155/265
+  Verifying        : libuuid-2.38-4.fc37.x86_64                                                                         156/265
+  Verifying        : libuv-1:1.44.2-1.fc37.x86_64                                                                       157/265
+  Verifying        : libverto-0.3.2-3.fc36.x86_64                                                                       158/265
+  Verifying        : libvterm-0.2-3.fc37.x86_64                                                                         159/265
+  Verifying        : libxcb-1.13.1-9.fc36.x86_64                                                                        160/265
+  Verifying        : libxcrypt-4.4.28-1.fc37.x86_64                                                                     161/265
+  Verifying        : libxcrypt-compat-4.4.28-1.fc37.x86_64                                                              162/265
+  Verifying        : libxkbcommon-1.4.1-1.fc37.x86_64                                                                   163/265
+  Verifying        : libxml2-2.9.14-2.fc37.x86_64                                                                       164/265
+  Verifying        : libyaml-0.2.5-7.fc36.x86_64                                                                        165/265
+  Verifying        : libzstd-1.5.2-2.fc37.x86_64                                                                        166/265
+  Verifying        : linux-firmware-20220708-136.fc37.noarch                                                            167/265
+  Verifying        : linux-firmware-whence-20220708-136.fc37.noarch                                                     168/265
+  Verifying        : lua-libs-5.4.4-2.fc37.x86_64                                                                       169/265
+  Verifying        : luajit-2.1.0-0.23beta3.fc36.x86_64                                                                 170/265
+  Verifying        : luajit2.1-luv-1.43.0.0-1.fc37.x86_64                                                               171/265
+  Verifying        : lz4-libs-1.9.3-4.fc36.x86_64                                                                       172/265
+  Verifying        : lzo-2.10-6.fc36.x86_64                                                                             173/265
+  Verifying        : memstrack-0.2.4-2.fc36.x86_64                                                                      174/265
+  Verifying        : mkpasswd-5.5.13-1.fc37.x86_64                                                                      175/265
+  Verifying        : mokutil-2:0.6.0-4.fc37.x86_64                                                                      176/265
+  Verifying        : mpdecimal-2.5.1-3.fc36.x86_64                                                                      177/265
+  Verifying        : mpfr-4.1.0-9.fc36.x86_64                                                                           178/265
+  Verifying        : msgpack-3.1.0-9.fc36.x86_64                                                                        179/265
+  Verifying        : nano-6.3-1.fc37.x86_64                                                                             180/265
+  Verifying        : nano-default-editor-6.3-1.fc37.noarch                                                              181/265
+  Verifying        : ncurses-6.3-2.20220501.fc37.x86_64                                                                 182/265
+  Verifying        : ncurses-base-6.3-2.20220501.fc37.noarch                                                            183/265
+  Verifying        : ncurses-libs-6.3-2.20220501.fc37.x86_64                                                            184/265
+  Verifying        : neovim-0.7.2-1.fc37.x86_64                                                                         185/265
+  Verifying        : nettle-3.8-1.fc37.x86_64                                                                           186/265
+  Verifying        : npth-1.6-8.fc36.x86_64                                                                             187/265
+  Verifying        : openldap-2.6.2-3.fc37.x86_64                                                                       188/265
+  Verifying        : openssl-libs-1:3.0.5-1.fc37.x86_64                                                                 189/265
+  Verifying        : openssl-pkcs11-0.4.11-8.fc36.x86_64                                                                190/265
+  Verifying        : os-prober-1.77-9.fc36.x86_64                                                                       191/265
+  Verifying        : p11-kit-0.24.1-2.fc36.x86_64                                                                       192/265
+  Verifying        : p11-kit-trust-0.24.1-2.fc36.x86_64                                                                 193/265
+  Verifying        : pam-1.5.2-13.fc37.x86_64                                                                           194/265
+  Verifying        : pam-libs-1.5.2-13.fc37.x86_64                                                                      195/265
+  Verifying        : passwd-0.80-12.fc36.x86_64                                                                         196/265
+  Verifying        : pcre-8.45-1.fc36.1.x86_64                                                                          197/265
+  Verifying        : pcre2-10.40-1.fc37.x86_64                                                                          198/265
+  Verifying        : pcre2-syntax-10.40-1.fc37.noarch                                                                   199/265
+  Verifying        : pcsc-lite-1.9.8-1.fc37.x86_64                                                                      200/265
+  Verifying        : pcsc-lite-ccid-1.5.0-1.fc36.x86_64                                                                 201/265
+  Verifying        : pcsc-lite-libs-1.9.8-1.fc37.x86_64                                                                 202/265
+  Verifying        : pigz-2.7-1.fc37.x86_64                                                                             203/265
+  Verifying        : pinentry-1.2.0-2.fc36.x86_64                                                                       204/265
+  Verifying        : pkgconf-1.8.0-2.fc36.x86_64                                                                        205/265
+  Verifying        : pkgconf-m4-1.8.0-2.fc36.noarch                                                                     206/265
+  Verifying        : pkgconf-pkg-config-1.8.0-2.fc36.x86_64                                                             207/265
+  Verifying        : polkit-121-1.fc37.x86_64                                                                           208/265
+  Verifying        : polkit-libs-121-1.fc37.x86_64                                                                      209/265
+  Verifying        : polkit-pkla-compat-0.1-21.fc36.x86_64                                                              210/265
+  Verifying        : popt-1.19~rc1-2.fc37.x86_64                                                                        211/265
+  Verifying        : procps-ng-3.3.17-5.fc37.x86_64                                                                     212/265
+  Verifying        : protobuf-c-1.4.0-5.fc37.x86_64                                                                     213/265
+  Verifying        : publicsuffix-list-dafsa-20210518-4.fc36.noarch                                                     214/265
+  Verifying        : python-pip-wheel-22.0.4-4.fc37.noarch                                                              215/265
+  Verifying        : python-setuptools-wheel-62.6.0-1.fc37.noarch                                                       216/265
+  Verifying        : python-unversioned-command-3.11.0~b4-1.fc37.noarch                                                 217/265
+  Verifying        : python3-3.11.0~b4-1.fc37.x86_64                                                                    218/265
+  Verifying        : python3-anytree-2.8.0-8.fc37.noarch                                                                219/265
+  Verifying        : python3-dbus-1.2.18-4.fc37.x86_64                                                                  220/265
+  Verifying        : python3-dnf-4.13.0-2.fc37.noarch                                                                   221/265
+  Verifying        : python3-gpg-1.17.0-3.fc37.x86_64                                                                   222/265
+  Verifying        : python3-hawkey-0.67.0-3.fc37.x86_64                                                                223/265
+  Verifying        : python3-libcomps-0.1.18-3.fc37.x86_64                                                              224/265
+  Verifying        : python3-libdnf-0.67.0-3.fc37.x86_64                                                                225/265
+  Verifying        : python3-libs-3.11.0~b4-1.fc37.x86_64                                                               226/265
+  Verifying        : python3-rpm-4.18.0-0.beta1.2.fc37.x86_64                                                           227/265
+  Verifying        : python3-six-1.16.0-7.fc37.noarch                                                                   228/265
+  Verifying        : python3-unbound-1.16.0-6.fc37.x86_64                                                               229/265
+  Verifying        : qrencode-libs-4.1.1-2.fc36.x86_64                                                                  230/265
+  Verifying        : readline-8.1-6.fc36.x86_64                                                                         231/265
+  Verifying        : rpm-4.18.0-0.beta1.2.fc37.x86_64                                                                   232/265
+  Verifying        : rpm-build-libs-4.18.0-0.beta1.2.fc37.x86_64                                                        233/265
+  Verifying        : rpm-libs-4.18.0-0.beta1.2.fc37.x86_64                                                              234/265
+  Verifying        : rpm-plugin-systemd-inhibit-4.18.0-0.beta1.2.fc37.x86_64                                            235/265
+  Verifying        : rpm-sign-libs-4.18.0-0.beta1.2.fc37.x86_64                                                         236/265
+  Verifying        : sed-4.8-10.fc36.x86_64                                                                             237/265
+  Verifying        : setup-2.13.10-1.fc37.noarch                                                                        238/265
+  Verifying        : shadow-utils-2:4.11.1-2.fc37.x86_64                                                                239/265
+  Verifying        : shim-x64-15.6-2.x86_64                                                                             240/265
+  Verifying        : sqlite-libs-3.39.1-1.fc37.x86_64                                                                   241/265
+  Verifying        : sudo-1.9.11-3.p3.fc37.x86_64                                                                       242/265
+  Verifying        : sudo-python-plugin-1.9.11-3.p3.fc37.x86_64                                                         243/265
+  Verifying        : systemd-251.3-1.fc37.x86_64                                                                        244/265
+  Verifying        : systemd-libs-251.3-1.fc37.x86_64                                                                   245/265
+  Verifying        : systemd-networkd-251.3-1.fc37.x86_64                                                               246/265
+  Verifying        : systemd-pam-251.3-1.fc37.x86_64                                                                    247/265
+  Verifying        : systemd-resolved-251.3-1.fc37.x86_64                                                               248/265
+  Verifying        : systemd-udev-251.3-1.fc37.x86_64                                                                   249/265
+  Verifying        : tmux-3.2a-3.fc36.x86_64                                                                            250/265
+  Verifying        : tpm2-tss-3.2.0-1.fc37.x86_64                                                                       251/265
+  Verifying        : tzdata-2022a-3.fc37.noarch                                                                         252/265
+  Verifying        : unbound-anchor-1.16.0-6.fc37.x86_64                                                                253/265
+  Verifying        : unbound-libs-1.16.0-6.fc37.x86_64                                                                  254/265
+  Verifying        : unibilium-2.1.1-2.fc36.x86_64                                                                      255/265
+  Verifying        : util-linux-2.38-4.fc37.x86_64                                                                      256/265
+  Verifying        : util-linux-core-2.38-4.fc37.x86_64                                                                 257/265
+  Verifying        : which-2.21-33.fc37.x86_64                                                                          258/265
+  Verifying        : whois-nls-5.5.13-1.fc37.noarch                                                                     259/265
+  Verifying        : xkeyboard-config-2.36-1.fc37.noarch                                                                260/265
+  Verifying        : xsel-1.2.0-30.fc36.x86_64                                                                          261/265
+  Verifying        : xz-5.2.5-9.fc37.x86_64                                                                             262/265
+  Verifying        : xz-libs-5.2.5-9.fc37.x86_64                                                                        263/265
+  Verifying        : zchunk-libs-1.2.2-1.fc37.x86_64                                                                    264/265
+  Verifying        : zlib-1.2.12-3.fc37.x86_64                                                                          265/265
+
+Installed:
+  NetworkManager-1:1.39.10-1.fc37.x86_64                        NetworkManager-libnm-1:1.39.10-1.fc37.x86_64
+  alternatives-1.19-2.fc36.x86_64                               audit-libs-3.0.8-2.fc37.x86_64
+  authselect-1.4.0-2.fc37.x86_64                                authselect-libs-1.4.0-2.fc37.x86_64
+  basesystem-11-13.fc36.noarch                                  bash-5.1.16-2.fc36.x86_64
+  bash-completion-1:2.11-7.fc37.noarch                          btrfs-progs-5.18-2.fc37.x86_64
+  bzip2-libs-1.0.8-11.fc36.x86_64                               ca-certificates-2022.2.54-2.fc37.noarch
+  compat-lua-libs-5.1.5-20.fc36.x86_64                          coreutils-9.1-2.fc37.x86_64
+  coreutils-common-9.1-2.fc37.x86_64                            cpio-2.13-12.fc36.x86_64
+  cracklib-2.9.6-28.fc36.x86_64                                 cracklib-dicts-2.9.6-28.fc36.x86_64
+  crypto-policies-20220428-2.gitdfb10ea.fc37.noarch             crypto-policies-scripts-20220428-2.gitdfb10ea.fc37.noarch
+  cryptsetup-libs-2.5.0~rc1-1.fc37.x86_64                       curl-7.84.0-1.fc37.x86_64
+  cyrus-sasl-lib-2.1.28-1.fc37.x86_64                           dbus-1:1.14.0-2.fc37.x86_64
+  dbus-broker-31-1.fc37.x86_64                                  dbus-common-1:1.14.0-2.fc37.noarch
+  dbus-libs-1:1.14.0-2.fc37.x86_64                              deltarpm-3.6.3-3.fc37.x86_64
+  device-mapper-1.02.175-8.fc37.x86_64                          device-mapper-libs-1.02.175-8.fc37.x86_64
+  dhcpcd-9.4.1-2.fc36.x86_64                                    diffutils-3.8-2.fc36.x86_64
+  dnf-4.13.0-2.fc37.noarch                                      dnf-data-4.13.0-2.fc37.noarch
+  dracut-057-1.fc37.x86_64                                      duktape-2.6.0-2.fc36.x86_64
+  e2fsprogs-libs-1.46.5-2.fc36.x86_64                           efi-filesystem-5-5.fc36.noarch
+  efibootmgr-18-1.fc37.x86_64                                   efivar-libs-38-3.fc37.x86_64
+  elfutils-debuginfod-client-0.187-5.fc37.x86_64                elfutils-default-yama-scope-0.187-5.fc37.noarch
+  elfutils-libelf-0.187-5.fc37.x86_64                           elfutils-libs-0.187-5.fc37.x86_64
+  expat-2.4.8-1.fc37.x86_64                                     fedora-gpg-keys-37-0.3.noarch
+  fedora-release-37-0.7.noarch                                  fedora-release-common-37-0.7.noarch
+  fedora-release-identity-basic-37-0.7.noarch                   fedora-repos-37-0.3.noarch
+  fedora-repos-rawhide-37-0.3.noarch                            file-5.41-6.fc37.x86_64
+  file-libs-5.41-6.fc37.x86_64                                  filesystem-3.16-2.fc36.x86_64
+  findutils-1:4.9.0-1.fc36.x86_64                               fuse-libs-2.9.9-14.fc36.x86_64
+  gawk-5.1.1-3.fc37.x86_64                                      gawk-all-langpacks-5.1.1-3.fc37.x86_64
+  gdbm-libs-1:1.23-1.fc37.x86_64                                gettext-0.21-15.fc37.0.20220203.x86_64
+  gettext-libs-0.21-15.fc37.0.20220203.x86_64                   glib2-2.73.2-2.fc37.x86_64
+  glibc-2.35.9000-29.fc37.x86_64                                glibc-common-2.35.9000-29.fc37.x86_64
+  glibc-gconv-extra-2.35.9000-29.fc37.x86_64                    glibc-langpack-en-2.35.9000-29.fc37.x86_64
+  glibc-locale-source-2.35.9000-29.fc37.x86_64                  gmp-1:6.2.1-2.fc36.x86_64
+  gnupg2-2.3.7-1.fc37.x86_64                                    gnupg2-smime-2.3.7-1.fc37.x86_64
+  gnutls-3.7.6-4.fc37.x86_64                                    gpgme-1.17.0-3.fc37.x86_64
+  grep-3.7-2.fc36.x86_64                                        grub2-common-1:2.06-42.fc37.noarch
+  grub2-efi-x64-1:2.06-42.fc37.x86_64                           grub2-efi-x64-modules-1:2.06-42.fc37.noarch
+  grub2-tools-1:2.06-42.fc37.x86_64                             grub2-tools-minimal-1:2.06-42.fc37.x86_64
+  grubby-8.40-61.fc37.x86_64                                    gzip-1.12-1.fc37.x86_64
+  ima-evm-utils-1.4-5.fc36.x86_64                               json-c-0.16-1.fc37.x86_64
+  kbd-2.5.1-1.fc37.x86_64                                       kbd-misc-2.5.1-1.fc37.noarch
+  kernel-5.19.0-0.rc7.53.fc37.x86_64                            kernel-core-5.19.0-0.rc7.53.fc37.x86_64
+  kernel-modules-5.19.0-0.rc7.53.fc37.x86_64                    keyutils-libs-1.6.1-4.fc36.x86_64
+  kmod-30-1.fc37.x86_64                                         kmod-libs-30-1.fc37.x86_64
+  kpartx-0.9.0-1.fc37.x86_64                                    krb5-libs-1.19.2-11.fc37.x86_64
+  libX11-1.8.1-1.fc37.x86_64                                    libX11-common-1.8.1-1.fc37.noarch
+  libXau-1.0.9-8.fc36.x86_64                                    libacl-2.3.1-3.fc36.x86_64
+  libarchive-3.6.1-1.fc37.x86_64                                libargon2-20171227-9.fc37.x86_64
+  libassuan-2.5.5-4.fc36.x86_64                                 libattr-2.5.1-4.fc36.x86_64
+  libb2-0.98.1-6.fc37.x86_64                                    libblkid-2.38-4.fc37.x86_64
+  libbpf-2:0.8.0-1.fc37.x86_64                                  libbrotli-1.0.9-8.fc37.x86_64
+  libcap-2.48-4.fc36.x86_64                                     libcap-ng-0.8.3-2.fc37.x86_64
+  libcbor-0.7.0-6.fc37.x86_64                                   libcom_err-1.46.5-2.fc36.x86_64
+  libcomps-0.1.18-3.fc37.x86_64                                 libcurl-7.84.0-1.fc37.x86_64
+  libdb-5.3.28-52.fc37.x86_64                                   libdnf-0.67.0-3.fc37.x86_64
+  libeconf-0.4.0-3.fc36.x86_64                                  libevent-2.1.12-6.fc36.x86_64
+  libfdisk-2.38-4.fc37.x86_64                                   libffi-3.4.2-8.fc36.x86_64
+  libfido2-1.11.0-2.fc37.x86_64                                 libfsverity-1.4-7.fc36.x86_64
+  libgcc-12.1.1-3.fc37.x86_64                                   libgcrypt-1.10.1-3.fc37.x86_64
+  libgomp-12.1.1-3.fc37.x86_64                                  libgpg-error-1.45-1.fc37.x86_64
+  libidn2-2.3.3-1.fc37.x86_64                                   libkcapi-1.3.1-4.fc36.x86_64
+  libkcapi-hmaccalc-1.3.1-4.fc36.x86_64                         libksba-1.6.0-3.fc36.x86_64
+  libmodulemd-2.14.0-3.fc37.x86_64                              libmount-2.38-4.fc37.x86_64
+  libndp-1.8-3.fc36.x86_64                                      libnghttp2-1.48.0-1.fc37.x86_64
+  libnsl2-2.0.0-3.fc36.x86_64                                   libpkgconf-1.8.0-2.fc36.x86_64
+  libpsl-0.21.1-5.fc36.x86_64                                   libpwquality-1.4.4-10.fc37.x86_64
+  librepo-1.14.3-2.fc37.x86_64                                  libreport-filesystem-2.17.1-2.fc37.noarch
+  libseccomp-2.5.3-2.fc36.x86_64                                libsecret-0.20.5-1.fc37.x86_64
+  libselinux-3.4-4.fc37.x86_64                                  libsemanage-3.4-3.fc37.x86_64
+  libsepol-3.4-2.fc37.x86_64                                    libsigsegv-2.14-2.fc36.x86_64
+  libsmartcols-2.38-4.fc37.x86_64                               libsolv-0.7.22-2.fc37.x86_64
+  libssh-0.9.6-4.fc36.x86_64                                    libssh-config-0.9.6-4.fc36.noarch
+  libstdc++-12.1.1-3.fc37.x86_64                                libtasn1-4.18.0-2.fc36.x86_64
+  libtermkey-0.22-2.fc36.x86_64                                 libtirpc-1.3.2-1.rc1.fc36.1.x86_64
+  libtree-sitter-0.20.6-1.fc37.x86_64                           libunistring-1.0-1.fc36.x86_64
+  libusb1-1.0.25-8.fc37.x86_64                                  libuser-0.63-11.fc37.x86_64
+  libutempter-1.2.1-6.fc36.x86_64                               libuuid-2.38-4.fc37.x86_64
+  libuv-1:1.44.2-1.fc37.x86_64                                  libverto-0.3.2-3.fc36.x86_64
+  libvterm-0.2-3.fc37.x86_64                                    libxcb-1.13.1-9.fc36.x86_64
+  libxcrypt-4.4.28-1.fc37.x86_64                                libxcrypt-compat-4.4.28-1.fc37.x86_64
+  libxkbcommon-1.4.1-1.fc37.x86_64                              libxml2-2.9.14-2.fc37.x86_64
+  libyaml-0.2.5-7.fc36.x86_64                                   libzstd-1.5.2-2.fc37.x86_64
+  linux-firmware-20220708-136.fc37.noarch                       linux-firmware-whence-20220708-136.fc37.noarch
+  lua-libs-5.4.4-2.fc37.x86_64                                  luajit-2.1.0-0.23beta3.fc36.x86_64
+  luajit2.1-luv-1.43.0.0-1.fc37.x86_64                          lz4-libs-1.9.3-4.fc36.x86_64
+  lzo-2.10-6.fc36.x86_64                                        memstrack-0.2.4-2.fc36.x86_64
+  mkpasswd-5.5.13-1.fc37.x86_64                                 mokutil-2:0.6.0-4.fc37.x86_64
+  mpdecimal-2.5.1-3.fc36.x86_64                                 mpfr-4.1.0-9.fc36.x86_64
+  msgpack-3.1.0-9.fc36.x86_64                                   nano-6.3-1.fc37.x86_64
+  nano-default-editor-6.3-1.fc37.noarch                         ncurses-6.3-2.20220501.fc37.x86_64
+  ncurses-base-6.3-2.20220501.fc37.noarch                       ncurses-libs-6.3-2.20220501.fc37.x86_64
+  neovim-0.7.2-1.fc37.x86_64                                    nettle-3.8-1.fc37.x86_64
+  npth-1.6-8.fc36.x86_64                                        openldap-2.6.2-3.fc37.x86_64
+  openssl-libs-1:3.0.5-1.fc37.x86_64                            openssl-pkcs11-0.4.11-8.fc36.x86_64
+  os-prober-1.77-9.fc36.x86_64                                  p11-kit-0.24.1-2.fc36.x86_64
+  p11-kit-trust-0.24.1-2.fc36.x86_64                            pam-1.5.2-13.fc37.x86_64
+  pam-libs-1.5.2-13.fc37.x86_64                                 passwd-0.80-12.fc36.x86_64
+  pcre-8.45-1.fc36.1.x86_64                                     pcre2-10.40-1.fc37.x86_64
+  pcre2-syntax-10.40-1.fc37.noarch                              pcsc-lite-1.9.8-1.fc37.x86_64
+  pcsc-lite-ccid-1.5.0-1.fc36.x86_64                            pcsc-lite-libs-1.9.8-1.fc37.x86_64
+  pigz-2.7-1.fc37.x86_64                                        pinentry-1.2.0-2.fc36.x86_64
+  pkgconf-1.8.0-2.fc36.x86_64                                   pkgconf-m4-1.8.0-2.fc36.noarch
+  pkgconf-pkg-config-1.8.0-2.fc36.x86_64                        polkit-121-1.fc37.x86_64
+  polkit-libs-121-1.fc37.x86_64                                 polkit-pkla-compat-0.1-21.fc36.x86_64
+  popt-1.19~rc1-2.fc37.x86_64                                   procps-ng-3.3.17-5.fc37.x86_64
+  protobuf-c-1.4.0-5.fc37.x86_64                                publicsuffix-list-dafsa-20210518-4.fc36.noarch
+  python-pip-wheel-22.0.4-4.fc37.noarch                         python-setuptools-wheel-62.6.0-1.fc37.noarch
+  python-unversioned-command-3.11.0~b4-1.fc37.noarch            python3-3.11.0~b4-1.fc37.x86_64
+  python3-anytree-2.8.0-8.fc37.noarch                           python3-dbus-1.2.18-4.fc37.x86_64
+  python3-dnf-4.13.0-2.fc37.noarch                              python3-gpg-1.17.0-3.fc37.x86_64
+  python3-hawkey-0.67.0-3.fc37.x86_64                           python3-libcomps-0.1.18-3.fc37.x86_64
+  python3-libdnf-0.67.0-3.fc37.x86_64                           python3-libs-3.11.0~b4-1.fc37.x86_64
+  python3-rpm-4.18.0-0.beta1.2.fc37.x86_64                      python3-six-1.16.0-7.fc37.noarch
+  python3-unbound-1.16.0-6.fc37.x86_64                          qrencode-libs-4.1.1-2.fc36.x86_64
+  readline-8.1-6.fc36.x86_64                                    rpm-4.18.0-0.beta1.2.fc37.x86_64
+  rpm-build-libs-4.18.0-0.beta1.2.fc37.x86_64                   rpm-libs-4.18.0-0.beta1.2.fc37.x86_64
+  rpm-plugin-systemd-inhibit-4.18.0-0.beta1.2.fc37.x86_64       rpm-sign-libs-4.18.0-0.beta1.2.fc37.x86_64
+  sed-4.8-10.fc36.x86_64                                        setup-2.13.10-1.fc37.noarch
+  shadow-utils-2:4.11.1-2.fc37.x86_64                           shim-x64-15.6-2.x86_64
+  sqlite-libs-3.39.1-1.fc37.x86_64                              sudo-1.9.11-3.p3.fc37.x86_64
+  sudo-python-plugin-1.9.11-3.p3.fc37.x86_64                    systemd-251.3-1.fc37.x86_64
+  systemd-libs-251.3-1.fc37.x86_64                              systemd-networkd-251.3-1.fc37.x86_64
+  systemd-pam-251.3-1.fc37.x86_64                               systemd-resolved-251.3-1.fc37.x86_64
+  systemd-udev-251.3-1.fc37.x86_64                              tmux-3.2a-3.fc36.x86_64
+  tpm2-tss-3.2.0-1.fc37.x86_64                                  tzdata-2022a-3.fc37.noarch
+  unbound-anchor-1.16.0-6.fc37.x86_64                           unbound-libs-1.16.0-6.fc37.x86_64
+  unibilium-2.1.1-2.fc36.x86_64                                 util-linux-2.38-4.fc37.x86_64
+  util-linux-core-2.38-4.fc37.x86_64                            which-2.21-33.fc37.x86_64
+  whois-nls-5.5.13-1.fc37.noarch                                xkeyboard-config-2.36-1.fc37.noarch
+  xsel-1.2.0-30.fc36.x86_64                                     xz-5.2.5-9.fc37.x86_64
+  xz-libs-5.2.5-9.fc37.x86_64                                   zchunk-libs-1.2.2-1.fc37.x86_64
+  zlib-1.2.12-3.fc37.x86_64
+
+Complete!
+bp1 > any systemd rpmdb services? maybe!
+Fedora rawhide openh264 (From Cisco) - x86_64                                                   1.8 kB/s | 2.5 kB     00:01
+Fedora - Rawhide - Developmental packages for the next Fedora release                           8.7 MB/s |  69 MB     00:07
+Package efibootmgr-18-1.fc37.x86_64 is already installed.
+Package grub2-efi-x64-1:2.06-42.fc37.x86_64 is already installed.
+Dependencies resolved.
+Nothing to do.
+Complete!
+cp: '/etc/resolv.conf' and '/mnt/etc/resolv.conf' are the same file
+bp2 > before yum.conf
+releasever=rawhide
+bp3 > after yum?
+UUID="0f939dc0-23f0-42f4-abaf-4b9ff760d665" / btrfs subvol=@_fedora,compress=zstd,noatime,ro 0 0
+UUID="0f939dc0-23f0-42f4-abaf-4b9ff760d665" / btrfs subvol=@_fedora,compress=zstd,noatime 0 0
+UUID="0f939dc0-23f0-42f4-abaf-4b9ff760d665" /.snapshots btrfs subvol=@.snapshots_fedora,compress=zstd,noatime 0 0
+UUID="0f939dc0-23f0-42f4-abaf-4b9ff760d665" /boot btrfs subvol=@boot_fedora,compress=zstd,noatime 0 0
+UUID="0f939dc0-23f0-42f4-abaf-4b9ff760d665" /etc btrfs subvol=@etc_fedora,compress=zstd,noatime 0 0
+UUID="0f939dc0-23f0-42f4-abaf-4b9ff760d665" /home btrfs subvol=@home_fedora,compress=zstd,noatime 0 0
+UUID="0f939dc0-23f0-42f4-abaf-4b9ff760d665" /var btrfs subvol=@var_fedora,compress=zstd,noatime 0 0
+UUID="85A4-59FC" /boot/efi vfat umask=0077 0 2
+/.snapshots/ast/root /root none bind 0 0
+/.snapshots/ast/tmp /tmp none bind 0 0
+0
+persistdir=/usr/share/ast/db/dnf
+fedclean2
+127.0.0.1 fedclean2
+[warning] LC_NAME: field `name_gen' not defined
+[warning] LC_IDENTIFICATION: field `audience' not defined
+[warning] LC_IDENTIFICATION: field `application' not defined
+[warning] LC_IDENTIFICATION: field `abbreviation' not defined
+[verbose] LC_CTYPE: table for class "upper": 18446744073709551615 bytes
+[verbose] LC_CTYPE: table for class "lower": 18446744073709551615 bytes
+[verbose] LC_CTYPE: table for class "alpha": 18446744073709551615 bytes
+[verbose] LC_CTYPE: table for class "digit": 18446744073709551615 bytes
+[verbose] LC_CTYPE: table for class "xdigit": 18446744073709551615 bytes
+[verbose] LC_CTYPE: table for class "space": 18446744073709551615 bytes
+[verbose] LC_CTYPE: table for class "print": 18446744073709551615 bytes
+[verbose] LC_CTYPE: table for class "graph": 2284922602003 bytes
+[verbose] LC_CTYPE: table for class "blank": 2357937046052 bytes
+[verbose] LC_CTYPE: table for class "cntrl": 2448131359289 bytes
+[verbose] LC_CTYPE: table for class "punct": 18446744073709551615 bytes
+[verbose] LC_CTYPE: table for class "alnum": 18446744073709551615 bytes
+[verbose] LC_CTYPE: table for class "combining": 18446744073709551615 bytes
+[verbose] LC_CTYPE: table for class "combining_level3": 18446744073709551615 bytes
+[verbose] LC_CTYPE: table for map "toupper": 16777523 bytes
+[verbose] LC_CTYPE: table for map "tolower": 0 bytes
+[verbose] LC_CTYPE: table for map "totitle": 0 bytes
+[verbose] LC_CTYPE: table for width: 0 bytes
+LANG=en_US.UTF-8
+0f939dc0-23f0-42f4-abaf-4b9ff760d665
+{'name': 'root', 'children': [{'name': '0'}]}
+Setting a password for 'root':
+Changing password for user root.
+New password:
+BAD PASSWORD: The password is a palindrome
+Retype new password:
+passwd: all authentication tokens updated successfully.
+Was your password set properly (y/n)?
+> y
+Enter username (all lowercase, max 8 letters)
+> me
+Happy with your username (y/n)?
+> y
+%wheel ALL=(ALL:ALL) ALL
+export XDG_RUNTIME_DIR="/run/user/1000"
+Setting a password for 'me':
+Changing password for user me.
+New password:
+BAD PASSWORD: The password is a palindrome
+Retype new password:
+passwd: all authentication tokens updated successfully.
+Was your password set properly (y/n)?
+> y
+Removed "/etc/systemd/system/basic.target.wants/rpmdb-migrate.service".
+grep: /mnt/etc/default/grub: No such file or directory
+GRUB_ENABLE_BLSCFG=false
+bp888 > any good grub.cfg in boot/grub2 ?
+Generating grub configuration file ...
+Found linux image: /boot/vmlinuz-5.19.0-0.rc7.53.fc37.x86_64
+Found initrd image: /boot/initramfs-5.19.0-0.rc7.53.fc37.x86_64.img
+Adding boot menu entry for UEFI Firmware Settings ...
+done
+DISTRO,BootOrder
+BootCurrent: 0001
+Timeout: 0 seconds
+BootOrder: 0004,0000,0001,0003,0002
+Boot0000* UiApp
+Boot0001* UEFI VBOX CD-ROM VB2-01700376
+Boot0002* UEFI VBOX HARDDISK VBd84c6635-8859033f
+Boot0003* EFI Internal Shell
+Boot0004* Fedora
+fedora, 0004
+Create a readonly snapshot of '/mnt' in '/mnt/.snapshots/rootfs/snapshot-0'
+Create subvolume '/mnt/.snapshots/boot/boot-tmp'
+Create subvolume '/mnt/.snapshots/etc/etc-tmp'
+Create a readonly snapshot of '/mnt/.snapshots/boot/boot-tmp' in '/mnt/.snapshots/boot/boot-0'
+Create a readonly snapshot of '/mnt/.snapshots/etc/etc-tmp' in '/mnt/.snapshots/etc/etc-0'
+Create a snapshot of '/mnt/.snapshots/rootfs/snapshot-0' in '/mnt/.snapshots/rootfs/snapshot-tmp'
+Delete subvolume (no-commit): '/mnt/@_fedora'
+Installation complete
+You can reboot now :)
+python3 init.py /dev/sda2 /dev/sda /dev/sda1  150.09s user 78.79s system 25% cpu 14:47.47 total
+root has logged on pts/1 from tmux(1010).
+root has logged on pts/2 from tmux(1010).
+root@archiso ~/ashos-dev (git)-[debian] #
+
+
