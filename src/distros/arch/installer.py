@@ -141,15 +141,15 @@ def main(args, distro):
         if excode != 0:
             print("Failed to download packages!")
             sys.exit()
-    if efi: # Mount-points needed for chrooting
-        #os.system("sudo mount -o x-mount.mkdir --rbind /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars")
-        os.system("sudo mount -o x-mount.mkdir --types efivarfs efivarfs /mnt/sys/firmware/efi/efivars")
     input("bp1")
     os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /dev /mnt/dev")
     os.system("sudo mount -o x-mount.mkdir --types proc /proc /mnt/proc")
     os.system("sudo mount -o x-mount.mkdir --bind --make-slave /run /mnt/run")
     os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /sys /mnt/sys")
     os.system("sudo cp --dereference /etc/resolv.conf /mnt/etc/")
+    if efi: # Mount-points needed for chrooting
+        #os.system("sudo mount -o x-mount.mkdir --rbind /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars")
+        os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars")
 
 #   Create fstab
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee -a /mnt/etc/fstab")
