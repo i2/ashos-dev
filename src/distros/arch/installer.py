@@ -142,7 +142,9 @@ def main(args, distro):
             print("Failed to download packages!")
             sys.exit()
     if efi: # Mount-points needed for chrooting
+        #os.system("sudo mount -o x-mount.mkdir --rbind /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars")
         os.system("sudo mount -o x-mount.mkdir --types efivarfs efivarfs /mnt/sys/firmware/efi/efivars")
+    input("bp1")
     os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /dev /mnt/dev")
     os.system("sudo mount -o x-mount.mkdir --types proc /proc /mnt/proc")
     os.system("sudo mount -o x-mount.mkdir --bind --make-slave /run /mnt/run")
@@ -236,7 +238,7 @@ def main(args, distro):
     input("bp1")
     os.system("sudo umount /mnt/boot")
     input("bp2")
-    os.system(f"sudo mount {args[1]} -o subvol=@boot{distro_suffix},compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp") ### IS this mnt point empty?
+    os.system(f"sudo mount {args[1]} -o subvol=@boot{distro_suffix},compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp")
     input("bp3")
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-tmp/. /mnt/boot/")
     input("bp4")
@@ -251,10 +253,14 @@ def main(args, distro):
     input("bp8")
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/. /mnt/.snapshots/rootfs/snapshot-tmp/etc/")
 
+    input("bp9")
 #   Unmount everything and finish
     os.system("sudo umount -R /mnt")
+    input("bp10")
     os.system(f"sudo mount {args[1]} -o subvolid=0 /mnt")
+    input("bp11")
     os.system(f"sudo btrfs sub del /mnt/@{distro_suffix}")
+    input("bp12")
     os.system("sudo umount -R /mnt")
     clear()
     print("Installation complete")
