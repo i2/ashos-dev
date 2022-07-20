@@ -72,9 +72,9 @@ def get_username():
                 continue
     return username
 
-def create_user(u):
-    os.system(f"sudo chroot /mnt /usr/sbin/useradd -m -G sudo -s /bin/bash {u}")
-    os.system("echo '%sudo ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
+def create_user(u, g):
+    os.system(f"sudo chroot /mnt /usr/sbin/useradd -m -G {g} -s /bin/bash {u}")
+    os.system(f"echo '%{g} ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /mnt/home/{u}/.bashrc")
 
 def set_password(u):
@@ -91,22 +91,22 @@ def set_password(u):
 
 def main(args, distro):
     print("Welcome to the AshOS installer!\n\n\n\n\n")
-    choice, distro_suffix = get_multiboot(distro)
 
 #   Define variables
     ARCH = "amd64"
     RELEASE = "sid"
-    astpart = to_uuid(args[1])
+    packages = f"linux-image-{ARCH} firmware-linux-nonfree python3 python3-anytree btrfs-progs network-manager locales sudo nano tmux dhcpcd5" # os-prober
+    choice, distro_suffix = get_multiboot(distro)
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
-    packages = f"linux-image-{ARCH} firmware-linux-nonfree python3 python3-anytree btrfs-progs network-manager locales sudo nano tmux dhcpcd5" # os-prober
+    envsupath = "ENV_SUPATH	PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    envpath = "ENV_PATH	PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games"
+    tz = get_timezone()
+    hostname = get_hostname()
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
         efi = False
-
-    tz = get_timezone()
-    hostname = get_hostname()
 
 #   Prep (format partition, etc.)
     os.system(f"sudo sed -i 's/[^ ]*[^ ]/{RELEASE}/3' /etc/apt/sources.list")
@@ -198,7 +198,7 @@ def main(args, distro):
 
 #   Copy and symlink astpk and detect_os.sh
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
-    os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
+    os.system(f"echo '{to_uuid(args[1])}' | sudo tee /mnt/.snapshots/ast/part")
     os.system(f"sudo cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
     os.system("sudo cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
     os.system("sudo chroot /mnt ln -s /.snapshots/ast/ast /usr/bin/ast")
@@ -209,7 +209,7 @@ def main(args, distro):
 #   Create user and set password
     set_password("root")
     username = get_username()
-    create_user(username)
+    create_user(username, "sudo")
     set_password(username)
 
 #   Systemd
@@ -218,7 +218,7 @@ def main(args, distro):
 #   GRUB and EFI
     os.system(f"sudo chroot /mnt grub-install {args[2]}")
     os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
-    os.system("sudo mkdir -p /mnt/boot/grub/BAK/") # Folder for backing up grub configs created by astpk
+    os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
     os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
     # Create a mapping of "distro" <=> "BootOrder number". Ash reads from this file to switch between distros.
     if efi:
@@ -235,7 +235,7 @@ def main(args, distro):
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-0")
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-0")
     os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
-    os.system("sudo chroot /mnt /usr/bin/btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
+    os.system("sudo chroot /mnt btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
     os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/")
     os.system("sudo cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")
     os.system("sudo rm -rf /mnt/root/*")

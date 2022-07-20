@@ -108,3 +108,10 @@
 # Bad idea to combine --make-[r]slave and --[r]bind ? https://unix.stackexchange.com/questions/120827/recursive-umount-after-rbind-mount
 
 --------------------------------------------------------------------
+
+
+    for i in ("/dev", "/dev/pts", "/proc", "/run", "/sys"): # Mount-points needed for chrooting
+        os.system(f"sudo mount -o x-mount.mkdir --bind {i} /mnt{i}")
+    if efi:
+        os.system("sudo mount -o x-mount.mkdir -t efivarfs none /mnt/sys/firmware/efi/efivars")
+    os.system("sudo cp --dereference /etc/resolv.conf /mnt/etc/") ### REVIEW_LATER
