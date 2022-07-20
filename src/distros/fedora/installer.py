@@ -138,16 +138,8 @@ def main(args, distro):
 #   Bootstrap then install anytree and necessary packages in chroot
 #################
     input("bp0 > any systemd rpmdb services? I don't think so!") # NOPE!
-    excode = int(os.system(f"sudo dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install -y {packages} --releasever={RELEASE} --forcearch={ARCH}")) ### TEST IF IT WORKS HERE!
-    if excode != 0:
-        print("Failed to febootstrap!")
-        sys.exit()
-#################
-    input("bp1 > any systemd rpmdb services? maybe!") #YES there is service in /mnt/usr/lib/systemd/system/rpmXYZ not sure if it's active yet (it exists under /mnt/etc/systemd/system/basic-tafrget/rpm-migrateXYZ yet) /mnt/usr/lib/sysimage/rpm/XYZ files are symlinked to /var/lib/rpm/XYZ files
-    if efi:
-        os.system("sudo dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install -y efibootmgr grub2-efi-x64") #addeed grub2-efi-x64 as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?  # grub2-common already installed at this point
-    os.system(f"sudo sed -i '/^[#?]ENV_SUPATH/ s|^#*|ENV_SUPATH PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin   #|' /mnt/etc/login.defs")
-    os.system(f'sudo sed -i "/^[#?]ENV_PATH/ s|^#*|ENV_PATH	PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games   #|" /mnt/etc/login.defs')
+###    os.system(f"sudo sed -i '/^[#?]ENV_SUPATH/ s|^#*|ENV_SUPATH PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin   #|' /mnt/etc/login.defs")
+###    os.system(f'sudo sed -i "/^[#?]ENV_PATH/ s|^#*|ENV_PATH	PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games   #|" /mnt/etc/login.defs')
     # Mount-points needed for chrooting
     os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /dev /mnt/dev")
     os.system("sudo mount -o x-mount.mkdir --types proc /proc /mnt/proc")
@@ -156,6 +148,14 @@ def main(args, distro):
     if efi:
         os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars")
     os.system("sudo cp --dereference /etc/resolv.conf /mnt/etc/") ### Not needed for Fedora and can be removed. as it says they are same file. Somewhere before this step, it already does that for us.
+    excode = int(os.system(f"sudo dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install -y {packages} --releasever={RELEASE} --forcearch={ARCH}")) ### TEST IF IT WORKS HERE!
+    if excode != 0:
+        print("Failed to febootstrap!")
+        sys.exit()
+#################
+    input("bp1 > any systemd rpmdb services? maybe!") #YES there is service in /mnt/usr/lib/systemd/system/rpmXYZ not sure if it's active yet (it exists under /mnt/etc/systemd/system/basic-tafrget/rpm-migrateXYZ yet) /mnt/usr/lib/sysimage/rpm/XYZ files are symlinked to /var/lib/rpm/XYZ files
+    if efi:
+        os.system("sudo dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install -y efibootmgr grub2-efi-x64") #addeed grub2-efi-x64 as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?  # grub2-common already installed at this point
 ### MOVED UP    if efi:
 ### MOVED UP        os.system("sudo chroot /mnt dnf install -y efibootmgr grub2-efi-x64") #addeed grub2-efi-x64 as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?  # grub2-common already installed at this point
 ### MOVED UP    os.system(f"sudo chroot /mnt dnf install -y {packages} --releasever={RELEASE}") ######## 'systemd' can be removed from packages list as it gets installed using some other package?!

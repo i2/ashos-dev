@@ -55,7 +55,7 @@ def get_timezone():
         elif os.path.isfile(f"/usr/share/zoneinfo/{zone}"):
             return str(f"/usr/share/zoneinfo/{zone}")
         else:
-            print("Invalid Timezone!")
+            print("Invalid timezone!")
             continue
 
 def get_username():
@@ -73,7 +73,6 @@ def get_username():
     return username
 
 def create_user(u, g):
-    ###os.system(f"sudo chroot /mnt /usr/sbin/useradd -m -G {g} -s /bin/bash {u}")
     os.system(f"sudo chroot /mnt sudo useradd -m -G {g} -s /bin/bash {u}")
     os.system(f"echo '%{g} ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /mnt/home/{u}/.bashrc")
@@ -82,7 +81,6 @@ def set_password(u):
     clear()
     while True:
         print(f"Setting a password for '{u}':")
-        ###os.system(f"sudo chroot /mnt passwd {u}")
         os.system(f"sudo chroot /mnt sudo passwd {u}")
         print("Was your password set properly (y/n)?")
         reply = input("> ")
@@ -100,8 +98,6 @@ def main(args, distro):
     choice, distro_suffix = get_multiboot(distro)
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
-    #envsupath = "ENV_SUPATH	PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-    #envpath = "ENV_PATH	PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games"
     tz = get_timezone()
     hostname = get_hostname()
     if os.path.exists("/sys/firmware/efi"):
@@ -134,8 +130,6 @@ def main(args, distro):
         os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
 #   Bootstrap then install anytree and necessary packages in chroot
-    #os.system(f"sudo sed -i '/^ENV_SUPATH/ s,^#*,ENV_SUPATH	PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin   #,' /mnt/etc/login.defs")
-    #os.system(f'sudo sed -i "/^ENV_PATH/ s,^#*,ENV_PATH	PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games   #," /mnt/etc/login.defs')
     excode = int(os.system(f"sudo pacstrap /mnt {packages}"))
     if excode != 0:
         print("Failed to download packages!")
@@ -178,25 +172,18 @@ def main(args, distro):
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
     os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
     os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /mnt/etc/locale.gen")
-###    os.system("sudo chroot /mnt locale-gen")
     os.system("sudo chroot /mnt locale-gen")
     os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
-###    os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
     os.system(f"sudo ln -srf /mnt{tz} /mnt/etc/localtime")
-###    os.system("sudo chroot /mnt /usr/sbin/hwclock --systohc")
     os.system("sudo chroot /mnt sudo hwclock --systohc")
-
 
 #   Copy and symlink astpk and detect_os.sh
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
     os.system(f"echo '{to_uuid(args[1])}' | sudo tee /mnt/.snapshots/ast/part")
     os.system(f"sudo cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
     os.system("sudo cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
-    ###os.system("sudo chroot /mnt ln -s /.snapshots/ast/ast /usr/bin/ast")
     os.system("sudo ln -srf /mnt/.snapshots/ast/ast /mnt/usr/bin/ast")
-    ###os.system("sudo chroot /mnt ln -s /.snapshots/ast/detect_os.sh /usr/bin/detect_os.sh")
     os.system("sudo ln -srf /mnt/.snapshots/ast/detect_os.sh /mnt/usr/bin/detect_os.sh")
-    ###os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
     os.system("sudo ln -srf /mnt/.snapshots/ast /mnt/var/lib/ast")
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree") # Initialize fstree
 
