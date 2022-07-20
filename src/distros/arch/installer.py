@@ -97,7 +97,8 @@ def main(args, distro):
     astpart = to_uuid(args[1])
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
-    packages = "base linux linux-firmware nano python3 python-anytree bash dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo tmux os-prober"
+    #packages = "base linux linux-firmware nano python3 python-anytree bash dhcpcd arch-install-scripts btrfs-progs networkmanager grub sudo tmux os-prober"
+    packages = "base linux nano btrfs-progs grub sudo"
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
