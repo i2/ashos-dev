@@ -110,7 +110,7 @@ def main(args, distro):
         efi = False
 
 #   Prep (format partition, etc.)
-    os.system(f'echo "deb http://archive.ubuntu.com/ubuntu {RELEASE} main restricted" | tee /etc/apt/sources.list')
+    os.system(f'echo "deb http://archive.ubuntu.com/ubuntu {RELEASE} main restricted" | sudo tee /etc/apt/sources.list')
     os.system("sudo apt-get clean && sudo apt-get -y update && sudo apt-get -y check")
     os.system("sudo apt-get -y install --fix-broken btrfs-progs ntp efibootmgr")
     if choice != "3":
