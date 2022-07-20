@@ -134,8 +134,6 @@ def main(args, distro):
         os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
 #   Bootstrap then install anytree and necessary packages in chroot
-    os.system(f"sudo sed -i '/^ENV_SUPATH/ s,^#*,ENV_SUPATH	PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin   #,' /mnt/etc/login.defs")
-    os.system(f'sudo sed -i "/^ENV_PATH/ s,^#*,ENV_PATH	PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games   #," /mnt/etc/login.defs')
 #################
     input("bp0 > any systemd rpmdb services? I don't think so!")
     excode = int(os.system(f"sudo dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install -y {packages} --releasever={RELEASE} --forcearch={ARCH}")) ### TEST IF IT WORKS HERE!
@@ -146,6 +144,8 @@ def main(args, distro):
     input("bp1 > any systemd rpmdb services? maybe!")
     if efi:
         os.system("sudo dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install -y efibootmgr grub2-efi-x64") #addeed grub2-efi-x64 as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?  # grub2-common already installed at this point
+    os.system(f"sudo sed -i '/^ENV_SUPATH/ s,^#*,ENV_SUPATH	PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin   #,' /mnt/etc/login.defs")
+    os.system(f'sudo sed -i "/^ENV_PATH/ s,^#*,ENV_PATH	PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games   #," /mnt/etc/login.defs')
     # Mount-points needed for chrooting
     os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /dev /mnt/dev")
     os.system("sudo mount -o x-mount.mkdir --types proc /proc /mnt/proc")
