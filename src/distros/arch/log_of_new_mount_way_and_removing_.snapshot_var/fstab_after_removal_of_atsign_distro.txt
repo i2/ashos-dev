@@ -1,0 +1,11 @@
+# <file system> <dir> <type> <options> <dump> <pass>
+UUID="baa46445-43a5-43fe-bc19-2711d382b2a4" / btrfs subvol=@.snapshots_arch/rootfs/snapshot-tmp,compress=zstd,noatime,ro 0 0
+UUID="baa46445-43a5-43fe-bc19-2711d382b2a4" /.snapshots btrfs subvol=@.snapshots_arch,compress=zstd,noatime 0 0
+UUID="baa46445-43a5-43fe-bc19-2711d382b2a4" /boot btrfs subvol=@.snapshots_arch/boot/boot-tmp,compress=zstd,noatime 0 0
+UUID="baa46445-43a5-43fe-bc19-2711d382b2a4" /etc btrfs subvol=@.snapshots_arch/etc/etc-tmp,compress=zstd,noatime 0 0
+UUID="baa46445-43a5-43fe-bc19-2711d382b2a4" /home btrfs subvol=@home_arch,compress=zstd,noatime 0 0
+UUID="baa46445-43a5-43fe-bc19-2711d382b2a4" /var btrfs subvol=@var_arch,compress=zstd,noatime 0 0
+UUID="85A4-59FC" /boot/efi vfat umask=0077 0 2
+/.snapshots/ast/root /root none bind 0 0
+/.snapshots/ast/tmp /tmp none bind 0 0
+
