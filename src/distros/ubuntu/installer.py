@@ -114,7 +114,7 @@ def main(args, distro):
     os.system("sudo apt-get clean && sudo apt-get -y update && sudo apt-get -y check")
     os.system("sudo apt-get -y install --fix-broken btrfs-progs ntp efibootmgr")
     if choice != "3":
-        os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
+        os.system(f"sudo mkfs.btrfs -L LINUX -f {args[1]}")
 
 #   Mount and create necessary sub-volumes and directories
     if choice != "3":
