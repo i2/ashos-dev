@@ -22,3 +22,5 @@ os.system(f"sudo chroot /mnt grub-install {args[2]}") ### REVIEW_LATER --recheck
 
 #   Unmount everything
     os.system(f"sudo mount {args[1]} -o subvolid=0 /mnt") # subvolid=5 needed for any cases?
+
+    os.system("sudo mount -o x-mount.mkdir,remount,rw --types efivarfs efivarfs /mnt/sys/firmware/efi/efivars")

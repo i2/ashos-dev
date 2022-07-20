@@ -127,7 +127,7 @@ def main(args, distro):
         os.system(f"sudo mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
     for i in ("tmp", "root"):
         os.system(f"mkdir -p /mnt/{i}")
-    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp"): ### JULY11, 2022 removed "var" as it's not needed!
+    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp"):
         os.system(f"mkdir -p /mnt/.snapshots/{i}")
     if efi:
         os.system("sudo mkdir /mnt/boot/efi")

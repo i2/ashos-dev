@@ -124,7 +124,7 @@ def main(args, distro):
         os.system(f"sudo mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
     for i in ("tmp", "root"):
         os.system(f"mkdir -p /mnt/{i}")
-    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp", "var"): ### JULY11, 2022 removed "var" as it's not needed!
+    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp"):
         os.system(f"mkdir -p /mnt/.snapshots/{i}")
     if efi:
         os.system("sudo mkdir /mnt/boot/efi")
@@ -141,7 +141,7 @@ def main(args, distro):
             print("Failed to download packages!")
             sys.exit()
     if efi: # Mount-points needed for chrooting
-        os.system("sudo mount -o x-mount.mkdir,remount,rw --types efivarfs efivarfs /mnt/sys/firmware/efi/efivars")
+        os.system("sudo mount -o x-mount.mkdir --types efivarfs efivarfs /mnt/sys/firmware/efi/efivars")
     os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /dev /mnt/dev")
     os.system("sudo mount -o x-mount.mkdir --types proc /proc /mnt/proc")
     os.system("sudo mount -o x-mount.mkdir --bind --make-slave /run /mnt/run")
@@ -149,7 +149,7 @@ def main(args, distro):
     os.system("sudo cp --dereference /etc/resolv.conf /mnt/etc/")
 
 #   Update fstab part 1
-    os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee -a /mnt/etc/fstab") ### REVIEW_LATER change 'sudo tee' to 'sudo tee -a' July 18, 2022
+    os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee -a /mnt/etc/fstab")
     for mntdir in mntdirs:
         os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}{distro_suffix},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
     if efi:
@@ -160,7 +160,11 @@ def main(args, distro):
     os.system(f"sudo sed -i '0,/@{distro_suffix}/ s,@{distro_suffix},@.snapshots{distro_suffix}/rootfs/snapshot-tmp,' /mnt/etc/fstab")
     os.system(f"sudo sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
     os.system(f"sudo sed -i '0,/@etc{distro_suffix}/ s,@etc{distro_suffix},@.snapshots{distro_suffix}/etc/etc-tmp,' /mnt/etc/fstab")
+#############
+    input("bp>1")
     os.system(f"sudo sed -i '/\@{distro_suffix}/d' /mnt/etc/fstab") # Delete @_distro entry
+    input("bp>1")
+#############
 
 #   Database and config files
     os.system("sudo mkdir -p /mnt/usr/share/ast/db")
@@ -174,14 +178,8 @@ def main(args, distro):
 #   Update hostname, hosts, locales and timezone, hosts
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
     os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
-#################
-    input("breakpoint-1 before editing locale.gen ----- any file in var? >")
-#################
     os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /mnt/etc/locale.gen") ### REVIEW_LATER change /etc/locale.gen to /mnt/etc/locale.gen
     os.system("sudo chroot /mnt locale-gen")
-#################
-    input("breakpoint-1 after executing locale.gen ----- any file in var? >")
-#################
     os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
     os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
     os.system("sudo chroot /mnt /usr/sbin/hwclock --systohc")
@@ -232,15 +230,9 @@ def main(args, distro):
     #---4---#
     os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/")
     os.system("sudo cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")
-#################
-    input("breakpoint1 any file in var? >")
-#################
     os.system("sudo rm -rf /mnt/root/*")
     os.system("sudo rm -rf /mnt/tmp/*")
 
-#################
-    input("breakpoint2 any file in var? >")
-#################
 #   Copy boot and etc from snapshot's tmp to common
     if efi:
         os.system("sudo umount /mnt/boot/efi")
@@ -253,10 +245,6 @@ def main(args, distro):
     #---1---#
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/. /mnt/.snapshots/rootfs/snapshot-tmp/boot/")
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/. /mnt/.snapshots/rootfs/snapshot-tmp/etc/")
-
-#################
-    input("breakpoint3 any file in var? >")
-#################
 
 #   Unmount everything and finish
     os.system("sudo umount -R /mnt")

@@ -127,7 +127,7 @@ def main(args, distro):
         os.system(f"sudo mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
     for i in ("tmp", "root"):
         os.system(f"mkdir -p /mnt/{i}")
-    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp"): ### JULY11, 2022 removed "var" as it's not needed!
+    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp"):
         os.system(f"mkdir -p /mnt/.snapshots/{i}")
     if efi:
         os.system("sudo mkdir /mnt/boot/efi")
@@ -150,7 +150,7 @@ def main(args, distro):
     os.system(f"echo 'releasever={RELEASE}' | tee /mnt/etc/yum.conf") ########NEW FOR FEDORA WHY DID I ADD THIS? ### CAN I REMOVE THIS?
 
 #   Update fstab part 1
-    os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee -a /mnt/etc/fstab") ### REVIEW_LATER change 'sudo tee' to 'sudo tee -a' July 18, 2022
+    os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee -a /mnt/etc/fstab")
     for mntdir in mntdirs:
         os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}{distro_suffix},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
     if efi:
