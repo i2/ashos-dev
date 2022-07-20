@@ -73,7 +73,8 @@ def get_username():
     return username
 
 def create_user(u, g):
-    os.system(f"sudo chroot /mnt /usr/sbin/useradd -m -G {g} -s /bin/bash {u}")
+    ###os.system(f"sudo chroot /mnt /usr/sbin/useradd -m -G {g} -s /bin/bash {u}")
+    os.system(f"sudo chroot /mnt sudo useradd -m -G {g} -s /bin/bash {u}")
     os.system(f"echo '%{g} ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /mnt/home/{u}/.bashrc")
 
@@ -81,7 +82,8 @@ def set_password(u):
     clear()
     while True:
         print(f"Setting a password for '{u}':")
-        os.system(f"sudo chroot /mnt passwd {u}")
+        ###os.system(f"sudo chroot /mnt passwd {u}")
+        os.system(f"sudo chroot /mnt sudo passwd {u}")
         print("Was your password set properly (y/n)?")
         reply = input("> ")
         if reply.casefold() == "y":
@@ -176,19 +178,26 @@ def main(args, distro):
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
     os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
     os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /mnt/etc/locale.gen")
+###    os.system("sudo chroot /mnt locale-gen")
     os.system("sudo chroot /mnt locale-gen")
     os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
-    os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
-    os.system("sudo chroot /mnt /usr/sbin/hwclock --systohc")
+###    os.system(f"sudo chroot /mnt ln -sf {tz} /etc/localtime")
+    os.system(f"sudo ln -srf /mnt{tz} /mnt/etc/localtime")
+###    os.system("sudo chroot /mnt /usr/sbin/hwclock --systohc")
+    os.system("sudo chroot /mnt sudo hwclock --systohc")
+
 
 #   Copy and symlink astpk and detect_os.sh
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
     os.system(f"echo '{to_uuid(args[1])}' | sudo tee /mnt/.snapshots/ast/part")
     os.system(f"sudo cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
     os.system("sudo cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
-    os.system("sudo chroot /mnt ln -s /.snapshots/ast/ast /usr/bin/ast")
-    os.system("sudo chroot /mnt ln -s /.snapshots/ast/detect_os.sh /usr/bin/detect_os.sh")
-    os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
+    ###os.system("sudo chroot /mnt ln -s /.snapshots/ast/ast /usr/bin/ast")
+	os.system("sudo ln -srf /mnt/.snapshots/ast/ast /mnt/usr/bin/ast")
+    ###os.system("sudo chroot /mnt ln -s /.snapshots/ast/detect_os.sh /usr/bin/detect_os.sh")
+    os.system("sudo ln -srf /mnt/.snapshots/ast/detect_os.sh /mnt/usr/bin/detect_os.sh")
+    ###os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
+	os.system("sudo ln -srf /mnt/.snapshots/ast /mnt/var/lib/ast")
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree") # Initialize fstree
 
 #   Create user and set password
@@ -202,7 +211,7 @@ def main(args, distro):
 
 #   GRUB and EFI
     os.system(f"sudo chroot /mnt grub-install {args[2]}")
-    os.system(f"sudo chroot /mnt grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
+    os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
     os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
     # Create a mapping of "distro" <=> "BootOrder number". Ash reads from this file to switch between distros.
