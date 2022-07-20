@@ -94,7 +94,7 @@ def main(args, distro):
 
 #   Define variables
     ARCH = "amd64"
-    RELEASE = "sid"
+    RELEASE = "jammy"
 #    packages = f"linux-image-{ARCH} firmware-linux-nonfree python3 python3-anytree \
 #                 btrfs-progs network-manager locales sudo nano tmux dhcpcd5" # os-prober
     packages = f"linux-image-{ARCH} \
