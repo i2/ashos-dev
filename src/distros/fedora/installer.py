@@ -95,7 +95,7 @@ def main(args, distro):
 #   Define variables
     ARCH = "x86_64"
     RELEASE = "rawhide"
-    packages = "passwd which grub2-efi-x64-modules shim-x64 btrfs-progs python python-anytree sudo tmux neovim NetworkManager \
+    packages = "dnf passwd which grub2-efi-x64-modules shim-x64 btrfs-progs python python-anytree sudo tmux neovim NetworkManager \
                 dhcpcd efibootmgr systemd ncurses bash-completion kernel glibc-locale-source glibc-langpack-en" # bash os-prober
     choice, distro_suffix = get_multiboot(distro)
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
@@ -136,12 +136,16 @@ def main(args, distro):
 #   Bootstrap then install anytree and necessary packages in chroot
     os.system(f"sudo sed -i '/^ENV_SUPATH/ s,^#*,ENV_SUPATH	PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin   #,' /mnt/etc/login.defs")
     os.system(f'sudo sed -i "/^ENV_PATH/ s,^#*,ENV_PATH	PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games   #," /mnt/etc/login.defs')
-    excode = int(os.system(f"sudo dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install dnf -y --releasever={RELEASE} --forcearch={ARCH}")) ### TEST IF IT WORKS HERE!
+#################
+    input("bp0 > any systemd rpmdb services? I don't think so!")
+    excode = int(os.system(f"sudo dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install -y {packages} --releasever={RELEASE} --forcearch={ARCH}")) ### TEST IF IT WORKS HERE!
     if excode != 0:
         print("Failed to febootstrap!")
         sys.exit()
-### REVIEW_LATER    if efi:
-### REVIEW_LATER        os.system("sudo dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install -y efibootmgr grub2-efi-x64") #addeed grub2-efi-x64 as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?  # grub2-common already installed at this point
+#################
+    input("bp1 > any systemd rpmdb services? maybe!")
+    if efi:
+        os.system("sudo dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install -y efibootmgr grub2-efi-x64") #addeed grub2-efi-x64 as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?  # grub2-common already installed at this point
     # Mount-points needed for chrooting
     os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /dev /mnt/dev")
     os.system("sudo mount -o x-mount.mkdir --types proc /proc /mnt/proc")
@@ -150,11 +154,16 @@ def main(args, distro):
     if efi:
         os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars")
     os.system("sudo cp --dereference /etc/resolv.conf /mnt/etc/")
-###    #os.system(f"sudo dnf -c ./src/distros/fedora/base.repo --installroot=/mnt install dnf -y --releasever={RELEASE} --forcearch={ARCH}") ### MOVED UP
-    if efi:
-        os.system("sudo chroot /mnt dnf install -y efibootmgr grub2-efi-x64") #addeed grub2-efi-x64 as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?  # grub2-common already installed at this point
-    os.system(f"sudo chroot /mnt dnf install -y {packages} --releasever={RELEASE}") ######## 'systemd' can be removed from packages list as it gets installed using some other package?!
+### MOVED UP    if efi:
+### MOVED UP        os.system("sudo chroot /mnt dnf install -y efibootmgr grub2-efi-x64") #addeed grub2-efi-x64 as I think without it, grub2-mkcongig and mkinstall don't exists! is that correct?  # grub2-common already installed at this point
+### MOVED UP    os.system(f"sudo chroot /mnt dnf install -y {packages} --releasever={RELEASE}") ######## 'systemd' can be removed from packages list as it gets installed using some other package?!
+#################
+    input("bp2 > before yum.conf")
     os.system(f"echo 'releasever={RELEASE}' | tee /mnt/etc/yum.conf") ########NEW FOR FEDORA WHY DID I ADD THIS? ### CAN I REMOVE THIS?
+
+#################
+    input("bp3 > after yum?")
+
 
 #   Update fstab
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee -a /mnt/etc/fstab")
