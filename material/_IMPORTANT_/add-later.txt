@@ -1,3 +1,5 @@
+In older version of astos public, wasn't /home different on each  snapshot (for privacy etc.)?
+
 make it so only two args are needed. /dev/sda1 /dev/sda2 ---> args[2] can be deduced from them. duh? or maybe it's a good idea to leave as is, install on
 multi disks in mind?
 

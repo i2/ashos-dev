@@ -180,7 +180,9 @@ def main(args, distro):
 
 #   Copy and symlink astpk and detect_os.sh
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
-    os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
+    ####
+    input("bp1 > check astpart")
+    ###os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")    ### CULPRIT
     os.system(f"sudo cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
     os.system("sudo cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
     os.system("sudo chroot /mnt ln -s /.snapshots/ast/ast /usr/bin/ast")
@@ -209,6 +211,8 @@ def main(args, distro):
         os.system(f"echo '{distro},' $(efibootmgr -v | grep -i {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | sudo tee -a /mnt/boot/efi/EFI/map.txt")
 
 #   BTRFS snapshots
+    #############3
+    input("bp2 > ")
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
     os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")
     os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp")
@@ -216,6 +220,9 @@ def main(args, distro):
     os.system("sudo cp --reflink=auto -r /mnt/etc/* /mnt/.snapshots/etc/etc-tmp")
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-0")
     os.system("sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-0")
+    #############3
+    input("bp3 > ")
+    os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part") ############ Can this be moved somewhere better (if at all there is such a place)?
     os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
     os.system("sudo chroot /mnt /usr/sbin/btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
     os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/")
