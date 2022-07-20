@@ -110,7 +110,7 @@ def main(args, distro):
         efi = False
 
 #   Prep (format partition, etc.)
-    os.system(f"sudo sed -i 's/[^ ]*[^ ]/{RELEASE}/3' /etc/apt/sources.list")
+    os.system(f'echo "deb http://archive.ubuntu.com/ubuntu {RELEASE} main restricted" | tee /etc/apt/sources.list')
     os.system("sudo apt-get clean && sudo apt-get -y update && sudo apt-get -y check")
     os.system("sudo apt-get -y install --fix-broken btrfs-progs ntp efibootmgr")
     if choice != "3":
@@ -189,7 +189,8 @@ def main(args, distro):
     os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
     os.system("sudo cp -r /mnt/var/lib/dpkg/* /mnt/usr/share/ast/db")
     os.system(f"echo 'RootDir=/usr/share/ast/db/' | sudo tee -a /mnt/etc/apt/apt.conf") ### REVIEW_LATER I don't think this works?!
-    os.system(f"sudo sed -i '/^ID/ s/{distro}/{distro}_ashos/' /mnt/etc/os-release") # Modify OS release information (optional)
+###    os.system(f"sudo sed -i '/^ID/ s/{distro}/{distro}_ashos/' /mnt/etc/os-release") # Modify OS release information (optional)
+    os.system(f"sudo sed -i '/^ID/ s/debian/{distro}_ashos/' /mnt/etc/os-release") # Modify OS release information (optional)
 
 #   Update hostname, hosts, locales and timezone, hosts
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
