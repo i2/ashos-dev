@@ -100,8 +100,8 @@ def main(args, distro):
     choice, distro_suffix = get_multiboot(distro)
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
-    envsupath = "ENV_SUPATH	PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-    envpath = "ENV_PATH	PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games"
+    #envsupath = "ENV_SUPATH	PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    #envpath = "ENV_PATH	PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games"
     tz = get_timezone()
     hostname = get_hostname()
     if os.path.exists("/sys/firmware/efi"):
@@ -134,8 +134,8 @@ def main(args, distro):
         os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
 #   Bootstrap then install anytree and necessary packages in chroot
-    os.system(f"sudo sed -i '/^ENV_SUPATH/ s,^#*,ENV_SUPATH	PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin   #,' /mnt/etc/login.defs")
-    os.system(f'sudo sed -i "/^ENV_PATH/ s,^#*,ENV_PATH	PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games   #," /mnt/etc/login.defs')
+    #os.system(f"sudo sed -i '/^ENV_SUPATH/ s,^#*,ENV_SUPATH	PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin   #,' /mnt/etc/login.defs")
+    #os.system(f'sudo sed -i "/^ENV_PATH/ s,^#*,ENV_PATH	PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games   #," /mnt/etc/login.defs')
     excode = int(os.system(f"sudo pacstrap /mnt {packages}"))
     if excode != 0:
         print("Failed to download packages!")
