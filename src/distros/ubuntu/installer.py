@@ -94,7 +94,7 @@ def main(args, distro):
 
 #   Define variables
     ARCH = "amd64"
-    RELEASE = "jammy"
+    RELEASE = "bionic"
 #    packages = f"linux-image-{ARCH} firmware-linux-nonfree python3 python3-anytree \
 #                 btrfs-progs network-manager locales sudo nano tmux dhcpcd5" # os-prober
     packages = f"linux-image-{ARCH} \
@@ -110,7 +110,7 @@ def main(args, distro):
         efi = False
 
 #   Prep (format partition, etc.)
-    os.system(f'echo "deb http://archive.ubuntu.com/ubuntu {RELEASE} main restricted" | sudo tee /etc/apt/sources.list')
+    os.system(f'echo "deb [trusted=yes] http://archive.ubuntu.com/ubuntu {RELEASE} main restricted" | sudo tee /etc/apt/sources.list')
     os.system("sudo apt-get clean && sudo apt-get -y update && sudo apt-get -y check")
     os.system("sudo apt-get -y install --fix-broken btrfs-progs ntp efibootmgr")
     if choice != "3":
@@ -266,4 +266,7 @@ def main(args, distro):
     clear()
     print("Installation complete")
     print("You can reboot now :)")
+
+
+# Debian can't bootstrap 'jammy' (zstd problem)
 
