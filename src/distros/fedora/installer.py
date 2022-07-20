@@ -97,8 +97,10 @@ def main(args, distro):
 #   Define variables
     ARCH = "x86_64"
     RELEASE = "rawhide"
-    packages = "dnf passwd which grub2-efi-x64-modules shim-x64 btrfs-progs python python-anytree sudo tmux neovim NetworkManager \
-                dhcpcd efibootmgr systemd ncurses bash-completion kernel glibc-locale-source glibc-langpack-en" # bash os-prober
+###    packages = "dnf passwd which grub2-efi-x64-modules shim-x64 btrfs-progs python python-anytree sudo tmux neovim NetworkManager \
+###                dhcpcd efibootmgr systemd ncurses bash-completion kernel glibc-locale-source glibc-langpack-en" # bash os-prober
+    packages = "dnf passwd which grub2-efi-x64-modules shim-x64 btrfs-progs sudo \
+                efibootmgr systemd kernel glibc-locale-source glibc-langpack-en" # bash os-prober
     choice, distro_suffix = get_multiboot(distro)
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
