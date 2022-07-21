@@ -97,7 +97,7 @@ def main(args, distro):
     RELEASE = "kinetic" ### If bootstrapping from debian iso: "jammy" not supported as of July 20, 2022 (https://bugs.debian.org/892664)
 #    packages = f"linux-image-{ARCH} firmware-linux-nonfree python3 python3-anytree \
 #                 btrfs-progs network-manager locales sudo nano tmux dhcpcd5" # os-prober
-    packages = f"linux-image-{ARCH} \
+    packages = f"linux-image-generic \
                  btrfs-progs locales sudo nano" # os-prober
     choice, distro_suffix = get_multiboot(distro)
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
