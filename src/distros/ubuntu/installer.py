@@ -137,11 +137,13 @@ def main(args, distro):
 
 #   Bootstrap (minimal)
     os.system("sudo apt-get -y install debootstrap")
+##########
+    input("bp1 @@@@@@@@@@@@@@@@@@ debootstrap software installed")
 ###    excl = subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' \
 ###                                    | awk '{print $1}'", shell=True).decode('utf-8').strip().replace("\n",",")
     excode = int(os.system(f"sudo debootstrap --arch {ARCH} --exclude={excl} --include='dbus-systemd-bus' {RELEASE} /mnt http://archive.ubuntu.com/ubuntu"))
-### THIS WORKS    os.system("sudo cp -f /etc/apt/sources.list /mnt/etc/apt/sources.list") ### MOVED THIS HERE AS THE REPO IN CHROOT SEEMED TO NOT HAVE UNIVERSE initially but somewhere before debootstrap finishes it becomes like the one from live iso.
-    excode = int(os.system(f"sudo debootstrap --arch {ARCH} --variant=minbase {RELEASE} /mnt http://archive.ubuntu.com/ubuntu"))
+###    os.system("sudo cp -f /etc/apt/sources.list /mnt/etc/apt/sources.list") ### MOVED THIS HERE AS THE REPO IN CHROOT SEEMED TO NOT HAVE UNIVERSE initially but somewhere before debootstrap finishes it becomes like the one from live iso.
+###  THIS WORKS   excode = int(os.system(f"sudo debootstrap --arch {ARCH} --variant=minbase {RELEASE} /mnt http://archive.ubuntu.com/ubuntu"))
     if excode != 0:
         print("Failed to bootstrap!")
         sys.exit()
@@ -153,6 +155,8 @@ def main(args, distro):
     if efi:
         os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars")
     os.system("sudo cp --remove-destination --dereference /etc/resolv.conf /mndt/etc/") ### not writing through dangling symlink! (do: try except)
+##########
+    input("bp2 @@@@@@@@@@@@@@@@@@ is sources.list updated with all from live environment?")
 ###moved up    os.system("sudo cp -f /etc/apt/sources.list /mnt/etc/apt/sources.list") ### IS THIS NEEDED?
 
 #   Install anytree and necessary packages in chroot
