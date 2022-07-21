@@ -137,8 +137,9 @@ def main(args, distro):
 
 #   Bootstrap (minimal)
     os.system("sudo apt-get -y install debootstrap")
-    excl = subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' | awk '{print $1}'", shell=True).decode('utf-8').strip().replace("\n",",")
-    excode = int(os.system(f"sudo debootstrap --arch {ARCH} --exclude={excl} {RELEASE} /mnt http://archive.ubuntu.com/ubuntu"))
+    excl = subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' \
+                                    | awk '{print $1}'", shell=True).decode('utf-8').strip().replace("\n",",")
+    excode = int(os.system(f"sudo debootstrap --arch {ARCH} --exclude={excl} --include='dbus' {RELEASE} /mnt http://archive.ubuntu.com/ubuntu"))
     if excode != 0:
         print("Failed to bootstrap!")
         sys.exit()
@@ -149,7 +150,7 @@ def main(args, distro):
     os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /sys /mnt/sys")
     if efi:
         os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars")
-    os.system("sudo cp --remove-destination --dereference /etc/resolv.conf /mnt/etc/") ### not writing through dangling symlink! (do try except)
+    os.system("sudo cp --remove-destination --dereference /etc/resolv.conf /mndt/etc/") ### not writing through dangling symlink! (do: try except)
     os.system("sudo cp -f /etc/apt/sources.list /mnt/etc/apt/sources.list") ### IS THIS NEEDED?
 
 #   Install anytree and necessary packages in chroot
