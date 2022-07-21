@@ -137,9 +137,10 @@ def main(args, distro):
 
 #   Bootstrap (minimal)
     os.system("sudo apt-get -y install debootstrap")
-    excl = subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' \
-                                    | awk '{print $1}'", shell=True).decode('utf-8').strip().replace("\n",",")
-    excode = int(os.system(f"sudo debootstrap --arch {ARCH} --exclude={excl} --include='dbus-systemd-bus' {RELEASE} /mnt http://archive.ubuntu.com/ubuntu"))
+###    excl = subprocess.check_output("dpkg-query -f '${binary:Package} ${Priority}\n' -W | grep -v 'required\|important' \
+###                                    | awk '{print $1}'", shell=True).decode('utf-8').strip().replace("\n",",")
+###    excode = int(os.system(f"sudo debootstrap --arch {ARCH} --exclude={excl} --include='dbus-systemd-bus' {RELEASE} /mnt http://archive.ubuntu.com/ubuntu"))
+    excode = int(os.system(f"sudo debootstrap --arch {ARCH} --variant=minbase {RELEASE} /mnt http://archive.ubuntu.com/ubuntu"))
     if excode != 0:
         print("Failed to bootstrap!")
         sys.exit()
