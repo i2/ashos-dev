@@ -1,5 +1,8 @@
+#!/bin/sh
+
 # If you are installing this on VirtualBox to test it out, set RAM bigger than
 # 1024MB as otherwise it errors out (running out of cache/RAM space)
+if [ -z "$HOME" ]; then HOME=~ ; fi
 sudo apt-get -y autoremove
 sudo apt-get -y autoclean
 sudo apt-get -y remove --purge man-db # Fix slow man-db trigger

@@ -26,4 +26,4 @@ https://discourse.ubuntu.com/t/ubuntu-22-04-pxe-uefi-netboot-desktop-installatio
 https://gist.github.com/smithclay/b0a7b7e7d93b1e7a38cf1829e20a3708#file-build-ubuntu-rootfs-sh-L80
 
 
-if [ -z "$HOME" ]; then HOME=$PWD ; fi
+
