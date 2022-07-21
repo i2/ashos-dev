@@ -94,7 +94,7 @@ def main(args, distro):
 
 #   Define variables
     ARCH = "amd64"
-    RELEASE = "bionic" ### "jammy" not supported as of July 20, 2022 (https://bugs.debian.org/892664)
+    RELEASE = "kinetic" ### If bootstrapping from debian iso: "jammy" not supported as of July 20, 2022 (https://bugs.debian.org/892664)
 #    packages = f"linux-image-{ARCH} firmware-linux-nonfree python3 python3-anytree \
 #                 btrfs-progs network-manager locales sudo nano tmux dhcpcd5" # os-prober
     packages = f"linux-image-{ARCH} \
@@ -110,7 +110,7 @@ def main(args, distro):
         efi = False
 
 #   Prep (format partition, etc.)
-    os.system(f"sed 's|RELEASE|{RELEASE}|g' ./sources.list | sudo tee /mnt/etc/apt/sources.list")
+    #os.system(f"sed 's|RELEASE|{RELEASE}|g' ./sources.list | sudo tee /mnt/etc/apt/sources.list")
     os.system("sudo apt-get clean && sudo apt-get -y update && sudo apt-get -y check")
     os.system("sudo apt-get -y install --fix-broken btrfs-progs ntp efibootmgr")
     if choice != "3":
