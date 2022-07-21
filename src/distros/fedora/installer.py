@@ -109,7 +109,7 @@ def main(args, distro):
 
 #   Prep (format partition, etc.)
     if choice != "3":
-        os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
+        os.system(f"sudo mkfs.btrfs -L LINUX -f {args[1]}")
     os.system("pacman -Syy --noconfirm archlinux-keyring dnf")
 
 #   Mount and create necessary sub-volumes and directories

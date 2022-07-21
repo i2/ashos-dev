@@ -1,0 +1,18 @@
+replace all open(xyz)
+    xyz.write(xyz)
+    xyz.close()
+    
+with
+
+    with open(f"/.snapshots/ast/snapshots/{snapshot}-desc", 'a+') as descfile:
+        descfile.write(desc)
+        
+alphabet order:
+        /.snapshots/etc
+        /.snapshots/etc
+        
+Add . at end of sentences with "F: xyz"
+
+immen -> enimm
+
++19024121918

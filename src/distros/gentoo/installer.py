@@ -75,7 +75,7 @@ def get_username():
     return username
 
 def create_user(u):
-    os.system(f"sudo chroot /mnt /usr/sbin/useradd -m -G wheel -s /bin/bash {u}")
+    os.system(f"sudo chroot /mnt sudo useradd -m -G wheel -s /bin/bash {u}")
     os.system("echo '%wheel ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /mnt/home/{u}/.bashrc")
 
@@ -111,7 +111,7 @@ def main(args, distro):
 
 #   Prep (format partition, etc.)
     if choice != "3":
-        os.system(f"sudo /usr/sbin/mkfs.btrfs -L LINUX -f {args[1]}")
+        os.system(f"sudo mkfs.btrfs -L LINUX -f {args[1]}")
     os.system("pacman -Syy --noconfirm archlinux-keyring")
 
 #   Mount and create necessary sub-volumes and directories
@@ -250,7 +250,7 @@ def main(args, distro):
     os.system(f"echo '{astpart}' | sudo tee /mnt/.snapshots/ast/part")
     #---3---#
     os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
-    os.system("sudo chroot /mnt /usr/sbin/btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
+    os.system("sudo chroot /mnt sudo btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
     #---4---#
     os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/")
     os.system("sudo cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")

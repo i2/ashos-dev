@@ -94,7 +94,7 @@ def main(args, distro):
 
 #   Define variables
     ARCH = "amd64"
-    RELEASE = "bionic"
+    RELEASE = "bionic" ### "jammy" not supported as of July 20, 2022 (https://bugs.debian.org/892664)
 #    packages = f"linux-image-{ARCH} firmware-linux-nonfree python3 python3-anytree \
 #                 btrfs-progs network-manager locales sudo nano tmux dhcpcd5" # os-prober
     packages = f"linux-image-{ARCH} \
@@ -110,7 +110,7 @@ def main(args, distro):
         efi = False
 
 #   Prep (format partition, etc.)
-    os.system(f'echo "deb [trusted=yes] http://archive.ubuntu.com/ubuntu {RELEASE} main restricted" | sudo tee /etc/apt/sources.list')
+    os.system(f"sed 's|RELEASE|{RELEASE}|g' ./sources.list | sudo tee /mnt/etc/apt/sources.list")
     os.system("sudo apt-get clean && sudo apt-get -y update && sudo apt-get -y check")
     os.system("sudo apt-get -y install --fix-broken btrfs-progs ntp efibootmgr")
     if choice != "3":
@@ -149,7 +149,8 @@ def main(args, distro):
     os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /sys /mnt/sys")
     if efi:
         os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars")
-    os.system("sudo cp --dereference /etc/resolv.conf /mnt/etc/")
+    os.system("sudo cp --remove-destination --dereference /etc/resolv.conf /mnt/etc/") ### not writing through dangling symlink! (do try except)
+    os.system("sudo cp -f /etc/apt/sources.list /mnt/etc/apt/sources.list") ### IS THIS NEEDED?
 
 #   Install anytree and necessary packages in chroot
     os.system("sudo systemctl enable --now ntp && sleep 30s && ntpq -p") # Sync time in the live iso

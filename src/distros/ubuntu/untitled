@@ -1,0 +1,26 @@
+cp /etc/apt/sources.list /mnt/etc/apt/
+for dir in sys dev proc ; do mount --rbind /$dir /mnt/$dir && mount --make-rslave /mnt/$dir ; done
+cp /etc/resolv.conf /mnt/etc/
+croot /mnt /bin/bash
+apt update
+- instal lbtrfs-progs
+- set locales
+- root passwd
+- install linux-image-generic sudo vim build-essential
+- cp /proc/mounts /etc/fstab (keep only disk entries and tmpfs
+- edit hostname
+- etc hosts
+- timezone
+- useradd
+-install grub-efi-amd64
+-grub-install /dev/sda
+- update-grub
+- sudo dhclient
+- apt install dhcpcd5
+- systemctl enable --now dhcpcd
+
+
+https://cdimage.ubuntu.com/ubuntu-server/daily-live/current/
+https://www.molnar-peter.hu/en/ubuntu-jammy-netinstall-pxe.html
+https://discourse.ubuntu.com/t/ubuntu-22-04-pxe-uefi-netboot-desktop-installation/27841/7
+
