@@ -1,3 +1,6 @@
+https://teejeetech.medium.com/linux-multiboot-with-btrfs-luks-and-efi-part-1-9b2325494e0f
+https://teejeetech.medium.com/linux-multiboot-with-btrfs-luks-and-efi-part-2-7b0896c03cce
+
 In older version of astos public, wasn't /home different on each  snapshot (for privacy etc.)?
 
 make it so only two args are needed. /dev/sda1 /dev/sda2 ---> args[2] can be deduced from them. duh? or maybe it's a good idea to leave as is, install on
@@ -776,3 +779,21 @@ taffee
 
 
 https://www.tonymacx86.com/threads/guide-how-to-keep-clover-working-when-installing-windows-and-linux.272807/
+
+
+https://semjonov.de/posts/2021-09/minimal-ubuntu-installation-with-debootstrap/
+
+---------------------------------- gentoo ----------------------------
+https://www.reddit.com/r/Gentoo/comments/npsax4/i_wrote_a_gentoo_installer_with_a/
+https://gist.github.com/MoritzMaxeiner/6f3b3b22ced5c93d9eb4
+https://wiki.gentoo.org/wiki/User:Sakaki/Sakaki's_EFI_Install_Guide/Installing_the_Gentoo_Stage_3_Files
+https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Base#systemd
+https://forums.gentoo.org/viewtopic-t-918118-start-0.html
+https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Bootloader#Default:_GRUB2
+-----------------------------------------------------------------------
+
+
+---------------------------------- fedora ----------------------------
+https://glacion.com/2019/06/16/Fedora.html
+----------------------------------------------------------------------
+

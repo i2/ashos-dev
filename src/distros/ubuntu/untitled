@@ -24,6 +24,26 @@ https://cdimage.ubuntu.com/ubuntu-server/daily-live/current/
 https://www.molnar-peter.hu/en/ubuntu-jammy-netinstall-pxe.html
 https://discourse.ubuntu.com/t/ubuntu-22-04-pxe-uefi-netboot-desktop-installation/27841/7
 https://gist.github.com/smithclay/b0a7b7e7d93b1e7a38cf1829e20a3708#file-build-ubuntu-rootfs-sh-L80
+Johnathan Blow's streams Rust
+
+
+OpenSea:
+Saudi
+BAYC
+Moonbird
 
 
 
+Tech IP:
+ssh ckdu@129.173.69.243
+129.173.69.243
+
+
+-----------------------------------------------fedora------------------------
+dnf install --installroot=/mnt --releasever=30 --setopt=install_weak_deps=False \
+--setopt=keepcache=True --assumeyes --nodocs {packages}
+
+systemd dnf glibc-langpack-en passwd rtkit policycoreutils NetworkManager audit \
+firewalld selinux-policy-targeted kbd zchunk sudo vim-minimal systemd-udev rootfiles less iputils deltarpm sqlite lz4 xfsprogs
+
+------------------------
