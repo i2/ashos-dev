@@ -271,6 +271,8 @@ def main(args, distro):
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/. /mnt/.snapshots/rootfs/snapshot-tmp/boot/")
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/. /mnt/.snapshots/rootfs/snapshot-tmp/etc/")
 
+### STEP 7 BEGINS
+
 #   Unmount everything and finish
     os.system("sudo umount -R /mnt")
     os.system(f"sudo mount {args[1]} -o subvolid=0 /mnt")
