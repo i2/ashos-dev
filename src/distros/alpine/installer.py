@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 
 ######33 /sbin/apk add py3
+###### export PATH=/bin:$PATH
+
 
 import os
 import subprocess
@@ -103,7 +105,8 @@ def main(args, distro):
     ARCH = "x86_64"
     RELEASE = "edge"
     APK = "2.12.9-r5"
-    packages = "alpine-base tzdata sudo python3 py3-anytree bash \
+    KERNEL = "edge"
+    packages = f"alpine-base linux-{KERNEL} tzdata sudo python3 py3-anytree bash \
                 btrfs-progs networkmanager tmux" #linux-firmware nano doas os-prober
     #packages = "base linux linux-firmware nano python3 python-anytree bash dhcpcd \
     #            arch-install-scripts btrfs-progs networkmanager grub sudo tmux os-prober"
@@ -226,8 +229,10 @@ def main(args, distro):
     os.system("/sbin/rc-service networkmanager start")
     os.system(f"adduser {username} plugdev")
 
+### STEP 5 BEGINS
+
 #   GRUB and EFI
-    os.system(f"sudo chroot /mnt sudo grub-install {args[2]}")
+    os.system(f"sudo chroot /mnt sudo /usr/sbin/grub-install {args[2]}")
     os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
     os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
