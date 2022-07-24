@@ -138,11 +138,6 @@ def main(args, distro):
     if excode != 0:
         print("Failed to bootstrap!")
         sys.exit()
-    if efi:
-        excode = int(os.system("sudo pacstrap /mnt efibootmgr"))
-        if excode != 0:
-            print("Failed to download packages!")
-            sys.exit()
     # Mount-points needed for chrooting
     os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /dev /mnt/dev")
     os.system("sudo mount -o x-mount.mkdir --types proc /proc /mnt/proc")
@@ -151,6 +146,16 @@ def main(args, distro):
     if efi:
         os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars")
     os.system("sudo cp --dereference /etc/resolv.conf /mnt/etc/")
+    if efi:
+        excode = int(os.system("sudo chroot /mnt apk add grub-efi efibootmgr")) ### efibootmgr does get installed. Does this do it?
+        if excode != 0:
+            print("Failed to install grub!")
+            sys.exit()
+    else:
+        excode = int(os.system("sudo chroot /mnt apk add grub-bios"))
+        if excode != 0:
+            print("Failed to install grub!")
+            sys.exit()
 
 #   Update fstab
     os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee -a /mnt/etc/fstab")

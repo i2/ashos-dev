@@ -107,29 +107,21 @@ def main(args, distro):
     else:
         efi = False
 
-#   Prep (format partition, etc.)
-    if choice != "3":
-        os.system(f"sudo mkfs.btrfs -L LINUX -f {args[1]}")
-    os.system("pacman -Syy --noconfirm archlinux-keyring")
-
-#   Mount and create necessary sub-volumes and directories
-    if choice != "3":
-        os.system(f"sudo mount {args[1]} /mnt")
-    else:
-        os.system(f"sudo mount -o subvolid=5 {args[1]} /mnt")
-    for btrdir in btrdirs:
-        os.system(f"sudo btrfs sub create /mnt/{btrdir}")
-    os.system("sudo umount /mnt")
-    for mntdir in mntdirs:
-        os.system(f"sudo mkdir -p /mnt/{mntdir}") # -p to ignore /mnt exists complaint
-        os.system(f"sudo mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
-    for i in ("tmp", "root"):
-        os.system(f"mkdir -p /mnt/{i}")
-    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp"):
-        os.system(f"mkdir -p /mnt/.snapshots/{i}")
+#   Bootstrap then install anytree and necessary packages in chroot
+    #os.system(f"curl -L -O https://dl-cdn.alpinelinux.org/alpine/{RELEASE}/main/{ARCH}/apk-tools-static-2.12.9-r5.apk")
+    #os.system("tar zxf apk-tools-static-*.apk")
+    #excode = int(os.system(f"sudo ./sbin/apk.static --arch {ARCH} -X http://dl-cdn.alpinelinux.org/alpine/{RELEASE}/main/ -U --allow-untrusted --root /mnt --initdb add alpine-base"))
+    #if excode != 0:
+    #    print("Failed to bootstrap!")
+    #    sys.exit()
+    # Mount-points needed for chrooting
+    os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /dev /mnt/dev")
+    os.system("sudo mount -o x-mount.mkdir --types proc /proc /mnt/proc")
+    os.system("sudo mount -o x-mount.mkdir --bind --make-slave /run /mnt/run")
+    os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /sys /mnt/sys")
     if efi:
-        os.system("sudo mkdir /mnt/boot/efi")
-        os.system(f"sudo mount {args[3]} /mnt/boot/efi")
+        os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars")
+    os.system("sudo cp --dereference /etc/resolv.conf /mnt/etc/")
 
 args = list(sys.argv)
 distro="fedora"
