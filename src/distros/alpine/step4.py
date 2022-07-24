@@ -73,7 +73,7 @@ def get_username():
     return username
 
 def create_user(u, g):
-    os.system(f"sudo chroot /mnt sudo useradd -m -G {g} -s /bin/bash {u}")
+    os.system(f"sudo chroot /mnt sudo /usr/sbin/adduser -m -h /home/{u} -G {g} -s /bin/bash {u}")
     os.system(f"echo '%{g} ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /mnt/home/{u}/.bashrc")
 
@@ -116,8 +116,8 @@ def main(args, distro):
     set_password(username)
 
 #   Network
-    os.system("/sbin/rc-service networkmanager start")
-    os.system(f"adduser {username} plugdev")
+    os.system("sudo chroot /mnt /sbin/rc-service networkmanager start")
+    os.system(f"sudo chroot /mnt /usr/sbin/adduser {username} plugdev")
 
 
 args = list(sys.argv)

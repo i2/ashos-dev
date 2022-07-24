@@ -75,9 +75,14 @@ def get_username():
     return username
 
 def create_user(u, g):
-    os.system(f"sudo chroot /mnt sudo useradd -m -G {g} -s /bin/bash {u}")
+    os.system(f"sudo chroot /mnt sudo /usr/sbin/adduser -m -h /home/{u} -G {g} -s /bin/bash {u}")
     os.system(f"echo '%{g} ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /mnt/home/{u}/.bashrc")
+
+###def create_user(u, g):
+###    os.system(f"sudo chroot /mnt sudo useradd -m -G {g} -s /bin/bash {u}")
+###    os.system(f"echo '%{g} ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
+###    os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /mnt/home/{u}/.bashrc")
 
 def set_password(u, s):
     clear()
