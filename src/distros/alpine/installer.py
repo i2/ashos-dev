@@ -79,11 +79,11 @@ def create_user(u, g):
     os.system(f"echo '%{g} ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
     os.system(f"echo 'export XDG_RUNTIME_DIR=\"/run/user/1000\"' | sudo tee -a /mnt/home/{u}/.bashrc")
 
-def set_password(u):
+def set_password(u, s):
     clear()
     while True:
         print(f"Setting a password for '{u}':")
-        os.system(f"sudo chroot /mnt sudo passwd {u}")
+        os.system(f"sudo chroot /mnt {s} passwd {u}")
         print("Was your password set properly (y/n)?")
         reply = input("> ")
         if reply.casefold() == "y":
@@ -98,7 +98,7 @@ def main(args, distro):
     ARCH = "x86_64"
     RELEASE = "edge"
     APK = "2.12.9-r5"
-    packages = "alpine-base tzdata python3 py3-anytree bash \
+    packages = "alpine-base tzdata sudo python3 py3-anytree bash \
                 btrfs-progs networkmanager tmux" #linux-firmware nano doas os-prober
     #packages = "base linux linux-firmware nano python3 python-anytree bash dhcpcd \
     #            arch-install-scripts btrfs-progs networkmanager grub sudo tmux os-prober"
@@ -212,13 +212,14 @@ def main(args, distro):
 ### STEP 4 BEGINS
 
 #   Create user and set password
-    set_password("root")
+    set_password("root", "") # will fix for "doas"
     username = get_username()
     create_user(username, "wheel")
-    set_password(username)
+    set_password(username, "") # will fix for "doas"
 
-#   Systemd
-    os.system("sudo chroot /mnt systemctl enable NetworkManager")
+#   Network
+    os.system("/sbin/rc-service networkmanager start")
+    os.system(f"adduser {username} plugdev")
 
 #   GRUB and EFI
     os.system(f"sudo chroot /mnt sudo grub-install {args[2]}")
