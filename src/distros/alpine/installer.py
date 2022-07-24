@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+######33 /sbin/apk add py3
+
 import os
 import subprocess
 import sys ### REMOVE WHEN USING TRY CATCH
@@ -95,8 +97,11 @@ def main(args, distro):
 #   Define variables
     ARCH = "x86_64"
     RELEASE = "edge"
-    packages = "base linux linux-firmware nano python3 python-anytree bash dhcpcd \
-                arch-install-scripts btrfs-progs networkmanager grub sudo tmux os-prober"
+    APK = "2.12.9-r5"
+    packages = "alpine-base tzdata python3 py3-anytree bash \
+                btrfs-progs networkmanager tmux" #linux-firmware nano doas os-prober
+    #packages = "base linux linux-firmware nano python3 python-anytree bash dhcpcd \
+    #            arch-install-scripts btrfs-progs networkmanager grub sudo tmux os-prober"
     choice, distro_suffix = get_multiboot(distro)
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
@@ -131,10 +136,13 @@ def main(args, distro):
         os.system("sudo mkdir /mnt/boot/efi")
         os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
+### STEP 2 BEGINS
+
 #   Bootstrap then install anytree and necessary packages in chroot
-    os.system(f"curl -L -O https://dl-cdn.alpinelinux.org/alpine/{RELEASE}/main/{ARCH}/apk-tools-static-2.12.9-r5.apk")
+    os.system(f"curl -L -O https://dl-cdn.alpinelinux.org/alpine/{RELEASE}/main/{ARCH}/apk-tools-static-{APK}.apk")
     os.system("tar zxf apk-tools-static-*.apk")
-    excode = int(os.system(f"sudo ./sbin/apk.static --arch {ARCH} -X http://dl-cdn.alpinelinux.org/alpine/{RELEASE}/main/ -U --allow-untrusted --root /mnt --initdb add alpine-base"))
+    excode = int(os.system(f"sudo ./sbin/apk.static --arch {ARCH} -X http://dl-cdn.alpinelinux.org/alpine/{RELEASE}/main/ \
+                             -U --allow-untrusted --root /mnt --initdb add --no-cache {packages}"))
     if excode != 0:
         print("Failed to bootstrap!")
         sys.exit()
@@ -146,13 +154,18 @@ def main(args, distro):
     if efi:
         os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars")
     os.system("sudo cp --dereference /etc/resolv.conf /mnt/etc/")
+    os.system("sudo cp ./src/distros/alpine/repositories /mnt/etc/apk/")
+    os.system("sudo cp ./src/distros/alpine/repositories /mnt/etc/apk/")
+
+### STEP 3 BEGINS
+
     if efi:
-        excode = int(os.system("sudo chroot /mnt apk add grub-efi efibootmgr")) ### efibootmgr does get installed. Does this do it?
+        excode = int(os.system("sudo chroot /mnt /sbin/apk update && /sbin/apk add grub-efi efibootmgr"))
         if excode != 0:
             print("Failed to install grub!")
             sys.exit()
     else:
-        excode = int(os.system("sudo chroot /mnt apk add grub-bios"))
+        excode = int(os.system("sudo chroot /mnt /sbin/apk update &&/sbin/apk add grub-bios"))
         if excode != 0:
             print("Failed to install grub!")
             sys.exit()
@@ -173,18 +186,18 @@ def main(args, distro):
 #   Database and config files
     os.system("sudo mkdir -p /mnt/usr/share/ast/db")
     os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
-    os.system("sudo cp -r /mnt/var/lib/pacman/* /mnt/usr/share/ast/db")
-    os.system(f"sed -i s,\"#DBPath      = /var/lib/pacman/\",\"DBPath      = /usr/share/ast/db/\",g /mnt/etc/pacman.conf")
+    os.system("sudo cp -r /mnt/var/lib/apk/* /mnt/usr/share/ast/db")
+    #os.system(f"sed -i s,\"#DBPath      = /var/lib/pacman/\",\"DBPath      = /usr/share/ast/db/\",g /mnt/etc/pacman.conf")
     os.system(f"sudo sed -i '/^ID/ s/{distro}/{distro}_ashos/' /mnt/etc/os-release") # Modify OS release information (optional)
 
 #   Update hostname, hosts, locales and timezone, hosts
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
     os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
-    os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /mnt/etc/locale.gen")
-    os.system("sudo chroot /mnt sudo locale-gen")
-    os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
+    #os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /mnt/etc/locale.gen")
+    #os.system("sudo chroot /mnt sudo locale-gen")
+    #os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
     os.system(f"sudo ln -srf /mnt{tz} /mnt/etc/localtime")
-    os.system("sudo chroot /mnt sudo hwclock --systohc")
+    os.system("sudo chroot /mnt /sbin/hwclock --systohc")
 
 #   Copy and symlink astpk and detect_os.sh
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
@@ -195,6 +208,8 @@ def main(args, distro):
     os.system("sudo ln -srf /mnt/.snapshots/ast/detect_os.sh /mnt/usr/bin/detect_os.sh")
     os.system("sudo ln -srf /mnt/.snapshots/ast /mnt/var/lib/ast")
     os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree") # Initialize fstree
+
+### STEP 4 BEGINS
 
 #   Create user and set password
     set_password("root")

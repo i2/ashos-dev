@@ -124,5 +124,5 @@ def main(args, distro):
     os.system("sudo cp --dereference /etc/resolv.conf /mnt/etc/")
 
 args = list(sys.argv)
-distro="fedora"
+distro="alpine"
 main(args, distro)

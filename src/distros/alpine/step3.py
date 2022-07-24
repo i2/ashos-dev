@@ -107,29 +107,45 @@ def main(args, distro):
     else:
         efi = False
 
-#   Prep (format partition, etc.)
-    if choice != "3":
-        os.system(f"sudo mkfs.btrfs -L LINUX -f {args[1]}")
-    os.system("pacman -Syy --noconfirm archlinux-keyring")
-
-#   Mount and create necessary sub-volumes and directories
-    if choice != "3":
-        os.system(f"sudo mount {args[1]} /mnt")
-    else:
-        os.system(f"sudo mount -o subvolid=5 {args[1]} /mnt")
-    for btrdir in btrdirs:
-        os.system(f"sudo btrfs sub create /mnt/{btrdir}")
-    os.system("sudo umount /mnt")
+#   Update fstab
+    os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee -a /mnt/etc/fstab")
     for mntdir in mntdirs:
-        os.system(f"sudo mkdir -p /mnt/{mntdir}") # -p to ignore /mnt exists complaint
-        os.system(f"sudo mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
-    for i in ("tmp", "root"):
-        os.system(f"mkdir -p /mnt/{i}")
-    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp"):
-        os.system(f"mkdir -p /mnt/.snapshots/{i}")
+        os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}{distro_suffix},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
     if efi:
-        os.system("sudo mkdir /mnt/boot/efi")
-        os.system(f"sudo mount {args[3]} /mnt/boot/efi")
+        os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | sudo tee -a /mnt/etc/fstab")
+    os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
+    os.system("echo '/.snapshots/ast/tmp /tmp none bind 0 0' | sudo tee -a /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@{distro_suffix}/ s,@{distro_suffix},@.snapshots{distro_suffix}/rootfs/snapshot-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@etc{distro_suffix}/ s,@etc{distro_suffix},@.snapshots{distro_suffix}/etc/etc-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '/\@{distro_suffix}/d' /mnt/etc/fstab") # Delete @_distro entry
+
+#   Database and config files
+    os.system("sudo mkdir -p /mnt/usr/share/ast/db")
+    os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
+    os.system("sudo cp -r /mnt/var/lib/apk/* /mnt/usr/share/ast/db")
+    #os.system(f"sed -i s,\"#DBPath      = /var/lib/pacman/\",\"DBPath      = /usr/share/ast/db/\",g /mnt/etc/pacman.conf")
+    os.system(f"sudo sed -i '/^ID/ s/{distro}/{distro}_ashos/' /mnt/etc/os-release") # Modify OS release information (optional)
+
+#   Update hostname, hosts, locales and timezone, hosts
+    os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
+    os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
+    #os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /mnt/etc/locale.gen")
+    #os.system("sudo chroot /mnt sudo locale-gen")
+    #os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
+    os.system(f"sudo ln -srf /mnt{tz} /mnt/etc/localtime")
+    os.system("sudo chroot /mnt /sbin/hwclock --systohc")
+
+#   Copy and symlink astpk and detect_os.sh
+    os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
+    os.system(f"echo '{to_uuid(args[1])}' | sudo tee /mnt/.snapshots/ast/part")
+    os.system(f"sudo cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
+    os.system("sudo cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
+    os.system("sudo ln -srf /mnt/.snapshots/ast/ast /mnt/usr/bin/ast")
+    os.system("sudo ln -srf /mnt/.snapshots/ast/detect_os.sh /mnt/usr/bin/detect_os.sh")
+    os.system("sudo ln -srf /mnt/.snapshots/ast /mnt/var/lib/ast")
+    os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree") # Initialize fstree
+
 
 args = list(sys.argv)
 distro="alpine"
