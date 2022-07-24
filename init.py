@@ -20,3 +20,13 @@ elif 'ubuntu' in distro:
 
 installer.main(args, distro)
 
+
+
+### ------------------------------------------------
+#import importlib.util
+#spec = importlib.util.spec_from_file_location('installer', f"src/distros/{distro}/installer.py")
+#mod = importlib.util.module_from_spec(spec)
+#spec.loader.exec_module(mod)
+#mod.main(args, distro)
+### ------------------------------------------------
+
