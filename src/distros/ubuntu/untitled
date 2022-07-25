@@ -52,3 +52,19 @@ firewalld selinux-policy-targeted kbd zchunk sudo vim-minimal systemd-udev rootf
 
 
 (I'd already gotten fed up with the boilerplate and drudgery that "quality object-oriented code" brought, so I was already using a data-oriented semi-functional style in my Python programs. Heck, I was doing dependency injection in Python for years under the banner of "architecting my code to be easy to unit-test" while saying I hated dependency injection because I didn't realize the boilerplate and ceremony from all the Java examples people pointed to was optional. YAGNI is my motto these days and it harmonizes very nicely with one of Rust's slogans, "fearless refactoring".)
+
+
+
+
+
+
+
+
+ proj-dir
+ ├── __init__.py
+ ├── package1
+ │   ├── __init__.py
+ │   ├── module1.py
+ └── package2
+     ├── __init__.py
+     └── module2.py 

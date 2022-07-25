@@ -1,32 +1,15 @@
 #!/usr/bin/python3
 
-import sys
+import importlib
 import subprocess
+import sys
 
-args = list(sys.argv)
-distro = subprocess.check_output(['sh', './src/detect_os.sh']).decode('utf-8').replace('"',"").strip()
-#distro = "fedora" # If distro to be installed does not match live environment
+parts = list(sys.argv[1:4])
 
-if 'arch' in distro:
-    from src.distros.arch import installer
-elif 'debian' in distro:
-    from src.distros.debian import installer
-elif 'fedora' in distro:
-    from src.distros.fedora import installer
-elif 'gentoo' in distro:
-    from src.distros.gentoo import installer
-elif 'ubuntu' in distro:
-    from src.distros.ubuntu import installer
+try: # If distro to be installed does not match live environment, use argument 4
+    distro = sys.argv[4]
+except IndexError:
+    distro = subprocess.check_output(['sh', './src/detect_os.sh']).decode('utf-8').replace('"',"").strip()
 
-installer.main(args, distro)
-
-
-
-### ------------------------------------------------
-#import importlib.util
-#spec = importlib.util.spec_from_file_location('installer', f"src/distros/{distro}/installer.py")
-#mod = importlib.util.module_from_spec(spec)
-#spec.loader.exec_module(mod)
-#mod.main(args, distro)
-### ------------------------------------------------
+importlib.import_module(f"src.distros.{distro}.installer").main(parts, distro)
 
