@@ -68,7 +68,7 @@ def get_username():
             reply = input("> ")
             if reply.casefold() == "y":
                 break
-            else:
+            elif reply.casefold() == "n":
                 continue
     return username
 
