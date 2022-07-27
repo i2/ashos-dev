@@ -93,8 +93,10 @@ def main(args, distro):
     print("Welcome to the AshOS installer!\n\n\n\n\n")
 
 #   Define variables
-    packages = "base linux linux-firmware nano python3 python-anytree bash dhcpcd \
-                arch-install-scripts btrfs-progs networkmanager grub sudo tmux os-prober"
+    #packages = "base linux linux-firmware nano python3 python-anytree bash dhcpcd \
+    #            arch-install-scripts btrfs-progs networkmanager grub sudo tmux os-prober"
+    packages = "base linux bash \
+                btrfs-progs grub sudo"
     choice, distro_suffix = get_multiboot(distro)
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
@@ -209,6 +211,9 @@ def main(args, distro):
     os.system("sudo chroot /mnt systemctl enable NetworkManager")
 
 #   GRUB and EFI
+    if luks:
+        os.system("sudo sed -i 's/^#GRUB_ENABLE_CRYPTODISK/GRUB_ENABLE_CRYPTODISK/' -i /mnt/etc/default/grub")
+        os.system(f"sudo sed -i 's|[#?]GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID={to_uuid(args[1])}:root root=/dev/mapper/luks|' /etc/default/grub")
     os.system(f"sudo chroot /mnt sudo grub-install {args[2]}")
     os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
