@@ -1,3 +1,7 @@
+QubesOS+btrfs in ashos?
+
+Allow user to specify custom subvolumes.
+
 https://teejeetech.medium.com/linux-multiboot-with-btrfs-luks-and-efi-part-1-9b2325494e0f
 https://teejeetech.medium.com/linux-multiboot-with-btrfs-luks-and-efi-part-2-7b0896c03cce
 
@@ -797,3 +801,6 @@ https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Bootloader#Default:_GRU
 https://glacion.com/2019/06/16/Fedora.html
 ----------------------------------------------------------------------
 
+
+
+https://gist.github.com/MaxXor/ba1665f47d56c24018a943bb114640d7
