@@ -68,24 +68,24 @@ def get_username():
             reply = input("> ")
             if reply.casefold() == "y":
                 break
-            elif reply.casefold() == "n":
+            else:
                 continue
     return username
 
 def get_luks():
     clear()
     while True:
-        print("Would you like to use LUKS?")
+        print("Would you like to use LUKS? (y/n)")
         reply = input("> ")
         if reply.casefold() == "y":
-            l = True
+            enc = True
             break
         elif reply.casefold() == "n":
-            l = False
+            enc = False
             break
         else:
             continue
-    return l
+    return enc
 
 def create_user(u, g):
     os.system(f"sudo chroot /mnt sudo useradd -m -G {g} -s /bin/bash {u}")
@@ -126,8 +126,8 @@ def main(args, distro):
 #   Prep (format partition, etc.)
     if isLUKS:
         os.system(f"cryptsetup -y -v --align-payload=8192 -s 256 -c aes-xts-plain64 luksFormat {args[1]}")
-        os.system(f"cryptsetup --type luks open {args[1]} luks")
-        btrfs_root = "/dev/mapper/luks"
+        os.system(f"cryptsetup --type luks open {args[1]} luks_root")
+        btrfs_root = "/dev/mapper/luks_root"
     else:
         btrfs_root = args[1]
     if choice != "3":
@@ -228,7 +228,8 @@ def main(args, distro):
 #   GRUB and EFI
     if isLUKS:
         os.system("sudo sed -i 's/^#GRUB_ENABLE_CRYPTODISK/GRUB_ENABLE_CRYPTODISK/' -i /mnt/etc/default/grub")
-        os.system(f"sudo sed -i -E 's|^#?GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID={to_uuid(args[1])}:root root=/dev/mapper/luks|' /mnt/etc/default/grub")
+###        os.system(f"sudo sed -i -E 's|^#?GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID={to_uuid(args[1])}:root root=/dev/mapper/luks|' /mnt/etc/default/grub")
+        os.system(f"sudo sed -i -E 's|^#?GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID={to_uuid(args[1])}:luks_root|' /mnt/etc/default/grub")
     os.system(f"sudo chroot /mnt sudo grub-install {args[2]}")
     os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
@@ -238,6 +239,10 @@ def main(args, distro):
         if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
             os.system("echo DISTRO,BootOrder | sudo tee /mnt/boot/efi/EFI/map.txt")
         os.system(f"echo '{distro},' $(efibootmgr -v | grep -i {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | sudo tee -a /mnt/boot/efi/EFI/map.txt")
+
+##########
+    input("> bp1")
+##########
 
 #   BTRFS snapshots
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
@@ -272,7 +277,7 @@ def main(args, distro):
     os.system(f"sudo btrfs sub del /mnt/@{distro_suffix}")
     os.system("sudo umount -R /mnt")
     if isLUKS:
-        os.system("sudo cryptsetup close luks")
+        os.system("sudo cryptsetup close luks_root")
     clear()
     print("Installation complete")
     print("You can reboot now :)")
