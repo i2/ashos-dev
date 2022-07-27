@@ -272,7 +272,7 @@ def main(args, distro):
     os.system(f"sudo btrfs sub del /mnt/@{distro_suffix}")
     os.system("sudo umount -R /mnt")
     if isLUKS:
-        os.system("sudo cryptsetup close 
+        os.system("sudo cryptsetup close luks")
     clear()
     print("Installation complete")
     print("You can reboot now :)")
