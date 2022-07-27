@@ -233,10 +233,16 @@ def main(args, distro):
 ###1        os.system(f"sudo sed -i -E 's|^#?GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID={to_uuid(args[1])}:root root=/dev/mapper/luks|' /mnt/etc/default/grub")
 ###2        os.system(f"sudo sed -i -E 's|^#?GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID={to_uuid(args[1])}:luks_root|' /mnt/etc/default/grub")
     os.system(f"sudo sed -i -E 's|^#?GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice={args[1]}:luks_root|' /mnt/etc/default/grub")
+
+##########
+    input("> bp1")
+##########
+
     os.system(f"sudo chroot /mnt sudo grub-install {args[2]}")
     os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
-    os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
+###    os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg") ### This was not replacing mount points in Advanced section
+    os.system(f"sudo sed -i 's,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
     # Create a mapping of "distro" <=> "BootOrder number". Ash reads from this file to switch between distros.
     if efi:
         if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
@@ -244,7 +250,7 @@ def main(args, distro):
         os.system(f"echo '{distro},' $(efibootmgr -v | grep -i {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | sudo tee -a /mnt/boot/efi/EFI/map.txt")
 
 ##########
-    input("> bp1")
+    input("> bp2")
 ##########
 
 #   BTRFS snapshots
