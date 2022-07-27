@@ -213,7 +213,7 @@ def main(args, distro):
 #   GRUB and EFI
     if luks:
         os.system("sudo sed -i 's/^#GRUB_ENABLE_CRYPTODISK/GRUB_ENABLE_CRYPTODISK/' -i /mnt/etc/default/grub")
-        os.system(f"sudo sed -i 's|[#?]GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID={to_uuid(args[1])}:root root=/dev/mapper/luks|' /etc/default/grub")
+        os.system(f"sudo sed -i 's|[#?]GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID={to_uuid(args[1])}:root root=/dev/mapper/luks|' /mnt/etc/default/grub")
     os.system(f"sudo chroot /mnt sudo grub-install {args[2]}")
     os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
