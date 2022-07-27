@@ -4,7 +4,7 @@ import importlib
 import subprocess
 import sys
 
-parts = list(sys.argv[1:4])
+parts = list(sys.argv[0:4])
 
 try: # If distro to be installed does not match live environment, use argument 4
     distro = sys.argv[4]

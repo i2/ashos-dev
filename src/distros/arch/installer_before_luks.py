@@ -104,30 +104,23 @@ def main(args, distro):
         efi = True
     else:
         efi = False
-    luks = True
 
 #   Prep (format partition, etc.)
-    if luks:
-        os.system(f"cryptsetup -y -v --align-payload=8192 -s 256 -c aes-xts-plain64 luksFormat {args[1]}")
-        os.system(f"cryptsetup --type luks open {args[1]} luks")
-        btrfs_root = "/dev/mapper/luks"
-    else:
-        btrfs_root = args[1]
     if choice != "3":
-        os.system(f"sudo mkfs.btrfs -L LINUX -f {btrfs_root}")
+        os.system(f"sudo mkfs.btrfs -L LINUX -f {args[1]}")
     os.system("pacman -Syy --noconfirm archlinux-keyring")
 
 #   Mount and create necessary sub-volumes and directories
     if choice != "3":
-        os.system(f"sudo mount -t btrfs {btrfs_root} /mnt")
+        os.system(f"sudo mount {args[1]} /mnt")
     else:
-        os.system(f"sudo mount -o subvolid=5 {btrfs_root} /mnt")
+        os.system(f"sudo mount -o subvolid=5 {args[1]} /mnt")
     for btrdir in btrdirs:
         os.system(f"sudo btrfs sub create /mnt/{btrdir}")
     os.system("sudo umount /mnt")
     for mntdir in mntdirs:
         os.system(f"sudo mkdir -p /mnt/{mntdir}") # -p to ignore /mnt exists complaint
-        os.system(f"sudo mount {btrfs_root} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
+        os.system(f"sudo mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
     for i in ("tmp", "root"):
         os.system(f"mkdir -p /mnt/{i}")
     for i in ("ast", "boot", "etc", "root", "rootfs", "tmp"):
@@ -155,15 +148,10 @@ def main(args, distro):
         os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars")
     os.system("sudo cp --dereference /etc/resolv.conf /mnt/etc/")
 
-#   LUKS
-    if luks:
-        os.system(f"sudo sed -i '/^HOOKS/ s/filesystems/encrypt filesystems/' /mnt/etc/mkinitcpio.conf")
-        os.system("sudo chroot /mnt sudo mkinitcpio -p linux")
-
 #   Update fstab
-    os.system(f"echo 'UUID=\"{to_uuid(btrfs_root)}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee -a /mnt/etc/fstab")
+    os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee -a /mnt/etc/fstab")
     for mntdir in mntdirs:
-        os.system(f"echo 'UUID=\"{to_uuid(btrfs_root)}\" /{mntdir} btrfs subvol=@{mntdir}{distro_suffix},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
+        os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}{distro_suffix},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
     if efi:
         os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
@@ -191,7 +179,7 @@ def main(args, distro):
 
 #   Copy and symlink astpk and detect_os.sh
     os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
-    os.system(f"echo '{to_uuid(btrfs_root)}' | sudo tee /mnt/.snapshots/ast/part")
+    os.system(f"echo '{to_uuid(args[1])}' | sudo tee /mnt/.snapshots/ast/part")
     os.system(f"sudo cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
     os.system("sudo cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
     os.system("sudo ln -srf /mnt/.snapshots/ast/ast /mnt/usr/bin/ast")
@@ -238,17 +226,17 @@ def main(args, distro):
     if efi:
         os.system("sudo umount /mnt/boot/efi")
     os.system("sudo umount /mnt/boot")
-    os.system(f"sudo mount {btrfs_root} -o subvol=@boot{distro_suffix},compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp")
+    os.system(f"sudo mount {args[1]} -o subvol=@boot{distro_suffix},compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp")
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-tmp/. /mnt/boot/")
     os.system("sudo umount /mnt/etc")
-    os.system(f"sudo mount {btrfs_root} -o subvol=@etc{distro_suffix},compress=zstd,noatime /mnt/.snapshots/etc/etc-tmp")
+    os.system(f"sudo mount {args[1]} -o subvol=@etc{distro_suffix},compress=zstd,noatime /mnt/.snapshots/etc/etc-tmp")
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-tmp/. /mnt/etc/")
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/. /mnt/.snapshots/rootfs/snapshot-tmp/boot/")
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/. /mnt/.snapshots/rootfs/snapshot-tmp/etc/")
 
 #   Unmount everything and finish
     os.system("sudo umount -R /mnt")
-    os.system(f"sudo mount {btrfs_root} -o subvolid=0 /mnt")
+    os.system(f"sudo mount {args[1]} -o subvolid=0 /mnt")
     os.system(f"sudo btrfs sub del /mnt/@{distro_suffix}")
     os.system("sudo umount -R /mnt")
     clear()
