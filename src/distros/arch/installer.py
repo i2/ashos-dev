@@ -37,7 +37,7 @@ def get_hostname():
         print("Enter hostname:")
         hostname = input("> ")
         if hostname:
-            print("Happy with your hostname (y/n)?")
+            print("Happy with your hostname? (y/n)")
             reply = input("> ")
             if reply.casefold() == "y":
                 break
@@ -64,7 +64,7 @@ def get_username():
         print("Enter username (all lowercase, max 8 letters)")
         username = input("> ")
         if username:
-            print("Happy with your username (y/n)?")
+            print("Happy with your username? (y/n)")
             reply = input("> ")
             if reply.casefold() == "y":
                 break
@@ -97,7 +97,7 @@ def set_password(u):
     while True:
         print(f"Setting a password for '{u}':")
         os.system(f"sudo chroot /mnt sudo passwd {u}")
-        print("Was your password set properly (y/n)?")
+        print("Was your password set properly? (y/n)")
         reply = input("> ")
         if reply.casefold() == "y":
             break
