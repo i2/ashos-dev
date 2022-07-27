@@ -72,6 +72,21 @@ def get_username():
                 continue
     return username
 
+def get_luks():
+    clear()
+    while True:
+        print("Would you like to use LUKS?")
+        reply = input("> ")
+        if reply.casefold() == "y":
+            l = True
+            break
+        elif reply.casefold() == "n":
+            l = False
+            break
+        else:
+            continue
+    return l
+
 def create_user(u, g):
     os.system(f"sudo chroot /mnt sudo useradd -m -G {g} -s /bin/bash {u}")
     os.system(f"echo '%{g} ALL=(ALL:ALL) ALL' | sudo tee -a /mnt/etc/sudoers")
@@ -106,10 +121,10 @@ def main(args, distro):
         efi = True
     else:
         efi = False
-    luks = True
+    isLUKS = get_luks()
 
 #   Prep (format partition, etc.)
-    if luks:
+    if isLUKS:
         os.system(f"cryptsetup -y -v --align-payload=8192 -s 256 -c aes-xts-plain64 luksFormat {args[1]}")
         os.system(f"cryptsetup --type luks open {args[1]} luks")
         btrfs_root = "/dev/mapper/luks"
@@ -158,7 +173,7 @@ def main(args, distro):
     os.system("sudo cp --dereference /etc/resolv.conf /mnt/etc/")
 
 #   LUKS
-    if luks:
+    if isLUKS:
         os.system(f"sudo sed -i '/^HOOKS/ s/filesystems/encrypt filesystems/' /mnt/etc/mkinitcpio.conf")
         os.system("sudo chroot /mnt sudo mkinitcpio -p linux")
 
@@ -211,9 +226,9 @@ def main(args, distro):
     os.system("sudo chroot /mnt systemctl enable NetworkManager")
 
 #   GRUB and EFI
-    if luks:
+    if isLUKS:
         os.system("sudo sed -i 's/^#GRUB_ENABLE_CRYPTODISK/GRUB_ENABLE_CRYPTODISK/' -i /mnt/etc/default/grub")
-        os.system(f"sudo sed -i 's|[#?]GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID={to_uuid(args[1])}:root root=/dev/mapper/luks|' /mnt/etc/default/grub")
+        os.system(f"sudo sed -i -E 's|^#?GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID={to_uuid(args[1])}:root root=/dev/mapper/luks|' /mnt/etc/default/grub")
     os.system(f"sudo chroot /mnt sudo grub-install {args[2]}")
     os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
@@ -256,6 +271,8 @@ def main(args, distro):
     os.system(f"sudo mount {btrfs_root} -o subvolid=0 /mnt")
     os.system(f"sudo btrfs sub del /mnt/@{distro_suffix}")
     os.system("sudo umount -R /mnt")
+    if isLUKS:
+        os.system("sudo cryptsetup close 
     clear()
     print("Installation complete")
     print("You can reboot now :)")
