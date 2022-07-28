@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-#########3 space_cache=v2 -----------> mount -o noatime,compress=zstd,ssd,space_cache=v2 "${__mapper__}" /mnt
+### space_cache=v2 -----------> mount -o noatime,compress=zstd,ssd,space_cache=v2 "${__mapper__}" /mnt
 
 import os
 import subprocess
@@ -119,8 +119,8 @@ def main(args, distro):
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
     isLUKS = get_luks()
     tz = get_timezone()
-#    hostname = get_hostname()
-    hostname = subprocess.check_output(f"git rev-parse --short HEAD", shell=True).decode('utf-8').strip() ### Just for debugging
+###    hostname = get_hostname()
+    hostname = subprocess.check_output(f"git rev-parse --short HEAD", shell=True).decode('utf-8').strip() # Just for debugging
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
@@ -238,7 +238,7 @@ def main(args, distro):
         os.system("sudo chroot /mnt sudo mkinitcpio -p linux")
         os.system("sudo sed -i 's/^#GRUB_ENABLE_CRYPTODISK/GRUB_ENABLE_CRYPTODISK/' -i /mnt/etc/default/grub")
         os.system(f"sudo sed -i -E 's|^#?GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID={to_uuid(args[1])}:luks_root|' /mnt/etc/default/grub")
-    if efi:
+    if efi: # running this seems to write core.img so it's important for this to be before mkimage
         os.system(f'sudo chroot /mnt sudo grub-install {args[2]} --modules="{luks_grub_args}"')
     else:
         os.system(f'sudo chroot /mnt sudo grub-install {args[2]} --modules="{luks_grub_args}"')
@@ -247,21 +247,11 @@ def main(args, distro):
         os.system(f"sed -i.bak 's|DISTRO|{distro}|' ./src/distros/arch/grub-luks2.conf")
         os.system(f"cp -a ./src/distros/arch/grub-luks2.conf /mnt/home/{username}/")
         if efi:
-            os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O x86_64-efi -c /home/{username}/grub-luks2.conf -o /boot/efi/EFI/{distro}/grubx64.efi {luks_grub_args}') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!) # changed from /tmp to $HOME
+            os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O x86_64-efi -c /home/{username}/grub-luks2.conf -o /boot/efi/EFI/{distro}/grubx64.efi {luks_grub_args}') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!) ### changed from /tmp to $HOME
         else:
-            os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O i386-pc -c /home/{username}/grub-luks2.conf -o /boot/grub/i386-pc/core_luks2.img {luks_grub_args}') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!) #### 'biosdisk' module not needed eh?
-
-
-
-
-##########
-    input("> bpZZZZZZZZZZ")
-##########
-
-
-
-
-    os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg") ### Ading /grub suffix to grub-luks2.conf didn't make a difference in the produced grub.cfg in this step so that's good I guess!!!
+            os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O i386-pc -c /home/{username}/grub-luks2.conf -o /boot/grub/i386-pc/core_luks2.img {luks_grub_args}') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!) ### 'biosdisk' module not needed eh?
+            os.system(f'dd oflag=seek_bytes seek=512 if=/mnt/boot/grub/i386-pc/core_luks2.img of={args[2]}')
+    os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg") ### Adding /grub suffix to grub-luks2.conf didn't make a difference in the produced grub.cfg in this step so that's good I guess!!!
     os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
 ###    os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg") ### This was not replacing mount points in Advanced section
     os.system(f"sudo sed -i 's,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
@@ -297,10 +287,6 @@ def main(args, distro):
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-tmp/. /mnt/etc/")
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/. /mnt/.snapshots/rootfs/snapshot-tmp/boot/")
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/. /mnt/.snapshots/rootfs/snapshot-tmp/etc/")
-
-##########
-    input("> before unmounting everything")
-##########
 
 #   Unmount everything and finish
     os.system("sudo umount -R /mnt")
