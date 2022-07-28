@@ -127,7 +127,7 @@ def main(args, distro):
         efi = False
     if isLUKS:
         btrfs_root = "/dev/mapper/luks_root"
-        luks_grub_args = "luks2 btrfs cryptodisk pbkdf2 gcry_rijndael gcry_sha512" ### part_gpt added here and removed from line TEMPORARY SEE IF IT FIXES NOT BOOTING WTF
+        luks_grub_args = "luks2 btrfs part_gpt cryptodisk pbkdf2 gcry_rijndael gcry_sha512" ### part_gpt added here and removed from line TEMPORARY SEE IF IT FIXES NOT BOOTING WTF
     else:
         btrfs_root = args[1]
         luks_grub_args = ""
@@ -236,7 +236,7 @@ def main(args, distro):
         os.system("sudo sed -i 's/^#GRUB_ENABLE_CRYPTODISK/GRUB_ENABLE_CRYPTODISK/' -i /mnt/etc/default/grub")
         os.system(f"sudo sed -i -E 's|^#?GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID={to_uuid(args[1])}:luks_root|' /mnt/etc/default/grub")
     if efi:
-        os.system(f'sudo chroot /mnt sudo grub-install --modules="{luks_grub_args} part_gpt" {args[2]}')
+        os.system(f'sudo chroot /mnt sudo grub-install --modules="{luks_grub_args}" {args[2]}')
     else:
         os.system(f'sudo chroot /mnt sudo grub-install --modules="{luks_grub_args} part_msdos" {args[2]}')
     if isLUKS: # Make LUKS2 compatible grub image
