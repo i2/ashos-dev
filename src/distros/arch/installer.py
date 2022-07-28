@@ -251,7 +251,8 @@ def main(args, distro):
     os.system(f'sudo chroot /mnt sudo grub-install --modules="{luks_grub_args}" {args[2]}')
 
     if isLUKS: # Make LUKS2 compatible grub image
-        os.system
+        os.system(f"sed -i.bak 's|LUKS_UUID_WITHOUT_DASHES|{to_uuid(args[1]).replace('-', '')}' ./src/distros/arch/grub-luks2.conf")
+        os.system(f"sed -i.bak 's|DISTRO_SUFFIX|{distro_suffix}' ./src/distros/arch/grub-luks2.conf")
         os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch" -O x86_64-efi -c ./src/distros/arch/grub-luks2.conf -o /boot/efi/EFI/{distro}/grubx64.efi {luks_grub_args}')
 
         
