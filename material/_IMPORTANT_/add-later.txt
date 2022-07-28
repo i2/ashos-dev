@@ -805,6 +805,8 @@ https://glacion.com/2019/06/16/Fedora.html
 
 ---------------------------------- LUKS ----------------------------
 https://aur.archlinux.org/packages/grub-git?O=10&PP=10#comment-769218
+https://blog.heckel.io/2017/05/28/creating-a-bios-gpt-and-uefi-gpt-grub-bootable-linux-system/#Creating-a-GPT-with-a-BIOS-boot-partition-and-an-EFI-System-Partition
+https://unix.stackexchange.com/questions/332880/how-does-grub-find-boot-partition-on-an-mbr-disk
 https://gist.github.com/MaxXor/ba1665f47d56c24018a943bb114640d7
 https://gist.github.com/mruiz42/83d9a232e7592d65d953671409a2aab9
 https://wiki.archlinux.org/title/User:M0p/LUKS_Root_on_Btrfs

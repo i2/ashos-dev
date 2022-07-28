@@ -18,7 +18,7 @@ def get_multiboot(dist):
     clear()
     while True:
         print("Please choose one of the following:\n1. Single OS installation\n2. Initiate a multi-boot ashos setup\n3. Adding to an already installed ashos")
-        print("Please be aware choosing option 1 and 2 will wipe {args[1]}")
+        print("Please be aware choosing option 1 and 2 will wipe root partition")
         i = input("> ")
         if i == "1":
             return i, ""
@@ -249,10 +249,17 @@ def main(args, distro):
         if efi:
             os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O x86_64-efi -c /home/{username}/grub-luks2.conf -o /boot/efi/EFI/{distro}/grubx64.efi {luks_grub_args}') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!) # changed from /tmp to $HOME
         else:
-###            os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O i386-pc -c /home/{username}/grub-luks2.conf -o /boot/grub/i386-pc/core.img {luks_grub_args}') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!) #### 'biosdisk' module not needed eh?
-            os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O i386-pc -c /home/{username}/grub-luks2.conf -o {args[2]} {luks_grub_args}') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!) #### 'biosdisk' module not needed eh?
+            os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O i386-pc -c /home/{username}/grub-luks2.conf -o /boot/grub/i386-pc/core_luks2.img {luks_grub_args}') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!) #### 'biosdisk' module not needed eh?
 
-    input("> >>>>>>>>>>>>>")
+
+
+
+##########
+    input("> bpZZZZZZZZZZ")
+##########
+
+
+
 
     os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg") ### Ading /grub suffix to grub-luks2.conf didn't make a difference in the produced grub.cfg in this step so that's good I guess!!!
     os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
