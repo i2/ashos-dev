@@ -243,7 +243,7 @@ def main(args, distro):
         if efi:
             os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O x86_64-efi -c /tmp/grub-luks2.conf -o /boot/efi/EFI/{distro}/grubx64.efi {luks_grub_args} part_gpt') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!)
         else:
-            os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O i386-pc -c /tmp/grub-luks2.conf -o /boot/grub/i386-pc/core.img {luks_grub_args} part_msdos') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!)
+            os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O i386-pc -c /tmp/grub-luks2.conf -o /boot/grub/i386-pc/core.img {luks_grub_args} part_msdos') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!) #### 'biosdisk' module not needed eh?
 
     os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg") ### Ading /grub suffix to grub-luks2.conf didn't make a difference in the produced grub.cfg in this step so that's good I guess!!!
     os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
