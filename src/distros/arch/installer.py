@@ -119,14 +119,15 @@ def main(args, distro):
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
     isLUKS = get_luks()
     tz = get_timezone()
-    hostname = get_hostname()
+#    hostname = get_hostname()
+    hostname = subprocess.check_output(f"git rev-parse --short HEAD", shell=True).decode('utf-8').strip() ### Just for debugging
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
         efi = False
     if isLUKS:
         btrfs_root = "/dev/mapper/luks_root"
-        luks_grub_args = "luks2 btrfs cryptodisk pbkdf2 gcry_rijndael gcry_sha512"
+        luks_grub_args = "luks2 btrfs part_gpt cryptodisk pbkdf2 gcry_rijndael gcry_sha512" ### part_gpt added here and removed from line TEMPORARY SEE IF IT FIXES NOT BOOTING WTF
     else:
         btrfs_root = args[1]
         luks_grub_args = ""
@@ -243,7 +244,7 @@ def main(args, distro):
         os.system(f"sed -i.bak 's|DISTRO|{distro}|' ./src/distros/arch/grub-luks2.conf")
         os.system("cp -a ./src/distros/arch/grub-luks2.conf /mnt/tmp/")
         if efi:
-            os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O x86_64-efi -c /tmp/grub-luks2.conf -o /boot/efi/EFI/{distro}/grubx64.efi {luks_grub_args} part_gpt') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!)
+            os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O x86_64-efi -c /tmp/grub-luks2.conf -o /boot/efi/EFI/{distro}/grubx64.efi {luks_grub_args}') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!)
         else:
             os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O i386-pc -c /tmp/grub-luks2.conf -o /boot/grub/i386-pc/core.img {luks_grub_args} part_msdos') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!) #### 'biosdisk' module not needed eh?
 
