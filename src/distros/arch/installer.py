@@ -254,10 +254,11 @@ def main(args, distro):
         os.system(f"sed -i.bak 's|LUKS_UUID_WITHOUT_DASHES|{to_uuid(args[1]).replace('-', '')}|' ./src/distros/arch/grub-luks2.conf")
         os.system(f"sed -i.bak 's|DISTRO_SUFFIX|{distro_suffix}|' ./src/distros/arch/grub-luks2.conf")
         os.system("cp -a ./src/distros/arch/grub-luks2.conf /mnt/tmp/")
-        os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch" -O x86_64-efi -c /tmp/grub-luks2.conf -o /boot/efi/EFI/{distro}/grubx64.efi {luks_grub_args}')
+###        os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch" -O x86_64-efi -c /tmp/grub-luks2.conf -o /boot/efi/EFI/{distro}/grubx64.efi {luks_grub_args}') #### gives error normal.mod not found
+        os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O x86_64-efi -c /tmp/grub-luks2.conf -o /boot/efi/EFI/{distro}/grubx64.efi {luks_grub_args}') #### gives error normal.mod not found
 
         
-    os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
+    os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg") ### Ading /grub suffix to grub-luks2.conf didn't make a difference in the produced grub.cfg in this step so that's good I guess!!!
     os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
 ###    os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg") ### This was not replacing mount points in Advanced section
     os.system(f"sudo sed -i 's,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
@@ -304,6 +305,12 @@ def main(args, distro):
     os.system(f"sudo mount {btrfs_root} -o subvolid=0 /mnt")
     os.system(f"sudo btrfs sub del /mnt/@{distro_suffix}")
     os.system("sudo umount -R /mnt")
+
+##########
+    input("> bp9 before closing LUKS partition")
+##########
+    
+    
     if isLUKS:
         os.system("sudo cryptsetup close luks_root")
     clear()
