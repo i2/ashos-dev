@@ -129,135 +129,31 @@ def main(args, distro):
 #   Prep (format partition, etc.)
     if isLUKS:
         luks_grub_args = "luks2 btrfs part_gpt cryptodisk gcry_rijndael pbkdf2 gcry_sha512"
-        os.system("sudo modprobe dm-crypt")
-        print("--- Create LUKS partition --- ")
-        os.system(f"sudo cryptsetup -y -v -c aes-xts-plain64 -s 512 --hash sha512 --pbkdf pbkdf2 --type luks2 luksFormat {args[1]}")
-        print("--- Open LUKS partition --- ")
-        os.system(f"cryptsetup --allow-discards --persistent --type luks2 open {args[1]} luks_root")
         btrfs_root = "/dev/mapper/luks_root"
     else:
         btrfs_root = args[1]
-    if choice != "3":
-        os.system(f"sudo mkfs.btrfs -L LINUX -f {btrfs_root}")
-    os.system("pacman -Syy --noconfirm archlinux-keyring")
 
-#   Mount and create necessary sub-volumes and directories
-    if choice != "3":
-        os.system(f"sudo mount -t btrfs {btrfs_root} /mnt")
-    else:
-        os.system(f"sudo mount -o subvolid=5 {btrfs_root} /mnt")
-    for btrdir in btrdirs:
-        os.system(f"sudo btrfs sub create /mnt/{btrdir}")
-    os.system("sudo umount /mnt")
-    for mntdir in mntdirs:
-        os.system(f"sudo mkdir -p /mnt/{mntdir}") # -p to ignore /mnt exists complaint
-        os.system(f"sudo mount {btrfs_root} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
-    for i in ("tmp", "root"):
-        os.system(f"mkdir -p /mnt/{i}")
-    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp"):
-        os.system(f"mkdir -p /mnt/.snapshots/{i}")
-    if efi:
-        os.system("sudo mkdir -p /mnt/boot/efi")
-        os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
-#   Bootstrap then install anytree and necessary packages in chroot
-    excode = int(os.system(f"sudo pacstrap /mnt {packages}"))
-    if excode != 0:
-        print("Failed to bootstrap!")
-        sys.exit()
-    if efi:
-        excode = int(os.system("sudo pacstrap /mnt efibootmgr"))
-        if excode != 0:
-            print("Failed to download packages!")
-            sys.exit()
-    # Mount-points needed for chrooting
-    os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /dev /mnt/dev")
-    os.system("sudo mount -o x-mount.mkdir --types proc /proc /mnt/proc")
-    os.system("sudo mount -o x-mount.mkdir --bind --make-slave /run /mnt/run")
-    os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /sys /mnt/sys")
-    if efi:
-        os.system("sudo mount -o x-mount.mkdir --rbind --make-rslave /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars")
-    os.system("sudo cp --dereference /etc/resolv.conf /mnt/etc/")
+###   RAN THESE BY HAND
+#    if isLUKS:
+#        os.system(f"sudo sed -i '/^HOOKS/ s/filesystems/encrypt filesystems/' /mnt/etc/mkinitcpio.conf")
+#        os.system("sudo chroot /mnt sudo mkinitcpio -p linux")
 
-#   LUKS
-###    if isLUKS:
-###        os.system(f"sudo sed -i '/^HOOKS/ s/filesystems/encrypt filesystems/' /mnt/etc/mkinitcpio.conf")
-###        os.system("sudo chroot /mnt sudo mkinitcpio -p linux")
+#    os.system(f'sudo chroot /mnt sudo grub-install --modules="{luks_grub_args}" {args[2]}')
 
-#   Update fstab
-    os.system(f"echo 'UUID=\"{to_uuid(btrfs_root)}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee -a /mnt/etc/fstab")
-    for mntdir in mntdirs:
-        os.system(f"echo 'UUID=\"{to_uuid(btrfs_root)}\" /{mntdir} btrfs subvol=@{mntdir}{distro_suffix},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
-    if efi:
-        os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | sudo tee -a /mnt/etc/fstab")
-    os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
-    os.system("echo '/.snapshots/ast/tmp /tmp none bind 0 0' | sudo tee -a /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@{distro_suffix}/ s,@{distro_suffix},@.snapshots{distro_suffix}/rootfs/snapshot-tmp,' /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@etc{distro_suffix}/ s,@etc{distro_suffix},@.snapshots{distro_suffix}/etc/etc-tmp,' /mnt/etc/fstab")
-    os.system(f"sudo sed -i '/\@{distro_suffix}/d' /mnt/etc/fstab") # Delete @_distro entry
-
-#   Database and config files
-    os.system("sudo mkdir -p /mnt/usr/share/ast/db")
-    os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
-    os.system("sudo cp -r /mnt/var/lib/pacman/. /mnt/usr/share/ast/db/")
-    os.system(f"sed -i s,\"#DBPath      = /var/lib/pacman/\",\"DBPath      = /usr/share/ast/db/\",g /mnt/etc/pacman.conf")
-    os.system(f"sudo sed -i '/^ID/ s/{distro}/{distro}_ashos/' /mnt/etc/os-release") # Modify OS release information (optional)
-
-#   Update hostname, hosts, locales and timezone, hosts
-    os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
-    os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
-    os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /mnt/etc/locale.gen")
-    os.system("sudo chroot /mnt sudo locale-gen")
-    os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
-    os.system(f"sudo ln -srf /mnt{tz} /mnt/etc/localtime")
-    os.system("sudo chroot /mnt sudo hwclock --systohc")
-
-#   Copy and symlink astpk and detect_os.sh
-    os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
-    os.system(f"echo '{to_uuid(btrfs_root)}' | sudo tee /mnt/.snapshots/ast/part")
-    os.system(f"sudo cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
-    os.system("sudo cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
-    os.system("sudo ln -srf /mnt/.snapshots/ast/ast /mnt/usr/bin/ast")
-    os.system("sudo ln -srf /mnt/.snapshots/ast/detect_os.sh /mnt/usr/bin/detect_os.sh")
-    os.system("sudo ln -srf /mnt/.snapshots/ast /mnt/var/lib/ast")
-    os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree") # Initialize fstree
-
-#   Create user and set password
-    set_password("root")
-    username = get_username()
-    create_user(username, "wheel")
-    set_password(username)
-
-#   Systemd
-    os.system("sudo chroot /mnt systemctl enable NetworkManager")
-
-#   GRUB and EFI
-    if isLUKS:
-        os.system("sudo sed -i 's/^#GRUB_ENABLE_CRYPTODISK/GRUB_ENABLE_CRYPTODISK/' -i /mnt/etc/default/grub")
-###        os.system(f"sudo sed -i -E 's|^#?GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID={to_uuid(args[1])}:root root=/dev/mapper/luks|' /mnt/etc/default/grub")
-        os.system(f"sudo sed -i -E 's|^#?GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID={to_uuid(args[1])}:luks_root|' /mnt/etc/default/grub")
-###        os.system(f"sudo sed -i -E 's|^#?GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice={args[1]}:luks_root|' /mnt/etc/default/grub")
-
-##########
-    input("> bp1")
-##########
-
-#   
-    if isLUKS:
-        os.system(f"sudo sed -i '/^HOOKS/ s/filesystems/encrypt filesystems/' /mnt/etc/mkinitcpio.conf")
-        os.system("sudo chroot /mnt sudo mkinitcpio -p linux")
-
-    os.system(f'sudo chroot /mnt sudo grub-install --modules="{luks_grub_args}" {args[2]}')
-
-    if isLUKS: # Make LUKS2 compatible grub image
-        os.system(f"sed -i.bak 's|LUKS_UUID_WITHOUT_DASHES|{to_uuid(args[1]).replace('-', '')}|' ./src/distros/arch/grub-luks2.conf")
-        os.system(f"sed -i.bak 's|DISTRO_SUFFIX|{distro_suffix}|' ./src/distros/arch/grub-luks2.conf")
-        os.system("cp -a ./src/distros/arch/grub-luks2.conf /mnt/tmp/")
-        os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch" -O x86_64-efi -c /tmp/grub-luks2.conf -o /boot/efi/EFI/{distro}/grubx64.efi {luks_grub_args}')
-
+#    if isLUKS: # Make LUKS2 compatible grub image
+#        os.system(f"sed -i.bak 's|LUKS_UUID_WITHOUT_DASHES|{to_uuid(args[1]).replace('-', '')}|' ./src/distros/arch/grub-luks2.conf")
+#        os.system(f"sed -i.bak 's|DISTRO_SUFFIX|{distro_suffix}|' ./src/distros/arch/grub-luks2.conf")
+#        os.system("cp -a ./src/distros/arch/grub-luks2.conf /mnt/tmp/")
+#        os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch" -O x86_64-efi -c /tmp/grub-luks2.conf -o /boot/efi/EFI/{distro}/grubx64.efi {luks_grub_args}')
         
-    os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
+#    os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
+
+##########
+    input("> after bp1")
+##########
+
+
     os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
 ###    os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg") ### This was not replacing mount points in Advanced section
     os.system(f"sudo sed -i 's,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
@@ -286,6 +182,11 @@ def main(args, distro):
     os.system("sudo cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")
     os.system("sudo rm -rf /mnt/root/*")
     os.system("sudo rm -rf /mnt/tmp/*")
+
+##########
+    input("> bp3")
+##########
+
 
 #   Copy boot and etc from snapshot's tmp to common
     if efi:
