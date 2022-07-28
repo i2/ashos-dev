@@ -130,7 +130,7 @@ def main(args, distro):
         if efi:
             luks_grub_args = "luks2 btrfs part_gpt cryptodisk pbkdf2 gcry_rijndael gcry_sha512"
         else:
-            luks_grub_args = "luks2 btrfs part_msdos cryptodisk pbkdf2 gcry_rijndael gcry_sha512"
+            luks_grub_args = "luks2 btrfs biosdisk part_msdos cryptodisk pbkdf2 gcry_rijndael gcry_sha512"
     else:
         btrfs_root = args[1]
         luks_grub_args = ""
@@ -249,7 +249,7 @@ def main(args, distro):
         if efi:
             os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O x86_64-efi -c /home/{username}/grub-luks2.conf -o /boot/efi/EFI/{distro}/grubx64.efi {luks_grub_args}') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!) # changed from /tmp to $HOME
         else:
-            os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O i386-pc -c /home/{username}/grub-luks2.conf -o /boot/grub/i386-pc/core.img {luks_grub_args} part_msdos') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!) #### 'biosdisk' module not needed eh?
+            os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O i386-pc -c /home/{username}/grub-luks2.conf -o /boot/grub/i386-pc/core.img {luks_grub_args}') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!) #### 'biosdisk' module not needed eh?
 
     os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg") ### Ading /grub suffix to grub-luks2.conf didn't make a difference in the produced grub.cfg in this step so that's good I guess!!!
     os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
