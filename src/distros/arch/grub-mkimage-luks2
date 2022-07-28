@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#source: https://aur.archlinux.org/packages/grub-git?O=10&PP=10#comment-769218
+
 distro_suffix="_arch"
 set -e
 read -rp "Enter the partition containing /, without '/dev/': " __ROOT__
