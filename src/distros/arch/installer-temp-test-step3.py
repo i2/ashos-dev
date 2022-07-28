@@ -211,3 +211,10 @@ def main(args, distro):
     print("Installation complete")
     print("You can reboot now :)")
 
+
+
+
+args = list(sys.argv)
+distro="arch"
+distro_suffix="_arch"
+main(args, distro)
