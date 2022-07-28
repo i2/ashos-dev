@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+#########3 space_cache=v2 -----------> mount -o noatime,compress=zstd,ssd,space_cache=v2 "${__mapper__}" /mnt
+
 import os
 import subprocess
 import sys ### REMOVE WHEN USING TRY CATCH
@@ -126,7 +128,7 @@ def main(args, distro):
 
 #   Prep (format partition, etc.)
     if isLUKS:
-        luks_grub_args = '--modules="luks2 part_gpt cryptodisk gcry_rijndael pbkdf2 gcry_sha512"'
+        luks_grub_args = "luks2 btrfs part_gpt cryptodisk gcry_rijndael pbkdf2 gcry_sha512"
         os.system("sudo modprobe dm-crypt")
         print("--- Create LUKS partition --- ")
         os.system(f"sudo cryptsetup -y -v -c aes-xts-plain64 -s 512 --hash sha512 --pbkdf pbkdf2 --type luks2 luksFormat {args[1]}")
@@ -241,7 +243,18 @@ def main(args, distro):
     input("> bp1")
 ##########
 
-    os.system(f"sudo chroot /mnt sudo grub-install {luks_grub_args} {args[2]}")
+#   
+    if isLUKS:
+        os.system(f"sudo sed -i '/^HOOKS/ s/filesystems/encrypt filesystems/' /mnt/etc/mkinitcpio.conf")
+        os.system("sudo chroot /mnt sudo mkinitcpio -p linux")
+
+    os.system(f'sudo chroot /mnt sudo grub-install --modules="{luks_grub_args}" {args[2]}')
+
+    if isLUKS: # Make LUKS2 compatible grub image
+        os.system
+        os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch" -O x86_64-efi -c ./src/distros/arch/grub-luks2.conf -o /boot/efi/EFI/{distro}/grubx64.efi {luks_grub_args}')
+
+        
     os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
 ###    os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg") ### This was not replacing mount points in Advanced section
@@ -251,11 +264,6 @@ def main(args, distro):
         if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
             os.system("echo DISTRO,BootOrder | sudo tee /mnt/boot/efi/EFI/map.txt")
         os.system(f"echo '{distro},' $(efibootmgr -v | grep -i {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | sudo tee -a /mnt/boot/efi/EFI/map.txt")
-
-#   LUKS
-    if isLUKS:
-        os.system(f"sudo sed -i '/^HOOKS/ s/filesystems/encrypt filesystems/' /mnt/etc/mkinitcpio.conf")
-        os.system("sudo chroot /mnt sudo mkinitcpio -p linux")
 
 
 ##########

@@ -1,0 +1,25 @@
+#!/bin/bash
+
+distro_suffix="_arch"
+set -e
+read -rp "Enter the partition containing /, without '/dev/': " __ROOT__
+cr_root_uuid="$(cryptsetup luksUUID /dev/${__ROOT__})"
+CONFIG=$(mktemp /tmp/grub-config.XXXXX)
+cat >"$CONFIG" <<EOF
+cryptomount -u ${cr_root_uuid//-/}
+
+set prefix='(crypto0)/@boot${distro_suffix}'
+set root='(crypto0)'
+
+insmod normal
+normal
+EOF
+
+grub-mkimage \
+    -p '(crypto0)/@grub' \
+    -O x86_64-efi \
+    -c "$CONFIG" \
+    -o /boot/efi/EFI/archlinux/grubx64.efi \
+    luks2 btrfs part_gpt cryptodisk gcry_rijndael pbkdf2 gcry_sha512
+
+rm "$CONFIG"
