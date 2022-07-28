@@ -2,8 +2,8 @@
 
 if [ -z "$HOME" ]; then HOME=~ ; fi
 # Ignore signature checking in pacman.conf (bad idea but sometimes necessary in VirtualBox)
-sed -e '/^SigLevel/ s/^#*/SigLevel = Never\n#/' -i /etc/pacman.conf
-sed -e '/^LocalFileSigLevel/ s/^#*/#/' -i /etc/pacman.conf
+sed -e '/^SigLevel/ s|^#*|SigLevel = Never\n#|' -i /etc/pacman.conf
+sed -e '/^LocalFileSigLevel/ s|^#*|#|' -i /etc/pacman.conf
 pacman -Syy --noconfirm archlinux-keyring
 pacman -S --noconfirm git
 echo "export LC_ALL=C LC_CTYPE=C LANGUAGE=C" | tee -a $HOME/.zshrc

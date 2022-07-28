@@ -121,14 +121,17 @@ def main(args, distro):
         efi = True
     else:
         efi = False
+    luks_grub_args = ""
     isLUKS = get_luks()
 
 #   Prep (format partition, etc.)
     if isLUKS:
+        luks_grub_args = '--modules="luks2 part_gpt cryptodisk gcry_rijndael pbkdf2 gcry_sha512"'
+        os.system("sudo modprobe dm-crypt")
         print("--- Create LUKS partition --- ")
-        os.system(f"cryptsetup -y -v --align-payload=8192 -s 256 -c aes-xts-plain64 luksFormat {args[1]}")
+        os.system(f"sudo cryptsetup -y -v -c aes-xts-plain64 -s 512 --hash sha512 --pbkdf pbkdf2 --type luks2 luksFormat {args[1]}")
         print("--- Open LUKS partition --- ")
-        os.system(f"cryptsetup --type luks open {args[1]} luks_root")
+        os.system(f"cryptsetup --allow-discards --persistent --type luks2 open {args[1]} luks_root")
         btrfs_root = "/dev/mapper/luks_root"
     else:
         btrfs_root = args[1]
@@ -152,7 +155,7 @@ def main(args, distro):
     for i in ("ast", "boot", "etc", "root", "rootfs", "tmp"):
         os.system(f"mkdir -p /mnt/.snapshots/{i}")
     if efi:
-        os.system("sudo mkdir /mnt/boot/efi")
+        os.system("sudo mkdir -p /mnt/boot/efi")
         os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
 #   Bootstrap then install anytree and necessary packages in chroot
@@ -175,9 +178,9 @@ def main(args, distro):
     os.system("sudo cp --dereference /etc/resolv.conf /mnt/etc/")
 
 #   LUKS
-    if isLUKS:
-        os.system(f"sudo sed -i '/^HOOKS/ s/filesystems/encrypt filesystems/' /mnt/etc/mkinitcpio.conf")
-        os.system("sudo chroot /mnt sudo mkinitcpio -p linux")
+###    if isLUKS:
+###        os.system(f"sudo sed -i '/^HOOKS/ s/filesystems/encrypt filesystems/' /mnt/etc/mkinitcpio.conf")
+###        os.system("sudo chroot /mnt sudo mkinitcpio -p linux")
 
 #   Update fstab
     os.system(f"echo 'UUID=\"{to_uuid(btrfs_root)}\" / btrfs subvol=@{distro_suffix},compress=zstd,noatime,ro 0 0' | sudo tee -a /mnt/etc/fstab")
@@ -230,15 +233,15 @@ def main(args, distro):
 #   GRUB and EFI
     if isLUKS:
         os.system("sudo sed -i 's/^#GRUB_ENABLE_CRYPTODISK/GRUB_ENABLE_CRYPTODISK/' -i /mnt/etc/default/grub")
-###1        os.system(f"sudo sed -i -E 's|^#?GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID={to_uuid(args[1])}:root root=/dev/mapper/luks|' /mnt/etc/default/grub")
-###2        os.system(f"sudo sed -i -E 's|^#?GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID={to_uuid(args[1])}:luks_root|' /mnt/etc/default/grub")
-    os.system(f"sudo sed -i -E 's|^#?GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice={args[1]}:luks_root|' /mnt/etc/default/grub")
+###        os.system(f"sudo sed -i -E 's|^#?GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID={to_uuid(args[1])}:root root=/dev/mapper/luks|' /mnt/etc/default/grub")
+        os.system(f"sudo sed -i -E 's|^#?GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID={to_uuid(args[1])}:luks_root|' /mnt/etc/default/grub")
+###        os.system(f"sudo sed -i -E 's|^#?GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice={args[1]}:luks_root|' /mnt/etc/default/grub")
 
 ##########
     input("> bp1")
 ##########
 
-    os.system(f"sudo chroot /mnt sudo grub-install {args[2]}")
+    os.system(f"sudo chroot /mnt sudo grub-install {luks_grub_args} {args[2]}")
     os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
 ###    os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg") ### This was not replacing mount points in Advanced section
@@ -248,6 +251,12 @@ def main(args, distro):
         if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
             os.system("echo DISTRO,BootOrder | sudo tee /mnt/boot/efi/EFI/map.txt")
         os.system(f"echo '{distro},' $(efibootmgr -v | grep -i {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | sudo tee -a /mnt/boot/efi/EFI/map.txt")
+
+#   LUKS
+    if isLUKS:
+        os.system(f"sudo sed -i '/^HOOKS/ s/filesystems/encrypt filesystems/' /mnt/etc/mkinitcpio.conf")
+        os.system("sudo chroot /mnt sudo mkinitcpio -p linux")
+
 
 ##########
     input("> bp2")

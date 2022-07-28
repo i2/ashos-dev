@@ -48,7 +48,7 @@ def immutability_enable(snapshot):
                 os.system(f"rm /.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable")
                 os.system(f"btrfs property set -ts /.snapshots/rootfs/snapshot-{snapshot} ro true")
                 print(f"Snapshot {snapshot} successfully made immutable.")
-                os.system(f"sed 's/ MUTABLE //g' /.snapshots/ast/snapshots/{snapshot}-desc")
+                os.system(f"sed 's| MUTABLE ||g' /.snapshots/ast/snapshots/{snapshot}-desc")
     else:
         print(f"F: Snapshot {snapshot} (base) should not be modified.")
 
@@ -210,7 +210,7 @@ def deploy(snapshot):
         os.system(f"cp --reflink=auto -r /.snapshots/etc/etc-{etc}/* /.snapshots/rootfs/snapshot-{tmp}/etc >/dev/null 2>&1")
         # If snapshot is mutable, modify '/' entry (1st line) in fstab to read-write
         if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
-            os.system(f"sed -i '0,/snapshots_tmp/ s/,ro//' /.snapshots/rootfs/snapshot-{tmp}/etc/fstab") # ,rw
+            os.system(f"sed -i '0,/snapshots_tmp/ s|,ro||' /.snapshots/rootfs/snapshot-{tmp}/etc/fstab") # ,rw
         os.system(f"btrfs sub snap /var /.snapshots/rootfs/snapshot-{tmp}/var >/dev/null 2>&1")
         os.system(f"cp --reflink=auto -r /.snapshots/boot/boot-{etc}/* /.snapshots/rootfs/snapshot-{tmp}/boot >/dev/null 2>&1")
         os.system(f"echo '{snapshot}' > /.snapshots/rootfs/snapshot-{tmp}/usr/share/ast/snap")
@@ -457,8 +457,8 @@ def update_boot(snapshot):
         ### TODO: DELETE grub.cfg.DATE.BAK older than 90 days
         subprocess.check_output("cp /boot/grub/grub.cfg /boot/grub/BAK/grub.cfg.`date '+%Y%m%d-%H%M%S'`", shell=True)
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} grub-mkconfig {part} -o /boot/grub/grub.cfg")
-        os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i s,snapshot-chr{snapshot},snapshot-{tmp},g /boot/grub/grub.cfg")
-        os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i '0,/Arch\ Linux/ s##Arch\ Linux\ snapshot\ {snapshot}#' /boot/grub/grub.cfg")
+        os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i s|snapshot-chr{snapshot}|snapshot-{tmp}|g /boot/grub/grub.cfg")
+        os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i '0,/Arch\ Linux/ s||Arch\ Linux\ snapshot\ {snapshot}|' /boot/grub/grub.cfg")
         posttrans(snapshot)
 
 #   Chroot into snapshot
@@ -754,22 +754,22 @@ def switchtmp():
     os.system(f"mount {part} -o subvol=@boot{distro_suffix} /etc/mnt/boot") # Mount boot partition for writing
     if "tmp0" in mount:
         os.system("cp --reflink=auto -r /.snapshots/rootfs/snapshot-tmp/boot/* /etc/mnt/boot")  ######REZA WHATABOUTTHIS?
-        os.system(f"sed -i 's,@.snapshots{distro_suffix}/rootfs/snapshot-tmp0,@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /etc/mnt/boot/grub/grub.cfg") # Overwrite grub config boot subvolume
-        os.system(f"sed -i 's,@.snapshots{distro_suffix}/rootfs/snapshot-tmp0,@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /.snapshots/rootfs/snapshot-tmp/boot/grub/grub.cfg")
-        os.system(f"sed -i 's,@.snapshots{distro_suffix}/rootfs/snapshot-tmp0,@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab") # Write fstab for new deployment
-        os.system(f"sed -i 's,@.snapshots{distro_suffix}/etc/etc-tmp0,@.snapshots{distro_suffix}/etc/etc-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
-        os.system(f"sed -i 's,@.snapshots{distro_suffix}/boot/boot-tmp0,@.snapshots{distro_suffix}/boot/boot-tmp,g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
+        os.system(f"sed -i 's|@.snapshots{distro_suffix}/rootfs/snapshot-tmp0|@.snapshots{distro_suffix}/rootfs/snapshot-tmp|g' /etc/mnt/boot/grub/grub.cfg") # Overwrite grub config boot subvolume
+        os.system(f"sed -i 's|@.snapshots{distro_suffix}/rootfs/snapshot-tmp0|@.snapshots{distro_suffix}/rootfs/snapshot-tmp|g' /.snapshots/rootfs/snapshot-tmp/boot/grub/grub.cfg")
+        os.system(f"sed -i 's|@.snapshots{distro_suffix}/rootfs/snapshot-tmp0|@.snapshots{distro_suffix}/rootfs/snapshot-tmp|g' /.snapshots/rootfs/snapshot-tmp/etc/fstab") # Write fstab for new deployment
+        os.system(f"sed -i 's|@.snapshots{distro_suffix}/etc/etc-tmp0|@.snapshots{distro_suffix}/etc/etc-tmp|g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
+        os.system(f"sed -i 's|@.snapshots{distro_suffix}/boot/boot-tmp0|@.snapshots{distro_suffix}/boot/boot-tmp|g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
         sfile = open("/.snapshots/rootfs/snapshot-tmp0/usr/share/ast/snap", "r")
         snap = sfile.readline()
         snap = snap.replace(" ", "")
         sfile.close()
     else:
         os.system("cp --reflink=auto -r /.snapshots/rootfs/snapshot-tmp0/boot/* /etc/mnt/boot")
-        os.system(f"sed -i 's,@.snapshots{distro_suffix}/rootfs/snapshot-tmp,@.snapshots{distro_suffix}/rootfs/snapshot-tmp0,g' /etc/mnt/boot/grub/grub.cfg")
-        os.system(f"sed -i 's,@.snapshots{distro_suffix}/rootfs/snapshot-tmp,@.snapshots{distro_suffix}/rootfs/snapshot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg")
-        os.system(f"sed -i 's,@.snapshots{distro_suffix}/rootfs/snapshot-tmp,@.snapshots{distro_suffix}/rootfs/snapshot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
-        os.system(f"sed -i 's,@.snapshots{distro_suffix}/etc/etc-tmp,@.snapshots{distro_suffix}/etc/etc-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
-        os.system(f"sed -i 's,@.snapshots{distro_suffix}/boot/boot-tmp,@.snapshots{distro_suffix}/boot/boot-tmp0,g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
+        os.system(f"sed -i 's|@.snapshots{distro_suffix}/rootfs/snapshot-tmp|@.snapshots{distro_suffix}/rootfs/snapshot-tmp0|g' /etc/mnt/boot/grub/grub.cfg")
+        os.system(f"sed -i 's|@.snapshots{distro_suffix}/rootfs/snapshot-tmp|@.snapshots{distro_suffix}/rootfs/snapshot-tmp0|g' /.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg")
+        os.system(f"sed -i 's|@.snapshots{distro_suffix}/rootfs/snapshot-tmp|@.snapshots{distro_suffix}/rootfs/snapshot-tmp0|g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
+        os.system(f"sed -i 's|@.snapshots{distro_suffix}/etc/etc-tmp|@.snapshots{distro_suffix}/etc/etc-tmp0|g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
+        os.system(f"sed -i 's|@.snapshots{distro_suffix}/boot/boot-tmp|@.snapshots{distro_suffix}/boot/boot-tmp0|g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
         sfile = open("/.snapshots/rootfs/snapshot-tmp/usr/share/ast/snap", "r")
         snap = sfile.readline()
         snap = snap.replace(" ", "")
