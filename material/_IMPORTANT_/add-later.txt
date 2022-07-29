@@ -90,10 +90,6 @@ The logic for updating grub.cfg where it says:
 while "BEGIN /etc/grub.d/10_linux" not in line:
 should be changed. It's not comprehensive!
 
-AshOS is:
-- A wrapper-installer for any Linux distribution that can be debootstrapped, and that is pretty much any major distribution
-- A meta-distribution that brings immutability even to distros that do not have a dedicated project i.e. Arch Linux, Gentoo, etc.
-
 Remove UEFI entry B00E: sudo efibootmgr -b E -B
 
 Fedora needs nomodeset in init parameters to boot
@@ -146,9 +142,6 @@ https://docs.freebsd.org/en/books/arch-handbook/boot/
 
 Convert installer.py to POSIX shell ideally with no bashism
 
-GREAT IDEA:
-Within the forest/tree of ashos, can I set a spot that makes a node and its children no longer immutable? A mix of immutable and non-immutable nodes.
-
 this test resulted in nonbootable efi:
 sudo ast clone 0
 sudo ast clone 0
@@ -168,7 +161,7 @@ $ sudo dmesg | nc termbin.com 9999 # then paste the link
 
 Downfall of PR32 from cuberjan3: ast tree in chroot deosn't see ast excutable?!!!
 
-IMPORTANT: In a multibooted system, what happens if btrfs of another OS say arch updates and becomes incompatible with btrfs from debian?
+IMPORTANT: In a multibooted system, what happens if btrfs-progs (btrfs driver) of another OS say arch updates and becomes incompatible with btrfs from debian?
 
 Combine options 2 and 3 into one.
 
@@ -239,8 +232,6 @@ mount /dev/sda1 /tmp/sda1
 cp -r /tmp/sda1/EFI/astOS/* /tmp/sda1/EFI/debian
 ------------
 
-AshOS (Alternative/Any Snapshot Hierarchical OS)
-
 -Would Refind be better than GRUB?
 - auto discover efi files?
 
@@ -261,8 +252,6 @@ curl -L -O https://bit.ly/astos042022
 tar xvf astos042022
 
 https://github.com/i2/ashos-dev/archive/refs/tags/v0.5.tar.gz
-
-As of june 23, 2022, the best version of my ashos installer for justminimal (my new vision for the project) is: installery_justminimal.py
 
 Can I combine power of ashos and bedrock linux?
 I THINK IT IS A GREAT IDEA. AshOS can be a great base for bedrock linux.

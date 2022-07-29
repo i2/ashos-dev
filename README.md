@@ -1,36 +1,42 @@
-# astOS (Arch Snapshot Tree OS)
-### An immutable Arch based distribution utilizing btrfs snapshots  
+# AshOS (Alternative/Any Snapshot Hierarchical OS)
+### An immutable meta-distribution using snapshots that looks like a tree
 
-![astos-logo](logo.png)
+![ashos-logo](logo.png)
 
 ---
 
 ## Table of contents
-* [What is astOS?](https://github.com/astos/astos#what-is-astos)
-* [astOS compared to other similar distributions](https://github.com/astos/astos#astos-compared-to-other-similar-distributions)
-* [ast and astOS documentation](https://github.com/astos/astos#additional-documentation)
-  * [Installation](https://github.com/astos/astos#installation)
-  * [Post installation](https://github.com/astos/astos#post-installation-setup)
-  * [Snapshot management and deployments](https://github.com/astos/astos#snapshot-management)
-  * [Package management](https://github.com/astos/astos#package-management)
-* [Additional documentation](https://github.com/astos/astos#additional-documentation)
-  * [Updating the pacman keys](https://github.com/astos/astos#fixing-pacman-corrupt-packages--key-issues)
-  * [Saving configuration changes made in /etc persistent](https://github.com/astos/astos#saving-configuration-changes-made-in-etc-persistent)
-  * [Configuring dual boot](https://github.com/astos/astos#dual-boot)
-  * [Updating ast itself](https://github.com/astos/astos#updating-ast-itself)
-  * [Debugging ast](https://github.com/astos/astos#debugging-ast)
-* [Known bugs](https://github.com/astos/astos#known-bugs)
-* [Contributing](https://github.com/astos/astos#contributing)
-* [Community](https://github.com/astos/astos#community)
+* [What is AshOS?](https://github.com/ashos/ashos#what-is-ashos)
+* [AshOS compared to other similar distributions](https://github.com/ashos/ashos#ashos-compared-to-other-similar-distributions)
+* [ast and astOS documentation](https://github.com/ashos/ashos#additional-documentation)
+  * [Installation](https://github.com/ashos/ashos#installation)
+  * [Post installation](https://github.com/ashos/ashos#post-installation-setup)
+  * [Snapshot management and deployments](https://github.com/ashos/ashos#snapshot-management)
+  * [Package management](https://github.com/ashos/ashos#package-management)
+* [Additional documentation](https://github.com/ashos/ashos#additional-documentation)
+  * [Updating the pacman keys](https://github.com/ashos/ashos#fixing-pacman-corrupt-packages--key-issues)
+  * [Saving configuration changes made in /etc persistent](https://github.com/ashos/ashos#saving-configuration-changes-made-in-etc-persistent)
+  * [Configuring dual boot](https://github.com/ashos/ashos#dual-boot)
+  * [Updating ast itself](https://github.com/ashos/ashos#updating-ast-itself)
+  * [Debugging ast](https://github.com/ashos/ashos#debugging-ast)
+* [Advanced features](https://github.com/ashos/ashos#advanced-features)
+  * [LUKS](https://github.com/ashos/ashos#luks)
+  * [Mutability toggle](https://github.com/ashos/ashos#mutability-toggle)
+* [Known bugs](https://github.com/ashos/ashos#known-bugs)
+* [Contributing](https://github.com/ashos/ashos#contributing)
+* [Community](https://github.com/ashos/ashos#community)
 
 ---
 
-## What is astOS?  
+## What is AshOS?
 
-astOS is a modern distribution based on [Arch Linux](https://archlinux.org).  
-Unlike Arch it uses an immutable (read-only) root filesystem.  
-Software is installed and configured into individual snapshot trees, which can then be deployed and booted into.  
-It doesn't use it's own package format or package manager, instead relying on [pacman](https://wiki.archlinux.org/title/pacman) from Arch.
+AshOS is a modern meta-distribution that
+- aims to bring immutability even to distros that do not have this very useful feature i.e. Arch Linux, Gentoo, etc.
+- wraps around any Linux distribution that can be debootstrapped, and that is pretty much any major distribution
+
+It was initially inspired by Arch Linux, but it uses an immutable (read-only) root filesystem.
+Software is installed and configured into individual snapshot trees, which can then be deployed and booted into.
+It does not invent yet another package format or package manager, but instead relies on the native package manager for instance [pacman](https://wiki.archlinux.org/title/pacman) from Arch.
 
 
 **This has several advantages:**
@@ -41,32 +47,32 @@ It doesn't use it's own package format or package manager, instead relying on [p
   * Due to the system being mounted as read only, it's not possible to accidentally overwrite system files
   * If the system runs into issues, you can easily rollback the last working snapshot within minutes
   * Atomic updates - Updating your system all at once is more reliable
-  * Thanks to the snapshot feature, astOS can ship cutting edge software without becoming unstable
-  * astOS needs little maintenance, as it has a built in fully automatic update tool that creates snapshots before updates and automatically checks if the system upgraded properly before deploying the new snapshot
+  * Thanks to the snapshot feature, AshOS can ship cutting edge software without becoming unstable
+  * AshOS needs little maintenance, as it has a built in fully automatic update tool that creates snapshots before updates and automatically checks if the system upgraded properly before deploying the new snapshot
 * Configurability
   * With the snapshots organised into a tree, you can easily have multiple different configurations of your software available, with varying packages, without any interference
   * For example: you can have a single Gnome desktop installed and then have 2 snapshots on top - one with your video games, with the newest kernel and drivers, and the other for work, with the LTS kernel and more stable software, you can then easily switch between these depending on what you're trying to do
   * You can also easily try out software without having to worry about breaking your system or polluting it with unnecessary files, for example you can try out a new desktop environment in a snapshot and then delete the snapshot after, without modifying your main system at all
   * This can also be used for multi-user systems, where each user has a completely separate system with different software, and yet they can share certain packages such as kernels and drivers
-  * astOS allows you to install software by chrooting into snapshots, therefore you can use software such as the AUR to install additional packages
-  * astOS is, just like Arch, very customizable, you can choose exactly which software you want to use
+  * AshOS allows you to install software by chrooting into snapshots, therefore you can use software such as the AUR to install additional packages
+  * AshOS is, very customizable, you can choose exactly which software you want to use (just like Arch Linux)
 
-* Thanks to it's reliabilty and automatic upgrades, astOS is well suitable for single use or embedded devices
-* It also makes for a good workstation or general use distribution utilizing development containers and flatpak for desktop applications 
+* Thanks to it's reliabilty and automatic upgrades, AshOS is well suitable for single use or embedded devices
+* It also makes for a good workstation or general use distribution utilizing development containers and flatpak for desktop applications
 
 ---
-## astOS compared to other similar distributions
-* **NixOS** - compared to nixOS, astOS is a more traditional system with how it's setup and maintained. While nixOS is entirely configured using the Nix programming language, astOS uses Arch's pacman package manager. astOS consumes less storage, and configuring your system is faster and easier (less reproducible however), it also gives you more customization options. astOS is FHS compliant, ensuring proper software compatability.
-  * astOS allows declarative configuration using Ansible, for somewhat similar functionality to NixOS
-* **Fedora Silverblue/Kinoite** - astOS is more customizable, but does require more manual setup. astOS supports dual boot, unlike Silverblue.
-* **OpenSUSE MicroOS** - astOS is a more customizable system, but once again requires a bit more manual setup. MicroOS works similarly in the way it utilizes btrfs snapshots. astOS has an official KDE install, but also supports other desktop environments, while MicroOS only properly supports Gnome. astOS supports dual boot.
+## AshOS compared to other similar distributions
+* **NixOS** - compared to nixOS, AshOS is a more traditional system with how it's setup and maintained. While nixOS is entirely configured using the Nix programming language, AshOS uses the native package manager of target distribution, for instance pacman for Arch, apt-get for Debian, etc. AshOS consumes less storage, and configuring your system is faster and easier (less reproducible however), it also gives you more customization options. AshOS is FHS compliant, ensuring proper software compatability.
+  * AshOS allows declarative configuration using Ansible, for somewhat similar functionality to NixOS
+* **Fedora Silverblue/Kinoite** - AshOS is more customizable, but does require more manual setup. AshOS supports dual boot, unlike Silverblue.
+* **OpenSUSE MicroOS** - AshOS is a more customizable system, but once again requires a bit more manual setup. MicroOS works similarly in the way it utilizes btrfs snapshots. AshOS has an official KDE install, but also supports other desktop environments, while MicroOS only properly supports Gnome. AshOS supports dual boot.
 
 ---
 ## Installation
-* astOS is installed from the official Arch Linux live iso available on [https://archlinux.org/](https://archlinux.org)
-* If you run into issues installing packages during installation, make sure you're using the newest arch iso, and if needed update the pacman keyring
-* You need an internet connection to install astOS
-* Currently astOS ships 3 installation profiles, one for minimal installs and two for desktop, one with the Gnome desktop environment and one with KDE Plasma, but support for more DE's will be added
+* AshOS is installed from the official live iso for target distribution. For example [https://archlinux.org/download/](Arch Linux) or [https://www.debian.org/CD/http-ftp/](Debian)
+* If you run into issues installing packages during installation, make sure you're using the newest iso, and update the package manager's keyring if needed
+* You need an internet connection to install AshOS
+* Currently AshOS ships 3 installation profiles, one for minimal installs and two for desktop, one with the Gnome desktop environment and one with KDE Plasma, but support for more DE's will be added
 * The installation script is easily configurable and adjusted for your needs (but it works just fine without any modifications)
 
 Install git first - this will allow us to download the install script
@@ -77,18 +83,19 @@ pacman -Sy git
 Clone repository
 
 ```
-git clone "https://github.com/astos/astos"  
-cd astos  
+git clone "https://github.com/ashos/ashos"
+cd ashos
 ```
 Partition and format drive
 
 * If installing on a BIOS system, use a dos (MBR) partition table
 * On EFI you can use GPT
 * The EFI partition has to be formatted to FAT32 before running the installer (```mkfs.fat -F32 /dev/<part>```)
+* There are prep scripts under `./src/prep/`
 
 ```
 lsblk  # Find your drive name
-cfdisk /dev/*** # Format drive, make sure to add an EFI partition, if using BIOS leave 2M free space before first partition  
+cfdisk /dev/*** # Format drive, make sure to add an EFI partition, if using BIOS leave 2M free space before first partition
 mkfs.btrfs /dev/*** # Create a btrfs filesystem, don't skip this step!
 ```
 Run installer
@@ -99,7 +106,7 @@ python3 main.py /dev/<partition> /dev/<drive> /dev/<efi part> # Skip the EFI par
 
 ## Post installation setup
 * Post installation setup is not necessary if you install one of the desktop editions (Gnome or KDE)
-* A lot of information for how to handle post-install setup is available on the [ArchWiki page](https://wiki.archlinux.org/title/general_recommendations) 
+* A lot of information for how to handle post-install setup is available on the [ArchWiki page](https://wiki.archlinux.org/title/general_recommendations)
 * Here is a small example setup procedure:
   * Start by creating a new snapshot from `base` using ```ast clone 0```
   * Chroot inside this new snapshot (```ast chroot <snapshot>```) and begin setup
@@ -112,7 +119,7 @@ python3 main.py /dev/<partition> /dev/<drive> /dev/<efi part> # Skip the EFI par
 
 ## Additional documentation
 * It is advised to refer to the [Arch wiki](https://wiki.archlinux.org/) for documentation not part of this project
-* Report issues/bugs on the [Github issues page](https://github.com/astos/astos/issues)
+* Report issues/bugs on the [Github issues page](https://github.com/ashos/ashos/issues)
 * **HINT: you can use `ast help` to get a quick cheatsheet of all available commands**
 
 #### Base snapshot
@@ -158,9 +165,9 @@ ast del <tree>
 #### Custom boot configuration
 * If you need to use a custom grub configuration, chroot into a snapshot and edit ```/etc/default/grub```, then deploy the snapshot and reboot
 
-#### chroot into snapshot 
+#### chroot into snapshot
 * Once inside the chroot the OS behaves like regular Arch, so you can install and remove packages using pacman or similar
-* Do not run ast from inside a chroot, it could cause damage to the system, there is a failsafe in place, which can be bypassed with ```--chroot``` if you really need to (not recommended)  
+* Do not run ast from inside a chroot, it could cause damage to the system, there is a failsafe in place, which can be bypassed with ```--chroot``` if you really need to (not recommended)
 * The chroot has to be exited properly with ```exit```, otherwise the changes made will not be saved
 * If you don't exit chroot the "clean" way with ```exit```, it's recommended to run ```ast tmp``` to clear temporary files left behind
 
@@ -175,7 +182,7 @@ ast chroot <snapshot>
 ast live-chroot
 ```
 
-* The changes made to live session are not saved on new deployments 
+* The changes made to live session are not saved on new deployments
 
 #### Other chroot options
 
@@ -221,12 +228,12 @@ ast ubranch <parent> <snapshot>
 ```
 ast new
 ```
-#### Deploy snapshot  
+#### Deploy snapshot
 
 * Reboot to  boot into the new snapshot after deploying
 
 ```
-ast deploy <snapshot>  
+ast deploy <snapshot>
 ```
 
 #### Update base which new snapshots are built from
@@ -284,8 +291,8 @@ ast tree-rmpkg <tree> <pacakge or packages>
 
 #### Updating
 * It is advised to clone a snapshot before updating it, so you can roll back in case of failure
-* This update only updates the system packages, in order to update ast itself see [this section](https://github.com/astos/astos#updating-ast-itself)
- 
+* This update only updates the system packages, in order to update ast itself see [this section](https://github.com/ashos/ashos#updating-ast-itself)
+
 
 * To update a single snapshot
 
@@ -329,7 +336,7 @@ ast etc-update
 * This allows you to configure your system by modifying ``/etc`` as usual, and then saving these changes.
 
 #### Dual boot
-* astOS supports dual boot using the GRUB bootloader
+* AshOS supports dual boot using the GRUB bootloader
 * When installing the system, use the existing EFI partition
 * to configure dual boot, we must begin by installing the ```os-prober``` package:
 
@@ -377,6 +384,19 @@ sed -i -e s,\ 2\>\&1\>\ \/dev\/null,,g astpk.py
 
 If you have modified the original ast file (possible but not recommended), please make sure to revert it back when done!
 
+## Advanced features
+
+These are some advanced feature and we suggest you use them only if you are ready for breakage, doing data backups and occasional fixes. They may not be prime-time ready.
+
+#### LUKS
+
+Full encrypted disk using LUKS2 is implemented. This means also encrypting /boot which is an experimental feature of GRUB since v2.06. Right now in mainstream, it only supports 
+
+#### Mutability toggle
+
+The beauty of customizability of AshOS is that we can have a mix of immutable and non-immutable nodes!
+Within the forest/tree of AshOS, one can make any snapshot (other than base `0`) mutable. For instance, to make node 9 mutable run `sudo ast immen 9`. This makes a node and any children (that are created afterwards) mutable.
+
 ## Known bugs
 
 * When running ast without arguments - IndexError: list index out of range
@@ -387,7 +407,7 @@ If you have modified the original ast file (possible but not recommended), pleas
 sudo chmod 666 /var/run/docker.sock
 ```
 
-* If you run into any issues, report them on [the issues page](https://github.com/astos/astos/issues)
+* If you run into any issues, report them on [the issues page](https://github.com/ashos/ashos/issues)
 
 # Contributing
 * Code and documentation contributions are welcome

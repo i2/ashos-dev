@@ -235,7 +235,7 @@ def main(args, distro):
         os.system("sudo sed -i 's/^#GRUB_ENABLE_CRYPTODISK/GRUB_ENABLE_CRYPTODISK/' -i /mnt/etc/default/grub")
         os.system(f"sudo sed -i -E 's|^#?GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID={to_uuid(args[1])}:luks_root|' /mnt/etc/default/grub")
         os.system(f"sed -e 's|DISTRO|{distro}|' -e 's|LUKS_UUID_NODASH|{to_uuid(args[1]).replace('-', '')}|' \
-                    ./src/distros/arch/grub-luks2.conf | sudo tee /mnt/etc/grub-luks2.conf")
+                        -e '/^#/d' ./src/distros/arch/grub-luks2.conf | sudo tee /mnt/etc/grub-luks2.conf")
     if efi: # running this seems to write core.img so it's important for this to be before mkimage
         os.system(f'sudo chroot /mnt sudo grub-install {args[2]} --modules="{luks_grub_args}"')
     else:
