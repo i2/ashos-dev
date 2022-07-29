@@ -476,15 +476,6 @@ Dir {
 # This post helped to fix the "efi variable not available in this system" error: https://bbs.archlinux.org/viewtopic.php?id=168516
 
 
-
-
-
-
-# find distro
-https://stackoverflow.com/questions/43540782/python-use-different-function-depending-on-os
-
-
-
 Add bedrock linux to https://distro.readthedocs.io/en/latest/
 https://bedrocklinux.org/1.0beta2/strata.html
 Fedora Rawhide with ash
@@ -665,7 +656,7 @@ green sleeves song
 
 
 
-Maybe beter descriptionfor these:
+Maybe better descriptionfor these:
 print(f"Branch {i} was added to parent of {snapshot}.")
 print(f"Branch {i} was added under snapshot {snapshot}.")
 

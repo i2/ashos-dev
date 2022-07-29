@@ -1,4 +1,4 @@
-# AshOS (Alternative/Any Snapshot Hierarchical OS)
+# AshOS (Any Snapshot Hierarchical OS)
 ### An immutable meta-distribution using snapshots that looks like a tree
 
 ![ashos-logo](logo.png)
@@ -30,7 +30,7 @@
 
 ## What is AshOS?
 
-AshOS is a modern meta-distribution that
+AshOS is a modern meta-distribution that:
 - aims to bring immutability even to distros that do not have this very useful feature i.e. Arch Linux, Gentoo, etc.
 - wraps around any Linux distribution that can be debootstrapped, and that is pretty much any major distribution
 
@@ -38,6 +38,7 @@ It was initially inspired by Arch Linux, but it uses an immutable (read-only) ro
 Software is installed and configured into individual snapshot trees, which can then be deployed and booted into.
 It does not invent yet another package format or package manager, but instead relies on the native package manager for instance [pacman](https://wiki.archlinux.org/title/pacman) from Arch.
 
+Ashes are one of the oldest trees in the world and they inspired naming AshOS.
 
 **This has several advantages:**
 
@@ -377,19 +378,11 @@ ast ast-sync
 #### Debugging ast
 
 - sometimes it may be necessary to debug ast
-- copy `ast` to any location:
-
-```
-cp /usr/local/sbin/ast astpk.py
-```
-
 - the following command is useful as it shows outputs of commands when running astpk.py:
 
 ```
-sed -i -e s,\ 2\>\&1\>\ \/dev\/null,,g astpk.py
+sed -e 's| >/dev/null 2>&1||g' /usr/bin/ash > ashpk.py
 ```
-
-If you have modified the original ast file (possible but not recommended), please make sure to revert it back when done!
 
 ## Advanced features
 
