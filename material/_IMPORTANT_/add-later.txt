@@ -817,4 +817,8 @@ https://gist.github.com/mruiz42/83d9a232e7592d65d953671409a2aab9
 https://wiki.archlinux.org/title/User:M0p/LUKS_Root_on_Btrfs
 https://www.gnu.org/software/grub/manual/grub/grub.html#BIOS-installation
 https://wiki.archlinux.org/title/dm-crypt/Encrypting_an_entire_system#LUKS_on_a_partition
+
+###TODO: cryptsetup close device-mapper "remove ioctl" busy
 ----------------------------------------------------------------------
+
+https://pubs.opengroup.org/onlinepubs/009604599/utilities/sed.html

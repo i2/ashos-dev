@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 
-### space_cache=v2 -----------> mount -o noatime,compress=zstd,ssd,space_cache=v2 "${__mapper__}" /mnt
-
 import os
 import subprocess
 import sys ### REMOVE WHEN USING TRY CATCH
@@ -119,8 +117,8 @@ def main(args, distro):
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
     isLUKS = get_luks()
     tz = get_timezone()
-###    hostname = get_hostname()
-    hostname = subprocess.check_output(f"git rev-parse --short HEAD", shell=True).decode('utf-8').strip() # Just for debugging
+    hostname = get_hostname()
+#    hostname = subprocess.check_output(f"git rev-parse --short HEAD", shell=True).decode('utf-8').strip() # Just for debugging
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
@@ -229,7 +227,7 @@ def main(args, distro):
     create_user(username, "wheel")
     set_password(username)
 
-#   Systemd
+#   Services (init, network, etc.)
     os.system("sudo chroot /mnt systemctl enable NetworkManager")
 
 #   GRUB and EFI
@@ -243,13 +241,12 @@ def main(args, distro):
     else:
         os.system(f'sudo chroot /mnt sudo grub-install {args[2]} --modules="{luks_grub_args}"')
     if isLUKS: # Make LUKS2 compatible grub image
-        os.system(f"sed -i.bak 's|LUKS_UUID_WITHOUT_DASHES|{to_uuid(args[1]).replace('-', '')}|' ./src/distros/arch/grub-luks2.conf")
-        os.system(f"sed -i.bak 's|DISTRO|{distro}|' ./src/distros/arch/grub-luks2.conf")
-        os.system(f"cp -a ./src/distros/arch/grub-luks2.conf /mnt/home/{username}/")
+        os.system(f"sed -e 's|DISTRO|{distro}|' -e 's|LUKS_UUID_NODASH|{to_uuid(args[1]).replace('-', '')}|' \
+                    ./src/distros/arch/grub-luks2.conf | tee /mnt/etc/grub-luks2.conf")
         if efi:
-            os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O x86_64-efi -c /home/{username}/grub-luks2.conf -o /boot/efi/EFI/{distro}/grubx64.efi {luks_grub_args}') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!) ### changed from /tmp to $HOME
+            os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O x86_64-efi -c /etc/grub-luks2.conf -o /boot/efi/EFI/{distro}/grubx64.efi {luks_grub_args}') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!) ### changed from /tmp to $HOME
         else:
-            os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O i386-pc -c /home/{username}/grub-luks2.conf -o /boot/grub/i386-pc/core_luks2.img {luks_grub_args}') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!) ### 'biosdisk' module not needed eh?
+            os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O i386-pc -c /etc/grub-luks2.conf -o /boot/grub/i386-pc/core_luks2.img {luks_grub_args}') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!) ### 'biosdisk' module not needed eh?
             os.system(f'dd oflag=seek_bytes seek=512 if=/mnt/boot/grub/i386-pc/core_luks2.img of={args[2]}')
     os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg") ### Adding /grub suffix to grub-luks2.conf didn't make a difference in the produced grub.cfg in this step so that's good I guess!!!
     os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
