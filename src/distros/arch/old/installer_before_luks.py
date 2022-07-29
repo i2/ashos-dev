@@ -16,7 +16,7 @@ def get_multiboot(dist):
     clear()
     while True:
         print("Please choose one of the following:\n1. Single OS installation\n2. Initiate a multi-boot ashos setup\n3. Adding to an already installed ashos")
-        print("Please be aware choosing option 1 and 2 will wipe {args[1]}")
+        print("Please be aware choosing option 1 and 2 will wipe root partition")
         i = input("> ")
         if i == "1":
             return i, ""
@@ -35,25 +35,25 @@ def get_hostname():
     clear()
     while True:
         print("Enter hostname:")
-        hostname = input("> ")
-        if hostname:
+        h = input("> ")
+        if h:
             print("Happy with your hostname? (y/n)")
             reply = input("> ")
             if reply.casefold() == "y":
                 break
             else:
                 continue
-    return hostname
+    return h
 
 def get_timezone():
     clear()
     while True:
         print("Select a timezone (type list to list):")
-        zone = input("> ")
-        if zone == "list":
+        z = input("> ")
+        if z == "list":
             os.system("ls /usr/share/zoneinfo | less")
-        elif os.path.isfile(f"/usr/share/zoneinfo/{zone}"):
-            return str(f"/usr/share/zoneinfo/{zone}")
+        elif os.path.isfile(f"/usr/share/zoneinfo/{z}"):
+            return str(f"/usr/share/zoneinfo/{z}")
         else:
             print("Invalid timezone!")
             continue
@@ -62,15 +62,15 @@ def get_username():
     clear()
     while True:
         print("Enter username (all lowercase, max 8 letters)")
-        username = input("> ")
-        if username:
+        u = input("> ")
+        if u:
             print("Happy with your username? (y/n)")
             reply = input("> ")
             if reply.casefold() == "y":
                 break
             else:
                 continue
-    return username
+    return u
 
 def create_user(u, g):
     os.system(f"sudo chroot /mnt sudo useradd -m -G {g} -s /bin/bash {u}")
@@ -99,7 +99,8 @@ def main(args, distro):
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
     tz = get_timezone()
-    hostname = get_hostname()
+#    hostname = get_hostname()
+    hostname = subprocess.check_output(f"git rev-parse --short HEAD", shell=True).decode('utf-8').strip() # Just for debugging
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
@@ -126,7 +127,7 @@ def main(args, distro):
     for i in ("ast", "boot", "etc", "root", "rootfs", "tmp"):
         os.system(f"mkdir -p /mnt/.snapshots/{i}")
     if efi:
-        os.system("sudo mkdir /mnt/boot/efi")
+        os.system("sudo mkdir -p /mnt/boot/efi")
         os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
 #   Bootstrap then install anytree and necessary packages in chroot
@@ -165,7 +166,7 @@ def main(args, distro):
     os.system("sudo mkdir -p /mnt/usr/share/ast/db")
     os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
     os.system("sudo cp -r /mnt/var/lib/pacman/. /mnt/usr/share/ast/db/")
-    os.system(f"sed -i s|\"#DBPath      = /var/lib/pacman/\"|\"DBPath      = /usr/share/ast/db/\"|g /mnt/etc/pacman.conf") ###
+    os.system(f"sed -i s|\"#DBPath      = /var/lib/pacman/\"|\"DBPath      = /usr/share/ast/db/\"|g /mnt/etc/pacman.conf") ### Any issues here?
 ###    os.system(f"sed -i s|\"#DBPath.*=\(.*\)\"|\"DBPath      = /usr/share/ast/db/ #\1\"|g /mnt/etc/pacman.conf") ###
 ###    os.system(f'sed -i s|"[#?]DBPath.*=\(.*\)/DBPath      = /usr/share/ast/db/ #\1| /mnt/etc/pacman.conf')
     os.system(f"sudo sed -i '/^ID/ s|{distro}|{distro}_ashos|' /mnt/etc/os-release") # Modify OS release information (optional)
@@ -195,11 +196,11 @@ def main(args, distro):
     create_user(username, "wheel")
     set_password(username)
 
-#   Systemd
+#   Services (init, network, etc.)
     os.system("sudo chroot /mnt systemctl enable NetworkManager")
 
 #   GRUB and EFI
-    os.system(f"sudo chroot /mnt sudo grub-install {args[2]}")
+    os.system(f'sudo chroot /mnt sudo grub-install {args[2]}')
     os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
 ###    os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")

@@ -819,6 +819,7 @@ https://www.gnu.org/software/grub/manual/grub/grub.html#BIOS-installation
 https://wiki.archlinux.org/title/dm-crypt/Encrypting_an_entire_system#LUKS_on_a_partition
 
 ###TODO: cryptsetup close device-mapper "remove ioctl" busy
+
 ----------------------------------------------------------------------
 
 https://pubs.opengroup.org/onlinepubs/009604599/utilities/sed.html

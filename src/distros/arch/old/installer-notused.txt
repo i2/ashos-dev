@@ -77,3 +77,8 @@ def set_password(u):
     ###os.system("sudo chroot /mnt ln -s /.snapshots/ast/ast /usr/bin/ast")
     ###os.system("sudo chroot /mnt ln -s /.snapshots/ast/detect_os.sh /usr/bin/detect_os.sh")
     ###os.system("sudo chroot /mnt ln -s /.snapshots/ast /var/lib/ast")
+
+
+-------------------- LUKS --------------
+### Adding /grub suffix to grub-luks2.conf does not make a change in grub.cfg produced (when running grub-mkconfig).
+It only modifies the grubx64.efi (UEFI) or core.img (BIOS) produced in the step just before that.

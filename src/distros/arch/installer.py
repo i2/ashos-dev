@@ -35,25 +35,25 @@ def get_hostname():
     clear()
     while True:
         print("Enter hostname:")
-        hostname = input("> ")
-        if hostname:
+        h = input("> ")
+        if h:
             print("Happy with your hostname? (y/n)")
             reply = input("> ")
             if reply.casefold() == "y":
                 break
             else:
                 continue
-    return hostname
+    return h
 
 def get_timezone():
     clear()
     while True:
         print("Select a timezone (type list to list):")
-        zone = input("> ")
-        if zone == "list":
+        z = input("> ")
+        if z == "list":
             os.system("ls /usr/share/zoneinfo | less")
-        elif os.path.isfile(f"/usr/share/zoneinfo/{zone}"):
-            return str(f"/usr/share/zoneinfo/{zone}")
+        elif os.path.isfile(f"/usr/share/zoneinfo/{z}"):
+            return str(f"/usr/share/zoneinfo/{z}")
         else:
             print("Invalid timezone!")
             continue
@@ -62,15 +62,15 @@ def get_username():
     clear()
     while True:
         print("Enter username (all lowercase, max 8 letters)")
-        username = input("> ")
-        if username:
+        u = input("> ")
+        if u:
             print("Happy with your username? (y/n)")
             reply = input("> ")
             if reply.casefold() == "y":
                 break
             else:
                 continue
-    return username
+    return u
 
 def get_luks():
     clear()
@@ -78,14 +78,14 @@ def get_luks():
         print("Would you like to use LUKS? (y/n)")
         reply = input("> ")
         if reply.casefold() == "y":
-            enc = True
+            e = True
             break
         elif reply.casefold() == "n":
-            enc = False
+            e = False
             break
         else:
             continue
-    return enc
+    return e
 
 def create_user(u, g):
     os.system(f"sudo chroot /mnt sudo useradd -m -G {g} -s /bin/bash {u}")
@@ -108,17 +108,15 @@ def main(args, distro):
     print("Welcome to the AshOS installer!\n\n\n\n\n")
 
 #   Define variables
-    #packages = "base linux linux-firmware nano python3 python-anytree bash dhcpcd \
-    #            arch-install-scripts btrfs-progs networkmanager grub sudo tmux os-prober"
-    packages = "base linux bash \
-                btrfs-progs grub sudo"
+    packages = "base linux linux-firmware nano python3 python-anytree bash dhcpcd \
+                arch-install-scripts btrfs-progs networkmanager grub sudo tmux os-prober"
     choice, distro_suffix = get_multiboot(distro)
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
     isLUKS = get_luks()
     tz = get_timezone()
-    hostname = get_hostname()
-#    hostname = subprocess.check_output(f"git rev-parse --short HEAD", shell=True).decode('utf-8').strip() # Just for debugging
+#    hostname = get_hostname()
+    hostname = subprocess.check_output(f"git rev-parse --short HEAD", shell=True).decode('utf-8').strip() # Just for debugging
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
@@ -190,22 +188,22 @@ def main(args, distro):
         os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/tmp /tmp none bind 0 0' | sudo tee -a /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@{distro_suffix}/ s,@{distro_suffix},@.snapshots{distro_suffix}/rootfs/snapshot-tmp,' /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@etc{distro_suffix}/ s,@etc{distro_suffix},@.snapshots{distro_suffix}/etc/etc-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@{distro_suffix}/ s|@{distro_suffix}|@.snapshots{distro_suffix}/rootfs/snapshot-tmp|' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@boot{distro_suffix}/ s|@boot{distro_suffix}|@.snapshots{distro_suffix}/boot/boot-tmp|' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@etc{distro_suffix}/ s|@etc{distro_suffix}|@.snapshots{distro_suffix}/etc/etc-tmp|' /mnt/etc/fstab")
     os.system(f"sudo sed -i '/\@{distro_suffix}/d' /mnt/etc/fstab") # Delete @_distro entry
 
 #   Database and config files
     os.system("sudo mkdir -p /mnt/usr/share/ast/db")
     os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
     os.system("sudo cp -r /mnt/var/lib/pacman/. /mnt/usr/share/ast/db/")
-    os.system(f"sed -i s,\"#DBPath      = /var/lib/pacman/\",\"DBPath      = /usr/share/ast/db/\",g /mnt/etc/pacman.conf")
-    os.system(f"sudo sed -i '/^ID/ s/{distro}/{distro}_ashos/' /mnt/etc/os-release") # Modify OS release information (optional)
+    os.system(f"sed -i s|\"#DBPath      = /var/lib/pacman/\"|\"DBPath      = /usr/share/ast/db/\"|g /mnt/etc/pacman.conf") ### Any issues here?
+    os.system(f"sudo sed -i '/^ID/ s|{distro}|{distro}_ashos|' /mnt/etc/os-release") # Modify OS release information (optional)
 
 #   Update hostname, hosts, locales and timezone, hosts
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
     os.system(f"echo 127.0.0.1 {hostname} | sudo tee -a /mnt/etc/hosts")
-    os.system("sudo sed -i 's/^#en_US.UTF-8/en_US.UTF-8/g' /mnt/etc/locale.gen")
+    os.system("sudo sed -i 's|^#en_US.UTF-8|en_US.UTF-8|g' /mnt/etc/locale.gen")
     os.system("sudo chroot /mnt sudo locale-gen")
     os.system("echo 'LANG=en_US.UTF-8' | sudo tee /mnt/etc/locale.conf")
     os.system(f"sudo ln -srf /mnt{tz} /mnt/etc/localtime")
@@ -236,27 +234,27 @@ def main(args, distro):
         os.system("sudo chroot /mnt sudo mkinitcpio -p linux")
         os.system("sudo sed -i 's/^#GRUB_ENABLE_CRYPTODISK/GRUB_ENABLE_CRYPTODISK/' -i /mnt/etc/default/grub")
         os.system(f"sudo sed -i -E 's|^#?GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID={to_uuid(args[1])}:luks_root|' /mnt/etc/default/grub")
+        os.system(f"sed -e 's|DISTRO|{distro}|' -e 's|LUKS_UUID_NODASH|{to_uuid(args[1]).replace('-', '')}|' \
+                    ./src/distros/arch/grub-luks2.conf | sudo tee /mnt/etc/grub-luks2.conf")
     if efi: # running this seems to write core.img so it's important for this to be before mkimage
         os.system(f'sudo chroot /mnt sudo grub-install {args[2]} --modules="{luks_grub_args}"')
     else:
         os.system(f'sudo chroot /mnt sudo grub-install {args[2]} --modules="{luks_grub_args}"')
     if isLUKS: # Make LUKS2 compatible grub image
-        os.system(f"sed -e 's|DISTRO|{distro}|' -e 's|LUKS_UUID_NODASH|{to_uuid(args[1]).replace('-', '')}|' \
-                    ./src/distros/arch/grub-luks2.conf | tee /mnt/etc/grub-luks2.conf")
         if efi:
             os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O x86_64-efi -c /etc/grub-luks2.conf -o /boot/efi/EFI/{distro}/grubx64.efi {luks_grub_args}') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!) ### changed from /tmp to $HOME
         else:
             os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O i386-pc -c /etc/grub-luks2.conf -o /boot/grub/i386-pc/core_luks2.img {luks_grub_args}') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!) ### 'biosdisk' module not needed eh?
             os.system(f'dd oflag=seek_bytes seek=512 if=/mnt/boot/grub/i386-pc/core_luks2.img of={args[2]}')
-    os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg") ### Adding /grub suffix to grub-luks2.conf didn't make a difference in the produced grub.cfg in this step so that's good I guess!!!
+    os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
 ###    os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg") ### This was not replacing mount points in Advanced section
-    os.system(f"sudo sed -i 's,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
+    os.system(f"sudo sed -i 's|subvol=@{distro_suffix}|subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp|g' /mnt/boot/grub/grub.cfg")
     # Create a mapping of "distro" <=> "BootOrder number". Ash reads from this file to switch between distros.
     if efi:
         if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
             os.system("echo DISTRO,BootOrder | sudo tee /mnt/boot/efi/EFI/map.txt")
-        os.system(f"echo '{distro},' $(efibootmgr -v | grep -i {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | sudo tee -a /mnt/boot/efi/EFI/map.txt")
+        os.system(f"echo '{distro},' $(efibootmgr -v | grep -i {distro} | awk '"'{print $1}'"' | sed '"'s|[^0-9]*||g'"') | sudo tee -a /mnt/boot/efi/EFI/map.txt")
 
 #   BTRFS snapshots
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
@@ -291,7 +289,7 @@ def main(args, distro):
     os.system(f"sudo btrfs sub del /mnt/@{distro_suffix}")
     os.system("sudo umount -R /mnt")
     if isLUKS:
-        os.system("sudo udevadm settle")
+        #os.system("sudo udevadm settle")
         os.system("sudo cryptsetup close luks_root")
     clear()
     print("Installation complete")
