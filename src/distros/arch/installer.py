@@ -155,7 +155,7 @@ def main(args, distro):
         os.system(f"sudo mount {btrfs_root} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
     for i in ("tmp", "root"):
         os.system(f"mkdir -p /mnt/{i}")
-    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp"):
+    for i in ("ash", "boot", "etc", "root", "rootfs", "tmp"):
         os.system(f"mkdir -p /mnt/.snapshots/{i}")
     if efi:
         os.system("sudo mkdir -p /mnt/boot/efi")
@@ -186,18 +186,18 @@ def main(args, distro):
         os.system(f"echo 'UUID=\"{to_uuid(btrfs_root)}\" /{mntdir} btrfs subvol=@{mntdir}{distro_suffix},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
     if efi:
         os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | sudo tee -a /mnt/etc/fstab")
-    os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
-    os.system("echo '/.snapshots/ast/tmp /tmp none bind 0 0' | sudo tee -a /mnt/etc/fstab")
+    os.system("echo '/.snapshots/ash/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
+    os.system("echo '/.snapshots/ash/tmp /tmp none bind 0 0' | sudo tee -a /mnt/etc/fstab")
     os.system(f"sudo sed -i '0,/@{distro_suffix}/ s|@{distro_suffix}|@.snapshots{distro_suffix}/rootfs/snapshot-deploy|' /mnt/etc/fstab")
     os.system(f"sudo sed -i '0,/@boot{distro_suffix}/ s|@boot{distro_suffix}|@.snapshots{distro_suffix}/boot/boot-deploy|' /mnt/etc/fstab")
     os.system(f"sudo sed -i '0,/@etc{distro_suffix}/ s|@etc{distro_suffix}|@.snapshots{distro_suffix}/etc/etc-deploy|' /mnt/etc/fstab")
     os.system(f"sudo sed -i '/\@{distro_suffix}/d' /mnt/etc/fstab") # Delete @_distro entry
 
 #   Database and config files
-    os.system("sudo mkdir -p /mnt/usr/share/ast/db")
-    os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
-    os.system("sudo cp -r /mnt/var/lib/pacman/. /mnt/usr/share/ast/db/")
-    os.system(f"sed -i 's|[#?]DBPath.*$|DBPath       = /usr/share/ast/db/|g' /mnt/etc/pacman.conf")
+    os.system("sudo mkdir -p /mnt/usr/share/ash/db")
+    os.system("echo '0' | sudo tee /mnt/usr/share/ash/snap")
+    os.system("sudo cp -r /mnt/var/lib/pacman/. /mnt/usr/share/ash/db/")
+    os.system(f"sed -i 's|[#?]DBPath.*$|DBPath       = /usr/share/ash/db/|g' /mnt/etc/pacman.conf")
     os.system(f"sudo sed -i '/^ID/ s|{distro}|{distro}_ashos|' /mnt/etc/os-release") # Modify OS release information (optional)
 
 #   Update hostname, hosts, locales and timezone, hosts
@@ -209,15 +209,15 @@ def main(args, distro):
     os.system(f"sudo ln -srf /mnt{tz} /mnt/etc/localtime")
     os.system("sudo chroot /mnt sudo hwclock --systohc")
 
-#   Copy and symlink astpk and detect_os.sh
-    os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
-    os.system(f"echo '{to_uuid(btrfs_root)}' | sudo tee /mnt/.snapshots/ast/part")
-    os.system(f"sudo cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
-    os.system("sudo cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
-    os.system("sudo ln -srf /mnt/.snapshots/ast/ast /mnt/usr/bin/ast")
-    os.system("sudo ln -srf /mnt/.snapshots/ast/detect_os.sh /mnt/usr/bin/detect_os.sh")
-    os.system("sudo ln -srf /mnt/.snapshots/ast /mnt/var/lib/ast")
-    os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree") # Initialize fstree
+#   Copy and symlink ashpk and detect_os.sh
+    os.system("sudo mkdir -p /mnt/.snapshots/ash/snapshots")
+    os.system(f"echo '{to_uuid(btrfs_root)}' | sudo tee /mnt/.snapshots/ash/part")
+    os.system(f"sudo cp -a ./src/distros/{distro}/ashpk.py /mnt/.snapshots/ash/ash")
+    os.system("sudo cp -a ./src/detect_os.sh /mnt/.snapshots/ash/detect_os.sh")
+    os.system("sudo ln -srf /mnt/.snapshots/ash/ash /mnt/usr/bin/ash")
+    os.system("sudo ln -srf /mnt/.snapshots/ash/detect_os.sh /mnt/usr/bin/detect_os.sh")
+    os.system("sudo ln -srf /mnt/.snapshots/ash /mnt/var/lib/ash")
+    os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ash/fstree") # Initialize fstree
 
 #   Create user and set password
     set_password("root")
@@ -247,7 +247,7 @@ def main(args, distro):
             os.system(f'sudo chroot /mnt sudo grub-mkimage -p "(crypto0)/@boot_arch/grub" -O i386-pc -c /etc/grub-luks2.conf -o /boot/grub/i386-pc/core_luks2.img {luks_grub_args}') # without '/grub' gives error normal.mod not found (maybe only one of these here and grub-luks2.conf is enough?!) ### 'biosdisk' module not needed eh?
             os.system(f'dd oflag=seek_bytes seek=512 if=/mnt/boot/grub/i386-pc/core_luks2.img of={args[2]}')
     os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
-    os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
+    os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by ashpk
 ###    os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg") ### This was not replacing mount points in Advanced section
     os.system(f"sudo sed -i 's|subvol=@{distro_suffix}|subvol=@.snapshots{distro_suffix}/rootfs/snapshot-deploy|g' /mnt/boot/grub/grub.cfg")
     # Create a mapping of "distro" <=> "BootOrder number". Ash reads from this file to switch between distros.
