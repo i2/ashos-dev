@@ -182,10 +182,10 @@ def get_part():
 #   Get tmp partition state
 def get_tmp():
     mount = str(subprocess.check_output("mount | grep 'on / type'", shell=True))
-    if "tmp0" in mount:
-        return("tmp0")
+    if "deploy-aux" in mount:
+        return("deploy-aux")
     else:
-        return("tmp")
+        return("deploy")
 
 #   Deploy snapshot
 def deploy(snapshot):
@@ -196,10 +196,10 @@ def deploy(snapshot):
         tmp = get_tmp()
         os.system(f"btrfs sub set-default /.snapshots/rootfs/snapshot-{tmp} >/dev/null 2>&1") # Set default volume
         untmp()
-        if "tmp0" in tmp:
-            tmp = "tmp"
+        if "deploy-aux" in tmp:
+            tmp = "deploy"
         else:
-            tmp = "tmp0"
+            tmp = "deploy-aux"
         etc = snapshot
         os.system(f"btrfs sub snap /.snapshots/rootfs/snapshot-{snapshot} /.snapshots/rootfs/snapshot-{tmp} >/dev/null 2>&1")
         os.system(f"btrfs sub snap /.snapshots/etc/etc-{snapshot} /.snapshots/etc/etc-{tmp} >/dev/null 2>&1")
@@ -210,7 +210,7 @@ def deploy(snapshot):
         os.system(f"cp --reflink=auto -r /.snapshots/etc/etc-{etc}/* /.snapshots/rootfs/snapshot-{tmp}/etc >/dev/null 2>&1")
         # If snapshot is mutable, modify '/' entry (1st line) in fstab to read-write
         if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ast/mutable"):
-            os.system(f"sed -i '0,/snapshots_tmp/ s|,ro||' /.snapshots/rootfs/snapshot-{tmp}/etc/fstab") # ,rw
+            os.system(f"sed -i '0,/snapshot-{tmp}/ s|,ro||' /.snapshots/rootfs/snapshot-{tmp}/etc/fstab") ### ,rw
         os.system(f"btrfs sub snap /var /.snapshots/rootfs/snapshot-{tmp}/var >/dev/null 2>&1")
         os.system(f"cp --reflink=auto -r /.snapshots/boot/boot-{etc}/* /.snapshots/rootfs/snapshot-{tmp}/boot >/dev/null 2>&1")
         os.system(f"echo '{snapshot}' > /.snapshots/rootfs/snapshot-{tmp}/usr/share/ast/snap")
@@ -497,10 +497,10 @@ def unchr(snapshot):
 #   Clean tmp dirs
 def untmp():
     tmp = get_tmp()
-    if "tmp0" in tmp:
-        tmp = "tmp"
+    if "deploy-aux" in tmp:
+        tmp = "deploy"
     else:
-        tmp = "tmp0"
+        tmp = "deploy-aux"
     os.system(f"btrfs sub del /.snapshots/rootfs/snapshot-{tmp}/* >/dev/null 2>&1")
     os.system(f"btrfs sub del /.snapshots/rootfs/snapshot-{tmp} >/dev/null 2>&1")
     os.system(f"btrfs sub del /.snapshots/etc/etc-{tmp} >/dev/null 2>&1")
@@ -752,25 +752,25 @@ def switchtmp():
     part = get_part()
     os.system(f"mkdir -p /etc/mnt/boot >/dev/null 2>&1")
     os.system(f"mount {part} -o subvol=@boot{distro_suffix} /etc/mnt/boot") # Mount boot partition for writing
-    if "tmp0" in mount:
-        os.system("cp --reflink=auto -r /.snapshots/rootfs/snapshot-tmp/boot/* /etc/mnt/boot")  ######REZA WHATABOUTTHIS?
-        os.system(f"sed -i 's|@.snapshots{distro_suffix}/rootfs/snapshot-tmp0|@.snapshots{distro_suffix}/rootfs/snapshot-tmp|g' /etc/mnt/boot/grub/grub.cfg") # Overwrite grub config boot subvolume
-        os.system(f"sed -i 's|@.snapshots{distro_suffix}/rootfs/snapshot-tmp0|@.snapshots{distro_suffix}/rootfs/snapshot-tmp|g' /.snapshots/rootfs/snapshot-tmp/boot/grub/grub.cfg")
-        os.system(f"sed -i 's|@.snapshots{distro_suffix}/rootfs/snapshot-tmp0|@.snapshots{distro_suffix}/rootfs/snapshot-tmp|g' /.snapshots/rootfs/snapshot-tmp/etc/fstab") # Write fstab for new deployment
-        os.system(f"sed -i 's|@.snapshots{distro_suffix}/etc/etc-tmp0|@.snapshots{distro_suffix}/etc/etc-tmp|g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
-        os.system(f"sed -i 's|@.snapshots{distro_suffix}/boot/boot-tmp0|@.snapshots{distro_suffix}/boot/boot-tmp|g' /.snapshots/rootfs/snapshot-tmp/etc/fstab")
-        sfile = open("/.snapshots/rootfs/snapshot-tmp0/usr/share/ast/snap", "r")
+    if "deploy-aux" in mount:
+        os.system("cp --reflink=auto -r /.snapshots/rootfs/snapshot-deploy/boot/* /etc/mnt/boot")  ######REZA WHATABOUTTHIS?
+        os.system(f"sed -i 's|@.snapshots{distro_suffix}/rootfs/snapshot-deploy-aux|@.snapshots{distro_suffix}/rootfs/snapshot-deploy|g' /etc/mnt/boot/grub/grub.cfg") # Overwrite grub config boot subvolume
+        os.system(f"sed -i 's|@.snapshots{distro_suffix}/rootfs/snapshot-deploy-aux|@.snapshots{distro_suffix}/rootfs/snapshot-deploy|g' /.snapshots/rootfs/snapshot-deploy/boot/grub/grub.cfg")
+        os.system(f"sed -i 's|@.snapshots{distro_suffix}/rootfs/snapshot-deploy-aux|@.snapshots{distro_suffix}/rootfs/snapshot-deploy|g' /.snapshots/rootfs/snapshot-deploy/etc/fstab") # Write fstab for new deployment
+        os.system(f"sed -i 's|@.snapshots{distro_suffix}/etc/etc-deploy-aux|@.snapshots{distro_suffix}/etc/etc-deploy|g' /.snapshots/rootfs/snapshot-deploy/etc/fstab")
+        os.system(f"sed -i 's|@.snapshots{distro_suffix}/boot/boot-deploy-aux|@.snapshots{distro_suffix}/boot/boot-deploy|g' /.snapshots/rootfs/snapshot-deploy/etc/fstab")
+        sfile = open("/.snapshots/rootfs/snapshot-deploy-aux/usr/share/ast/snap", "r")
         snap = sfile.readline()
         snap = snap.replace(" ", "")
         sfile.close()
     else:
-        os.system("cp --reflink=auto -r /.snapshots/rootfs/snapshot-tmp0/boot/* /etc/mnt/boot")
-        os.system(f"sed -i 's|@.snapshots{distro_suffix}/rootfs/snapshot-tmp|@.snapshots{distro_suffix}/rootfs/snapshot-tmp0|g' /etc/mnt/boot/grub/grub.cfg")
-        os.system(f"sed -i 's|@.snapshots{distro_suffix}/rootfs/snapshot-tmp|@.snapshots{distro_suffix}/rootfs/snapshot-tmp0|g' /.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg")
-        os.system(f"sed -i 's|@.snapshots{distro_suffix}/rootfs/snapshot-tmp|@.snapshots{distro_suffix}/rootfs/snapshot-tmp0|g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
-        os.system(f"sed -i 's|@.snapshots{distro_suffix}/etc/etc-tmp|@.snapshots{distro_suffix}/etc/etc-tmp0|g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
-        os.system(f"sed -i 's|@.snapshots{distro_suffix}/boot/boot-tmp|@.snapshots{distro_suffix}/boot/boot-tmp0|g' /.snapshots/rootfs/snapshot-tmp0/etc/fstab")
-        sfile = open("/.snapshots/rootfs/snapshot-tmp/usr/share/ast/snap", "r")
+        os.system("cp --reflink=auto -r /.snapshots/rootfs/snapshot-deploy-aux/boot/* /etc/mnt/boot")
+        os.system(f"sed -i 's|@.snapshots{distro_suffix}/rootfs/snapshot-deploy|@.snapshots{distro_suffix}/rootfs/snapshot-deploy-aux|g' /etc/mnt/boot/grub/grub.cfg")
+        os.system(f"sed -i 's|@.snapshots{distro_suffix}/rootfs/snapshot-deploy|@.snapshots{distro_suffix}/rootfs/snapshot-deploy-aux|g' /.snapshots/rootfs/snapshot-deploy-aux/boot/grub/grub.cfg")
+        os.system(f"sed -i 's|@.snapshots{distro_suffix}/rootfs/snapshot-deploy|@.snapshots{distro_suffix}/rootfs/snapshot-deploy-aux|g' /.snapshots/rootfs/snapshot-deploy-aux/etc/fstab")
+        os.system(f"sed -i 's|@.snapshots{distro_suffix}/etc/etc-deploy|@.snapshots{distro_suffix}/etc/etc-deploy-aux|g' /.snapshots/rootfs/snapshot-deploy-aux/etc/fstab")
+        os.system(f"sed -i 's|@.snapshots{distro_suffix}/boot/boot-deploy|@.snapshots{distro_suffix}/boot/boot-deploy-aux|g' /.snapshots/rootfs/snapshot-deploy-aux/etc/fstab")
+        sfile = open("/.snapshots/rootfs/snapshot-deploy/usr/share/ast/snap", "r")
         snap = sfile.readline()
         snap = snap.replace(" ", "")
         sfile.close()
@@ -785,10 +785,10 @@ def switchtmp():
     while "}" not in line:
         gconf = str(gconf)+str(line)
         line = grubconf.readline()
-    if "snapshot-tmp0" in gconf:
-        gconf = gconf.replace("snapshot-tmp0", "snapshot-tmp")
+    if "snapshot-deploy-aux" in gconf:
+        gconf = gconf.replace("snapshot-deploy-aux", "snapshot-deploy")
     else:
-        gconf = gconf.replace("snapshot-tmp", "snapshot-tmp0")
+        gconf = gconf.replace("snapshot-deploy", "snapshot-deploy-aux")
     if "Arch Linux" in gconf:
         gconf = re.sub('snapshot \d', '', gconf)
         gconf = gconf.replace(f"Arch Linux", f"Arch Linux last booted deployment (snapshot {snap})")
@@ -800,7 +800,7 @@ def switchtmp():
     grubconf.write("### END /etc/grub.d/41_custom ###")
     grubconf.close()
 
-    grubconf = open("/.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg", "r")
+    grubconf = open("/.snapshots/rootfs/snapshot-deploy-aux/boot/grub/grub.cfg", "r")
     line = grubconf.readline()
     while "BEGIN /etc/grub.d/10_linux" not in line:
         line = grubconf.readline()
@@ -809,16 +809,16 @@ def switchtmp():
     while "}" not in line:
         gconf = str(gconf)+str(line)
         line = grubconf.readline()
-    if "snapshot-tmp0" in gconf:
-        gconf = gconf.replace("snapshot-tmp0", "snapshot-tmp")
+    if "snapshot-deploy-aux" in gconf:
+        gconf = gconf.replace("snapshot-deploy-aux", "snapshot-deploy")
     else:
-        gconf = gconf.replace("snapshot-tmp", "snapshot-tmp0")
+        gconf = gconf.replace("snapshot-deploy", "snapshot-deploy-aux")
     if "Arch Linux" in gconf:
         gconf = re.sub('snapshot \d', '', gconf)
         gconf = gconf.replace(f"Arch Linux", f"Arch Linux last booted deployment (snapshot {snap})")
     grubconf.close()
-    os.system("sed -i '$ d' /.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg")
-    grubconf = open("/.snapshots/rootfs/snapshot-tmp0/boot/grub/grub.cfg", "a")
+    os.system("sed -i '$ d' /.snapshots/rootfs/snapshot-deploy-aux/boot/grub/grub.cfg")
+    grubconf = open("/.snapshots/rootfs/snapshot-deploy-aux/boot/grub/grub.cfg", "a")
     grubconf.write(gconf)
     grubconf.write("}\n")
     grubconf.write("### END /etc/grub.d/41_custom ###")

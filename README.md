@@ -60,6 +60,13 @@ It does not invent yet another package format or package manager, but instead re
 * Thanks to it's reliabilty and automatic upgrades, AshOS is well suitable for single use or embedded devices
 * It also makes for a good workstation or general use distribution utilizing development containers and flatpak for desktop applications
 
+As AshOS strives to be minimal solid and follow a LEGO like structure (start small, customize as you go), we primarily focus development on the base, meaning by default no Desktop Environment (not even Window Manager) is installed. This is by design as otherwise team has to support many DEs on many distros. What is provided is `profiles`. As DEs/WMs are just packages, with power of snapshotting, one can use ast to install the desired DE/WM.
+For instance to install GNOME in snapshot 1:
+```sudo ast clone 0
+sudo ast install-profile gnome 1
+sudo ast deploy 1
+sudo reboot```
+
 ---
 ## AshOS compared to other similar distributions
 * **NixOS** - compared to nixOS, AshOS is a more traditional system with how it's setup and maintained. While nixOS is entirely configured using the Nix programming language, AshOS uses the native package manager of target distribution, for instance pacman for Arch, apt-get for Debian, etc. AshOS consumes less storage, and configuring your system is faster and easier (less reproducible however), it also gives you more customization options. AshOS is FHS compliant, ensuring proper software compatability.
@@ -390,7 +397,7 @@ These are some advanced feature and we suggest you use them only if you are read
 
 #### LUKS
 
-Full encrypted disk using LUKS2 is implemented. This means also encrypting /boot which is an experimental feature of GRUB since v2.06. Right now in mainstream, it only supports 
+Full-disk encryption using LUKS2 is implemented. This means also encrypting /boot which is an experimental feature of GRUB since v2.06. Right now in mainstream, it only supports pbkdf2 and not the default argon2.
 
 #### Mutability toggle
 
@@ -399,7 +406,7 @@ Within the forest/tree of AshOS, one can make any snapshot (other than base `0`)
 
 ## Known bugs
 
-* When running ast without arguments - IndexError: list index out of range
+* At the end of installer if LUKS is used, there would be warning `remove ioctl device or resource busy`. They can be ignore. Most likely cause: systemd-journald
 * Running ast without root permissions shows permission denied errors instead of an error message
 * Swap partition doesn't work, it's recommended to use a swapfile or zram instead
 * Docker has issues with permissions, to fix run
