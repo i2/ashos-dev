@@ -1,5 +1,5 @@
 # AshOS (Any Snapshot Hierarchical OS)
-### An immutable meta-distribution using snapshots that looks like a tree
+### An immutable tree-shaped meta-distribution using snapshots
 
 ![ashos-logo](logo.png)
 
