@@ -166,9 +166,7 @@ def main(args, distro):
     os.system("sudo mkdir -p /mnt/usr/share/ast/db")
     os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
     os.system("sudo cp -r /mnt/var/lib/pacman/. /mnt/usr/share/ast/db/")
-    os.system(f"sed -i s|\"#DBPath      = /var/lib/pacman/\"|\"DBPath      = /usr/share/ast/db/\"|g /mnt/etc/pacman.conf") ### Any issues here?
-###    os.system(f"sed -i s|\"#DBPath.*=\(.*\)\"|\"DBPath      = /usr/share/ast/db/ #\1\"|g /mnt/etc/pacman.conf") ###
-###    os.system(f'sed -i s|"[#?]DBPath.*=\(.*\)/DBPath      = /usr/share/ast/db/ #\1| /mnt/etc/pacman.conf')
+    os.system(f"sed -i 's|[#?]DBPath.*$|DBPath       = /usr/share/ast/db/|g' /mnt/etc/pacman.conf")
     os.system(f"sudo sed -i '/^ID/ s|{distro}|{distro}_ashos|' /mnt/etc/os-release") # Modify OS release information (optional)
 
 #   Update hostname, hosts, locales and timezone, hosts
@@ -203,7 +201,7 @@ def main(args, distro):
     os.system(f'sudo chroot /mnt sudo grub-install {args[2]}')
     os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
     os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
-###    os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg")
+###    os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg") ### This was not replacing mount points in Advanced section
     os.system(f"sudo sed -i 's|subvol=@{distro_suffix}|subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp|g' /mnt/boot/grub/grub.cfg")
     # Create a mapping of "distro" <=> "BootOrder number". Ash reads from this file to switch between distros.
     if efi:
@@ -239,10 +237,10 @@ def main(args, distro):
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/. /mnt/.snapshots/rootfs/snapshot-tmp/etc/")
 
 #   Unmount everything and finish
-    os.system("sudo umount -R /mnt")
+    os.system("sudo umount --recursive /mnt")
     os.system(f"sudo mount {args[1]} -o subvolid=0 /mnt")
     os.system(f"sudo btrfs sub del /mnt/@{distro_suffix}")
-    os.system("sudo umount -R /mnt")
+    os.system("sudo umount --recursive /mnt")
     clear()
     print("Installation complete")
     print("You can reboot now :)")

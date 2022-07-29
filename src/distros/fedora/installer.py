@@ -16,7 +16,7 @@ def get_multiboot(dist):
     clear()
     while True:
         print("Please choose one of the following:\n1. Single OS installation\n2. Initiate a multi-boot ashos setup\n3. Adding to an already installed ashos")
-        print("Please be aware choosing option 1 and 2 will wipe {args[1]}")
+        print("Please be aware choosing option 1 and 2 will wipe root partition")
         i = input("> ")
         if i == "1":
             return i, ""
@@ -35,25 +35,25 @@ def get_hostname():
     clear()
     while True:
         print("Enter hostname:")
-        hostname = input("> ")
-        if hostname:
-            print("Happy with your hostname (y/n)?")
+        h = input("> ")
+        if h:
+            print("Happy with your hostname? (y/n)")
             reply = input("> ")
             if reply.casefold() == "y":
                 break
             else:
                 continue
-    return hostname
+    return h
 
 def get_timezone():
     clear()
     while True:
         print("Select a timezone (type list to list):")
-        zone = input("> ")
-        if zone == "list":
+        z = input("> ")
+        if z == "list":
             os.system("ls /usr/share/zoneinfo | less")
-        elif os.path.isfile(f"/usr/share/zoneinfo/{zone}"):
-            return str(f"/usr/share/zoneinfo/{zone}")
+        elif os.path.isfile(f"/usr/share/zoneinfo/{z}"):
+            return str(f"/usr/share/zoneinfo/{z}")
         else:
             print("Invalid timezone!")
             continue
@@ -62,15 +62,15 @@ def get_username():
     clear()
     while True:
         print("Enter username (all lowercase, max 8 letters)")
-        username = input("> ")
-        if username:
-            print("Happy with your username (y/n)?")
+        u = input("> ")
+        if u:
+            print("Happy with your username? (y/n)")
             reply = input("> ")
             if reply.casefold() == "y":
                 break
             else:
                 continue
-    return username
+    return u
 
 def create_user(u, g):
     os.system(f"sudo chroot /mnt sudo useradd -m -G {g} -s /bin/bash {u}")
@@ -82,7 +82,7 @@ def set_password(u):
     while True:
         print(f"Setting a password for '{u}':")
         os.system(f"sudo chroot /mnt sudo passwd {u}")
-        print("Was your password set properly (y/n)?")
+        print("Was your password set properly? (y/n)")
         reply = input("> ")
         if reply.casefold() == "y":
             break
@@ -101,7 +101,8 @@ def main(args, distro):
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
     tz = get_timezone()
-    hostname = get_hostname()
+#    hostname = get_hostname()
+    hostname = subprocess.check_output(f"git rev-parse --short HEAD", shell=True).decode('utf-8').strip() # Just for debugging
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
@@ -114,7 +115,7 @@ def main(args, distro):
 
 #   Mount and create necessary sub-volumes and directories
     if choice != "3":
-        os.system(f"sudo mount {args[1]} /mnt")
+        os.system(f"sudo mount -t btrfs {args[1]} /mnt")
     else:
         os.system(f"sudo mount -o subvolid=5 {args[1]} /mnt")
     for btrdir in btrdirs:
@@ -128,7 +129,7 @@ def main(args, distro):
     for i in ("ast", "boot", "etc", "root", "rootfs", "tmp"):
         os.system(f"mkdir -p /mnt/.snapshots/{i}")
     if efi:
-        os.system("sudo mkdir /mnt/boot/efi")
+        os.system("sudo mkdir -p /mnt/boot/efi")
         os.system(f"sudo mount {args[3]} /mnt/boot/efi")
 
 #   Bootstrap then install anytree and necessary packages in chroot
@@ -170,9 +171,9 @@ def main(args, distro):
         os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
     os.system("echo '/.snapshots/ast/tmp /tmp none bind 0 0' | sudo tee -a /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@{distro_suffix}/ s,@{distro_suffix},@.snapshots{distro_suffix}/rootfs/snapshot-tmp,' /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@boot{distro_suffix}/ s,@boot{distro_suffix},@.snapshots{distro_suffix}/boot/boot-tmp,' /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@etc{distro_suffix}/ s,@etc{distro_suffix},@.snapshots{distro_suffix}/etc/etc-tmp,' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@{distro_suffix}/ s|@{distro_suffix}|@.snapshots{distro_suffix}/rootfs/snapshot-tmp|' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@boot{distro_suffix}/ s|@boot{distro_suffix}|@.snapshots{distro_suffix}/boot/boot-tmp|' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@etc{distro_suffix}/ s|@etc{distro_suffix}|@.snapshots{distro_suffix}/etc/etc-tmp|' /mnt/etc/fstab")
     os.system(f"sudo sed -i '/\@{distro_suffix}/d' /mnt/etc/fstab") # Delete @_distro entry
 
 #   Database and config files
@@ -190,7 +191,7 @@ def main(args, distro):
     os.system(f"sudo cp -a /mnt/var/lib/dnf /mnt/usr/share/ast/db/")
     os.system("sudo cp -a /mnt/var/lib/rpm /mnt/usr/share/ast/db/")
     os.system('echo persistdir="/usr/share/ast/db/dnf" | sudo tee -a /mnt/etc/dnf/dnf.conf') ### REVIEW_LATER I'm not sure if this works?!
-    os.system(f"sudo sed -i '/^ID/ s/{distro}/{distro}_ashos/' /mnt/etc/os-release") # Modify OS release information (optional)
+    os.system(f"sudo sed -i '/^ID/ s|{distro}|{distro}_ashos|' /mnt/etc/os-release") # Modify OS release information (optional)
 
 #   Update hostname, hosts, locales and timezone, hosts
     os.system(f"echo {hostname} | sudo tee /mnt/etc/hostname")
@@ -216,7 +217,7 @@ def main(args, distro):
     create_user(username, "wheel")
     set_password(username)
 
-#   Systemd
+#   Services (init, network, etc.)
     os.system("sudo chroot /mnt systemctl enable NetworkManager")
     os.system("sudo chroot /mnt systemctl disable rpmdb-migrate") # https://fedoraproject.org/wiki/Changes/RelocateRPMToUsr ### WHEN IS THIS SERVICE ACTIVATED, DO A BREAKPOINT CHECK
 
@@ -233,7 +234,7 @@ def main(args, distro):
         if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
             os.system("echo DISTRO,BootOrder | sudo tee /mnt/boot/efi/EFI/map.txt")
         os.system(f"efibootmgr -c -d {args[2]} -p 1 -L 'Fedora' -l '\\EFI\\fedora\\shim.efi'") ###REVIEW_LATER shim.efi vs shimx64.efi ### CAN I REMOVE THIS?
-        os.system(f"echo '{distro},' $(efibootmgr -v | grep -i {distro} | awk '"'{print $1}'"' | sed '"'s/[^0-9]*//g'"') | tee -a /mnt/boot/efi/EFI/map.txt")
+        os.system(f"echo '{distro},' $(efibootmgr -v | grep -i {distro} | awk '"'{print $1}'"' | sed '"'s|[^0-9]*||g'"') | sudo tee -a /mnt/boot/efi/EFI/map.txt")
 
 #   BTRFS snapshots
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
@@ -263,10 +264,10 @@ def main(args, distro):
     os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/. /mnt/.snapshots/rootfs/snapshot-tmp/etc/")
 
 #   Unmount everything and finish
-    os.system("sudo umount -R /mnt")
+    os.system("sudo umount --recursive /mnt")
     os.system(f"sudo mount {args[1]} -o subvolid=0 /mnt")
     os.system(f"sudo btrfs sub del /mnt/@{distro_suffix}")
-    os.system("sudo umount -R /mnt")
+    os.system("sudo umount --recursive /mnt")
     clear()
     print("Installation complete")
     print("You can reboot now :)")
