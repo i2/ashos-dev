@@ -231,7 +231,11 @@ def main(args, distro):
 
 #   GRUB and EFI
     if isLUKS:
-        os.system(f"sudo sed -i '/^HOOKS/ s/filesystems/encrypt filesystems/' /mnt/etc/mkinitcpio.conf")
+        os.system("sudo dd bs=512 count=4 if=/dev/random of=/mnt/etc/crypto_keyfile.bin iflag=fullblock")
+        os.system("sudo chmod 600 /mnt/etc/crypto_keyfile.bin")
+        os.system(f"sudo cryptsetup luksAddKey {args[1]} /mnt/etc/crypto_keyfile.bin")
+        os.system("sudo sed -i -e '/^HOOKS/ s/filesystems/encrypt filesystems/' \
+                    -e 's|^FILES=(|FILES=(/etc/crypto_keyfile.bin|' /mnt/etc/mkinitcpio.conf")
         os.system("sudo chroot /mnt sudo mkinitcpio -p linux")
         os.system("sudo sed -i 's/^#GRUB_ENABLE_CRYPTODISK/GRUB_ENABLE_CRYPTODISK/' -i /mnt/etc/default/grub")
         os.system(f"sudo sed -i -E 's|^#?GRUB_CMDLINE_LINUX=\"|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID={to_uuid(args[1])}:luks_root|' /mnt/etc/default/grub")

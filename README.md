@@ -384,7 +384,7 @@ These are some advanced feature and we suggest you use them only if you are read
 
 #### LUKS
 
-Full-disk encryption using LUKS2 is implemented. This means also encrypting /boot which is an experimental feature of GRUB since v2.06. Right now in mainstream, it only supports pbkdf2 and not the default argon2.
+Full-disk encryption using LUKS2 is implemented. This means also encrypting /boot which is an experimental feature of GRUB since v2.06. Right now in mainstream, it only supports pbkdf2 and not the default argon2. This will significantly slow down booting as for example cryptomount decryption is about 30 seconds on 8kb keyfile.
 
 #### Mutability toggle
 
