@@ -1,11 +1,20 @@
 #!/bin/sh
 
 if [ -z "$HOME" ]; then HOME=~ ; fi
-# Ignore signature checking in pacman.conf (bad idea but sometimes necessary in VirtualBox)
-sed -e '/^SigLevel/ s|^#*|SigLevel = Never\n#|' -i /etc/pacman.conf
-sed -e '/^LocalFileSigLevel/ s|^#*|#|' -i /etc/pacman.conf
-pacman -Syy --noconfirm archlinux-keyring
-pacman -S --noconfirm git
+
+# Fix signature invalid error
+rm -rf /etc/pacman.d/gnupg ~/.gnupg
+pacman -Syy
+gpg --refresh-keys
+killall gpg-agent
+pacman-key --init
+pacman-key --populate archlinux
+
+# Ignore signature checking in pacman.conf (bad idea - use above fix)
+#sed -e '/^SigLevel/ s|^#*|SigLevel = Never\n#|' -i /etc/pacman.conf
+#sed -e '/^LocalFileSigLevel/ s|^#*|#|' -i /etc/pacman.conf
+
+pacman -Syy --noconfirm archlinux-keyring git
 echo "export LC_ALL=C LC_CTYPE=C LANGUAGE=C" | tee -a $HOME/.zshrc
 #echo "alias p='curl -F "'"sprunge=<-"'" sprunge.us'" | tee -a $HOME/.zshrc
 echo "alias p='curl -F "'"f:1=<-"'" ix.io'" | tee -a $HOME/.zshrc
