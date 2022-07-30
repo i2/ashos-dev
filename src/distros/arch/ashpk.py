@@ -231,10 +231,11 @@ def extend_branch(snapshot, desc=""):
             immutability = "-r"
         i = findnew()
         os.system(f"btrfs sub snap {immutability} /.snapshots/rootfs/snapshot-{snapshot} /.snapshots/rootfs/snapshot-{i} >/dev/null 2>&1")
-        #os.system(f"mkdir -p /.snapshots/rootfs/snapshot-{i}/usr/share/ash") ### REVIEW_LATER MOST PROBABLY NOT NEEDED
-        os.system(f"touch /.snapshots/rootfs/snapshot-{i}/usr/share/ash/mutable")
         os.system(f"btrfs sub snap {immutability} /.snapshots/etc/etc-{snapshot} /.snapshots/etc/etc-{i} >/dev/null 2>&1")
         os.system(f"btrfs sub snap {immutability} /.snapshots/boot/boot-{snapshot} /.snapshots/boot/boot-{i} >/dev/null 2>&1")
+        if immutability == "": # Mark newly created snapshot as mutable too
+            #os.system(f"mkdir -p /.snapshots/rootfs/snapshot-{i}/usr/share/ash") ### MOST PROBABLY NOT NEEDED
+            os.system(f"touch /.snapshots/rootfs/snapshot-{i}/usr/share/ash/mutable")
         add_node_to_parent(fstree, snapshot, i)
         write_tree(fstree)
         if desc: write_desc(i, desc)
@@ -251,10 +252,11 @@ def clone_branch(snapshot):
             immutability = "-r"
         i = findnew()
         os.system(f"btrfs sub snap {immutability} /.snapshots/rootfs/snapshot-{snapshot} /.snapshots/rootfs/snapshot-{i} >/dev/null 2>&1")
-        #os.system(f"mkdir -p /.snapshots/rootfs/snapshot-{i}/usr/share/ash") ### REVIEW_LATER MOST PROBABLY NOT NEEDED
-        os.system(f"touch /.snapshots/rootfs/snapshot-{i}/usr/share/ash/mutable")
         os.system(f"btrfs sub snap {immutability} /.snapshots/etc/etc-{snapshot} /.snapshots/etc/etc-{i} >/dev/null 2>&1")
         os.system(f"btrfs sub snap {immutability} /.snapshots/boot/boot-{snapshot} /.snapshots/boot/boot-{i} >/dev/null 2>&1")
+        if immutability == "": # Mark newly created snapshot as mutable too
+            #os.system(f"mkdir -p /.snapshots/rootfs/snapshot-{i}/usr/share/ash") ### MOST PROBABLY NOT NEEDED
+            os.system(f"touch /.snapshots/rootfs/snapshot-{i}/usr/share/ash/mutable")
         add_node_to_level(fstree, snapshot, i)
         write_tree(fstree)
         desc = str(f"clone of {snapshot}")
@@ -272,10 +274,11 @@ def clone_under(snapshot, branch):
             immutability = "-r"
         i = findnew()
         os.system(f"btrfs sub snap {immutability} /.snapshots/rootfs/snapshot-{branch} /.snapshots/rootfs/snapshot-{i} >/dev/null 2>&1")
-        #os.system(f"mkdir -p /.snapshots/rootfs/snapshot-{i}/usr/share/ash") ### REVIEW_LATER MOST PROBABLY NOT NEEDED
-        os.system(f"touch /.snapshots/rootfs/snapshot-{i}/usr/share/ash/mutable")
         os.system(f"btrfs sub snap {immutability} /.snapshots/etc/etc-{branch} /.snapshots/etc/etc-{i} >/dev/null 2>&1")
         os.system(f"btrfs sub snap {immutability} /.snapshots/boot/boot-{branch} /.snapshots/boot/boot-{i} >/dev/null 2>&1")
+        if immutability == "": # Mark newly created snapshot as mutable too
+            #os.system(f"mkdir -p /.snapshots/rootfs/snapshot-{i}/usr/share/ash") ### MOST PROBABLY NOT NEEDED
+            os.system(f"touch /.snapshots/rootfs/snapshot-{i}/usr/share/ash/mutable")
         add_node_to_parent(fstree, snapshot, i)
         write_tree(fstree)
         desc = str(f"clone of {snapshot}")
@@ -409,11 +412,11 @@ def clone_as_tree(snapshot):
             immutability = "-r"
         i = findnew()
         os.system(f"btrfs sub snap {immutability} /.snapshots/rootfs/snapshot-{snapshot} /.snapshots/rootfs/snapshot-{i} >/dev/null 2>&1")
-        #os.system(f"mkdir -p /.snapshots/rootfs/snapshot-{i}/usr/share/ash") ### REVIEW_LATER MOST PROBABLY NOT NEEDED
-        if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ash/mutable"):
-            os.system(f"touch /.snapshots/rootfs/snapshot-{i}/usr/share/ash/mutable")
         os.system(f"btrfs sub snap {immutability} /.snapshots/etc/etc-{snapshot} /.snapshots/etc/etc-{i} >/dev/null 2>&1")
         os.system(f"btrfs sub snap {immutability} /.snapshots/boot/boot-{snapshot} /.snapshots/boot/boot-{i} >/dev/null 2>&1")
+        if immutability == "": # Mark newly created snapshot as mutable too
+            #os.system(f"mkdir -p /.snapshots/rootfs/snapshot-{i}/usr/share/ash") ### MOST PROBABLY NOT NEEDED
+            os.system(f"touch /.snapshots/rootfs/snapshot-{i}/usr/share/ash/mutable")
         append_base_tree(fstree, i)
         write_tree(fstree)
         desc = str(f"clone of {snapshot}")

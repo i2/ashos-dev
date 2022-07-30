@@ -279,7 +279,7 @@ def main(args, distro):
     os.system("sudo rm -rf /mnt/root/*")
     os.system("sudo rm -rf /mnt/tmp/*")
 
-#   Copy boot and etc: deployed snapshot <===> common
+#   Copy boot and etc: deployed snapshot <---> common
     if efi:
         os.system("sudo umount /mnt/boot/efi")
     os.system("sudo umount /mnt/boot")
@@ -297,7 +297,6 @@ def main(args, distro):
     os.system(f"sudo btrfs sub del /mnt/@{distro_suffix}")
     os.system("sudo umount --recursive /mnt")
     if isLUKS:
-        #os.system("sudo udevadm settle")
         os.system("sudo cryptsetup close luks_root")
     clear()
     print("Installation complete!")
