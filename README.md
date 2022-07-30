@@ -421,6 +421,10 @@ sudo chmod 666 /var/run/docker.sock
 * Please feel free to join us on [Discord](https://discord.gg/YVHEC6XNZw) for further discussion and support!
 * Happy worry-free snapshotting!
 
+# ToDos
+* A clean way to completely unistall ast
+* Implement AUR package maintenance between snapshots
+
 ---
 
 **Project is licensed under the AGPLv3 license**
