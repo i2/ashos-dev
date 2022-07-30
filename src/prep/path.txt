@@ -1,3 +1,4 @@
+# /etc/login.defs
 # (they are minimal, add the rest in the shell startup files)
 
 Arch:
