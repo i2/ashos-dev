@@ -110,7 +110,7 @@ def main(args, distro):
 #   Define variables
     #packages = "base linux linux-firmware nano python3 python-anytree bash dhcpcd \
     #            arch-install-scripts btrfs-progs networkmanager grub sudo tmux os-prober"
-    packages = "base linux nano bash grub sudo tmux" # Just for debugging
+    packages = "base linux btrfs-progs nano bash grub sudo tmux" # Just for debugging
     choice, distro_suffix = get_multiboot(distro)
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
