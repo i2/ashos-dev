@@ -34,7 +34,7 @@ def immutability_disable(snapshot):
                 print(f"Snapshot {snapshot} successfully made mutable.")
                 write_desc(snapshot, " MUTABLE ")
     else:
-        print(f"F: Snapshot {snapshot} (base) should not be modified.")
+        print("F: Snapshot 0 (base) should not be modified.")
 
 #   Make a node immutable
 def immutability_enable(snapshot):
@@ -48,9 +48,9 @@ def immutability_enable(snapshot):
                 os.system(f"rm /.snapshots/rootfs/snapshot-{snapshot}/usr/share/ash/mutable")
                 os.system(f"btrfs property set -ts /.snapshots/rootfs/snapshot-{snapshot} ro true")
                 print(f"Snapshot {snapshot} successfully made immutable.")
-                os.system(f"sed 's| MUTABLE ||g' /.snapshots/ash/snapshots/{snapshot}-desc")
+                os.system(f"sed -i 's| MUTABLE ||g' /.snapshots/ash/snapshots/{snapshot}-desc")
     else:
-        print(f"F: Snapshot {snapshot} (base) should not be modified.")
+        print("F: Snapshot 0 (base) should not be modified.")
 
 #   This function returns either empty string or underscore plus name of distro if it was appended to sub-volume names to distinguish
 def get_distro_suffix():
@@ -454,8 +454,8 @@ def update_boot(snapshot):
         tmp = get_tmp()
         part = get_part()
         prepare(snapshot)
-        ### TODO: DELETE grub.cfg.DATE.BAK older than 90 days
-        subprocess.check_output("cp /boot/grub/grub.cfg /boot/grub/BAK/grub.cfg.`date '+%Y%m%d-%H%M%S'`", shell=True)
+        os.system("find /boot/grub/BAK/* -mtime +90 -exec rm {} \;") # Delete 90-day-old grub.cfg.DATE files
+        os.system("cp /boot/grub/grub.cfg /boot/grub/BAK/grub.cfg.`date '+%Y%m%d-%H%M%S'`")
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} grub-mkconfig {part} -o /boot/grub/grub.cfg")
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i 's|snapshot-chr{snapshot}|snapshot-{tmp}|g' /boot/grub/grub.cfg")
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} sed -i '0,/Arch\ Linux/ s||Arch\ Linux\ snapshot\ {snapshot}|' /boot/grub/grub.cfg")
@@ -551,7 +551,7 @@ def install(snapshot, pkg):
             print("F: Install failed and changes discarded.")
 
 #   Install a profile from a text file
-def install_profile(snapshot, profile, path="", dist=distro_suffix):
+def install_profile(snapshot, profile, path="", dist=get_distro_suffix()):
     if not os.path.isfile(f"$HOME/ashos/src/profiles/{profile}/packages{dist}.txt") and path == "":
         os.system(f"curl -o /tmp/ -LO https://github.com/i2/ashos-dev/blob/debian/src/profiles/{profile}/packages{dist}.txt")
         install(snapshot, subprocess.check_output(f"cat /tmp/packages{dist}.txt | grep -E -v '^#|^$'", shell=True).decode('utf-8').replace('\n', ' '))

@@ -784,6 +784,8 @@ https://glacion.com/2019/06/16/Fedora.html
 * https://unix.stackexchange.com/questions/508253/can-i-restore-a-grub-installation-using-dd
 * https://unix.stackexchange.com/questions/81556/area-on-disk-after-the-mbr-and-before-the-partition-start-point
 * https://stackoverflow.com/questions/15238100/use-dd-to-write-data-starting-from-a-specific-location
+https://wiki.archlinux.org/title/dm-crypt/Encrypting_an_entire_system#Avoiding_having_to_enter_the_passphrase_twice
+https://www.pavelkogan.com/2014/05/23/luks-full-disk-encryption/#bonus-login-once
 https://unix.stackexchange.com/questions/502287/what-are-the-differences-between-the-purposes-of-core-img-and-files-in-boot
 https://blog.heckel.io/2017/05/28/creating-a-bios-gpt-and-uefi-gpt-grub-bootable-linux-system/#Creating-a-GPT-with-a-BIOS-boot-partition-and-an-EFI-System-Partition
 https://unix.stackexchange.com/questions/332880/how-does-grub-find-boot-partition-on-an-mbr-disk
@@ -819,4 +821,18 @@ https://gist.github.com/nhumrich/67f6f13ae88eaabaa219953d41c5bf9d
 
 ---------------------------------- Veracrypt ----------------------------
 https://forums.linuxmint.com/viewtopic.php?t=273185
+----------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+----------- LINUX MINT --------------------------------------------------
+https://www.pavelkogan.com/2015/01/25/linux-mint-encryption/
 ----------------------------------------------------------------------
