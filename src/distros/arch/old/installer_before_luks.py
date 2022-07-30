@@ -15,8 +15,8 @@ def to_uuid(part):
 def get_multiboot(dist):
     clear()
     while True:
-        print("Please choose one of the following:\n1. Single OS installation\n2. Initiate a multi-boot ashos setup\n3. Adding to an already installed ashos")
-        print("Please be aware choosing option 1 and 2 will wipe root partition")
+        print("Please choose one of the following:\n1. Single OS installation\n2. Initiate a multi-boot ashos setup\n3. Adding to an already installed ashos.")
+        print("Please be aware choosing option 1 and 2 will wipe root partition.")
         i = input("> ")
         if i == "1":
             return i, ""
@@ -61,7 +61,7 @@ def get_timezone():
 def get_username():
     clear()
     while True:
-        print("Enter username (all lowercase, max 8 letters)")
+        print("Enter username (all lowercase):")
         u = input("> ")
         if u:
             print("Happy with your username? (y/n)")
@@ -93,8 +93,9 @@ def main(args, distro):
     print("Welcome to the AshOS installer!\n\n\n\n\n")
 
 #   Define variables
-    packages = "base linux linux-firmware nano python3 python-anytree bash dhcpcd \
-                arch-install-scripts btrfs-progs networkmanager grub sudo tmux os-prober"
+    #packages = "base linux linux-firmware nano python3 python-anytree bash dhcpcd \
+    #            arch-install-scripts btrfs-progs networkmanager grub sudo tmux os-prober"
+    packages = "base linux btrfs-progs dhcpcd nano bash grub sudo tmux" # Just for debugging
     choice, distro_suffix = get_multiboot(distro)
     btrdirs = [f"@{distro_suffix}", f"@.snapshots{distro_suffix}", f"@boot{distro_suffix}", f"@etc{distro_suffix}", f"@home{distro_suffix}", f"@var{distro_suffix}"]
     mntdirs = ["", ".snapshots", "boot", "etc", "home", "var"]
@@ -124,7 +125,7 @@ def main(args, distro):
         os.system(f"sudo mount {args[1]} -o subvol={btrdirs[mntdirs.index(mntdir)]},compress=zstd,noatime /mnt/{mntdir}")
     for i in ("tmp", "root"):
         os.system(f"mkdir -p /mnt/{i}")
-    for i in ("ast", "boot", "etc", "root", "rootfs", "tmp"):
+    for i in ("ash", "boot", "etc", "root", "rootfs", "tmp"):
         os.system(f"mkdir -p /mnt/.snapshots/{i}")
     if efi:
         os.system("sudo mkdir -p /mnt/boot/efi")
@@ -155,18 +156,18 @@ def main(args, distro):
         os.system(f"echo 'UUID=\"{to_uuid(args[1])}\" /{mntdir} btrfs subvol=@{mntdir}{distro_suffix},compress=zstd,noatime 0 0' | sudo tee -a /mnt/etc/fstab")
     if efi:
         os.system(f"echo 'UUID=\"{to_uuid(args[3])}\" /boot/efi vfat umask=0077 0 2' | sudo tee -a /mnt/etc/fstab")
-    os.system("echo '/.snapshots/ast/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
-    os.system("echo '/.snapshots/ast/tmp /tmp none bind 0 0' | sudo tee -a /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@{distro_suffix}/ s|@{distro_suffix}|@.snapshots{distro_suffix}/rootfs/snapshot-tmp|' /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@boot{distro_suffix}/ s|@boot{distro_suffix}|@.snapshots{distro_suffix}/boot/boot-tmp|' /mnt/etc/fstab")
-    os.system(f"sudo sed -i '0,/@etc{distro_suffix}/ s|@etc{distro_suffix}|@.snapshots{distro_suffix}/etc/etc-tmp|' /mnt/etc/fstab")
+    os.system("echo '/.snapshots/ash/root /root none bind 0 0' | sudo tee -a /mnt/etc/fstab")
+    os.system("echo '/.snapshots/ash/tmp /tmp none bind 0 0' | sudo tee -a /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@{distro_suffix}/ s|@{distro_suffix}|@.snapshots{distro_suffix}/rootfs/snapshot-deploy|' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@boot{distro_suffix}/ s|@boot{distro_suffix}|@.snapshots{distro_suffix}/boot/boot-deploy|' /mnt/etc/fstab")
+    os.system(f"sudo sed -i '0,/@etc{distro_suffix}/ s|@etc{distro_suffix}|@.snapshots{distro_suffix}/etc/etc-deploy|' /mnt/etc/fstab")
     os.system(f"sudo sed -i '/\@{distro_suffix}/d' /mnt/etc/fstab") # Delete @_distro entry
 
 #   Database and config files
-    os.system("sudo mkdir -p /mnt/usr/share/ast/db")
-    os.system("echo '0' | sudo tee /mnt/usr/share/ast/snap")
-    os.system("sudo cp -r /mnt/var/lib/pacman/. /mnt/usr/share/ast/db/")
-    os.system(f"sed -i 's|[#?]DBPath.*$|DBPath       = /usr/share/ast/db/|g' /mnt/etc/pacman.conf")
+    os.system("sudo mkdir -p /mnt/usr/share/ash/db")
+    os.system("echo '0' | sudo tee /mnt/usr/share/ash/snap")
+    os.system("sudo cp -r /mnt/var/lib/pacman/. /mnt/usr/share/ash/db/")
+    os.system(f"sed -i 's|[#?]DBPath.*$|DBPath       = /usr/share/ash/db/|g' /mnt/etc/pacman.conf")
     os.system(f"sudo sed -i '/^ID/ s|{distro}|{distro}_ashos|' /mnt/etc/os-release") # Modify OS release information (optional)
 
 #   Update hostname, hosts, locales and timezone, hosts
@@ -178,15 +179,15 @@ def main(args, distro):
     os.system(f"sudo ln -srf /mnt{tz} /mnt/etc/localtime")
     os.system("sudo chroot /mnt sudo hwclock --systohc")
 
-#   Copy and symlink astpk and detect_os.sh
-    os.system("sudo mkdir -p /mnt/.snapshots/ast/snapshots")
-    os.system(f"echo '{to_uuid(args[1])}' | sudo tee /mnt/.snapshots/ast/part")
-    os.system(f"sudo cp -a ./src/distros/{distro}/astpk.py /mnt/.snapshots/ast/ast")
-    os.system("sudo cp -a ./src/detect_os.sh /mnt/.snapshots/ast/detect_os.sh")
-    os.system("sudo ln -srf /mnt/.snapshots/ast/ast /mnt/usr/bin/ast")
-    os.system("sudo ln -srf /mnt/.snapshots/ast/detect_os.sh /mnt/usr/bin/detect_os.sh")
-    os.system("sudo ln -srf /mnt/.snapshots/ast /mnt/var/lib/ast")
-    os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ast/fstree") # Initialize fstree
+#   Copy and symlink ashpk and detect_os.sh
+    os.system("sudo mkdir -p /mnt/.snapshots/ash/snapshots")
+    os.system(f"echo '{to_uuid(args[1])}' | sudo tee /mnt/.snapshots/ash/part")
+    os.system(f"sudo cp -a ./src/distros/{distro}/ashpk.py /mnt/.snapshots/ash/ash")
+    os.system("sudo cp -a ./src/detect_os.sh /mnt/.snapshots/ash/detect_os.sh")
+    os.system("sudo ln -srf /mnt/.snapshots/ash/ash /mnt/usr/bin/ash")
+    os.system("sudo ln -srf /mnt/.snapshots/ash/detect_os.sh /mnt/usr/bin/detect_os.sh")
+    os.system("sudo ln -srf /mnt/.snapshots/ash /mnt/var/lib/ash")
+    os.system("echo {\\'name\\': \\'root\\', \\'children\\': [{\\'name\\': \\'0\\'}]} | sudo tee /mnt/.snapshots/ash/fstree") # Initialize fstree
 
 #   Create user and set password
     set_password("root")
@@ -200,9 +201,9 @@ def main(args, distro):
 #   GRUB and EFI
     os.system(f'sudo chroot /mnt sudo grub-install {args[2]}')
     os.system(f"sudo chroot /mnt sudo grub-mkconfig {args[2]} -o /boot/grub/grub.cfg")
-    os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by astpk
+    os.system("sudo mkdir -p /mnt/boot/grub/BAK") # Folder for backing up grub configs created by ashpk
 ###    os.system(f"sudo sed -i '0,/subvol=@{distro_suffix}/ s,subvol=@{distro_suffix},subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp,g' /mnt/boot/grub/grub.cfg") ### This was not replacing mount points in Advanced section
-    os.system(f"sudo sed -i 's|subvol=@{distro_suffix}|subvol=@.snapshots{distro_suffix}/rootfs/snapshot-tmp|g' /mnt/boot/grub/grub.cfg")
+    os.system(f"sudo sed -i 's|subvol=@{distro_suffix}|subvol=@.snapshots{distro_suffix}/rootfs/snapshot-deploy|g' /mnt/boot/grub/grub.cfg")
     # Create a mapping of "distro" <=> "BootOrder number". Ash reads from this file to switch between distros.
     if efi:
         if not os.path.exists("/mnt/boot/efi/EFI/map.txt"):
@@ -211,30 +212,30 @@ def main(args, distro):
 
 #   BTRFS snapshots
     os.system("sudo btrfs sub snap -r /mnt /mnt/.snapshots/rootfs/snapshot-0")
-    os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-tmp")
-    os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-tmp")
-    os.system("sudo cp --reflink=auto -r /mnt/boot/* /mnt/.snapshots/boot/boot-tmp")
-    os.system("sudo cp --reflink=auto -r /mnt/etc/* /mnt/.snapshots/etc/etc-tmp")
-    os.system("sudo btrfs sub snap -r /mnt/.snapshots/boot/boot-tmp /mnt/.snapshots/boot/boot-0")
-    os.system("sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-tmp /mnt/.snapshots/etc/etc-0")
-    os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-tmp")
-    os.system("sudo chroot /mnt sudo btrfs sub set-default /.snapshots/rootfs/snapshot-tmp")
+    os.system("sudo btrfs sub create /mnt/.snapshots/boot/boot-deploy")
+    os.system("sudo btrfs sub create /mnt/.snapshots/etc/etc-deploy")
+    os.system("sudo cp --reflink=auto -r /mnt/boot/* /mnt/.snapshots/boot/boot-deploy")
+    os.system("sudo cp --reflink=auto -r /mnt/etc/* /mnt/.snapshots/etc/etc-deploy")
+    os.system("sudo btrfs sub snap -r /mnt/.snapshots/boot/boot-deploy /mnt/.snapshots/boot/boot-0")
+    os.system("sudo btrfs sub snap -r /mnt/.snapshots/etc/etc-deploy /mnt/.snapshots/etc/etc-0")
+    os.system("sudo btrfs sub snap /mnt/.snapshots/rootfs/snapshot-0 /mnt/.snapshots/rootfs/snapshot-deploy")
+    os.system("sudo chroot /mnt sudo btrfs sub set-default /.snapshots/rootfs/snapshot-deploy")
     os.system("sudo cp -r /mnt/root/. /mnt/.snapshots/root/")
     os.system("sudo cp -r /mnt/tmp/. /mnt/.snapshots/tmp/")
     os.system("sudo rm -rf /mnt/root/*")
     os.system("sudo rm -rf /mnt/tmp/*")
 
-#   Copy boot and etc from snapshot's tmp to common
+#   Copy boot and etc: deployed snapshot <===> common
     if efi:
         os.system("sudo umount /mnt/boot/efi")
     os.system("sudo umount /mnt/boot")
-    os.system(f"sudo mount {args[1]} -o subvol=@boot{distro_suffix},compress=zstd,noatime /mnt/.snapshots/boot/boot-tmp")
-    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-tmp/. /mnt/boot/")
+    os.system(f"sudo mount {args[1]} -o subvol=@boot{distro_suffix},compress=zstd,noatime /mnt/.snapshots/boot/boot-deploy")
+    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-deploy/. /mnt/boot/")
     os.system("sudo umount /mnt/etc")
-    os.system(f"sudo mount {args[1]} -o subvol=@etc{distro_suffix},compress=zstd,noatime /mnt/.snapshots/etc/etc-tmp")
-    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-tmp/. /mnt/etc/")
-    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/. /mnt/.snapshots/rootfs/snapshot-tmp/boot/")
-    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/. /mnt/.snapshots/rootfs/snapshot-tmp/etc/")
+    os.system(f"sudo mount {args[1]} -o subvol=@etc{distro_suffix},compress=zstd,noatime /mnt/.snapshots/etc/etc-deploy")
+    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-deploy/. /mnt/etc/")
+    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/boot/boot-0/. /mnt/.snapshots/rootfs/snapshot-deploy/boot/")
+    os.system("sudo cp --reflink=auto -r /mnt/.snapshots/etc/etc-0/. /mnt/.snapshots/rootfs/snapshot-deploy/etc/")
 
 #   Unmount everything and finish
     os.system("sudo umount --recursive /mnt")
@@ -242,6 +243,6 @@ def main(args, distro):
     os.system(f"sudo btrfs sub del /mnt/@{distro_suffix}")
     os.system("sudo umount --recursive /mnt")
     clear()
-    print("Installation complete")
+    print("Installation complete!")
     print("You can reboot now :)")
 
