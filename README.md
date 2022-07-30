@@ -18,10 +18,10 @@
   * [Saving configuration changes made in /etc persistent](https://github.com/ashos/ashos#saving-configuration-changes-made-in-etc-persistent)
   * [Configuring dual boot](https://github.com/ashos/ashos#dual-boot)
   * [Updating ast itself](https://github.com/ashos/ashos#updating-ast-itself)
-  * [Debugging ast](https://github.com/ashos/ashos#debugging-ast)
 * [Advanced features](https://github.com/ashos/ashos#advanced-features)
   * [LUKS](https://github.com/ashos/ashos#luks)
   * [Mutability toggle](https://github.com/ashos/ashos#mutability-toggle)
+  * [Debugging ast](https://github.com/ashos/ashos#debugging-ast)
 * [Known bugs](https://github.com/ashos/ashos#known-bugs)
 * [Contributing](https://github.com/ashos/ashos#contributing)
 * [Community](https://github.com/ashos/ashos#community)
@@ -378,15 +378,6 @@ ast deploy <snapshot>
 ast ast-sync
 ```
 
-#### Debugging ast
-
-- sometimes it may be necessary to debug ast
-- the following command is useful as it shows outputs of commands when running astpk.py:
-
-```
-sed -e 's| >/dev/null 2>&1||g' /usr/bin/ash > ashpk.py
-```
-
 ## Advanced features
 
 These are some advanced feature and we suggest you use them only if you are ready for breakage, doing data backups and occasional fixes. They may not be prime-time ready.
@@ -399,6 +390,15 @@ Full-disk encryption using LUKS2 is implemented. This means also encrypting /boo
 
 The beauty of customizability of AshOS is that we can have a mix of immutable and non-immutable nodes!
 Within the forest/tree of AshOS, one can make any snapshot (other than base `0`) mutable. For instance, to make node 9 mutable run `sudo ast immen 9`. This makes a node and any children (that are created afterwards) mutable.
+
+#### Debugging ast
+
+- sometimes it may be necessary to debug ast
+- the following command is useful as it shows outputs of commands when running astpk.py:
+
+```
+sed -e 's| >/dev/null 2>&1||g' /usr/bin/ash > ashpk.py
+```
 
 ## Known bugs
 
