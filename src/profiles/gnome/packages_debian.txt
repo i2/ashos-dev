@@ -1,4 +1,3 @@
-### Arch Linux gnome debloated -----
 gnome-shell
 gnome-terminal
 gnome-tweak-tool
@@ -6,7 +5,6 @@ gnome-control-center
 xdg-user-dirs
 gdm
 gnome-keyring
-networkmanager
+network-manager
 ### iwd even better
-### gnome-shell-extension-pop-shell-bin (from aur)
 
