@@ -11,8 +11,4 @@ alphabet order:
         /.snapshots/etc
         /.snapshots/etc
         
-Add . at end of sentences with "F: xyz"
-
-immen -> enimm
-
 +19024121918

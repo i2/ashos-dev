@@ -413,7 +413,8 @@ sudo chmod 666 /var/run/docker.sock
 * If you run into any issues, report them on [the issues page](https://github.com/ashos/ashos/issues)
 
 # Contributing
-* Code and documentation contributions are welcome
+* Please take a look under `/src/profiles/` and add a desktop environment or windows manager if missing. Please try to be as minimal and vanilla as possible. If a package has different names in different distros (like networkmanager in Arch and network-manager in Debian, create a file with the distro suffix for the profile i.e. under gnome: packages-arch.txt vs. packages-debian.txt
+* Code and documentation contributions are welcome!
 * Bug reports are a good way of contributing to the project too
 * Before submitting a pull request test your code and make sure to comment it properly
 
@@ -427,5 +428,5 @@ sudo chmod 666 /var/run/docker.sock
 
 ---
 
-**Project is licensed under the AGPLv3 license**
+**This project is licensed under the AGPLv3.**
 

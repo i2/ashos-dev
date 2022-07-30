@@ -190,7 +190,7 @@ def get_tmp():
 #   Deploy snapshot
 def deploy(snapshot):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
-        print(f"F: cannot deploy as snapshot {snapshot} doesn't exist.")
+        print(f"F: Cannot deploy as snapshot {snapshot} doesn't exist.")
     else:
         update_boot(snapshot)
         tmp = get_tmp()
@@ -223,7 +223,7 @@ def deploy(snapshot):
 #   Add node to branch
 def extend_branch(snapshot, desc=""):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
-        print(f"F: cannot branch as snapshot {snapshot} doesn't exist.")
+        print(f"F: Cannot branch as snapshot {snapshot} doesn't exist.")
     else:
         if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ash/mutable"):
             immutability = ""
@@ -243,7 +243,7 @@ def extend_branch(snapshot, desc=""):
 #   Clone branch under same parent
 def clone_branch(snapshot):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
-        print(f"F: cannot clone as snapshot {snapshot} doesn't exist.")
+        print(f"F: Cannot clone as snapshot {snapshot} doesn't exist.")
     else:
         if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ash/mutable"):
             immutability = ""
@@ -264,7 +264,7 @@ def clone_branch(snapshot):
 #   Clone under specified parent
 def clone_under(snapshot, branch):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")) or (not(os.path.exists(f"/.snapshots/rootfs/snapshot-{branch}"))):
-        print(f"F: cannot clone as snapshot {snapshot} doesn't exist.")
+        print(f"F: Cannot clone as snapshot {snapshot} doesn't exist.")
     else:
         if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ash/mutable"):
             immutability = ""
@@ -299,7 +299,7 @@ def get_lock():
 #   Recursively remove package in tree
 def remove_from_tree(tree, treename, pkg):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{treename}")):
-        print(f"F: cannot update as tree {treename} doesn't exist.")
+        print(f"F: Cannot update as tree {treename} doesn't exist.")
     else:
         remove(treename, pkg)
         order = recurstree(tree, treename)
@@ -320,7 +320,7 @@ def remove_from_tree(tree, treename, pkg):
 #   Recursively run an update in tree
 def update_tree(tree, treename):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{treename}")):
-        print(f"F: cannot update as tree {treename} doesn't exist.")
+        print(f"F: Cannot update as tree {treename} doesn't exist.")
     else:
         upgrade(treename)
         order = recurstree(tree, treename)
@@ -341,7 +341,7 @@ def update_tree(tree, treename):
 #   Recursively run an update in tree
 def run_tree(tree, treename, cmd):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{treename}")):
-        print(f"F: cannot update as tree {treename} doesn't exist.")
+        print(f"F: Cannot update as tree {treename} doesn't exist.")
     else:
         prepare(treename)
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{treename} {cmd}")
@@ -359,8 +359,8 @@ def run_tree(tree, treename, cmd):
             order.remove(order[0])
             order.remove(order[0])
             if os.path.exists(f"/.snapshots/rootfs/snapshot-chr{sarg}"):
-                print(f"F: snapshot {snapshot} appears to be in use. If you're certain it's not in use clear lock with 'ash unlock {snapshot}'.")
-                print("tree command cancelled.")
+                print(f"F: Snapshot {snapshot} appears to be in use. If you're certain it's not in use clear lock with 'ash unlock {snapshot}'.")
+                print("Tree command canceled.")
                 return
             else:
                 prepare(sarg)
@@ -371,7 +371,7 @@ def run_tree(tree, treename, cmd):
 #   Sync tree and all it's snapshots
 def sync_tree(tree, treename, forceOffline):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{treename}")):
-        print(f"F: cannot sync as tree {treename} doesn't exist.")
+        print(f"F: Cannot sync as tree {treename} doesn't exist.")
     else:
         if not forceOffline: # Syncing tree automatically updates it, unless 'force-sync' is used
             update_tree(tree, treename)
@@ -388,8 +388,8 @@ def sync_tree(tree, treename, forceOffline):
             order.remove(order[0])
             order.remove(order[0])
             if os.path.exists(f"/.snapshots/rootfs/snapshot-chr{sarg}"):
-                print(f"F: snapshot {snapshot} appears to be in use. If you're certain it's not in use clear lock with 'ash unlock {snapshot}'.")
-                print("tree sync cancelled.")
+                print(f"F: Snapshot {snapshot} appears to be in use. If you're certain it's not in use clear lock with 'ash unlock {snapshot}'.")
+                print("Tree sync canceled.")
                 return
             else:
                 prepare(sarg)
@@ -401,7 +401,7 @@ def sync_tree(tree, treename, forceOffline):
 #   Clone tree
 def clone_as_tree(snapshot):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
-        print(f"F: cannot clone as snapshot {snapshot} doesn't exist.")
+        print(f"F: Cannot clone as snapshot {snapshot} doesn't exist.")
     else:
         if os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}/usr/share/ash/mutable"):
             immutability = ""
@@ -449,7 +449,7 @@ def update_etc():
 #   Update boot
 def update_boot(snapshot):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
-        print(f"F: cannot update boot as snapshot {snapshot} doesn't exist.")
+        print(f"F: Cannot update boot as snapshot {snapshot} doesn't exist.")
     else:
         tmp = get_tmp()
         part = get_part()
@@ -464,11 +464,11 @@ def update_boot(snapshot):
 #   Chroot into snapshot
 def chroot(snapshot):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
-        print(f"F: cannot chroot as snapshot {snapshot} doesn't exist.")
+        print(f"F: Cannot chroot as snapshot {snapshot} doesn't exist.")
     elif snapshot == "0":
-        print("F: changing base snapshot is not allowed.")
+        print("F: Changing base snapshot is not allowed.")
     elif os.path.exists(f"/.snapshots/rootfs/snapshot-chr{snapshot}"): # Make sure snapshot is not in use by another ash process
-        print(f"F: snapshot {snapshot} appears to be in use. If you're certain it's not in use clear lock with 'ash unlock {snapshot}'.")
+        print(f"F: Snapshot {snapshot} appears to be in use. If you're certain it's not in use clear lock with 'ash unlock {snapshot}'.")
     else:
         prepare(snapshot)
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot}")
@@ -477,11 +477,11 @@ def chroot(snapshot):
 #   Run command in snapshot
 def chrrun(snapshot, cmd):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
-        print(f"F: cannot chroot as snapshot {snapshot} doesn't exist.")
+        print(f"F: Cannot chroot as snapshot {snapshot} doesn't exist.")
     elif snapshot == "0":
-        print("F: changing base snapshot is not allowed.")
+        print("F: Changing base snapshot is not allowed.")
     elif os.path.exists(f"/.snapshots/rootfs/snapshot-chr{snapshot}"): # Make sure snapshot is not in use by another ash process
-        print(f"F: snapshot {snapshot} appears to be in use. If you're certain it's not in use clear lock with 'ash unlock {snapshot}'.")
+        print(f"F: Snapshot {snapshot} appears to be in use. If you're certain it's not in use, clear lock with 'ash unlock {snapshot}'.")
     else:
         prepare(snapshot)
         os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} {cmd}")
@@ -535,11 +535,11 @@ def live_unlock():
 #   Install packages
 def install(snapshot, pkg):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
-        print(f"F: cannot install as snapshot {snapshot} doesn't exist.")
+        print(f"F: Cannot install as snapshot {snapshot} doesn't exist.")
     elif snapshot == "0":
-        print("F: changing base snapshot is not allowed.")
+        print("F: Changing base snapshot is not allowed.")
     elif os.path.exists(f"/.snapshots/rootfs/snapshot-chr{snapshot}"): # Make sure snapshot is not in use by another ash process
-        print(f"F: snapshot {snapshot} appears to be in use. If you're certain it's not in use clear lock with 'ash unlock {snapshot}'.")
+        print(f"F: Snapshot {snapshot} appears to be in use. If you're certain it's not in use clear lock with 'ash unlock {snapshot}'.")
     else:
         prepare(snapshot)
         excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} pacman -S {pkg} --overwrite '/var/*'"))
@@ -548,7 +548,7 @@ def install(snapshot, pkg):
             print(f"Package {pkg} installed in snapshot {snapshot} successfully.")
         else:
             unchr(snapshot)
-            print("F: install failed and changes discarded.")
+            print("F: Install failed and changes discarded.")
 
 #   Install from a text file
 def install_profile(snapshot, profile):
@@ -557,11 +557,11 @@ def install_profile(snapshot, profile):
 #   Remove packages
 def remove(snapshot, pkg):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
-        print(f"F: cannot remove as snapshot {snapshot} doesn't exist.")
+        print(f"F: Cannot remove as snapshot {snapshot} doesn't exist.")
     elif snapshot == "0":
-        print("F: changing base snapshot is not allowed.")
+        print("F: Changing base snapshot is not allowed.")
     elif os.path.exists(f"/.snapshots/rootfs/snapshot-chr{snapshot}"):
-        print(f"F: snapshot {snapshot} appears to be in use. If you're certain it's not in use clear lock with 'ash unlock {snapshot}'.")
+        print(f"F: Snapshot {snapshot} appears to be in use. If you're certain it's not in use clear lock with 'ash unlock {snapshot}'.")
     else:
         prepare(snapshot)
         excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} pacman --noconfirm -Rns {pkg}"))
@@ -570,7 +570,7 @@ def remove(snapshot, pkg):
             print(f"Package {pkg} removed from snapshot {snapshot} successfully.")
         else:
             unchr(snapshot)
-            print("F: remove failed and changes discarded.")
+            print("F: Remove failed and changes discarded.")
 
 #   Delete tree or branch
 def delete(snapshot):
@@ -581,9 +581,9 @@ def delete(snapshot):
         print("Aborted")
         run = False
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
-        print(f"F: cannot delete as snapshot {snapshot} doesn't exist.")
+        print(f"F: Cannot delete as snapshot {snapshot} doesn't exist.")
     elif snapshot == "0":
-        print("F: changing base snapshot is not allowed.")
+        print("F: Changing base snapshot is not allowed.")
     elif run == True:
         children = return_children(fstree, snapshot)
         os.system(f"btrfs sub del /.snapshots/boot/boot-{snapshot} >/dev/null 2>&1")
@@ -601,7 +601,7 @@ def delete(snapshot):
 def update_base():
     snapshot = "0"
     if os.path.exists(f"/.snapshots/rootfs/snapshot-chr{snapshot}"):
-        print(f"F: snapshot {snapshot} appears to be in use. If you're certain it's not in use clear lock with 'ash unlock {snapshot}'.")
+        print(f"F: Snapshot {snapshot} appears to be in use. If you're certain it's not in use clear lock with 'ash unlock {snapshot}'.")
     else:
         prepare(snapshot)
         excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} pacman -Syyu"))
@@ -610,7 +610,7 @@ def update_base():
             print(f"Snapshot {snapshot} upgraded successfully.")
         else:
             unchr(snapshot)
-            print("F: upgrade failed and changes discarded.")
+            print("F: Upgrade failed and changes discarded.")
 
 #   Prepare snapshot to chroot dir to install or chroot into
 def prepare(snapshot):
@@ -672,11 +672,11 @@ def posttrans(snapshot):
 #   Upgrade snapshot
 def upgrade(snapshot):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
-        print(f"F: cannot upgrade as snapshot {snapshot} doesn't exist.")
+        print(f"F: Cannot upgrade as snapshot {snapshot} doesn't exist.")
     elif snapshot == "0":
-        print("F: changing base snapshot is not allowed.")
+        print("F: Changing base snapshot is not allowed.")
     elif os.path.exists(f"/.snapshots/rootfs/snapshot-chr{snapshot}"):
-        print(f"F: snapshot {snapshot} appears to be in use. If you're certain it's not in use clear lock with 'ash unlock {snapshot}'.")
+        print(f"F: Snapshot {snapshot} appears to be in use. If you're certain it's not in use clear lock with 'ash unlock {snapshot}'.")
     else:
         prepare(snapshot)
         excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} pacman -Syyu")) # Default upgrade behaviour is now "safe" update, meaning failed updates get fully discarded
@@ -685,16 +685,16 @@ def upgrade(snapshot):
             print(f"Snapshot {snapshot} upgraded successfully.")
         else:
             unchr(snapshot)
-            print("F: upgrade failed and changes discarded.")
+            print("F: Upgrade failed and changes discarded.")
 
 #   Refresh snapshot
 def refresh(snapshot):
     if not (os.path.exists(f"/.snapshots/rootfs/snapshot-{snapshot}")):
-        print(f"F: cannot refresh as snapshot {snapshot} doesn't exist.")
+        print(f"F: Cannot refresh as snapshot {snapshot} doesn't exist.")
     elif snapshot == "0":
-        print("F: changing base snapshot is not allowed.")
+        print("F: Changing base snapshot is not allowed.")
     elif os.path.exists(f"/.snapshots/rootfs/snapshot-chr{snapshot}"):
-        print(f"F: snapshot {snapshot} appears to be in use. If you're certain it's not in use clear lock with 'ash unlock {snapshot}'.")
+        print(f"F: Snapshot {snapshot} appears to be in use. If you're certain it's not in use clear lock with 'ash unlock {snapshot}'.")
     else:
         prepare(snapshot)
         excode = str(os.system(f"chroot /.snapshots/rootfs/snapshot-chr{snapshot} pacman -Syy"))
@@ -703,7 +703,7 @@ def refresh(snapshot):
             print(f"Snapshot {snapshot} refreshed successfully.")
         else:
             unchr(snapshot)
-            print("F: refresh failed and changes discarded.")
+            print("F: Refresh failed and changes discarded.")
 
 #   Noninteractive update
 def autoupgrade(snapshot):
@@ -838,7 +838,7 @@ def snapshot_unlock(snap):
 
 #   Show some basic ash commands
 def ash_help():
-    print("all ash commands, aside from 'ash tree' must be used with root permissions!")
+    print("All ash commands, aside from 'ash tree' must be used with root permissions!")
     print("\n\ntree manipulation commands:")
     print("\ttree - show the snapshot tree")
     print("\tdiff <snapshot 1> <snapshot 2> - show package diff between snapshots")
@@ -875,9 +875,9 @@ def ash_update():
     if int(excode) == 0:
         os.system("cp ./ashpk.py /.snapshots/ash/ash")
         os.system("chmod +x /.snapshots/ash/ash")
-        print("ash updated succesfully.")
+        print("Ash updated successfully.")
     else:
-        print("F: failed to download ash")
+        print("F: Failed to download ash.")
     os.chdir(cdir)
 
 # Clear all temporary snapshots
@@ -926,7 +926,7 @@ def main(args):
     if isChroot == True and ("--chroot" not in args):
         print("Please don't use ash inside a chroot!")
     elif lock == True:
-        print("ash is locked. To manually unlock, run 'rm -rf /var/lib/ash/lock'.")
+        print("Ash is locked. To manually unlock, run 'rm -rf /var/lib/ash/lock'.")
     elif arg == "new-tree" or arg == "new":
         args_2 = args
         args_2.remove(args_2[0])

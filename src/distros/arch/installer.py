@@ -15,8 +15,8 @@ def to_uuid(part):
 def get_multiboot(dist):
     clear()
     while True:
-        print("Please choose one of the following:\n1. Single OS installation\n2. Initiate a multi-boot ashos setup\n3. Adding to an already installed ashos")
-        print("Please be aware choosing option 1 and 2 will wipe root partition")
+        print("Please choose one of the following:\n1. Single OS installation\n2. Initiate a multi-boot ashos setup\n3. Adding to an already installed ashos.")
+        print("Please be aware choosing option 1 and 2 will wipe root partition.")
         i = input("> ")
         if i == "1":
             return i, ""
@@ -61,7 +61,7 @@ def get_timezone():
 def get_username():
     clear()
     while True:
-        print("Enter username (all lowercase, max 8 letters)")
+        print("Enter username (all lowercase):")
         u = input("> ")
         if u:
             print("Happy with your username? (y/n)")
@@ -138,7 +138,7 @@ def main(args, distro):
         print("--- Create LUKS partition --- ")
         os.system(f"sudo cryptsetup -y -v -c aes-xts-plain64 -s 512 --hash sha512 --pbkdf pbkdf2 --type luks2 luksFormat {args[1]}")
         print("--- Open LUKS partition --- ")
-        os.system(f"cryptsetup --allow-discards --persistent --type luks2 open {args[1]} luks_root")
+        os.system(f"sudo cryptsetup --allow-discards --persistent --type luks2 open {args[1]} luks_root")
     if choice != "3":
         os.system(f"sudo mkfs.btrfs -L LINUX -f {btrfs_root}")
     os.system("pacman -Syy --noconfirm archlinux-keyring")
@@ -293,6 +293,6 @@ def main(args, distro):
         #os.system("sudo udevadm settle")
         os.system("sudo cryptsetup close luks_root")
     clear()
-    print("Installation complete")
+    print("Installation complete!")
     print("You can reboot now :)")
 
