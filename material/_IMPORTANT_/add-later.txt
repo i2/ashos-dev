@@ -798,3 +798,25 @@ https://wiki.archlinux.org/title/dm-crypt/Encrypting_an_entire_system#LUKS_on_a_
 ----------------------------------------------------------------------
 
 https://pubs.opengroup.org/onlinepubs/009604599/utilities/sed.html
+
+
+
+
+---------------------------------- Debian ----------------------------
+https://gist.github.com/Tookmund/abfc4cbd803915264e0c
+----------------------------------------------------------------------
+
+
+---------------------------------- LVM ----------------------------
+https://gist.github.com/OdinsPlasmaRifle/e16700b83624ff44316f87d9cdbb5c94
+https://gist.github.com/lambroisie/93ff32ccf59f4b322148cc436bdee434
+https://gist.github.com/thecatwasnot/ad9fc24ce1e5e44018ed8389b1f29016
+https://gist.github.com/hightemp/22d5da40ee2e4467403db5f2ff889216
+https://gist.github.com/ahoneybun/e96db89fbe5f5b4e269ca935aba54420
+https://gist.github.com/nhumrich/67f6f13ae88eaabaa219953d41c5bf9d
+----------------------------------------------------------------------
+
+
+---------------------------------- Veracrypt ----------------------------
+https://forums.linuxmint.com/viewtopic.php?t=273185
+----------------------------------------------------------------------

@@ -25,6 +25,7 @@
 * [Known bugs](https://github.com/ashos/ashos#known-bugs)
 * [Contributing](https://github.com/ashos/ashos#contributing)
 * [Community](https://github.com/ashos/ashos#community)
+* [ToDos](https://github.com/ashos/ashos#todos)
 
 ---
 
@@ -32,7 +33,7 @@
 
 AshOS is a modern meta-distribution that:
 - aims to bring immutability even to distros that do not have this very useful feature i.e. Arch Linux, Gentoo, etc.
-- wraps around any Linux distribution that can be debootstrapped, and that is pretty much any major distribution
+- wraps around any Linux distribution that can be bootstrapped (pretty much any major distribution)
 
 It was initially inspired by Arch Linux, but it uses an immutable (read-only) root filesystem.
 Software is installed and configured into individual snapshot trees, which can then be deployed and booted into.
@@ -63,10 +64,12 @@ Ashes are one of the oldest trees in the world and they inspired naming AshOS.
 
 As AshOS strives to be minimal solid and follow a LEGO like structure (start small, customize as you go), we primarily focus development on the base, meaning by default no Desktop Environment (not even Window Manager) is installed. This is by design as otherwise team has to support many DEs on many distros. What is provided is `profiles`. As DEs/WMs are just packages, with power of snapshotting, one can use ast to install the desired DE/WM.
 For instance to install GNOME in snapshot 1:
-```sudo ast clone 0
+```
+sudo ast clone 0
 sudo ast install-profile gnome 1
 sudo ast deploy 1
-sudo reboot```
+sudo reboot
+```
 
 ---
 ## AshOS compared to other similar distributions
