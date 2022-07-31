@@ -949,8 +949,22 @@ def main(args):
     elif arg == "install" or (arg == "in") and (lock != True):
         ash_lock()
         args_2 = args
+        input(">")
+        print"args_2")
+        print(args_2)
         args_2.remove(args_2[0])
+        input(">")
+        print("args_2[[0]")
+        print(args_2[[0])
+        print"args_2")
+        print(args_2)
         args_2.remove(args_2[0])
+        input(">")
+        print("args_2[[0]")
+        print(args_2[[0])
+        print"args_2")
+        print(args_2)
+        input(">")
         live = False
         if args_2[0] == "--live":
             args_2.remove(args_2[0])

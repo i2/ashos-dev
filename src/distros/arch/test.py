@@ -6,6 +6,12 @@ import re
 import subprocess
 import sys
 
+from anytree.importer import DictImporter
+from anytree.exporter import DictExporter
+import anytree
+args = list(sys.argv)
+distro = "arch"
+
 # Directories
 # All snapshots share one /var
 # global boot is always at @boot
@@ -162,22 +168,6 @@ def recurstree(tree, cid):
             order.append(par)
             order.append(child)
     return (order)
-
-#   Get current snapshot
-def get_snapshot():
-    csnapshot = open("/usr/share/ash/snap", "r")
-    snapshot = csnapshot.readline()
-    csnapshot.close()
-    snapshot = snapshot.replace('\n', "")
-    return(snapshot)
-
-#   Get drive partition
-def get_part():
-    cpart = open("/.snapshots/ash/part", "r")
-    uuid = cpart.readline().replace('\n', "")
-    cpart.close()
-    part = str(subprocess.check_output(f"blkid | grep '{uuid}' | awk '{{print $1}}'", shell=True))
-    return(part.replace(":", "").replace("b'", "").replace("\\n'", ""))
 
 #   Get tmp partition state
 def get_tmp():
@@ -913,7 +903,6 @@ def findnew():
 
 #   Main function
 def main(args):
-    snapshot = get_snapshot() # Get current snapshot
     importer = DictImporter() # Dict importer
     isChroot = chroot_check()
     lock = get_lock() # True = locked
@@ -1092,12 +1081,6 @@ def main(args):
     else:
         print("Operation not found.")
 
-#   Call main
-if __name__ == "__main__":
-    from anytree.importer import DictImporter
-    from anytree.exporter import DictExporter
-    import anytree
-    args = list(sys.argv)
-    distro = subprocess.check_output(['sh', '/usr/bin/detect_os.sh']).decode('utf-8').replace('"', "").strip()
-    main(args)
+
+main(args)
 

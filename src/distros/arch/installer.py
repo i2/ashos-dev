@@ -117,7 +117,7 @@ def main(args, distro):
     isLUKS = get_luks()
     tz = get_timezone()
 #    hostname = get_hostname()
-    hostname = subprocess.check_output(f"git rev-parse --short HEAD", shell=True).decode('utf-8').strip() # Just for debugging
+    hostname = subprocess.check_output("git rev-parse --short HEAD", shell=True).decode('utf-8').strip() # Just for debugging
     if os.path.exists("/sys/firmware/efi"):
         efi = True
     else:
@@ -198,7 +198,7 @@ def main(args, distro):
     os.system("sudo mkdir -p /mnt/usr/share/ash/db")
     os.system("echo '0' | sudo tee /mnt/usr/share/ash/snap")
     os.system("sudo cp -r /mnt/var/lib/pacman/. /mnt/usr/share/ash/db/")
-    os.system(f"sed -i 's|[#?]DBPath.*$|DBPath       = /usr/share/ash/db/|g' /mnt/etc/pacman.conf")
+    os.system("sed -i 's|[#?]DBPath.*$|DBPath       = /usr/share/ash/db/|g' /mnt/etc/pacman.conf")
     os.system(f"sudo sed -i '/^ID/ s|{distro}|{distro}_ashos|' /mnt/etc/os-release") # Modify OS release information (optional)
 
 #   Update hostname, hosts, locales and timezone, hosts
