@@ -54,6 +54,7 @@ def immutability_enable(snapshot):
 
 #   This function returns either empty string or underscore plus name of distro if it was appended to sub-volume names to distinguish
 def get_distro_suffix():
+    distro = subprocess.check_output(['sh', '/usr/bin/detect_os.sh']).decode('utf-8').replace('"', "").strip()
     if "ashos" in distro:
         return f'_{distro.replace("_ashos", "")}'
     else:
@@ -552,9 +553,7 @@ def install(snapshot, pkg):
             print("F: Install failed and changes discarded.")
 
 #   Install a profile from a text file
-def install_profile(snapshot, profile, path="", dist):
-    if dist != "":
-        dist=get_distro_suffix()
+def install_profile(snapshot, profile, path="", dist=get_distro_suffix()):
     if not os.path.isfile(f"$HOME/ashos/src/profiles/{profile}/packages{dist}.txt") and path == "":
         os.system(f"curl -o /tmp/ -LO https://github.com/i2/ashos-dev/blob/debian/src/profiles/{profile}/packages{dist}.txt")
         install(snapshot, subprocess.check_output(f"cat /tmp/packages{dist}.txt | grep -E -v '^#|^$'", shell=True).decode('utf-8').replace('\n', ' '))
@@ -1100,6 +1099,6 @@ if __name__ == "__main__":
     from anytree.exporter import DictExporter
     import anytree
     args = list(sys.argv)
-    distro = subprocess.check_output(['sh', '/usr/bin/detect_os.sh']).decode('utf-8').replace('"', "").strip()
+###    distro = subprocess.check_output(['sh', '/usr/bin/detect_os.sh']).decode('utf-8').replace('"', "").strip()
     main(args)
 
