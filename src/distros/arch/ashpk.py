@@ -552,8 +552,9 @@ def install(snapshot, pkg):
             print("F: Install failed and changes discarded.")
 
 #   Install a profile from a text file
-def install_profile(snapshot, profile, path=""):
-    dist=get_distro_suffix()
+def install_profile(snapshot, profile, path="", dist):
+    if dist != "":
+        dist=get_distro_suffix()
     if not os.path.isfile(f"$HOME/ashos/src/profiles/{profile}/packages{dist}.txt") and path == "":
         os.system(f"curl -o /tmp/ -LO https://github.com/i2/ashos-dev/blob/debian/src/profiles/{profile}/packages{dist}.txt")
         install(snapshot, subprocess.check_output(f"cat /tmp/packages{dist}.txt | grep -E -v '^#|^$'", shell=True).decode('utf-8').replace('\n', ' '))
