@@ -1,3 +1,6 @@
+Add pacman nuke_db functionality to ash
+
+
 QubesOS+btrfs in ashos?
 
 tmp <-> deploy but I didn't change {tmp} variable
